@@ -4,45 +4,97 @@
 
 A comprehensive Flutter application for tracking Islamic daily practices (Amal) including prayer times, dhikr counters, daily checklists, Quran/Hadith reading, and detailed analytics—fully in Bangla.
 
-## Features
+![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)
+![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)
+![License](https://img.shields.io/badge/License-Proprietary-red.svg)
 
-### ✅ Completed Features
-- **Project Foundation**
-  - Clean Architecture structure (Data, Domain, Presentation layers)
-  - Hive 4.x local database with cloud-ready data models
-  - Versioned models with sync metadata for future cloud backup
-  - Professional Bangla UI theme (Golden/Teal colors)
-  - Full Bangla localization support
+## ✨ Features
 
-- **Prayer Times**
-  - Islamic Foundation Bangladesh calculation method (Fajr: 18.5°, Isha: 17.5°)
-  - Hanafi madhab support for accurate Asr timing
-  - Manual time adjustments (+/- minutes per prayer)
-  - Detailed rakat tracking (Fajr: 2S+2F, Dhuhr: 4S+4F+2S, Asr: 4F, Maghrib: 3F+2S, Isha: 4F+2S+3W)
+### 🕌 নামাজ ট্র্যাকার (Prayer Tracker)
+- Real-time prayer times based on GPS location
+- Islamic Foundation Bangladesh calculation method
+- Hanafi madhab support for accurate Asr timing
+- Complete rakat tracking (Fard, Sunnah, Nafl, Witr)
+- Individual prayer completion with checkboxes
+- Prayer time countdown to next Salah
+- Automatic daily reset
 
-- **Permissions & Notifications**
-  - Location permission for accurate prayer times
-  - Notification permission (Android 13+ support)
-  - Prayer reminders 15-30 minutes before each Salah
-  - Custom reminders for any task
+### 📿 যিকির কাউন্টার (Dhikr Counter)
+- Default dhikr list with Arabic text
+- Customizable target counts (33, 100, etc.)
+- Haptic feedback on tap
+- Visual progress indicators
+- Add custom dhikr items
+- Daily statistics tracking
 
-- **Data Models**
-  - `PrayerRecord` - Daily prayer tracking with rakat counts
-  - `DhikrSession` - Dhikr counter with session history
-  - `AmalCategory` - Customizable daily Amal categories
-  - `ReadingProgress` - Quran/Tafsir/Hadith reading tracker
-  - `DailyStats` - Comprehensive daily statistics
-  - `AppSettings` - User preferences and configuration
+### ✅ প্রতিদিনের আমল (Daily Amal Checklist)
+- Pre-configured daily Islamic tasks:
+  - মিসওয়াক (6 times daily)
+  - নামাজের পর আযকার (5 times)
+  - দৈনিক সূরা (ইয়াসিন, ওয়াকিয়া, মুলক)
+  - সকাল-সন্ধ্যার দোয়া
+- Category-wise organization
+- Completion tracking with timestamps
+- Add custom items
 
-### 🚧 In Progress
-- Prayer tracker UI
-- Dhikr counter interface
-- Daily Amal checklist
-- Reading tracker
-- Home dashboard
-- Analytics & history
+### 📖 পড়াশোনা ট্র্যাকার (Reading Tracker)
+- Track Quran, Tafsir, and Hadith reading
+- Session-based logging with duration
+- Surah/Ayah tracking for Quran
+- Page/chapter tracking for books
+- Daily reading goals (minutes)
+- Progress visualization
 
-## Project Structure
+### 📊 পরিসংখ্যান (Statistics & Analytics)
+- **Weekly View**:
+  - 7-day bar chart with dynamic day labels
+  - Category-wise progress (নামাজ, আমল, যিকির, পড়াশোনা)
+  - Weekly summary with totals
+- **Monthly View**:
+  - Interactive calendar with color-coded days
+  - Click any date to see detailed breakdown
+  - Monthly progress chart
+  - Monthly summary statistics
+- **Streak Tracking**:
+  - Current streak counter
+  - Best streak record
+  - Perfect day indicators (80%+ completion)
+
+### 🏠 হোম ড্যাশবোর্ড (Home Dashboard)
+- Greeting card with date in Bengali
+- Real-time prayer times display
+- Next prayer countdown
+- Today's progress section with:
+  - Overall completion percentage
+  - Animated progress bar
+  - Dynamic color based on progress
+  - Motivational messages
+- Quick access cards to all features
+
+### 🔔 নোটিফিকেশন (Notifications)
+- Prayer time reminders (15-30 mins before)
+- Custom reminder scheduler
+- Time-based notifications
+- Android 13+ notification permission support
+
+### ⚙️ সেটিংস (Settings)
+- Notification preferences per prayer
+- Custom reminder management
+- Prayer time adjustments (+/- minutes)
+- Theme customization
+
+## 🎨 Design
+
+- **Theme**: Dark mode with Gold (#D4AF37) accent
+- **Font**: Hind Siliguri (Bengali)
+- **Colors**:
+  - Background: #0A0A0A, #1A1A1A
+  - Primary: #D4AF37 (Gold)
+  - Success: #4CAF50
+  - Warning: #FF9800
+  - Error: #E57373
+
+## 📁 Project Structure
 
 ```
 lib/
@@ -55,39 +107,102 @@ lib/
 │   ├── local/
 │   │   └── hive_service.dart
 │   ├── models/
-│   │   ├── prayer_record.dart
-│   │   ├── dhikr_session.dart
-│   │   ├── amal_category.dart
-│   │   ├── reading_progress.dart
-│   │   ├── daily_stats.dart
-│   │   └── app_settings.dart
+│   │   ├── prayer_tracking_model.dart
+│   │   ├── dhikr_counter_model.dart
+│   │   ├── daily_amal_model.dart
+│   │   ├── reading_tracker_model.dart
+│   │   └── statistics_model.dart
 │   └── services/
 │       ├── prayer_time_service.dart
 │       ├── permission_service.dart
 │       └── notification_service.dart
-├── domain/
-│   └── (Business logic - TBD)
 ├── presentation/
+│   ├── providers/
+│   │   ├── prayer_times_provider.dart
+│   │   ├── prayer_tracking_provider.dart
+│   │   ├── daily_amal_provider.dart
+│   │   ├── dhikr_counter_provider.dart
+│   │   ├── reading_tracker_provider.dart
+│   │   ├── statistics_provider.dart
+│   │   ├── notification_settings_provider.dart
+│   │   └── custom_reminders_provider.dart
 │   ├── screens/
-│   │   └── splash/
+│   │   ├── home/
+│   │   │   └── home_screen.dart
+│   │   ├── prayer/
+│   │   │   └── prayer_tracker_screen.dart
+│   │   ├── dhikr/
+│   │   │   └── dhikr_counter_screen.dart
+│   │   ├── daily_amal/
+│   │   │   └── daily_amal_screen.dart
+│   │   ├── reading/
+│   │   │   └── reading_tracker_screen.dart
+│   │   ├── statistics/
+│   │   │   ├── statistics_screen.dart
+│   │   │   └── widgets/
+│   │   │       ├── streak_card.dart
+│   │   │       ├── tab_selector.dart
+│   │   │       ├── weekly_progress_chart.dart
+│   │   │       ├── monthly_calendar_view.dart
+│   │   │       ├── category_progress_section.dart
+│   │   │       ├── weekly_summary_section.dart
+│   │   │       └── day_details_sheet.dart
+│   │   ├── settings/
+│   │   │   └── settings_screen.dart
+│   │   └── notifications/
+│   │       └── reminders_screen.dart
 │   └── widgets/
-│       └── (Reusable widgets - TBD)
 └── main.dart
 ```
 
-## Setup Instructions
+## 🛠️ Tech Stack
+
+### Core
+- **Flutter** 3.0+ - Cross-platform framework
+- **Dart** 3.0+ - Programming language
+- **Riverpod** 2.5+ - State management
+
+### Storage
+- **Hive** 4.x - Local NoSQL database
+- **Shared Preferences** - Simple key-value storage
+
+### Prayer Times
+- **adhan_dart** - Islamic prayer time calculations
+- **geolocator** - GPS location services
+
+### Notifications
+- **flutter_local_notifications** - Local push notifications
+- **timezone** - Timezone support
+
+### UI/UX
+- **fl_chart** - Beautiful charts
+- **Google Fonts** - Bangla typography
+- **shimmer** - Loading animations
+
+## 📱 Screenshots
+
+| হোম | নামাজ | যিকির |
+|-----|-------|-------|
+| Home Dashboard | Prayer Tracker | Dhikr Counter |
+
+| পরিসংখ্যান (সাপ্তাহিক) | পরিসংখ্যান (মাসিক) |
+|------------------------|-------------------|
+| Weekly Statistics | Monthly Calendar |
+
+## 🚀 Installation
 
 ### Prerequisites
-- Flutter SDK 3.0.0 or higher
-- Dart SDK 3.0.0 or higher
+- Flutter SDK 3.0.0+
+- Dart SDK 3.0.0+
 - Android Studio / VS Code
-- Android device/emulator (API 21+) or iOS device/simulator
+- Android device (API 21+) or iOS device
 
-### Installation
+### Steps
 
 1. **Clone the repository**
    ```bash
-   cd "d:\work\app development\amal-tracker"
+   git clone https://github.com/your-repo/amal-tracker.git
+   cd amal-tracker
    ```
 
 2. **Install dependencies**
@@ -95,89 +210,63 @@ lib/
    flutter pub get
    ```
 
-3. **Download Bangla font**
-   - Download "Hind Siliguri" font from Google Fonts
-   - Place font files in `assets/fonts/`:
-     - `HindSiliguri-Regular.ttf`
-     - `HindSiliguri-Bold.ttf`
-
-4. **Add app icon**
-   - Place app icon in `assets/images/`
-   - Update `@mipmap/ic_launcher` in notification service
-
-5. **Run the app**
+3. **Run the app**
    ```bash
    flutter run
    ```
 
-## Dependencies
+4. **Build APK**
+   ```bash
+   flutter build apk --release
+   ```
 
-### Core
-- `flutter_riverpod: ^2.5.1` - State management
-- `hive: ^4.0.0-dev.2` - Local NoSQL database
-- `easy_localization: ^3.0.7` - Internationalization
-
-### Prayer & Location
-- `adhan_dart: ^2.0.0` - Prayer time calculations
-- `permission_handler: ^11.3.1` - Runtime permissions
-
-### Notifications
-- `flutter_local_notifications: ^17.2.2` - Local notifications
-- `timezone: ^0.9.4` - Timezone support
-
-### UI & Charts
-- `fl_chart: ^0.69.0` - Analytics charts
-- `google_fonts: ^6.2.1` - Bangla font support
-- `shimmer: ^3.0.0` - Loading animations
-
-### Utilities
-- `uuid: ^4.5.1` - Unique ID generation
-- `path_provider: ^2.1.2` - File system paths
-- `shared_preferences: ^2.3.2` - Simple data persistence
-
-## Configuration
+## ⚙️ Configuration
 
 ### Prayer Calculation
-- **Method**: Islamic Foundation Bangladesh
-- **Fajr Angle**: 18.5°
-- **Isha Angle**: 17.5°
-- **Madhab**: Hanafi (affects Asr calculation)
+| Setting | Value |
+|---------|-------|
+| Method | Islamic Foundation Bangladesh |
+| Fajr Angle | 18.5° |
+| Isha Angle | 17.5° |
+| Madhab | Hanafi |
 
 ### Default Prayer Rakats
-- **Fajr**: 2 Sunnah + 2 Fard
-- **Dhuhr**: 4 Sunnah + 4 Fard + 2 Sunnah
-- **Asr**: 4 Fard
-- **Maghrib**: 3 Fard + 2 Sunnah
-- **Isha**: 4 Fard + 2 Sunnah + 3 Witr
+| Prayer | Rakats |
+|--------|--------|
+| ফজর | 2 সুন্নত + 2 ফরজ |
+| যোহর | 4 সুন্নত + 4 ফরজ + 2 সুন্নত + 2 নফল |
+| আসর | 4 সুন্নত + 4 ফরজ |
+| মাগরিব | 3 ফরজ + 2 সুন্নত + 2 নফল |
+| এশা | 4 সুন্নত + 4 ফরজ + 2 সুন্নত + 2 নফল + 3 বিতর |
 
-### Default Dhikr List (100x each)
-- লা ইলাহা ইল্লাল্লাহ
-- দুরূদ শরীফ
-- আস্তাগফিরুল্লাহ
-- সুবহানাল্লাহ
-- আলহামদুলিল্লাহ
-- আল্লাহু আকবার
+### Default Dhikr (100x each)
+- لا إله إلا الله (লা ইলাহা ইল্লাল্লাহ)
+- ﷺ দুরূদ শরীফ
+- أستغفر الله (আস্তাগফিরুল্লাহ)
+- سبحان الله (সুবহানাল্লাহ)
+- الحمد لله (আলহামদুলিল্লাহ)
+- الله أكبر (আল্লাহু আকবার)
+- لا حول ولا قوة إلا بالله (লা হাওলা ওয়ালা কুওয়াতা)
 
-### Daily Amal Categories
-- **Miswak**: 6 times (after each prayer + before sleep)
-- **Post-Prayer Azkar**: 5 times (after each prayer)
-- **Daily Surahs**: Yasin, Waqiah, Mulk
-- **Daily Duas**: Morning/evening duas
+## 📋 Data Persistence
 
-## Data Models
+All data is stored locally using Hive with the following boxes:
+- `prayer_tracking` - Daily prayer records
+- `dhikr_counter` - Dhikr sessions
+- `daily_amal` - Daily checklist items
+- `reading_tracker` - Reading sessions
+- `statistics` - Aggregated statistics
+- `notification_settings` - Notification preferences
+- `custom_reminders` - User-defined reminders
 
-All models include cloud-ready fields:
-- `id` (UUID)
-- `modelVersion` (for schema migrations)
-- `createdAt`, `updatedAt` (timestamps)
-- `syncStatus` (synced, pending, failed)
-- `lastSyncedAt` (last cloud sync time)
+### Data Model Features
+- Automatic JSON serialization
+- Deep conversion for Hive compatibility
+- Cloud-ready with sync metadata fields
 
-This enables future cloud backup implementation with **last-write-wins** conflict resolution strategy.
+## 🔐 Permissions
 
-## Permissions
-
-### Android (`android/app/src/main/AndroidManifest.xml`)
+### Android
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -185,49 +274,57 @@ This enables future cloud backup implementation with **last-write-wins** conflic
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<uses-permission android:name="android.permission.VIBRATE" />
 ```
 
-### iOS (`ios/Runner/Info.plist`)
+### iOS
 ```xml
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>সঠিক নামাজের সময় নির্ধারণের জন্য লোকেশন প্রয়োজন</string>
-<key>NSNotificationUsageDescription</key>
-<string>নামাজের সময় এবং রিমাইন্ডারের জন্য নোটিফিকেশন প্রয়োজন</string>
 ```
 
-## Next Steps
+## 🗓️ Roadmap
 
-1. ✅ ~~Setup project foundation~~
-2. ✅ ~~Create data models with versioning~~
-3. ✅ ~~Implement prayer time service~~
-4. ✅ ~~Add permission handlers~~
-5. ✅ ~~Setup notification service~~
-6. 🚧 Build prayer tracker UI
-7. 🚧 Implement dhikr counter
-8. 🚧 Create daily Amal checklist
-9. 🚧 Build reading tracker
-10. 🚧 Implement home widget
-11. 🚧 Add analytics & charts
-12. 🚧 Design professional UI
+### ✅ Completed
+- [x] Project foundation & architecture
+- [x] Prayer times with GPS
+- [x] Prayer tracker with rakat details
+- [x] Dhikr counter with custom items
+- [x] Daily Amal checklist
+- [x] Reading tracker (Quran/Tafsir/Hadith)
+- [x] Statistics with weekly/monthly views
+- [x] Interactive calendar
+- [x] Notifications & reminders
+- [x] Settings screen
+- [x] Data persistence with Hive
+- [x] Bengali localization
 
-## Future Features
+### 🔮 Future Features
+- [ ] Cloud backup (Firebase/Google Drive)
+- [ ] Home screen widget
+- [ ] Ramadan mode (Suhoor/Iftar, Taraweeh)
+- [ ] Achievement badges & gamification
+- [ ] Export/import data (JSON/PDF)
+- [ ] Multi-language (English, Arabic)
+- [ ] Apple Watch / WearOS support
+- [ ] Qibla compass
+- [ ] Hijri calendar integration
 
-- ☁️ Cloud backup (Firebase/Google Drive)
-- 📊 Advanced analytics & insights
-- 🌙 Ramadan mode (Suhoor/Iftar times, Taraweeh tracker)
-- 🎯 Achievement badges & streaks
-- 📤 Export/import data (JSON)
-- 🌐 Multi-language support (English, Arabic)
+## 🤝 Contributing
 
-## License
+This is a private project. For contributions, please contact the development team.
 
-Proprietary - All rights reserved
+## 📄 License
 
-## Contact
+Proprietary - All rights reserved © 2026
+
+## 📞 Contact
 
 For questions or support, please contact the development team.
 
 ---
 
-**Development Status**: In Progress (Foundation Complete)
-**Last Updated**: January 1, 2026
+**Status**: ✅ Production Ready  
+**Version**: 1.0.0  
+**Last Updated**: January 2, 2026
