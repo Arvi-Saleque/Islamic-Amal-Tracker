@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../providers/statistics_provider.dart';
+import '../../../../data/models/sin_tracker_model.dart';
+import 'package:hive/hive.dart';
 
 class DayDetailsSheet extends StatefulWidget {
   final DateTime date;
@@ -19,6 +21,8 @@ class DayDetailsSheet extends StatefulWidget {
 class _DayDetailsSheetState extends State<DayDetailsSheet> {
   DayDetailedData? detailedData;
   bool isLoading = true;
+  DailySinRecord? sinRecord;
+  List<SinType> allSinTypes = [];
 
   @override
   void initState() {
@@ -29,9 +33,38 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
   Future<void> _loadData() async {
     final dateKey = _formatDate(widget.date);
     final data = await widget.statsNotifier.getDetailedDataForDate(dateKey);
+    
+    // Load sin data and sin types
+    DailySinRecord? sinData;
+    List<SinType> sinTypes = getDefaultSinTypes();
+    
+    try {
+      final box = Hive.box('sin_tracker');
+      
+      // Load sin record for the date
+      final sinJson = box.get(dateKey);
+      if (sinJson != null) {
+        sinData = DailySinRecord.fromJson(Map<String, dynamic>.from(sinJson));
+      }
+      
+      // Load all sin types (default + custom)
+      final sinTypesData = box.get('sin_types');
+      if (sinTypesData != null) {
+        final List<dynamic> typesList = List<dynamic>.from(sinTypesData);
+        sinTypes = typesList.map((s) {
+          final map = Map<String, dynamic>.from(s);
+          return SinType.fromJson(map);
+        }).toList();
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+    
     if (mounted) {
       setState(() {
         detailedData = data;
+        sinRecord = sinData;
+        allSinTypes = sinTypes;
         isLoading = false;
       });
     }
@@ -148,6 +181,10 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
                           // Reading Section
                           _buildReadingSection(),
+                          const SizedBox(height: 16),
+
+                          // Sin Tracker Section
+                          _buildSinSection(),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -353,6 +390,154 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               'কোনো ডেটা নেই',
               style: TextStyle(color: Colors.grey),
             ),
+    );
+  }
+
+  Widget _buildSinSection() {
+    final sins = sinRecord?.records ?? [];
+    final committedSins = sins.where((s) => s.hasSinned).toList();
+    final totalSins = committedSins.length;
+    final kaffaraDone = committedSins.where((s) => s.kaffaraDone).length;
+
+    String getSinName(String sinTypeId) {
+      // First check in loaded sin types (includes custom)
+      for (final sinType in allSinTypes) {
+        if (sinType.id == sinTypeId) {
+          return sinType.name;
+        }
+      }
+      // Fallback to default types
+      for (final sinType in getDefaultSinTypes()) {
+        if (sinType.id == sinTypeId) {
+          return sinType.name;
+        }
+      }
+      return 'অজানা গুনাহ';
+    }
+
+    String getKaffaraName(String? kaffaraType) {
+      if (kaffaraType == null) return '';
+      return KaffaraType.getName(kaffaraType);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF242424),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGold.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.auto_fix_high,
+                  color: AppTheme.primaryGold.withOpacity(0.8),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'গুনাহ ট্র্যাকার',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      totalSins == 0
+                          ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
+                          : '${_toBengaliNumber(totalSins)} টি গুনাহ, ${_toBengaliNumber(kaffaraDone)} টি কাফফারা দেওয়া',
+                      style: TextStyle(
+                        color: totalSins == 0 ? const Color(0xFF4CAF50) : Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          if (committedSins.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const Divider(color: Colors.grey, height: 1),
+            const SizedBox(height: 12),
+            
+            // Sin list
+            ...committedSins.map((sin) {
+              final sinName = getSinName(sin.sinTypeId);
+              final kaffaraName = sin.kaffaraDone ? getKaffaraName(sin.kaffaraType) : '';
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      sin.kaffaraDone ? Icons.check_circle : Icons.cancel,
+                      color: sin.kaffaraDone ? const Color(0xFF4CAF50) : Colors.red.shade300,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        sinName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    if (sin.kaffaraDone)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          kaffaraName,
+                          style: const TextStyle(
+                            color: Color(0xFF4CAF50),
+                            fontSize: 11,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade300.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'কাফফারা বাকি',
+                          style: TextStyle(
+                            color: Colors.red.shade300,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ],
+      ),
     );
   }
 }

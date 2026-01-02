@@ -42,7 +42,7 @@ class DailyStats {
     this.totalDhikrCount = 0,
     this.dhikrSessionsCompleted = 0,
     this.amalItemsCompleted = 0,
-    this.totalAmalItems = 0,
+    this.totalAmalItems = 18,
     Map<String, int>? categoryCompletionCount,
     this.pagesRead = 0,
     Duration? readingDuration,

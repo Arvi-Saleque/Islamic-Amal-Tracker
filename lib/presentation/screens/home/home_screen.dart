@@ -9,6 +9,7 @@ import '../../providers/reading_tracker_provider.dart';
 import '../../providers/statistics_provider.dart';
 import '../../providers/notification_settings_provider.dart';
 import '../../providers/custom_reminders_provider.dart';
+import '../../providers/sin_tracker_provider.dart';
 import '../prayer/prayer_tracker_screen.dart';
 import '../daily_amal/daily_amal_screen.dart';
 import '../dhikr/dhikr_counter_screen.dart';
@@ -16,6 +17,7 @@ import '../reading/reading_tracker_screen.dart';
 import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../notifications/reminders_screen.dart';
+import '../sin_tracker/sin_tracker_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -277,8 +279,8 @@ class HomeScreen extends ConsumerWidget {
               ),
             )
           else ...[
-            // Next Prayer Highlight
-            if (state.nextPrayer != null && state.timeToNextPrayer != null)
+            // Current Prayer Highlight (চলমান ওয়াক্ত)
+            if (state.currentPrayer != null && state.timeToCurrentPrayerEnd != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 margin: const EdgeInsets.only(bottom: 20),
@@ -298,14 +300,14 @@ class HomeScreen extends ConsumerWidget {
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.notifications_active,
+                      Icons.access_time_filled,
                       color: Color(0xFFD4AF37),
                       size: 20,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'পরবর্তী: ${_getPrayerNameInBangla(state.nextPrayer!)} - ${state.timeToNextPrayer}',
+                        'চলমান: ${_getPrayerNameInBangla(state.currentPrayer!)} - ${state.timeToCurrentPrayerEnd} বাকি',
                         style: const TextStyle(
                           color: Color(0xFFD4AF37),
                           fontSize: 15,
@@ -659,6 +661,7 @@ class HomeScreen extends ConsumerWidget {
     final dailyAmalState = ref.watch(dailyAmalProvider);
     final dhikrState = ref.watch(dhikrCounterProvider);
     final readingState = ref.watch(readingTrackerProvider);
+    final sinTrackerState = ref.watch(sinTrackerProvider);
     final completedPrayers = prayerTrackingState.todayData.completedPrayersCount;
     final completedAmal = dailyAmalState.todayData.completedCount;
     final totalAmal = dailyAmalState.todayData.totalCount;
@@ -666,6 +669,8 @@ class HomeScreen extends ConsumerWidget {
     final dhikrTarget = dhikrState.todayData.totalTarget;
     final readingMinutes = readingState.todayData.totalMinutes;
     final readingGoal = readingState.todayData.goal.totalMinutes;
+    final totalSins = sinTrackerState.todayRecord.totalSinCount;
+    final pendingKaffara = sinTrackerState.todayRecord.pendingKaffaraCount;
     
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -750,8 +755,100 @@ class HomeScreen extends ConsumerWidget {
               );
             },
           ),
+          const SizedBox(height: 14),
+          _buildSinTrackerCard(
+            context,
+            totalSins: totalSins,
+            pendingKaffara: pendingKaffara,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SinTrackerScreen(),
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildSinTrackerCard(
+    BuildContext context, {
+    required int totalSins,
+    required int pendingKaffara,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF2A2A2A),
+          width: 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4AF37).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFD4AF37).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.auto_fix_high,
+                  color: Color(0xFFD4AF37),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'প্রতিদিনের গুনাহ',
+                      style: TextStyle(
+                        color: Color(0xFFE0E0E0),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      totalSins == 0
+                          ? 'মাশাআল্লাহ! আজ কোনো গুনাহ নেই'
+                          : pendingKaffara == 0
+                              ? 'আজ $totalSins টি গুনাহ • সব কাফফারা হয়েছে ✓'
+                              : 'আজ $totalSins টি গুনাহ • $pendingKaffara বাকি',
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey.shade600,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

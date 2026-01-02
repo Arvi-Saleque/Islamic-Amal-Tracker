@@ -16,7 +16,7 @@ class DailyStatistics {
     this.amalCompleted = 0,
     this.totalAmal = 18,
     this.dhikrCount = 0,
-    this.dhikrTarget = 700,
+    this.dhikrTarget = 600,
     this.readingMinutes = 0,
     this.readingTarget = 35,
   });
@@ -43,7 +43,7 @@ class DailyStatistics {
       amalCompleted: json['amalCompleted'] as int? ?? 0,
       totalAmal: json['totalAmal'] as int? ?? 18,
       dhikrCount: json['dhikrCount'] as int? ?? 0,
-      dhikrTarget: json['dhikrTarget'] as int? ?? 700,
+      dhikrTarget: json['dhikrTarget'] as int? ?? 600,
       readingMinutes: json['readingMinutes'] as int? ?? 0,
       readingTarget: json['readingTarget'] as int? ?? 35,
     );

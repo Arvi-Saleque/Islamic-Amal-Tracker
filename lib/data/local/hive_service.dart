@@ -15,6 +15,7 @@ class HiveService {
   static late Box statsBox;
   static late Box settingsBox;
   static late Box customRemindersBox;
+  static late Box sinTrackerBox;
   
   static Future<void> init() async {
     // Open all boxes using Hive 2.x API
@@ -31,6 +32,8 @@ class HiveService {
     settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
     
     customRemindersBox = await Hive.openBox('custom_reminders');
+    
+    sinTrackerBox = await Hive.openBox('sin_tracker');
     
     // Initialize default data if first time
     await _initializeDefaultData();

@@ -632,7 +632,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'ডেভেলপার: Alif Salek',
+              'ডেভেলপার: Salek Bin Hossain',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 8),

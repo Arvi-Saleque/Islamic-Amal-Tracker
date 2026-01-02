@@ -7,6 +7,8 @@ class PrayerTimesState {
   final Map<String, DateTime> prayerTimes;
   final String? nextPrayer;
   final String? timeToNextPrayer;
+  final String? currentPrayer;
+  final String? timeToCurrentPrayerEnd;
   final bool isLoading;
   final String? error;
 
@@ -14,6 +16,8 @@ class PrayerTimesState {
     required this.prayerTimes,
     this.nextPrayer,
     this.timeToNextPrayer,
+    this.currentPrayer,
+    this.timeToCurrentPrayerEnd,
     this.isLoading = false,
     this.error,
   });
@@ -22,6 +26,8 @@ class PrayerTimesState {
     Map<String, DateTime>? prayerTimes,
     String? nextPrayer,
     String? timeToNextPrayer,
+    String? currentPrayer,
+    String? timeToCurrentPrayerEnd,
     bool? isLoading,
     String? error,
   }) {
@@ -29,6 +35,8 @@ class PrayerTimesState {
       prayerTimes: prayerTimes ?? this.prayerTimes,
       nextPrayer: nextPrayer ?? this.nextPrayer,
       timeToNextPrayer: timeToNextPrayer ?? this.timeToNextPrayer,
+      currentPrayer: currentPrayer ?? this.currentPrayer,
+      timeToCurrentPrayerEnd: timeToCurrentPrayerEnd ?? this.timeToCurrentPrayerEnd,
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );
@@ -62,27 +70,43 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
     final now = DateTime.now();
     String? nextPrayer;
     String? timeToNext;
+    String? currentPrayer;
+    String? timeToCurrentEnd;
 
-    // Prayer times are stored with today's date in local timezone
-    // We need to compare properly
-    for (var entry in state.prayerTimes.entries) {
-      final prayerTime = entry.value;
-      // Create comparable DateTime with same timezone as now
+    final prayerOrder = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    
+    // Find next prayer and current prayer
+    for (int i = 0; i < prayerOrder.length; i++) {
+      final prayer = prayerOrder[i];
+      final prayerTime = state.prayerTimes[prayer];
+      if (prayerTime == null) continue;
+      
       final prayerTimeLocal = DateTime(
         now.year, now.month, now.day,
         prayerTime.hour, prayerTime.minute, prayerTime.second
       );
       
       if (prayerTimeLocal.isAfter(now)) {
-        nextPrayer = entry.key;
+        nextPrayer = prayer;
         final duration = prayerTimeLocal.difference(now);
         timeToNext = formatTimeToNext(duration);
+        
+        // Current prayer is the previous one
+        if (i > 0) {
+          currentPrayer = prayerOrder[i - 1];
+          timeToCurrentEnd = timeToNext; // Time until next prayer = time until current ends
+        } else {
+          // Before Fajr - current is Isha from previous day
+          currentPrayer = 'isha';
+          timeToCurrentEnd = timeToNext;
+        }
         break;
       }
     }
 
-    // If no prayer found (all prayers done for today), next is Fajr tomorrow
+    // If no next prayer found (after Isha), current is Isha and next is Fajr tomorrow
     if (nextPrayer == null && state.prayerTimes.containsKey('fajr')) {
+      currentPrayer = 'isha';
       nextPrayer = 'fajr';
       final fajrTime = state.prayerTimes['fajr']!;
       // Tomorrow's Fajr
@@ -92,11 +116,14 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       );
       final duration = tomorrowFajr.difference(now);
       timeToNext = formatTimeToNext(duration);
+      timeToCurrentEnd = timeToNext;
     }
 
     state = state.copyWith(
       nextPrayer: nextPrayer,
       timeToNextPrayer: timeToNext,
+      currentPrayer: currentPrayer,
+      timeToCurrentPrayerEnd: timeToCurrentEnd,
     );
   }
 
@@ -117,11 +144,11 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       final params = CalculationMethodParameters.karachi();
       params.madhab = Madhab.hanafi;
       // Adjustments for Bangladesh (Islamic Foundation method approximation)
-      params.adjustments[Prayer.fajr] = 2; // +2 minutes for Fajr
-      params.adjustments[Prayer.dhuhr] = 3; // +3 minutes for Dhuhr
-      params.adjustments[Prayer.asr] = 3; // +3 minutes for Asr
-      params.adjustments[Prayer.maghrib] = 3; // +3 minutes for Maghrib
-      params.adjustments[Prayer.isha] = 2; // +2 minutes for Isha
+      params.adjustments[Prayer.fajr] = 0; // +2 minutes for Fajr
+      params.adjustments[Prayer.dhuhr] = 0; // +3 minutes for Dhuhr
+      params.adjustments[Prayer.asr] = 0; // +3 minutes for Asr
+      params.adjustments[Prayer.maghrib] = 0; // +3 minutes for Maghrib
+      params.adjustments[Prayer.isha] = 0; // +2 minutes for Isha
 
       final prayerTimes = PrayerTimes(
         coordinates: coordinates,
@@ -155,29 +182,46 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       print('  Isha: ${times['isha']}');
       print('  Current time: ${DateTime.now()}');
 
-      // Calculate next prayer using proper local time comparison
+      // Calculate next prayer and current prayer using proper local time comparison
       final now = DateTime.now();
       String? nextPrayer;
       String? timeToNext;
-
-      for (var entry in times.entries) {
-        final prayerTime = entry.value;
-        // Create comparable DateTime with today's date
+      String? currentPrayer;
+      String? timeToCurrentEnd;
+      
+      final prayerOrder = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+      
+      for (int i = 0; i < prayerOrder.length; i++) {
+        final prayer = prayerOrder[i];
+        final prayerTime = times[prayer];
+        if (prayerTime == null) continue;
+        
         final prayerTimeToday = DateTime(
           now.year, now.month, now.day,
           prayerTime.hour, prayerTime.minute, prayerTime.second
         );
         
         if (prayerTimeToday.isAfter(now)) {
-          nextPrayer = entry.key;
+          nextPrayer = prayer;
           final duration = prayerTimeToday.difference(now);
           timeToNext = formatTimeToNext(duration);
+          
+          // Current prayer is the previous one
+          if (i > 0) {
+            currentPrayer = prayerOrder[i - 1];
+            timeToCurrentEnd = timeToNext;
+          } else {
+            // Before Fajr - current is Isha from previous day
+            currentPrayer = 'isha';
+            timeToCurrentEnd = timeToNext;
+          }
           break;
         }
       }
 
-      // If no prayer found (all prayers done for today), next is Fajr tomorrow
+      // If no next prayer found (after Isha), current is Isha and next is Fajr tomorrow
       if (nextPrayer == null) {
+        currentPrayer = 'isha';
         nextPrayer = 'fajr';
         final fajrTime = times['fajr']!;
         final tomorrowFajr = DateTime(
@@ -186,11 +230,14 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         );
         final duration = tomorrowFajr.difference(now);
         timeToNext = formatTimeToNext(duration);
+        timeToCurrentEnd = timeToNext;
       }
 
       state = PrayerTimesState(
         prayerTimes: times,
         nextPrayer: nextPrayer,
+        currentPrayer: currentPrayer,
+        timeToCurrentPrayerEnd: timeToCurrentEnd,
         timeToNextPrayer: timeToNext,
         isLoading: false,
       );
