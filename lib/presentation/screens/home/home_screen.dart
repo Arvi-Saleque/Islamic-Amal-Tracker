@@ -18,6 +18,7 @@ import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../notifications/reminders_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -60,6 +61,17 @@ class HomeScreen extends ConsumerWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const RemindersScreenWidget(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline, color: Color(0xFFD4AF37)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileScreen(),
                 ),
               );
             },

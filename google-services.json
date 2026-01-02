@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "320471382990",
+    "project_id": "amaltrack2026",
+    "storage_bucket": "amaltrack2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320471382990:android:b3b7b04ed7f34d42ec099f",
+        "android_client_info": {
+          "package_name": "com.amaltracker.amal_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPHvr1Diywn902OeTHWLygIMy6qnnCw_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

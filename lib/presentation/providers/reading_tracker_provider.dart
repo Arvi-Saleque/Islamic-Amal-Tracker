@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../../data/models/reading_tracker_model.dart';
+import '../../data/services/firestore_sync_service.dart';
 
 /// Recursively converts dynamic Maps to Map<String, dynamic>
 Map<String, dynamic> _deepConvert(Map data) {
@@ -175,7 +176,11 @@ class ReadingTrackerNotifier extends StateNotifier<ReadingTrackerState> {
   }
 
   void _saveToHive() {
-    _box?.put(_todayKey, state.todayData.toJson());
+    final json = state.todayData.toJson();
+    _box?.put(_todayKey, json);
+    
+    // Sync to cloud
+    firestoreSyncService.syncReadingTracker(_todayKey, json);
   }
 
   List<ReadingSession> getSessionsByType(ReadingType type) {

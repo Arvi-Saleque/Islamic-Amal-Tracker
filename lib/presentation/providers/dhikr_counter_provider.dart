@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../../data/models/dhikr_counter_model.dart';
+import '../../data/services/firestore_sync_service.dart';
 
 /// Recursively converts dynamic Maps to Map<String, dynamic>
 Map<String, dynamic> _deepConvert(Map data) {
@@ -180,7 +181,11 @@ class DhikrCounterNotifier extends StateNotifier<DhikrCounterState> {
   }
 
   void _saveToHive() {
-    _box?.put(_todayKey, state.todayData.toJson());
+    final json = state.todayData.toJson();
+    _box?.put(_todayKey, json);
+    
+    // Sync to cloud
+    firestoreSyncService.syncDhikrCounter(_todayKey, json);
   }
 
   DhikrItem? getDhikrById(String dhikrId) {

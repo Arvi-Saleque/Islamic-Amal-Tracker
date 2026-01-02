@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/prayer_tracking_model.dart';
+import '../../data/services/firestore_sync_service.dart';
 
 // Prayer tracking state
 class PrayerTrackingState {
@@ -67,11 +68,14 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
         state = state.copyWith(
           todayData: PrayerTrackingModel.empty(today),
         );
+        await _saveTodayData();
       }
     } else {
+      // Create new data for today
       state = state.copyWith(
         todayData: PrayerTrackingModel.empty(today),
       );
+      await _saveTodayData();
     }
   }
 
@@ -80,7 +84,11 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
     if (_box == null) return;
 
     try {
-      _box!.put(state.todayData.date, state.todayData.toJson());
+      final json = state.todayData.toJson();
+      _box!.put(state.todayData.date, json);
+      
+      // Sync to cloud
+      firestoreSyncService.syncPrayerTracking(state.todayData.date, json);
     } catch (e) {
       print('Error saving prayer data: $e');
     }

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/daily_amal_model.dart';
+import '../../data/services/firestore_sync_service.dart';
 
 /// Recursively converts dynamic Maps to Map<String, dynamic>
 Map<String, dynamic> _deepConvert(Map data) {
@@ -81,11 +82,14 @@ class DailyAmalNotifier extends StateNotifier<DailyAmalState> {
         state = state.copyWith(
           todayData: DailyAmalModel.empty(today),
         );
+        await _saveTodayData();
       }
     } else {
+      // Create new data for today
       state = state.copyWith(
         todayData: DailyAmalModel.empty(today),
       );
+      await _saveTodayData();
     }
   }
 
@@ -93,7 +97,11 @@ class DailyAmalNotifier extends StateNotifier<DailyAmalState> {
     if (_box == null) return;
 
     try {
-      _box!.put(state.todayData.date, state.todayData.toJson());
+      final json = state.todayData.toJson();
+      _box!.put(state.todayData.date, json);
+      
+      // Sync to cloud
+      firestoreSyncService.syncDailyAmal(state.todayData.date, json);
     } catch (e) {
       print('Error saving daily amal data: $e');
     }

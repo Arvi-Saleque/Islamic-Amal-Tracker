@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../../data/models/sin_tracker_model.dart';
+import '../../data/services/firestore_sync_service.dart';
 
 class SinTrackerState {
   final DailySinRecord todayRecord;
@@ -123,12 +124,18 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
   Future<void> _saveData() async {
     try {
       final box = await Hive.openBox(_boxName);
-      await box.put(state.todayRecord.date, state.todayRecord.toJson());
+      final todayJson = state.todayRecord.toJson();
+      await box.put(state.todayRecord.date, todayJson);
       
       // Save custom sin types only
       final customTypes = state.sinTypes.where((t) => !t.isDefault).toList();
       final allTypes = [...getDefaultSinTypes(), ...customTypes];
-      await box.put(_sinTypesKey, allTypes.map((t) => t.toJson()).toList());
+      final typesJson = allTypes.map((t) => t.toJson()).toList();
+      await box.put(_sinTypesKey, typesJson);
+      
+      // Sync to cloud
+      firestoreSyncService.syncSinTracker(state.todayRecord.date, todayJson);
+      firestoreSyncService.syncSinTypes(typesJson.cast<Map<String, dynamic>>());
     } catch (e) {
       print('Error saving sin tracker data: $e');
     }
