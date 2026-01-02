@@ -59,7 +59,7 @@ class SettingsScreen extends ConsumerWidget {
                       if (settings.prayerNotificationsEnabled) ...[
                         const Divider(color: Color(0xFF2A2A2A)),
                         _buildMinuteSelector(
-                          title: 'আগে রিমাইন্ডার',
+                          title: 'ওয়াক্ত শেষের আগে',
                           value: settings.prayerReminderMinutesBefore,
                           onChanged: (value) {
                             ref

@@ -121,14 +121,14 @@ class NotificationService {
     return false;
   }
 
-  // Schedule prayer reminder
+  // Schedule prayer reminder (before waqt ends)
   Future<void> schedulePrayerReminder({
     required int id,
     required String prayerName,
-    required DateTime prayerTime,
+    required DateTime waqtEndTime,
     required int minutesBefore,
   }) async {
-    final scheduledTime = prayerTime.subtract(Duration(minutes: minutesBefore));
+    final scheduledTime = waqtEndTime.subtract(Duration(minutes: minutesBefore));
     
     // Don't schedule if time has passed
     if (scheduledTime.isBefore(DateTime.now())) return;
@@ -137,20 +137,20 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       id,
-      'নামাজের সময় হয়ে আসছে 🕌',
-      '$prayerName এর সময় $minutesBefore মিনিট পরে',
+      '$prayerName এর ওয়াক্ত শেষ হয়ে যাচ্ছে! 🕌',
+      '$prayerName এর ওয়াক্ত শেষ হতে আর $minutesBefore মিনিট বাকি',
       tzScheduledTime,
       NotificationDetails(
         android: AndroidNotificationDetails(
           prayerChannelId,
           'নামাজের রিমাইন্ডার',
-          channelDescription: 'নামাজের সময়ের আগে রিমাইন্ডার',
+          channelDescription: 'ওয়াক্ত শেষ হওয়ার আগে রিমাইন্ডার',
           importance: Importance.high,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
           color: const Color(0xFFD4AF37),
           styleInformation: BigTextStyleInformation(
-            '$prayerName এর সময় আর মাত্র $minutesBefore মিনিট বাকি। নামাজের জন্য প্রস্তুত হোন।',
+            '$prayerName এর ওয়াক্ত শেষ হতে আর মাত্র $minutesBefore মিনিট বাকি! এখনো নামাজ না পড়ে থাকলে দ্রুত আদায় করুন।',
           ),
         ),
         iOS: const DarwinNotificationDetails(
@@ -166,9 +166,10 @@ class NotificationService {
     );
   }
 
-  // Schedule all prayer reminders for the day
+  // Schedule all prayer reminders for the day (before waqt ends)
   Future<void> scheduleAllPrayerReminders({
     required Map<String, DateTime> prayerTimes,
+    required Map<String, DateTime> waqtEndTimes,
     required int minutesBefore,
   }) async {
     final prayerIds = {
@@ -190,11 +191,12 @@ class NotificationService {
     for (final entry in prayerTimes.entries) {
       final id = prayerIds[entry.key];
       final name = prayerNames[entry.key];
-      if (id != null && name != null) {
+      final waqtEnd = waqtEndTimes[entry.key];
+      if (id != null && name != null && waqtEnd != null) {
         await schedulePrayerReminder(
           id: id,
           prayerName: name,
-          prayerTime: entry.value,
+          waqtEndTime: waqtEnd,
           minutesBefore: minutesBefore,
         );
       }

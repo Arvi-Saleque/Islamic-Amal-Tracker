@@ -122,25 +122,47 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettingsSta
     await _notificationService.cancelAllPrayerNotifications();
     
     final prayerTimes = <String, DateTime>{};
+    final waqtEndTimes = <String, DateTime>{};
     
-    if (settings.fajrEnabled && prayerTimesState.prayerTimes['fajr'] != null) {
-      prayerTimes['fajr'] = prayerTimesState.prayerTimes['fajr']!;
+    // Get all prayer times
+    final fajr = prayerTimesState.prayerTimes['fajr'];
+    final sunrise = prayerTimesState.prayerTimes['sunrise'];
+    final dhuhr = prayerTimesState.prayerTimes['dhuhr'];
+    final asr = prayerTimesState.prayerTimes['asr'];
+    final maghrib = prayerTimesState.prayerTimes['maghrib'];
+    final isha = prayerTimesState.prayerTimes['isha'];
+    
+    // Fajr waqt ends at sunrise
+    if (settings.fajrEnabled && fajr != null && sunrise != null) {
+      prayerTimes['fajr'] = fajr;
+      waqtEndTimes['fajr'] = sunrise;
     }
-    if (settings.dhuhrEnabled && prayerTimesState.prayerTimes['dhuhr'] != null) {
-      prayerTimes['dhuhr'] = prayerTimesState.prayerTimes['dhuhr']!;
+    // Dhuhr waqt ends at Asr
+    if (settings.dhuhrEnabled && dhuhr != null && asr != null) {
+      prayerTimes['dhuhr'] = dhuhr;
+      waqtEndTimes['dhuhr'] = asr;
     }
-    if (settings.asrEnabled && prayerTimesState.prayerTimes['asr'] != null) {
-      prayerTimes['asr'] = prayerTimesState.prayerTimes['asr']!;
+    // Asr waqt ends at Maghrib
+    if (settings.asrEnabled && asr != null && maghrib != null) {
+      prayerTimes['asr'] = asr;
+      waqtEndTimes['asr'] = maghrib;
     }
-    if (settings.maghribEnabled && prayerTimesState.prayerTimes['maghrib'] != null) {
-      prayerTimes['maghrib'] = prayerTimesState.prayerTimes['maghrib']!;
+    // Maghrib waqt ends at Isha
+    if (settings.maghribEnabled && maghrib != null && isha != null) {
+      prayerTimes['maghrib'] = maghrib;
+      waqtEndTimes['maghrib'] = isha;
     }
-    if (settings.ishaEnabled && prayerTimesState.prayerTimes['isha'] != null) {
-      prayerTimes['isha'] = prayerTimesState.prayerTimes['isha']!;
+    // Isha waqt ends at Fajr (next day - use midnight as approximation)
+    if (settings.ishaEnabled && isha != null) {
+      prayerTimes['isha'] = isha;
+      // Isha ends at Fajr next day, but we use midnight as safe approximation
+      final midnight = DateTime(isha.year, isha.month, isha.day, 23, 59);
+      waqtEndTimes['isha'] = midnight;
     }
     
     await _notificationService.scheduleAllPrayerReminders(
       prayerTimes: prayerTimes,
+      waqtEndTimes: waqtEndTimes,
       minutesBefore: settings.prayerReminderMinutesBefore,
     );
   }
