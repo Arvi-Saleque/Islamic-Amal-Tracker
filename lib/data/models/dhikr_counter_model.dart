@@ -115,24 +115,24 @@ class DhikrCounterModel {
 
   static List<DhikrItem> _getDefaultDhikrItems() {
     return [
-      // সকাল-সন্ধ্যার যিকির
+      // তাসবীহ (১০০ বার)
       DhikrItem(
-        id: 'subhanallah_33',
+        id: 'subhanallah_100',
         title: 'সুবহানাল্লাহ',
         arabic: 'سُبْحَانَ اللّٰهِ',
-        targetCount: 33,
+        targetCount: 100,
       ),
       DhikrItem(
-        id: 'alhamdulillah_33',
+        id: 'alhamdulillah_100',
         title: 'আলহামদুলিল্লাহ',
         arabic: 'الْحَمْدُ لِلّٰهِ',
-        targetCount: 33,
+        targetCount: 100,
       ),
       DhikrItem(
-        id: 'allahu_akbar_34',
+        id: 'allahu_akbar_100',
         title: 'আল্লাহু আকবার',
         arabic: 'اللّٰهُ أَكْبَرُ',
-        targetCount: 34,
+        targetCount: 100,
       ),
       
       // ইস্তিগফার
@@ -156,22 +156,6 @@ class DhikrCounterModel {
         id: 'kalima_100',
         title: 'লা ইলাহা ইল্লাল্লাহ',
         arabic: 'لَا إِلٰهَ إِلَّا اللّٰهُ',
-        targetCount: 100,
-      ),
-      
-      // সুবহানাল্লাহি ওয়াবিহামদিহি
-      DhikrItem(
-        id: 'subhanallahi_wabihamdihi_100',
-        title: 'সুবহানাল্লাহি ওয়াবিহামদিহি',
-        arabic: 'سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ',
-        targetCount: 100,
-      ),
-      
-      // সুবহানাল্লাহিল আযীম
-      DhikrItem(
-        id: 'subhanallahil_azim_100',
-        title: 'সুবহানাল্লাহিল আযীম',
-        arabic: 'سُبْحَانَ اللّٰهِ الْعَظِيمِ',
         targetCount: 100,
       ),
     ];
