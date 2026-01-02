@@ -1,0 +1,15 @@
+# Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Node
+node_modules/
+
+# Generated
+output/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,72 @@
+name: amal_tracker
+description: Professional Bengali Islamic Amal (practice) tracker app with prayer times, dhikr counters, and analytics
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Local Database
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+
+  # Prayer Times
+  adhan_dart: ^1.2.0
+  geolocator: ^13.0.2
+
+  # Notifications & Reminders
+  flutter_local_notifications: ^17.2.2
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
+  permission_handler: ^11.3.1
+
+  # Charts & Analytics
+  fl_chart: ^0.69.0
+
+  # Localization
+  easy_localization: ^3.0.7
+  intl: ^0.20.2
+
+  # Home Widget
+  home_widget: ^0.6.0
+
+  # Utilities
+  uuid: ^4.5.1
+  shared_preferences: ^2.3.2
+  url_launcher: ^6.3.1
+  
+  # UI Components
+  shimmer: ^3.0.0
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#1A1A1A"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/translations/
+    - assets/images/
+    - assets/icons/

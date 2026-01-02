@@ -1,0 +1,65 @@
+{
+  "app_name": "আমল ট্র্যাকার",
+  "home": "হোম",
+  "prayers": "নামাজ",
+  "dhikr": "যিকির",
+  "daily_amal": "প্রতিদিনের আমল",
+  "reading": "পড়াশোনা",
+  "history": "হিস্টরি",
+  "settings": "সেটিংস",
+  
+  "prayer_times": "নামাজের সময়",
+  "next_prayer": "পরবর্তী নামাজ",
+  "today_progress": "আজকের অগ্রগতি",
+  
+  "fajr": "ফজর",
+  "dhuhr": "যোহর",
+  "asr": "আসর",
+  "maghrib": "মাগরিব",
+  "isha": "এশা",
+  
+  "fard": "ফরয",
+  "sunnah": "সুন্নাত",
+  "witr": "বিতর",
+  "rakat": "রাকাত",
+  
+  "dhikr_counter": "যিকির কাউন্টার",
+  "total_today": "আজকের মোট যিকির",
+  "target": "টার্গেট",
+  "completed": "সম্পন্ন",
+  
+  "miswak": "মিসওয়াক",
+  "times_daily": "বার (দিনে)",
+  "post_prayer_azkar": "নামাজের পরের আজকার",
+  
+  "quran": "কুরআন",
+  "tafsir": "তাফসির",
+  "hadith": "হাদিস",
+  "pages": "পৃষ্ঠা",
+  "portions": "পাড়া",
+  
+  "daily": "দৈনিক",
+  "weekly": "সাপ্তাহিক",
+  "monthly": "মাসিক",
+  
+  "add_custom": "কাস্টম যোগ করুন",
+  "edit": "সম্পাদনা",
+  "delete": "মুছুন",
+  "save": "সেভ করুন",
+  "cancel": "বাতিল",
+  
+  "notifications": "নোটিফিকেশন",
+  "reminders": "রিমাইন্ডার",
+  "set_reminder": "রিমাইন্ডার সেট করুন",
+  
+  "permission_required": "অনুমতি প্রয়োজন",
+  "notification_permission_message": "নামাজের সময় এবং রিমাইন্ডারের জন্য নোটিফিকেশন অনুমতি প্রয়োজন।",
+  "location_permission_message": "সঠিক নামাজের সময় নির্ধারণের জন্য লোকেশন অনুমতি প্রয়োজন।",
+  "allow": "অনুমতি দিন",
+  "deny": "না",
+  
+  "streak": "ধারাবাহিকতা",
+  "days": "দিন",
+  "achievement": "অর্জন",
+  "statistics": "পরিসংখ্যান"
+}
