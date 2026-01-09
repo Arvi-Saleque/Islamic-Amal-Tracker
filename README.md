@@ -37,84 +37,112 @@ A comprehensive Flutter application for tracking Islamic daily practices (Amal) 
 - **Manual Backup/Restore**: Full data backup and restore options
 - **Firestore Integration**: Secure cloud storage with offline persistence
 
-### 🕌 নামাজ ট্র্যাকার (Prayer Tracker)
-- Real-time prayer times based on GPS location
-- Islamic Foundation Bangladesh calculation method
-- Hanafi madhab support for accurate Asr timing
-- Complete rakat tracking (Fard, Sunnah, Nafl, Witr)
-- Individual prayer completion with checkboxes
-- Prayer time countdown to next Salah
-- Automatic daily reset
-- **Cloud sync enabled**
+### 🕌 নামাজ ট্র্যাকিং (Prayer Tracking)
+প্রতিদিনের পাঁচ ওয়াক্ত নামাজের সম্পূর্ণ ট্র্যাকিং সিস্টেম:
 
-### 📿 যিকির কাউন্টার (Dhikr Counter)
-- Default dhikr list with Arabic text
-- Customizable target counts (33, 100, etc.)
-- Haptic feedback on tap
-- Visual progress indicators
-- Add custom dhikr items
-- Daily statistics tracking
-- **Cloud sync enabled**
+▪️ **প্রতিদিনের পাঁচ ওয়াক্ত নামাজ ট্র্যাক** করার সুবিধা  
+▪️ **জামাতে / আউয়াল ওয়াক্তে / দেরিতে** — সব আলাদা করে দেখা যাবে  
+▪️ **শেষ ৭ ও ৩০ দিনের নামাজ রিপোর্ট** দেখার সুবিধা  
+▪️ **কোন নামাজ কাজা হয়েছে** — বিস্তারিত ও আপডেট সুবিধা  
+▪️ GPS ভিত্তিক সঠিক নামাজের সময়  
+▪️ Islamic Foundation Bangladesh হিসাব পদ্ধতি  
+▪️ হানাফী মাযহাব অনুযায়ী আসরের সময়  
+▪️ সম্পূর্ণ রাকাত ট্র্যাকিং (ফরজ, সুন্নত, নফল, বিতর)  
+▪️ পরবর্তী নামাজের কাউন্টডাউন টাইমার  
+▪️ **Cloud sync enabled**
 
-### ✅ প্রতিদিনের আমল (Daily Amal Checklist)
-- Pre-configured daily Islamic tasks:
-  - মিসওয়াক (6 times daily)
-  - নামাজের পর আযকার (5 times)
+### � যিকির ট্র্যাকিং (Dhikr Tracking)
+দৈনিক যিকির ও তাসবিহের সম্পূর্ণ হিসাব রাখার সিস্টেম:
+
+▪️ **৬টি বেসিক তাসবিহ (১০০ করে)**:
+  - لا إله إلا الله (লা ইলাহা ইল্লাল্লাহ)
+  - ﷺ দুরূদ শরীফ
+  - أستغفر الله (আস্তাগফিরুল্লাহ)
+  - سبحان الله (সুবহানাল্লাহ)
+  - الحمد لله (আলহামদুলিল্লাহ)
+  - الله أكبر (আল্লাহু আকবার)  
+
+▪️ **নিজের মতো করে কাস্টম যিকির ও টার্গেট সেট** করার সুবিধা  
+▪️ হ্যাপটিক ফিডব্যাক সহ টাচ কাউন্টার  
+▪️ ভিজ্যুয়াল প্রোগ্রেস ইন্ডিকেটর  
+▪️ দৈনিক পরিসংখ্যান ট্র্যাকিং  
+▪️ আরবি টেক্সট সহ প্রদর্শন  
+▪️ **Cloud sync enabled**
+
+### 📿 দৈনিক আমল ট্র্যাকিং (Daily Amal Tracking)
+প্রতিদিনের আমল সংগঠিত ও সহজ করার পূর্ণাঙ্গ সিস্টেম:
+
+▪️ **ডিফল্ট ১৮টি বেসিক আমল** প্রি-কনফিগার করা:
+  - মিসওয়াক (৬ বার)
+  - নামাজের পর আযকার (৫ বার)
   - দৈনিক সূরা (ইয়াসিন, ওয়াকিয়া, মুলক)
   - সকাল-সন্ধ্যার দোয়া
   - কুরআন তিলাওয়াত, তাফসীর পড়া
   - হাদীস পড়া, ইসলামী বই পড়া
   - সাদকাহ, পিতা-মাতার সেবা
   - আত্মীয়তার সম্পর্ক রক্ষা
-  - অসুস্থ দেখা, জানাযায় অংশগ্রহণ
-- Category-wise organization
-- Completion tracking with timestamps
-- Add custom items
-- **Cloud sync enabled**
+  - অসুস্থ দেখা, জানাযায় অংশগ্রহণ  
 
-### 📖 পড়াশোনা ট্র্যাকার (Reading Tracker)
-- Track Quran, Tafsir, and Hadith reading
-- Session-based logging with duration
-- Surah/Ayah tracking for Quran
-- Page/chapter tracking for books
-- Daily reading goals (minutes)
-- Progress visualization
-- **Cloud sync enabled**
+▪️ **নিজের প্রয়োজন অনুযায়ী কাস্টম আমল যোগ** করার সুবিধা  
+▪️ **একবার যোগ করলেই যথেষ্ট** — প্রতিদিন আবার যোগ করতে হবে না  
+▪️ **সকাল–সন্ধ্যার সব দোয়া এক জায়গায়**  
+▪️ ক্যাটাগরি অনুযায়ী সাজানো  
+▪️ সম্পূর্ণ হওয়ার সময় স্বয়ংক্রিয়ভাবে সংরক্ষিত  
+▪️ **Cloud sync enabled**
 
-### 🚫 গুনাহ ট্র্যাকার (Sin Tracker with Kaffara)
-- Track different types of sins
-- Pre-configured sin categories (Kabira & Saghira)
-- Custom sin types support
-- **Kaffara Calculator**:
-  - Automatic calculation of fasting days required
-  - Feeding cost calculation (60 poor people per day)
-  - Mixed compensation (fast + feed) support
-  - Current rate: ৳100 per person
-- Statistics:
-  - Total sins tracked
-  - Sins requiring Kaffara
-  - Total fasting days needed
-  - Total feeding cost
-  - Total compensation calculation
-- Daily tracking with timestamps
-- **Cloud sync enabled**
+### 📖 পড়াশোনা ট্র্যাকিং (Reading Tracking)
+ইসলামিক পড়াশোনার সম্পূর্ণ রেকর্ড রাখার ব্যবস্থা:
 
-### 📊 পরিসংখ্যান (Statistics & Analytics)
-- **Weekly View**:
-  - 7-day bar chart with dynamic day labels
-  - Category-wise progress (নামাজ, আমল, যিকির, পড়াশোনা, গুনাহ)
-  - Weekly summary with totals
-  - Color-coded performance indicators
-- **Monthly View**:
-  - Interactive calendar with color-coded days
-  - Click any date to see detailed breakdown
-  - Monthly progress chart
-  - Monthly summary statistics
-- **Streak Tracking**:
-  - Current streak counter
-  - Best streak record
-  - Perfect day indicators (80%+ completion)
-  - Motivation messages
+▪️ **কুরআন, হাদীস ও তাফসীর** — তিনটি আলাদা ট্র্যাকিং  
+▪️ **প্রতিদিন কত সময় পড়বেন নিজেই নির্ধারণ করুন**  
+▪️ সূরা/আয়াত ট্র্যাকিং (কুরআনের জন্য)  
+▪️ পৃষ্ঠা/অধ্যায় ট্র্যাকিং (বইয়ের জন্য)  
+▪️ সেশন ভিত্তিক লগিং সহ সময়কাল  
+▪️ দৈনিক পড়ার লক্ষ্য (মিনিট)  
+▪️ প্রোগ্রেস ভিজ্যুয়ালাইজেশন  
+▪️ **Cloud sync enabled**
+
+### ⚠️ গুনাহ ট্র্যাকিং (Sin Tracking)
+গুনাহ থেকে ফিরে আসা ও কাফফারার হিসাব রাখার সিস্টেম:
+
+▪️ **ডিফল্ট ও কাস্টম গুনাহ যুক্ত করার সুবিধা**  
+▪️ প্রি-কনফিগার করা গুনাহের ক্যাটাগরি (কবীরা ও সাগীরা)  
+▪️ **কোন গুনাহের কাফফারা বাকি আছে স্পষ্টভাবে দেখা যাবে**  
+▪️ **কাফফারা হিসাব ৪ ভাবে**: যিকির, দান, কুরআন ও নামাজ  
+▪️ স্বয়ংক্রিয় রোজার দিন হিসাব  
+▪️ খাওয়ানোর খরচ হিসাব (৬০ মিসকীন × ৳১০০)  
+▪️ মিশ্র ক্ষতিপূরণ (রোজা + খাওয়ানো)  
+▪️ সম্পূর্ণ পরিসংখ্যান:
+  - মোট গুনাহ ট্র্যাক করা হয়েছে
+  - কাফফারা প্রয়োজন এমন গুনাহ
+  - মোট রোজার দিন প্রয়োজন
+  - মোট খাওয়ানোর খরচ
+  - মোট ক্ষতিপূরণ হিসাব  
+▪️ তারিখ সহ দৈনিক ট্র্যাকিং  
+▪️ **Cloud sync enabled**
+
+### 📊 স্ট্যাটস ও স্ট্রিক সিস্টেম (Stats & Streak System)
+বিস্তারিত পরিসংখ্যান ও মোটিভেশনাল ট্র্যাকিং:
+
+▪️ **৬০%+ প্রোগ্রেস হলে স্ট্রিক কাউন্ট** শুরু হয়  
+▪️ **সাপ্তাহিক ও মাসিক চার্ট**:
+  - ৭ দিনের বার চার্ট
+  - ক্যাটাগরি অনুযায়ী প্রোগ্রেস (নামাজ, আমল, যিকির, পড়াশোনা, গুনাহ)
+  - সাপ্তাহিক সামারি সহ মোট হিসাব
+  - কালার-কোডেড পারফরমেন্স ইন্ডিকেটর  
+
+▪️ **ক্যালেন্ডার ভিউতে প্রতিদিনের বিস্তারিত রিপোর্ট**:
+  - ইন্টারেক্টিভ ক্যালেন্ডার
+  - রঙিন দিন চিহ্ন
+  - যেকোনো তারিখে ক্লিক করে বিস্তারিত দেখা
+  - মাসিক প্রোগ্রেস চার্ট
+  - মাসিক সামারি স্ট্যাটিস্টিক্স  
+
+▪️ **স্ট্রিক ট্র্যাকিং**:
+  - বর্তমান স্ট্রিক কাউন্টার
+  - সর্বোচ্চ স্ট্রিক রেকর্ড
+  - পারফেক্ট দিন ইন্ডিকেটর (৮০%+ সম্পূর্ণ)
+  - মোটিভেশনাল বার্তা
 
 ### 🏠 হোম ড্যাশবোর্ড (Home Dashboard)
 - Greeting card with Hijri and Gregorian dates in Bengali
@@ -144,12 +172,17 @@ A comprehensive Flutter application for tracking Islamic daily practices (Amal) 
   - Auto-sync status indicator
 - Logout functionality
 
-### 🔔 নোটিফিকেশন (Notifications)
-- Prayer time reminders (15-30 mins before)
-- Custom reminder scheduler
-- Time-based notifications
-- Android 13+ notification permission support
-- Configurable per-prayer notifications
+### ⏰ স্মার্ট রিমাইন্ডার (Smart Reminders)
+সময়মতো স্মরণ করিয়ে দেওয়ার স্মার্ট সিস্টেম:
+
+▪️ **ওয়াক্ত শেষ হওয়ার আগে নোটিফিকেশন** (১৫-৩০ মিনিট আগে)  
+▪️ **সকাল–সন্ধ্যার যিকির রিমাইন্ডার**  
+▪️ **দৈনিক আমল ও কাস্টম রিমাইন্ডার সুবিধা**  
+▪️ প্রতিটি নামাজের জন্য আলাদা নোটিফিকেশন সেটিংস  
+▪️ সময় ভিত্তিক নোটিফিকেশন  
+▪️ Android 13+ নোটিফিকেশন পারমিশন সাপোর্ট  
+▪️ কনফিগারযোগ্য রিমাইন্ডার ম্যানেজমেন্ট  
+▪️ ডিভাইস রিস্টার্টের পর অটো রিস্টোর
 
 ### ⚙️ সেটিংস (Settings)
 - Notification preferences per prayer
