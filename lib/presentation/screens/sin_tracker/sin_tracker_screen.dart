@@ -15,10 +15,11 @@ class SinTrackerScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
+        titleSpacing: 0,
         title: const Text(
           'প্রতিদিনের গুনাহ',
           style: TextStyle(
-            color: Colors.white,
+            color: const Color(0xFFD4AF37),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -31,7 +32,7 @@ class SinTrackerScreen extends ConsumerWidget {
             tooltip: 'নতুন গুনাহ যোগ করুন',
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.grey),
+            icon: const Icon(Icons.refresh, color: Color(0xFFD4AF37)),
             onPressed: () => _showResetConfirmation(context, ref),
             tooltip: 'রিসেট',
           ),

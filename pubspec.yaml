@@ -1,7 +1,7 @@
 name: amal_tracker
 description: Professional Bengali Islamic Amal (practice) tracker app with prayer times, dhikr counters, and analytics
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.2+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -13,47 +13,46 @@ dependencies:
     sdk: flutter
 
   # State Management
-  flutter_riverpod: ^2.5.1
+  flutter_riverpod: ^2.6.1
 
   # Local Database
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  path_provider: ^2.1.2
+  path_provider: ^2.1.5
 
   # Prayer Times
   adhan_dart: ^1.2.0
   geolocator: ^13.0.2
 
   # Notifications & Reminders
-  flutter_local_notifications: ^17.2.2
-  timezone: ^0.9.4
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
   flutter_timezone: ^3.0.1
   permission_handler: ^11.3.1
 
   # Charts & Analytics
-  fl_chart: ^0.69.0
+  fl_chart: ^0.70.1
 
   # Localization
   easy_localization: ^3.0.7
   intl: ^0.20.2
 
-  # Home Widget
+  # Home Widget (Android/iOS only)
   home_widget: ^0.6.0
 
   # Utilities
   uuid: ^4.5.1
-  shared_preferences: ^2.3.2
+  shared_preferences: ^2.3.3
   url_launcher: ^6.3.1
   
-  # Firebase
+  # Firebase (Desktop & Web support)
   firebase_core: ^3.8.1
-  cloud_firestore: ^5.6.0
+  cloud_firestore: ^5.6.1
   firebase_auth: ^5.3.4
-  google_sign_in: ^6.2.2
   
   # UI Components
   shimmer: ^3.0.0
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.0.14
   google_fonts: ^6.2.1
 
 dev_dependencies:
@@ -61,13 +60,38 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.3
 
 flutter_launcher_icons:
   android: true
   ios: false
-  image_path: "assets/icons/app_icon.png"
-  adaptive_icon_background: "#1A1A1A"
-  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo.png"
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+    background_color: "#1A1A1A"
+    theme_color: "#1A1A1A"
+  windows:
+    generate: true
+    image_path: "assets/images/logo.png"
+    icon_size: 256
+  macos:
+    generate: false
+  linux:
+    generate: true
+    image_path: "assets/images/logo.png"
+
+flutter_native_splash:
+  color: "#1A1A1A"
+  image: "assets/images/logo.png"
+  android: true
+  ios: true
+  web: true
+  android_12:
+    color: "#1A1A1A"
+    image: "assets/images/logo.png"
 
 flutter:
   uses-material-design: true

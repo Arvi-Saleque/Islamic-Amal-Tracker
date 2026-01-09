@@ -37,79 +37,115 @@ class StreakCard extends StatelessWidget {
           color: AppTheme.primaryGold.withOpacity(0.3),
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Current Streak
-          Expanded(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryGold.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.local_fire_department,
-                    color: AppTheme.primaryGold,
-                    size: 32,
-                  ),
+          Row(
+            children: [
+              // Current Streak
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGold.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.local_fire_department,
+                        color: AppTheme.primaryGold,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _toBengaliNumber(currentStreak),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      'বর্তমান স্ট্রিক',
+                      style: TextStyle(
+                        color: AppTheme.primaryGold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  _toBengaliNumber(currentStreak),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              // Divider
+              Container(
+                height: 100,
+                width: 1,
+                color: AppTheme.primaryGold.withOpacity(0.3),
+              ),
+              // Best Streak
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGold.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.emoji_events,
+                        color: AppTheme.primaryGold,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _toBengaliNumber(bestStreak),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      'সর্বোচ্চ স্ট্রিক',
+                      style: TextStyle(
+                        color: AppTheme.primaryGold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                const Text(
-                  'বর্তমান স্ট্রিক',
-                  style: TextStyle(
-                    color: AppTheme.primaryGold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          // Divider
+          const SizedBox(height: 16),
           Container(
-            height: 100,
-            width: 1,
-            color: AppTheme.primaryGold.withOpacity(0.3),
-          ),
-          // Best Streak
-          Expanded(
-            child: Column(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGold.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppTheme.primaryGold.withOpacity(0.2),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryGold.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.emoji_events,
-                    color: AppTheme.primaryGold,
-                    size: 32,
-                  ),
+                Icon(
+                  Icons.info_outline,
+                  color: AppTheme.primaryGold.withOpacity(0.8),
+                  size: 16,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  _toBengaliNumber(bestStreak),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'সর্বোচ্চ স্ট্রিক',
-                  style: TextStyle(
-                    color: AppTheme.primaryGold,
-                    fontSize: 14,
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'স্ট্রিক কাউন্টের জন্য কমপক্ষে ৬০%+ প্রোগ্রেস পূরণ করতে হবে',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],

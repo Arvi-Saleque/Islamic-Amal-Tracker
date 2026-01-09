@@ -1,0 +1,38 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "amaltrack2026",
+          "appId": "1:320471382990:android:f14476916b074682ec099f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "amaltrack2026",
+          "configurations": {
+            "android": "1:320471382990:android:f14476916b074682ec099f",
+            "macos": "1:320471382990:ios:6fc90803f37da798ec099f",
+            "web": "1:320471382990:web:cdb7288347f09618ec099f",
+            "windows": "1:320471382990:web:58eef377f76698f5ec099f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

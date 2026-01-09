@@ -27,6 +27,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),
@@ -41,6 +42,11 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         ),
         centerTitle: true,
         actions: [
+          // Info button
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+            onPressed: () => _showInfoBottomSheet(context),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFFD4AF37)),
             onPressed: () => _showResetConfirmDialog(context, dhikrNotifier),
@@ -68,11 +74,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        mini: true,
         onPressed: () => _showAddDhikrDialog(context, dhikrNotifier),
         backgroundColor: const Color(0xFFD4AF37),
         child: const Icon(
           Icons.add,
           color: Color(0xFF0A0A0A),
+          size: 20,
         ),
       ),
     );
@@ -954,6 +962,333 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               ),
             ),
             child: const Text('হ্যাঁ, রিসেট করুন'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show info bottom sheet
+  void _showInfoBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Title
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.info_outline,
+                        color: Color(0xFFD4AF37),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Text(
+                        'যিকির - তথ্য ও ফযিলত',
+                        style: TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 1,
+                color: const Color(0xFF2A2A2A),
+              ),
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    // How it works
+                    _buildInfoSection(
+                      icon: Icons.touch_app,
+                      title: 'কিভাবে ব্যবহার করবেন?',
+                      content: '''
+• প্রতিটি যিকির কার্ডে ট্যাপ করলে কাউন্ট বাড়বে
+• টার্গেট পূরণ হলে স্বয়ংক্রিয়ভাবে সম্পন্ন হবে
+• নিজের পছন্দমতো যিকির যোগ করতে পারবেন
+• প্রতিদিন মধ্যরাতে স্বয়ংক্রিয়ভাবে রিসেট হয়''',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Tasbih section
+                    _buildInfoSection(
+                      icon: Icons.favorite,
+                      title: 'তাসবীহ ফাতেমীর ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'প্রতি নামাজের পর ৩৩ বার সুবহানাল্লাহ, ৩৩ বার আলহামদুলিল্লাহ, ৩৩ বার আল্লাহু আকবার বললে গুনাহ মাফ হয়, যদিও সমুদ্রের ফেনার মতো হয়।',
+                      reference: 'সহীহ মুসলিম: ৬৯৭',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'দুটি কালেমা আছে যা জিহ্বায় হালকা কিন্তু মীযানে ভারী: সুবহানাল্লাহি ওয়া বিহামদিহি ও লা ইলাহা ইল্লাল্লাহু ওয়াল্লাহু আকবার।',
+                      reference: 'সহীহ বুখারী: ৬৩৬০, সহীহ মুসলিম: ২৬৯২',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // SubhanAllah section
+                    _buildInfoSection(
+                      icon: Icons.star,
+                      title: 'সুবহানাল্লাহির ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'সুবহানাল্লাহি ওয়াল হামদুলিল্লাহ - এটি মীযানকে ভরপুর করে দেয়, অথবা আসমান ও জমিনের মধ্যবর্তী স্থানের মতো।',
+                      reference: 'সহীহ মুসলিম: ২৬৯৬',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি দিনে ১০০ বার সুবহানাল্লাহ বলবে, তার জন্য ১০০০ নেকী লেখা হবে এবং ১০০ গুনাহ মাফ হবে।',
+                      reference: 'সহীহ মুসলিম: ২৬৯২',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Istighfar section
+                    _buildInfoSection(
+                      icon: Icons.healing,
+                      title: 'ইস্তিগফারের ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি নিয়মিত ইস্তিগফার করবে, আল্লাহ তার সব দুশ্চিন্তা দূর করে দেবেন, সব সংকট থেকে বের করে দেবেন এবং অপ্রত্যাশিত জায়গা থেকে রিযিিক দেবেন।',
+                      reference: 'সুনানে আবু দাউদ: ১৫১৮',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'আমি দিনে ৭০ বারেরও বেশি আল্লাহর কাছে তাওবা করি এবং ইস্তিগফার করি।',
+                      reference: 'সহীহ বুখারী: ৬৩০৭',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // La ilaha illallah section
+                    _buildInfoSection(
+                      icon: Icons.brightness_high,
+                      title: 'লা ইলাহা ইল্লাল্লাহর ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'সর্বোত্তম যিকির হলো লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুয়া আলা কুল্লি শাইইন কাদীর।',
+                      reference: 'জামে তিরমিযী: ৩৫৮৫',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি দিনে ১০০ বার লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু... বলবে, তা ১০টি গোলাম মুক্ত করার সমান, ১০০ নেকী লেখা হবে, ১০০ গুনাহ মাফ হবে এবং সন্ধ্যা পর্যন্ত শয়তান থেকে রক্ষা হবে।',
+                      reference: 'সহীহ বুখারী: ৬৩০৩, সহীহ মুসলিম: ২৬৯১',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Durood section
+                    _buildInfoSection(
+                      icon: Icons.auto_awesome,
+                      title: 'দরূদ শরীফের ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি আমার উপর একবার দরূদ পাঠাবে, আল্লাহ তার উপর দশবার রহমত বর্ষণ করেন।',
+                      reference: 'সহীহ মুসলিম: ৪০২',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'কিয়ামতের দিন আমার নিকটতম হবে সেই ব্যক্তি যে আমার উপর সবচেয়ে বেশি দরূদ পাঠাবে।',
+                      reference: 'জামে তিরমিযী: ৪৮৪',
+                    ),
+
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection({
+    required IconData icon,
+    required String title,
+    required String content,
+    bool isHadithSection = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0A0A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF2A2A2A),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFFD4AF37),
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFFD4AF37),
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (content.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              content,
+              style: const TextStyle(
+                color: Color(0xFFE0E0E0),
+                fontSize: 14,
+                height: 1.7,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHadithCard({
+    required String hadith,
+    required String reference,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFD4AF37).withOpacity(0.08),
+            const Color(0xFFD4AF37).withOpacity(0.03),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFD4AF37).withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.format_quote,
+                color: Color(0xFFD4AF37),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  hadith,
+                  style: const TextStyle(
+                    color: Color(0xFFE0E0E0),
+                    fontSize: 14,
+                    height: 1.6,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD4AF37).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '📚 $reference',
+              style: TextStyle(
+                color: const Color(0xFFD4AF37).withOpacity(0.9),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

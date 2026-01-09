@@ -44,34 +44,36 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh_rounded, color: Color(0xFFD4AF37)),
+            tooltip: 'রিফ্রেশ',
+            onPressed: () async {
+              // Refresh all data
+              ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
+              ref.read(prayerTrackingProvider.notifier).loadTodayData();
+              ref.read(dailyAmalProvider.notifier).loadTodayData();
+              ref.read(dhikrCounterProvider.notifier).loadTodayData();
+              ref.read(readingTrackerProvider.notifier).loadTodayData();
+              ref.read(statisticsProvider.notifier).updateTodayStats();
+              ref.read(notificationSettingsProvider.notifier).refreshPrayerNotifications();
+              ref.read(customRemindersProvider.notifier).rescheduleAll();
+              
+              // Show feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('ডেটা আপডেট হয়েছে'),
+                  duration: Duration(seconds: 1),
+                  backgroundColor: Color(0xFFD4AF37),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.bar_chart_rounded, color: Color(0xFFD4AF37)),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const StatisticsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Color(0xFFD4AF37)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const RemindersScreenWidget(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline, color: Color(0xFFD4AF37)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
                 ),
               );
             },
@@ -291,8 +293,114 @@ class HomeScreen extends ConsumerWidget {
               ),
             )
           else ...[
-            // Current Prayer Highlight (চলমান ওয়াক্ত)
-            if (state.currentPrayer != null && state.timeToCurrentPrayerEnd != null)
+            // Forbidden time warning (নিষিদ্ধ সময়) - RED
+            if (state.isForbiddenTime)
+              Container(
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.red.withOpacity(0.15),
+                      Colors.red.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.red.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.block,
+                      color: Colors.red[400],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'নিষিদ্ধ সময়',
+                            style: TextStyle(
+                              color: Colors.red[400],
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            state.timeToCurrentPrayerEnd != null 
+                                ? '${state.timeToCurrentPrayerEnd} বাকি'
+                                : 'এখন নামাজ পড়া নিষিদ্ধ',
+                            style: TextStyle(
+                              color: Colors.red[300],
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            // Nafl time (নফল নামাজের সময়) - GOLDEN
+            else if (state.isNaflTime)
+              Container(
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFD4AF37).withOpacity(0.15),
+                      const Color(0xFFD4AF37).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFD4AF37).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.volunteer_activism,
+                      color: Color(0xFFD4AF37),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '✨ নফল নামাজের সময়',
+                            style: TextStyle(
+                              color: Color(0xFFD4AF37),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'যোহর শুরু: ${state.timeToNextPrayer ?? ""} বাকি',
+                            style: TextStyle(
+                              color: const Color(0xFFD4AF37).withOpacity(0.8),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            // Current Prayer Highlight (চলমান ওয়াক্ত) - GOLDEN
+            else if (state.currentPrayer != null && state.timeToCurrentPrayerEnd != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 margin: const EdgeInsets.only(bottom: 20),

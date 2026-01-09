@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/notification_settings_provider.dart';
+import '../profile/profile_screen.dart';
+import '../notifications/reminders_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -16,6 +18,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),
@@ -38,6 +41,42 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Quick Access Section
+                  const SizedBox(height: 30),
+                  _buildSettingsCard(
+                    children: [
+                      _buildNavigationTile(
+                        context: context,
+                        icon: Icons.person_outline,
+                        title: 'প্রোফাইল',
+                        subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(color: Color(0xFF2A2A2A)),
+                      _buildNavigationTile(
+                        context: context,
+                        icon: Icons.alarm,
+                        title: 'কাস্টম রিমাইন্ডার',
+                        subtitle: 'নিজের রিমাইন্ডার তৈরি করুন',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RemindersScreenWidget(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+
                   // Permission Card
                   if (!settingsState.hasPermission)
                     _buildPermissionCard(context, ref),
@@ -327,6 +366,49 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       child: Column(children: children),
+    );
+  }
+
+  Widget _buildNavigationTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD4AF37).withOpacity(0.2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          color: const Color(0xFFD4AF37),
+          size: 24,
+        ),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.6),
+          fontSize: 12,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: Color(0xFFD4AF37),
+      ),
+      onTap: onTap,
     );
   }
 
@@ -707,88 +789,582 @@ class ManualScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildManualSection(
-              title: '🕌 নামাজ ট্র্যাকার',
-              description: 'আপনার স্থান অনুযায়ী পাঁচ ওয়াক্তের নামাজের সময় দেখুন এবং ট্র্যাক করুন। প্রতিটি নামাজের জন্য রাকাত কাউন্ট করতে পারবেন।',
-            ),
-            _buildManualSection(
-              title: '✨ দৈনিক আমল',
-              description: 'প্রতিদিন করার মত ১৮টি আমল। যেমন মিসওয়াক, সূরা পড়া, দোয়া করা এবং নফল নামাজ। প্রতিটি আমল সম্পন্ন হলে চেকবক্সে টিক দিন।',
-            ),
-            _buildManualSection(
-              title: '📿 যিকর কাউন্টার',
-              description: '৮টি বিখ্যাত যিকর দিয়ে শুরু করুন বা নিজের যিকর যোগ করুন। বাটন চাপিয়ে সংখ্যা বৃদ্ধি করুন বা সরাসরি সংখ্যা টাইপ করুন।',
-            ),
-            _buildManualSection(
-              title: '📖 পড়া ট্র্যাকার',
-              description: 'কুরআন, তাফসীর এবং হাদীস পড়ার হিসাব রাখুন। প্রতিদিন কতটা পড়লেন সেটি রেকর্ড করুন এবং লক্ষ্য নির্ধারণ করুন।',
-            ),
-            _buildManualSection(
-              title: '📊 পরিসংখ্যান',
-              description: 'সাপ্তাহিক এবং মাসিক গ্রাফে আপনার অগ্রগতি দেখুন। ক্যালেন্ডারে প্রতিটি দিনের বিস্তারিত তথ্য পান।',
-            ),
-            _buildManualSection(
-              title: '🔔 রিমাইন্ডার',
-              description: 'নামাজের সময় পূর্বে রিমাইন্ডার পান। যিকর এবং আমলের জন্য নির্দিষ্ট সময়ে বিজ্ঞপ্তি পাবেন।',
-            ),
-            _buildManualSection(
-              title: '⏰ কাস্টম রিমাইন্ডার',
-              description: 'আপনার পছন্দ অনুযায়ী নতুন রিমাইন্ডার যোগ করুন। যেকোনো সময় এবং যেকোনো দিনের জন্য রিমাইন্ডার সেট করতে পারবেন।',
-            ),
+            // Header
+            _buildHeaderSection(),
             const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFD4AF37)),
-                borderRadius: BorderRadius.circular(8),
+            
+            // Prayer Section
+            _buildPrayerSection(),
+            const SizedBox(height: 24),
+            
+            // Amal Section
+            _buildAmalSection(),
+            const SizedBox(height: 24),
+            
+            // Dhikr Section
+            _buildDhikrSection(),
+            const SizedBox(height: 24),
+            
+            // Reading Section
+            _buildReadingSection(),
+            const SizedBox(height: 24),
+            
+            // Sin Tracker Section
+            _buildSinTrackerSection(),
+            const SizedBox(height: 24),
+            
+            // Statistics Section
+            _buildStatisticsSection(),
+            const SizedBox(height: 24),
+            
+            // Reminders Section
+            _buildRemindersSection(),
+            const SizedBox(height: 24),
+            
+            // Contact Section
+            _buildContactSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildHeaderSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFD4AF37).withOpacity(0.2),
+            const Color(0xFFD4AF37).withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🌟 আমল ট্র্যাকার অ্যাপে স্বাগতম',
+            style: TextStyle(
+              color: Color(0xFFD4AF37),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            'এই অ্যাপটি আপনার দৈনন্দিন ইবাদত, আমল এবং ইসলামিক কাজকর্ম ট্র্যাক করতে সাহায্য করবে। নিচে প্রতিটি ফিচারের বিস্তারিত বর্ণনা দেওয়া হলো।',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildPrayerSection() {
+    return _buildFeatureCard(
+      icon: '🕌',
+      title: 'নামাজ ট্র্যাকার',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '📍 কি করতে পারবেন:',
+          items: [
+            'আপনার লোকেশন অনুযায়ী স্বয়ংক্রিয় নামাজের সময় দেখুন',
+            'পাঁচ ওয়াক্ত নামাজ ট্র্যাক করুন (ফজর, যোহর, আসর, মাগরিব, ইশা)',
+            'প্রতিটি নামাজের জন্য ফরজ + সুন্নত রাকাত আলাদা আলাদা কাউন্ট করুন',
+            'চলমান ওয়াক্ত এবং কতক্ষণ বাকি আছে তা দেখুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '⏰ নামাজের সময়:',
+          items: [
+            'ফজর: সুবহে সাদিক থেকে সূর্যোদয় পর্যন্ত',
+            'যোহর: সূর্য মধ্যাকাশ পার থেকে আসর পর্যন্ত',
+            'আসর: আসর সময় থেকে সূর্যাস্তের ১৫ মিনিট আগে পর্যন্ত',
+            'মাগরিব: সূর্যাস্ত থেকে ইশা পর্যন্ত',
+            'ইশা: ইশা থেকে পরের দিন ফজর পর্যন্ত',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🚫 নিষিদ্ধ সময় (মাকরূহ ওয়াক্ত):',
+          items: [
+            'সূর্যোদয়ের পর ১৫ মিনিট',
+            'যোহরের ১০ মিনিট আগে (যাওয়াল)',
+            'সূর্যাস্তের ১৫ মিনিট আগে',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '✨ নফল সময়:',
+          items: [
+            'সূর্যোদয়ের ১৫ মিনিট পর থেকে যোহরের ১০ মিনিট আগে পর্যন্ত',
+            'এই সময়ে শুধু নফল নামাজ পড়া যায়',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 হিস্টোরি কোথায় পাবেন:',
+          items: [
+            'হোম স্ক্রিনে "Prayer Tracker" কার্ডে ট্যাপ করুন',
+            'পরিসংখ্যান পেজে গিয়ে নামাজের গ্রাফ এবং ক্যালেন্ডার দেখুন',
+            'প্রতিদিনের কত নামাজ পড়েছেন তা দেখতে পারবেন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildAmalSection() {
+    return _buildFeatureCard(
+      icon: '✨',
+      title: 'দৈনিক আমল',
+      color: const Color(0xFFD4AF37),
+      children: [
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '✅ কিভাবে ব্যবহার করবেন:',
+          items: [
+            'হোম স্ক্রিনে "Daily Amal" কার্ডে যান',
+            'যে আমল করেছেন সেটার চেকবক্সে টিক দিন',
+            'টিক দিলেই তা সেভ হয়ে যাবে',
+            'পরের দিন সব আমল আবার রিসেট হয়ে যাবে',
+            'নতুন কাস্টম আমল যোগ করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 হিস্টোরি:',
+          items: [
+            'পরিসংখ্যান পেজে "Amal" ট্যাবে যান',
+            'সাপ্তাহিক/মাসিক গ্রাফে আমলের হার দেখুন',
+            'ক্যালেন্ডারে প্রতিদিন কত আমল করেছেন তা দেখুন',
+            'প্রতিটি আমলের আলাদা হিস্টোরি দেখতে পারবেন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildDhikrSection() {
+    return _buildFeatureCard(
+      icon: '📿',
+      title: 'যিকির কাউন্টার',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '🎯 কি করতে পারবেন:',
+          items: [
+            'ডিফল্ট ৬টি যিকির দিয়ে শুরু করুন',
+            'নতুন কাস্টম যিকির যোগ করুন',
+            'বাটন ক্লিক করে কাউন্ট বাড়ান',
+            'সরাসরি সংখ্যা টাইপ করে দিতে পারবেন',
+            'টার্গেট সেট করুন (যেমন: ১০০ বার)',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '➕ নতুন যিকির যোগ করুন:',
+          items: [
+            'যিকির পেজে + বাটনে ক্লিক করুন',
+            'যিকিরের নাম লিখুন (আরবি/বাংলা)',
+            'টার্গেট সংখ্যা সেট করুন',
+            'Save করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 হিস্টোরি:',
+          items: [
+            'পরিসংখ্যান পেজে "Dhikr" ট্যাবে যান',
+            'প্রতিদিন কত যিকির করেছেন গ্রাফে দেখুন',
+            'কোন যিকির কতবার করেছেন তা দেখুন',
+            'সেশন হিস্টোরি দেখতে পারবেন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildReadingSection() {
+    return _buildFeatureCard(
+      icon: '📖',
+      title: 'পড়াশোনা ট্র্যাকার',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '📚 কি কি ট্র্যাক করতে পারবেন:',
+          items: [
+            'কুরআন তিলাওয়াত (পৃষ্ঠা/আয়াত সংখ্যা)',
+            'তাফসীর পড়া (পৃষ্ঠা সংখ্যা)',
+            'হাদীস পড়া (হাদীস সংখ্যা)',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '✍️ কিভাবে রেকর্ড করবেন:',
+          items: [
+            'Reading Tracker পেজে যান',
+            'কুরআন/তাফসীর/হাদীস ট্যাব সিলেক্ট করুন',
+            '+ Add Session বাটনে ক্লিক করুন',
+            'কত পৃষ্ঠা/আয়াত/হাদীস পড়েছেন লিখুন',
+            'ঐচ্ছিক: নোট যোগ করতে পারবেন',
+            'Save করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🎯 লক্ষ্য নির্ধারণ:',
+          items: [
+            'দৈনিক লক্ষ্য সেট করুন',
+            'সাপ্তাহিক/মাসিক লক্ষ্য দেখুন',
+            'কতটা সম্পন্ন হয়েছে প্রগ্রেস বারে দেখুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📖 কুরআন বিশেষ ফিচার:',
+          items: [
+            'সূরা নম্বর এবং আয়াত নম্বর দিয়ে ট্র্যাক করুন',
+            'কতটি সূরা সম্পূর্ণ পড়েছেন দেখুন',
+            'পারা অনুযায়ী প্রগ্রেস দেখতে পারবেন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 হিস্টোরি:',
+          items: [
+            'Reading Tracker পেজেই নিচে স্ক্রল করুন',
+            'সব সেশনের লিস্ট দেখুন (তারিখ সহ)',
+            'পরিসংখ্যান পেজে গ্রাফ দেখুন',
+            'মোট কত পড়েছেন তা দেখুন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildSinTrackerSection() {
+    return _buildFeatureCard(
+      icon: '⚠️',
+      title: 'গুনাহ ট্র্যাকার',
+      color: Colors.red,
+      children: [
+        _buildSubSection(
+          title: '🎯 উদ্দেশ্য:',
+          items: [
+            'নিজের গুনাহ সম্পর্কে সচেতন হওয়া',
+            'গুনাহ থেকে ফিরে আসতে সাহায্য করা',
+            'তওবা এবং ইস্তিগফারের অভ্যাস তৈরি করা',
+            'কোন গুনাহ বেশি হচ্ছে তা চিহ্নিত করা',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📝 কিভাবে রেকর্ড করবেন:',
+          items: [
+            'Sin Tracker পেজে যান',
+            '+ বাটনে ক্লিক করুন',
+            'গুনাহের ক্যাটাগরি সিলেক্ট করুন (ছোট/বড়)',
+            'গুনাহের বর্ণনা লিখুন (ঐচ্ছিক)',
+            'তওবা করেছেন কিনা মার্ক করুন',
+            'Save করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🔒 গোপনীয়তা:',
+          items: [
+            'সব ডাটা শুধুমাত্র আপনার ফোনে সংরক্ষিত',
+            'কোনো তথ্য বাইরে শেয়ার হয় না',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '✅ তওবা ট্র্যাকিং:',
+          items: [
+            'প্রতিটি গুনাহের জন্য তওবা মার্ক করুন',
+            'কতবার তওবা করেছেন তা দেখুন',
+            'তওবার পর পুনরায় করেছেন কিনা ট্র্যাক করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 হিস্টোরি ও পরিসংখ্যান:',
+          items: [
+            'Sin Tracker পেজেই সব রেকর্ড দেখুন',
+            'পরিসংখ্যান পেজে গ্রাফ দেখুন',
+            'সপ্তাহ/মাস অনুযায়ী তুলনা করুন',
+            'কোন গুনাহ কমছে/বাড়ছে তা বুঝুন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildStatisticsSection() {
+    return _buildFeatureCard(
+      icon: '📊',
+      title: 'পরিসংখ্যান ও হিস্টোরি',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '📈 কি কি দেখতে পারবেন:',
+          items: [
+            'নামাজ, আমল, যিকির, পড়া - সব আলাদা ট্যাবে',
+            'সাপ্তাহিক বার চার্ট',
+            'মাসিক লাইন চার্ট',
+            'বর্তমান মাসের ক্যালেন্ডার ভিউ',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🗓️ ক্যালেন্ডার ফিচার:',
+          items: [
+            'প্রতিদিন কত আমল/নামাজ করেছেন দেখুন',
+            'তারিখে ক্লিক করে বিস্তারিত দেখুন',
+            'কোন দিন বেশি ভালো ছিল তা বুঝুন',
+            'মাস পরিবর্তন করে আগের ডাটা দেখুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 গ্রাফ বিশ্লেষণ:',
+          items: [
+            'সাপ্তাহিক: গত ৭ দিনের তুলনা',
+            'মাসিক: পুরো মাসের ট্রেন্ড',
+            'গড় হিসাব দেখুন',
+            'সর্বোচ্চ ও সর্বনিম্ন দিন চিহ্নিত করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🎯 প্রগ্রেস ট্র্যাকিং:',
+          items: [
+            'মোট স্কোর দেখুন',
+            'কমপ্লিশন রেট (%) দেখুন',
+            'স্ট্রিক (পরপর কতদিন) দেখুন',
+            'উন্নতির হার বুঝতে পারবেন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildRemindersSection() {
+    return _buildFeatureCard(
+      icon: '🔔',
+      title: 'রিমাইন্ডার ও নোটিফিকেশন',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '🕌 নামাজের রিমাইন্ডার:',
+          items: [
+            'প্রতিটি ওয়াক্তের জন্য আলাদা সেটিংস',
+            'নামাজের কত মিনিট আগে রিমাইন্ডার চান সেট করুন',
+            'কোন কোন নামাজের জন্য চান সিলেক্ট করুন',
+            'সেটিংস > Notifications থেকে কনফিগার করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '✨ দৈনিক আমল রিমাইন্ডার:',
+          items: [
+            'প্রতিদিন একটি নির্দিষ্ট সময়ে রিমাইন্ডার',
+            'সময় সেট করুন (যেমন: সকাল ৮টা)',
+            'আমল করতে ভুলে যাবেন না',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '⏰ কাস্টম রিমাইন্ডার:',
+          items: [
+            'Reminders পেজে + বাটনে ক্লিক করুন',
+            'রিমাইন্ডারের টাইটেল লিখুন',
+            'সময় এবং দিন সিলেক্ট করুন',
+            'Repeat অপশন সেট করুন (Daily/Weekly)',
+            'নির্দিষ্ট দিনগুলো সিলেক্ট করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🔧 ম্যানেজমেন্ট:',
+          items: [
+            'Reminders পেজে সব রিমাইন্ডার দেখুন',
+            'On/Off টগল করুন',
+            'এডিট বা ডিলিট করুন',
+            'পরমিশন ঠিক আছে কিনা চেক করুন',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildContactSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFD4AF37)),
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF1A1A1A),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.support_agent, color: Color(0xFFD4AF37), size: 24),
+              SizedBox(width: 12),
+              Text(
+                'সাহায্য ও সাপোর্ট',
+                style: TextStyle(
+                  color: Color(0xFFD4AF37),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            '📧 কোনো সমস্যা, বাগ রিপোর্ট, বা নতুন ফিচারের পরামর্শ থাকলে আমাদের ইমেইল করুন:',
+            style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.5),
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () {
+              final Uri emailUri = Uri(
+                scheme: 'mailto',
+                path: 'alifsalek.as@gmail.com',
+                queryParameters: {
+                  'subject': 'আমল ট্র্যাকার - সাপোর্ট',
+                },
+              );
+              launchUrl(emailUri);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD4AF37).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+              ),
+              child: const Row(
                 children: [
-                  const Text(
-                    'ই-মেইল সাপোর্ট 📧',
+                  Icon(Icons.email, color: Color(0xFFD4AF37), size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'alifsalek.as@gmail.com',
                     style: TextStyle(
                       color: Color(0xFFD4AF37),
-                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
                       fontSize: 14,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'কোনো সমস্যা পেলে বা পরামর্শ থাকলে নিচের ইমেইলে যোগাযোগ করুন:',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.email, color: Color(0xFFD4AF37), size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            final Uri emailUri = Uri(
-                              scheme: 'mailto',
-                              path: 'alifsalek.as@gmail.com',
-                            );
-                            launchUrl(emailUri);
-                          },
-                          child: const Text(
-                            'alifsalek.as@gmail.com',
-                            style: TextStyle(
-                              color: Color(0xFFD4AF37),
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            '💡 টিপস: স্ক্রিনশট সহ সমস্যার বর্ণনা দিলে দ্রুত সমাধান পাবেন।',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  static Widget _buildFeatureCard({
+    required String icon,
+    required String title,
+    required Color color,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildSubSection({
+    required String title,
+    required List<String> items,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(0xFFD4AF37),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...items.map((item) => Padding(
+          padding: const EdgeInsets.only(bottom: 6, left: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '• ',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+              Expanded(
+                child: Text(
+                  item,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
+      ],
     );
   }
 

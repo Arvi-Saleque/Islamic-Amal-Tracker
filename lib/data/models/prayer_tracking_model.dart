@@ -2,12 +2,20 @@ class PrayerTrackingModel {
   final String date; // Format: yyyy-MM-dd
   final Map<String, bool> prayerDone;
   final Map<String, Map<String, bool>> rakatsDone;
+  final Map<String, bool> qazaDone; // Track if qaza has been completed for missed prayers
 
   PrayerTrackingModel({
     required this.date,
     required this.prayerDone,
     required this.rakatsDone,
-  });
+    Map<String, bool>? qazaDone,
+  }) : qazaDone = qazaDone ?? {
+          'ফজর': false,
+          'যুহর': false,
+          'আসর': false,
+          'মাগরিব': false,
+          'এশা': false,
+        };
 
   // Convert to JSON for Hive storage
   Map<String, dynamic> toJson() {
@@ -18,6 +26,7 @@ class PrayerTrackingModel {
             prayer,
             rakats.map((rakat, done) => MapEntry(rakat, done)),
           )),
+      'qazaDone': qazaDone,
     };
   }
 
@@ -32,6 +41,9 @@ class PrayerTrackingModel {
           Map<String, bool>.from(rakats as Map),
         ),
       ),
+      qazaDone: json['qazaDone'] != null 
+          ? Map<String, bool>.from(json['qazaDone'] as Map)
+          : null,
     );
   }
 
@@ -47,18 +59,31 @@ class PrayerTrackingModel {
         'এশা': false,
       },
       rakatsDone: {
-        'ফজর': {'২ রাকাত ফরয': false, '২ রাকাত সুন্নাত': false},
-        'যুহর': {
-          '৪ রাকাত সুন্নাত': false,
-          '২ রাকাত ফরয': false,
-          '২ রাকাত সুন্নাত': false
-        },
-        'আসর': {'৪ রাকাত ফরয': false},
-        'মাগরিব': {'৩ রাকাত ফরয': false, '২ রাকাত সুন্নাত': false},
-        'এশা': {
-          '৪ রাকাত ফরয': false,
+        'ফজর': {
+          '২ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+          '২ রাকাত ফরয (দেরী করে)': false,
           '২ রাকাত সুন্নাত': false,
-          '৩ রাকাত বেতের': false
+        },
+        'যুহর': {
+          '৪ রাকাত সুন্নাত (আগে)': false,
+          '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+          '৪ রাকাত ফরয (দেরী করে)': false,
+          '২ রাকাত সুন্নাত (পরে)': false,
+        },
+        'আসর': {
+          '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+          '৪ রাকাত ফরয (দেরী করে)': false,
+        },
+        'মাগরিব': {
+          '৩ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+          '৩ রাকাত ফরয (দেরী করে)': false,
+          '২ রাকাত সুন্নাত': false,
+        },
+        'এশা': {
+          '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+          '৪ রাকাত ফরয (দেরী করে)': false,
+          '২ রাকাত সুন্নাত': false,
+          '৩ রাকাত বেতের': false,
         },
       },
     );
@@ -69,11 +94,19 @@ class PrayerTrackingModel {
     return prayerDone.values.where((done) => done).length;
   }
 
+  // Check if a prayer needs qaza (missed and not yet done qaza)
+  bool needsQaza(String prayer) {
+    final isMissed = !(prayerDone[prayer] ?? false);
+    final isQazaDone = qazaDone[prayer] ?? false;
+    return isMissed && !isQazaDone;
+  }
+
   // Copy with
   PrayerTrackingModel copyWith({
     String? date,
     Map<String, bool>? prayerDone,
     Map<String, Map<String, bool>>? rakatsDone,
+    Map<String, bool>? qazaDone,
   }) {
     return PrayerTrackingModel(
       date: date ?? this.date,
@@ -82,6 +115,7 @@ class PrayerTrackingModel {
           this.rakatsDone.map(
             (prayer, rakats) => MapEntry(prayer, Map.from(rakats)),
           ),
+      qazaDone: qazaDone ?? Map.from(this.qazaDone),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/statistics_provider.dart';
+import '../../providers/qaza_prayer_provider.dart';
 import '../../../data/models/statistics_model.dart';
 import '../../../core/theme/app_theme.dart';
 import 'widgets/streak_card.dart';
@@ -11,6 +12,7 @@ import 'widgets/monthly_calendar_view.dart';
 import 'widgets/category_progress_section.dart';
 import 'widgets/weekly_summary_section.dart';
 import 'widgets/day_details_sheet.dart';
+import 'widgets/qaza_prayer_section.dart';
 
 class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
@@ -20,7 +22,7 @@ class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
-  bool isWeeklyView = true;
+  StatisticsTab selectedTab = StatisticsTab.weekly;
   DateTime selectedMonth = DateTime.now();
   DateTime? selectedDate;
 
@@ -33,6 +35,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppTheme.primaryGold),
           onPressed: () => Navigator.pop(context),
@@ -51,19 +54,21 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Streak Card
-            StreakCard(
-              currentStreak: statsState.data.currentStreak,
-              bestStreak: statsState.data.bestStreak,
-            ),
-            const SizedBox(height: 20),
+            // Streak Card (only show for weekly/monthly)
+            if (selectedTab != StatisticsTab.qaza) ...[
+              StreakCard(
+                currentStreak: statsState.data.currentStreak,
+                bestStreak: statsState.data.bestStreak,
+              ),
+              const SizedBox(height: 20),
+            ],
 
-            // Weekly/Monthly Tab Selector
+            // Tab Selector
             TabSelector(
-              isWeeklyView: isWeeklyView,
-              onTabChanged: (isWeekly) {
+              selectedTab: selectedTab,
+              onTabChanged: (tab) {
                 setState(() {
-                  isWeeklyView = isWeekly;
+                  selectedTab = tab;
                   selectedDate = null;
                 });
               },
@@ -71,7 +76,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             const SizedBox(height: 20),
 
             // Content based on selected tab
-            if (isWeeklyView) ...[
+            if (selectedTab == StatisticsTab.weekly) ...[
               // Weekly Progress Chart
               WeeklyProgressChart(weeklyStats: statsState.weeklyStats),
               const SizedBox(height: 20),
@@ -82,7 +87,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
               // Weekly Summary Section
               WeeklySummarySection(weeklyStats: statsState.weeklyStats),
-            ] else ...[
+            ] else if (selectedTab == StatisticsTab.monthly) ...[
               // Monthly Calendar View
               MonthlyCalendarView(
                 selectedMonth: selectedMonth,
@@ -121,10 +126,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 isMonthly: true,
                 monthlyStats: statsState.data.getMonthlyStats(),
               ),
+            ] else if (selectedTab == StatisticsTab.qaza) ...[
+              // Qaza Prayer Section
+              const QazaPrayerSection(),
             ],
 
             // Show day details if date is selected
-            if (selectedDate != null) ...[
+            if (selectedDate != null && selectedTab == StatisticsTab.monthly) ...[
               const SizedBox(height: 20),
               _buildSelectedDayDetails(selectedDate!, statsState),
             ],

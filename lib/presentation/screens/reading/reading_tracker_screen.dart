@@ -26,6 +26,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),
@@ -40,6 +41,11 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         ),
         centerTitle: true,
         actions: [
+          // Info button
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+            onPressed: () => _showInfoBottomSheet(context),
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Color(0xFFD4AF37)),
             onPressed: () => _showGoalSettingsDialog(context, readingNotifier),
@@ -795,6 +801,318 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               ),
             ),
             child: const Text('সংরক্ষণ করুন'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show info bottom sheet
+  void _showInfoBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Title
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.info_outline,
+                        color: Color(0xFFD4AF37),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Text(
+                        'পড়াশোনা - তথ্য ও ফযিলত',
+                        style: TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 1,
+                color: const Color(0xFF2A2A2A),
+              ),
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    // How it works
+                    _buildInfoSection(
+                      icon: Icons.timer_outlined,
+                      title: 'কিভাবে ব্যবহার করবেন?',
+                      content: '''
+• প্রতিটি ক্যাটাগরিতে সেশন যোগ করুন
+• মিনিট এবং পৃষ্ঠা/আয়াত/হাদিস সংখ্যা লিখুন
+• সেটিংস থেকে দৈনিক লক্ষ্য নির্ধারণ করুন
+• লক্ষ্য পূরণ হলে সম্পন্ন দেখাবে
+• প্রতিদিন মধ্যরাতে স্বয়ংক্রিয়ভাবে রিসেট হয়''',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Quran section
+                    _buildInfoSection(
+                      icon: Icons.menu_book,
+                      title: 'কুরআন তেলাওয়াতের ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'কুরআনের প্রতিটি অক্ষর পাঠে একটি নেকী এবং প্রতিটি নেকী দশগুণে বৃদ্ধি পায়।',
+                      reference: 'জামে তিরমিযী: ২৯১০',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি কুরআন পড়ে এবং তা মুখস্থ করে, সে সম্মানিত নেক ফেরেশতাদের সাথে থাকবে। আর যে কষ্ট করে পড়ে, তার জন্য দুই সওয়াব।',
+                      reference: 'সহীহ বুখারী: ৪৯৩৭',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'তোমরা কুরআন পড়ো, কারণ এটি কিয়ামতের দিন তার পাঠকদের জন্য সুপারিশকারী হিসেবে আসবে।',
+                      reference: 'সহীহ মুসলিম: ৭৩০',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Tafsir section
+                    _buildInfoSection(
+                      icon: Icons.book,
+                      title: 'কুরআন বোঝার গুরুত্ব',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'তোমাদের মধ্যে সেই ব্যক্তি সর্বোত্তম যে কুরআন শেখে এবং অন্যকে শেখায়।',
+                      reference: 'সহীহ বুখারী: ৫০২২',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, আল্লাহ তার জন্য জান্নাতের পথ সহজ করে দেন।',
+                      reference: 'সহীহ মুসলিম: ২৬৭৬',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Hadith section
+                    _buildInfoSection(
+                      icon: Icons.auto_stories,
+                      title: 'হাদিস শিক্ষার গুরুত্ব',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'আল্লাহ সেই ব্যক্তির চেহারা উজ্জ্বল (সজীব) করুন, যে আমার কথা শুনেছে, তা সংরক্ষণ (মুখস্থ) করেছে এবং তা অন্যের কাছে পৌঁছে দিয়েছে।',
+                      reference: 'জামে তিরমিযী: ২৬৫৭',
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Knowledge seeking
+                    _buildInfoSection(
+                      icon: Icons.school,
+                      title: 'ইলম অর্জনের ফযিলত',
+                      content: '',
+                      isHadithSection: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildHadithCard(
+                      hadith:
+                          'ইলম অর্জন করা প্রতিটি মুসলিম নর-নারীর জন্য ফরজ।',
+                      reference: 'সুনানে ইবনে মাজাহ: ২২৬',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, সে ফিরে আসা পর্যন্ত সে আল্লাহর পথে থাকে।',
+                      reference: 'জামে তিরমিযী: ২৬৫৪',
+                    ),
+                    const SizedBox(height: 12),
+
+                    _buildHadithCard(
+                      hadith:
+                          'আলেমরা নবীদের উত্তরাধিকারী। নবীগণ উত্তরাধিকারী রেখে যাননি দিনার-দিরহাম, বরং রেখে গেছেন ইলম।',
+                      reference: 'সুনানে আবু দাউদ: ৩৬৪১',
+                    ),
+
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection({
+    required IconData icon,
+    required String title,
+    required String content,
+    bool isHadithSection = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0A0A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF2A2A2A),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFFD4AF37),
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFFD4AF37),
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (content.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              content,
+              style: const TextStyle(
+                color: Color(0xFFE0E0E0),
+                fontSize: 14,
+                height: 1.7,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHadithCard({
+    required String hadith,
+    required String reference,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFD4AF37).withOpacity(0.08),
+            const Color(0xFFD4AF37).withOpacity(0.03),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFD4AF37).withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.format_quote,
+                color: Color(0xFFD4AF37),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  hadith,
+                  style: const TextStyle(
+                    color: Color(0xFFE0E0E0),
+                    fontSize: 14,
+                    height: 1.6,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD4AF37).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '📚 $reference',
+              style: TextStyle(
+                color: const Color(0xFFD4AF37).withOpacity(0.9),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

@@ -10,6 +10,12 @@ set(BINARY_NAME "amal_tracker")
 # versions of CMake.
 cmake_policy(VERSION 3.14...3.25)
 
+# Allow Firebase SDK with older CMake requirements
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
+# Minimum Windows 10 SDK version (1809 - Build 17763)
+set(CMAKE_SYSTEM_VERSION 10.0.17763.0)
+
 # Define build configuration option.
 get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(IS_MULTICONFIG)

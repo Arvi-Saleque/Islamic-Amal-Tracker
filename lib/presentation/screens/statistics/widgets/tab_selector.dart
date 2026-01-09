@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
+enum StatisticsTab { weekly, monthly, qaza }
+
 class TabSelector extends StatelessWidget {
-  final bool isWeeklyView;
-  final Function(bool) onTabChanged;
+  final StatisticsTab selectedTab;
+  final Function(StatisticsTab) onTabChanged;
 
   const TabSelector({
     super.key,
-    required this.isWeeklyView,
+    required this.selectedTab,
     required this.onTabChanged,
   });
 
@@ -24,20 +26,24 @@ class TabSelector extends StatelessWidget {
           // Weekly Tab
           Expanded(
             child: GestureDetector(
-              onTap: () => onTabChanged(true),
+              onTap: () => onTabChanged(StatisticsTab.weekly),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: isWeeklyView ? AppTheme.primaryGold : Colors.transparent,
+                  color: selectedTab == StatisticsTab.weekly 
+                      ? AppTheme.primaryGold 
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
                 child: Center(
                   child: Text(
                     'সাপ্তাহিক',
                     style: TextStyle(
-                      color: isWeeklyView ? Colors.black : Colors.grey,
+                      color: selectedTab == StatisticsTab.weekly 
+                          ? Colors.black 
+                          : Colors.grey,
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -47,20 +53,51 @@ class TabSelector extends StatelessWidget {
           // Monthly Tab
           Expanded(
             child: GestureDetector(
-              onTap: () => onTabChanged(false),
+              onTap: () => onTabChanged(StatisticsTab.monthly),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: !isWeeklyView ? AppTheme.primaryGold : Colors.transparent,
+                  color: selectedTab == StatisticsTab.monthly 
+                      ? AppTheme.primaryGold 
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
                 child: Center(
                   child: Text(
                     'মাসিক',
                     style: TextStyle(
-                      color: !isWeeklyView ? Colors.black : Colors.grey,
+                      color: selectedTab == StatisticsTab.monthly 
+                          ? Colors.black 
+                          : Colors.grey,
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Qaza Tab
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onTabChanged(StatisticsTab.qaza),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: selectedTab == StatisticsTab.qaza 
+                      ? AppTheme.primaryGold 
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(26),
+                ),
+                child: Center(
+                  child: Text(
+                    'কাজা',
+                    style: TextStyle(
+                      color: selectedTab == StatisticsTab.qaza 
+                          ? Colors.black 
+                          : Colors.grey,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
                   ),
                 ),

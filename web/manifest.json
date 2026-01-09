@@ -1,11 +1,11 @@
 {
-    "name": "amal_tracker",
-    "short_name": "amal_tracker",
+    "name": "আমল ট্র্যাকার - Amal Tracker",
+    "short_name": "আমল ট্র্যাকার",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#1A1A1A",
+    "description": "Bengali Islamic Amal Tracker with Prayer Times, Dhikr Counter & Analytics",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

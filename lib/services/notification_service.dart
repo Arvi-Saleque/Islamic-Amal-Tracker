@@ -3,6 +3,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:ui' show Color;
 
 class NotificationService {
@@ -32,6 +33,13 @@ class NotificationService {
 
   Future<void> initialize() async {
     if (_isInitialized) return;
+    
+    // Web doesn't support local notifications the same way
+    if (kIsWeb) {
+      _isInitialized = true;
+      print('⚠️ Notifications not supported on web');
+      return;
+    }
 
     // Initialize timezone
     tz_data.initializeTimeZones();
@@ -112,6 +120,8 @@ class NotificationService {
   }
 
   Future<bool> requestPermissions() async {
+    if (kIsWeb) return true; // No permission needed on web
+    
     final status = await Permission.notification.request();
     if (status.isGranted) {
       // Also request exact alarm permission for Android 12+
@@ -128,6 +138,8 @@ class NotificationService {
     required DateTime waqtEndTime,
     required int minutesBefore,
   }) async {
+    if (kIsWeb) return; // Skip on web
+    
     final scheduledTime = waqtEndTime.subtract(Duration(minutes: minutesBefore));
     
     // Don't schedule if time has passed
@@ -172,6 +184,7 @@ class NotificationService {
     required Map<String, DateTime> waqtEndTimes,
     required int minutesBefore,
   }) async {
+    if (kIsWeb) return; // Skip on web
     final prayerIds = {
       'fajr': fajrNotificationId,
       'dhuhr': dhuhrNotificationId,
@@ -208,6 +221,7 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (kIsWeb) return; // Skip on web
     await _scheduleDailyReminder(
       id: morningDhikrId,
       title: 'সকালের যিকির 🌅',
@@ -224,6 +238,7 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (kIsWeb) return; // Skip on web
     await _scheduleDailyReminder(
       id: eveningDhikrId,
       title: 'সন্ধ্যার যিকির 🌆',
@@ -240,6 +255,7 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
+    if (kIsWeb) return; // Skip on web
     await _scheduleDailyReminder(
       id: dailyAmalReminderId,
       title: 'দৈনিক আমল রিমাইন্ডার ✨',
@@ -300,11 +316,13 @@ class NotificationService {
 
   // Cancel specific notification
   Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return; // Skip on web
     await _notifications.cancel(id);
   }
 
   // Cancel all prayer notifications
   Future<void> cancelAllPrayerNotifications() async {
+    if (kIsWeb) return; // Skip on web
     await _notifications.cancel(fajrNotificationId);
     await _notifications.cancel(dhuhrNotificationId);
     await _notifications.cancel(asrNotificationId);
@@ -314,6 +332,7 @@ class NotificationService {
 
   // Cancel all notifications
   Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return; // Skip on web
     await _notifications.cancelAll();
   }
 
@@ -348,6 +367,8 @@ class NotificationService {
     required int minute,
     required int dayOfWeek, // 0=Sunday, 1=Monday, ..., 6=Saturday
   }) async {
+    if (kIsWeb) return; // Skip on web
+    
     try {
       final now = tz.TZDateTime.now(tz.local);
       var scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
@@ -379,6 +400,7 @@ class NotificationService {
           ),
           iOS: const DarwinNotificationDetails(),
         ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
@@ -390,6 +412,7 @@ class NotificationService {
 
   // Get pending notifications
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    if (kIsWeb) return []; // Return empty on web
     return await _notifications.pendingNotificationRequests();
   }
 }

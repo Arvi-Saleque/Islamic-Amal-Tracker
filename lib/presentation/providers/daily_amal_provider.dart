@@ -76,6 +76,42 @@ class DailyAmalNotifier extends StateNotifier<DailyAmalState> {
         final model = DailyAmalModel.fromJson(
           _deepConvert(data),
         );
+        
+        // Check if today's data has any custom items
+        final hasCustomItems = model.items.any((item) => item.id.startsWith('custom_'));
+        
+        if (!hasCustomItems) {
+          // No custom items in today's data, try to get from previous days
+          final customItemsFromPreviousDays = await _getCustomItemsFromPreviousDays();
+          
+          if (customItemsFromPreviousDays.isNotEmpty) {
+            final allItems = List<DailyAmalItem>.from(model.items);
+            
+            for (final customItem in customItemsFromPreviousDays) {
+              // Check if this custom item already exists (by title to avoid duplicates)
+              final alreadyExists = allItems.any((item) => 
+                item.title == customItem.title && item.id.startsWith('custom_'));
+              
+              if (!alreadyExists) {
+                // Add with new id but same title, reset completion status
+                allItems.add(DailyAmalItem(
+                  id: 'custom_${DateTime.now().millisecondsSinceEpoch}_${customItemsFromPreviousDays.indexOf(customItem)}',
+                  title: customItem.title,
+                  category: customItem.category,
+                  isCompleted: false,
+                  completedAt: null,
+                ));
+              }
+            }
+            
+            state = state.copyWith(
+              todayData: model.copyWith(items: allItems),
+            );
+            await _saveTodayData();
+            return;
+          }
+        }
+        
         state = state.copyWith(todayData: model);
       } catch (e) {
         print('Error loading daily amal data: $e');
@@ -85,12 +121,84 @@ class DailyAmalNotifier extends StateNotifier<DailyAmalState> {
         await _saveTodayData();
       }
     } else {
-      // Create new data for today
-      state = state.copyWith(
-        todayData: DailyAmalModel.empty(today),
-      );
+      // Create new data for today - but first check for custom items from previous days
+      final customItemsFromPreviousDays = await _getCustomItemsFromPreviousDays();
+      
+      // Start with empty template for today
+      final newModel = DailyAmalModel.empty(today);
+      
+      // Add custom items from previous days (with isCompleted = false)
+      if (customItemsFromPreviousDays.isNotEmpty) {
+        final allItems = List<DailyAmalItem>.from(newModel.items);
+        
+        for (final customItem in customItemsFromPreviousDays) {
+          // Check if this custom item already exists (by title to avoid duplicates)
+          final alreadyExists = allItems.any((item) => 
+            item.title == customItem.title && item.id.startsWith('custom_'));
+          
+          if (!alreadyExists) {
+            // Add with new id but same title, reset completion status
+            allItems.add(DailyAmalItem(
+              id: 'custom_${DateTime.now().millisecondsSinceEpoch}_${customItemsFromPreviousDays.indexOf(customItem)}',
+              title: customItem.title,
+              category: customItem.category,
+              isCompleted: false,
+              completedAt: null,
+            ));
+          }
+        }
+        
+        state = state.copyWith(
+          todayData: newModel.copyWith(items: allItems),
+        );
+      } else {
+        state = state.copyWith(
+          todayData: newModel,
+        );
+      }
+      
       await _saveTodayData();
     }
+  }
+  
+  /// Get custom items from the most recent previous day that has data
+  Future<List<DailyAmalItem>> _getCustomItemsFromPreviousDays() async {
+    if (_box == null) return [];
+    
+    final customItems = <DailyAmalItem>[];
+    
+    // Check last 7 days for custom items
+    for (int i = 1; i <= 7; i++) {
+      final previousDate = DateTime.now().subtract(Duration(days: i));
+      final previousDateStr = DateFormat('yyyy-MM-dd').format(previousDate);
+      final previousData = _box!.get(previousDateStr);
+      
+      if (previousData != null) {
+        try {
+          final previousModel = DailyAmalModel.fromJson(_deepConvert(previousData));
+          
+          // Find custom items (id starts with 'custom_')
+          for (final item in previousModel.items) {
+            if (item.id.startsWith('custom_')) {
+              // Check if we already have this item (by title)
+              final alreadyAdded = customItems.any((ci) => ci.title == item.title);
+              if (!alreadyAdded) {
+                customItems.add(item);
+              }
+            }
+          }
+          
+          // If we found data, we have the custom items we need
+          if (customItems.isNotEmpty) {
+            break;
+          }
+        } catch (e) {
+          print('Error loading previous day data: $e');
+        }
+      }
+    }
+    
+    return customItems;
   }
 
   Future<void> _saveTodayData() async {

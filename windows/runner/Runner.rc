@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.amaltracker" "\0"
-            VALUE "FileDescription", "amal_tracker" "\0"
+            VALUE "FileDescription", "Amal Tracker - Islamic Practice Tracker" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "amal_tracker" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.amaltracker. All rights reserved." "\0"
             VALUE "OriginalFilename", "amal_tracker.exe" "\0"
-            VALUE "ProductName", "amal_tracker" "\0"
+            VALUE "ProductName", "Amal Tracker" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

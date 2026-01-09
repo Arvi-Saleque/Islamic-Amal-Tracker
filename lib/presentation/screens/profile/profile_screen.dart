@@ -184,6 +184,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
+        titleSpacing: 0,
         title: const Text(
           'প্রোফাইল',
           style: TextStyle(

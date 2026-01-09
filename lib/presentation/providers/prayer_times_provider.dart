@@ -5,38 +5,50 @@ import 'package:geolocator/geolocator.dart';
 
 class PrayerTimesState {
   final Map<String, DateTime> prayerTimes;
+  final Map<String, DateTime> waqtEndTimes; // Each prayer's actual end time
   final String? nextPrayer;
   final String? timeToNextPrayer;
   final String? currentPrayer;
   final String? timeToCurrentPrayerEnd;
+  final bool isForbiddenTime; // True during forbidden prayer times (post-sunrise & zawal)
+  final bool isNaflTime; // True during voluntary prayer time
   final bool isLoading;
   final String? error;
 
   PrayerTimesState({
     required this.prayerTimes,
+    this.waqtEndTimes = const {},
     this.nextPrayer,
     this.timeToNextPrayer,
     this.currentPrayer,
     this.timeToCurrentPrayerEnd,
+    this.isForbiddenTime = false,
+    this.isNaflTime = false,
     this.isLoading = false,
     this.error,
   });
 
   PrayerTimesState copyWith({
     Map<String, DateTime>? prayerTimes,
+    Map<String, DateTime>? waqtEndTimes,
     String? nextPrayer,
     String? timeToNextPrayer,
     String? currentPrayer,
     String? timeToCurrentPrayerEnd,
+    bool? isForbiddenTime,
+    bool? isNaflTime,
     bool? isLoading,
     String? error,
   }) {
     return PrayerTimesState(
       prayerTimes: prayerTimes ?? this.prayerTimes,
+      waqtEndTimes: waqtEndTimes ?? this.waqtEndTimes,
       nextPrayer: nextPrayer ?? this.nextPrayer,
       timeToNextPrayer: timeToNextPrayer ?? this.timeToNextPrayer,
       currentPrayer: currentPrayer ?? this.currentPrayer,
       timeToCurrentPrayerEnd: timeToCurrentPrayerEnd ?? this.timeToCurrentPrayerEnd,
+      isForbiddenTime: isForbiddenTime ?? this.isForbiddenTime,
+      isNaflTime: isNaflTime ?? this.isNaflTime,
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );
@@ -65,66 +77,224 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
   }
   
   void _updateNextPrayerTime() {
-    if (state.prayerTimes.isEmpty) return;
+    if (state.prayerTimes.isEmpty || state.waqtEndTimes.isEmpty) return;
     
     final now = DateTime.now();
+    final result = _calculateCurrentAndNextPrayer(now, state.prayerTimes, state.waqtEndTimes);
+    
+    state = state.copyWith(
+      nextPrayer: result['nextPrayer'],
+      timeToNextPrayer: result['timeToNext'],
+      currentPrayer: result['currentPrayer'],
+      timeToCurrentPrayerEnd: result['timeToCurrentEnd'],
+      isForbiddenTime: result['isForbiddenTime'] ?? false,
+      isNaflTime: result['isNaflTime'] ?? false,
+    );
+  }
+  
+  /// Calculate current prayer and next prayer based on actual waqt end times
+  /// 
+  /// Prayer Time Rules:
+  /// - Fajr: starts at fajr time, ends at sunrise
+  /// - Forbidden: sunrise to sunrise+15min (sun fully rising)
+  /// - Nafl (voluntary): sunrise+15min to dhuhr-10min
+  /// - Forbidden: dhuhr-10min to dhuhr (zawal - sun at zenith)
+  /// - Dhuhr: starts at dhuhr time, ends at asr start
+  /// - Asr: starts at asr time, ends at maghrib-15min
+  /// - Forbidden: maghrib-15min to maghrib (sun setting)
+  /// - Maghrib: starts at maghrib time, ends at isha start
+  /// - Isha: starts at isha time, ends at fajr (next day)
+  Map<String, dynamic> _calculateCurrentAndNextPrayer(
+    DateTime now,
+    Map<String, DateTime> prayerTimes,
+    Map<String, DateTime> waqtEndTimes,
+  ) {
+    String? currentPrayer;
     String? nextPrayer;
     String? timeToNext;
-    String? currentPrayer;
     String? timeToCurrentEnd;
-
-    final prayerOrder = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    bool isForbiddenTime = false;
+    bool isNaflTime = false;
     
-    // Find next prayer and current prayer
-    for (int i = 0; i < prayerOrder.length; i++) {
-      final prayer = prayerOrder[i];
-      final prayerTime = state.prayerTimes[prayer];
-      if (prayerTime == null) continue;
-      
-      final prayerTimeLocal = DateTime(
-        now.year, now.month, now.day,
-        prayerTime.hour, prayerTime.minute, prayerTime.second
-      );
-      
-      if (prayerTimeLocal.isAfter(now)) {
-        nextPrayer = prayer;
-        final duration = prayerTimeLocal.difference(now);
-        timeToNext = formatTimeToNext(duration);
-        
-        // Current prayer is the previous one
-        if (i > 0) {
-          currentPrayer = prayerOrder[i - 1];
-          timeToCurrentEnd = timeToNext; // Time until next prayer = time until current ends
-        } else {
-          // Before Fajr - current is Isha from previous day
-          currentPrayer = 'isha';
-          timeToCurrentEnd = timeToNext;
+    // Convert all times to today's date for comparison
+    DateTime toToday(DateTime time) {
+      return DateTime(now.year, now.month, now.day, time.hour, time.minute, time.second);
+    }
+    
+    // Get today's times
+    final fajrStart = prayerTimes['fajr'] != null ? toToday(prayerTimes['fajr']!) : null;
+    final sunrise = prayerTimes['sunrise'] != null ? toToday(prayerTimes['sunrise']!) : null;
+    final dhuhrStart = prayerTimes['dhuhr'] != null ? toToday(prayerTimes['dhuhr']!) : null;
+    final asrStart = prayerTimes['asr'] != null ? toToday(prayerTimes['asr']!) : null;
+    final maghribStart = prayerTimes['maghrib'] != null ? toToday(prayerTimes['maghrib']!) : null;
+    final ishaStart = prayerTimes['isha'] != null ? toToday(prayerTimes['isha']!) : null;
+    
+    // Calculate forbidden times
+    final sunriseEnd = sunrise?.add(const Duration(minutes: 15)); // ~15 min after sunrise
+    final zawalStart = dhuhrStart?.subtract(const Duration(minutes: 10)); // ~10 min before dhuhr
+    final sunsetForbiddenStart = maghribStart?.subtract(const Duration(minutes: 15)); // ~15 min before maghrib
+    
+    // Get waqt end times (adjusted for sunset forbidden time)
+    final fajrEnd = waqtEndTimes['fajr'] != null ? toToday(waqtEndTimes['fajr']!) : sunrise;
+    final dhuhrEnd = waqtEndTimes['dhuhr'] != null ? toToday(waqtEndTimes['dhuhr']!) : asrStart;
+    final asrEnd = sunsetForbiddenStart; // Asr ends 15 min before maghrib (sunset)
+    final maghribEnd = waqtEndTimes['maghrib'] != null ? toToday(waqtEndTimes['maghrib']!) : ishaStart;
+    // Isha ends at fajr next day
+    final ishaEnd = fajrStart != null 
+        ? DateTime(now.year, now.month, now.day + 1, fajrStart.hour, fajrStart.minute, fajrStart.second)
+        : null;
+    
+    // Check each time period
+    if (fajrStart != null && fajrEnd != null) {
+      // Before Fajr starts - current is Isha (from yesterday)
+      if (now.isBefore(fajrStart)) {
+        currentPrayer = 'isha';
+        nextPrayer = 'fajr';
+        timeToNext = formatTimeToNext(fajrStart.difference(now));
+        timeToCurrentEnd = timeToNext;
+      }
+      // During Fajr time (fajr start to sunrise)
+      else if (now.isAfter(fajrStart) && now.isBefore(fajrEnd)) {
+        currentPrayer = 'fajr';
+        nextPrayer = 'dhuhr';
+        timeToCurrentEnd = formatTimeToNext(fajrEnd.difference(now));
+        if (dhuhrStart != null) {
+          timeToNext = formatTimeToNext(dhuhrStart.difference(now));
         }
-        break;
       }
     }
-
-    // If no next prayer found (after Isha), current is Isha and next is Fajr tomorrow
-    if (nextPrayer == null && state.prayerTimes.containsKey('fajr')) {
-      currentPrayer = 'isha';
-      nextPrayer = 'fajr';
-      final fajrTime = state.prayerTimes['fajr']!;
-      // Tomorrow's Fajr
-      final tomorrowFajr = DateTime(
-        now.year, now.month, now.day + 1,
-        fajrTime.hour, fajrTime.minute, fajrTime.second
-      );
-      final duration = tomorrowFajr.difference(now);
-      timeToNext = formatTimeToNext(duration);
-      timeToCurrentEnd = timeToNext;
+    
+    // Forbidden time after sunrise (~15 minutes)
+    if (sunrise != null && sunriseEnd != null) {
+      if (now.isAfter(sunrise) && now.isBefore(sunriseEnd)) {
+        currentPrayer = null;
+        nextPrayer = 'dhuhr';
+        timeToNext = formatTimeToNext(dhuhrStart!.difference(now));
+        timeToCurrentEnd = formatTimeToNext(sunriseEnd.difference(now));
+        isForbiddenTime = true;
+        return {
+          'currentPrayer': currentPrayer,
+          'nextPrayer': nextPrayer,
+          'timeToNext': timeToNext,
+          'timeToCurrentEnd': timeToCurrentEnd,
+          'isForbiddenTime': isForbiddenTime,
+          'isNaflTime': isNaflTime,
+        };
+      }
     }
-
-    state = state.copyWith(
-      nextPrayer: nextPrayer,
-      timeToNextPrayer: timeToNext,
-      currentPrayer: currentPrayer,
-      timeToCurrentPrayerEnd: timeToCurrentEnd,
-    );
+    
+    // Nafl time (after sunrise forbidden period, before zawal)
+    if (sunriseEnd != null && zawalStart != null) {
+      if (now.isAfter(sunriseEnd) && now.isBefore(zawalStart)) {
+        currentPrayer = null;
+        nextPrayer = 'dhuhr';
+        timeToNext = formatTimeToNext(dhuhrStart!.difference(now));
+        timeToCurrentEnd = formatTimeToNext(zawalStart.difference(now));
+        isNaflTime = true;
+        return {
+          'currentPrayer': currentPrayer,
+          'nextPrayer': nextPrayer,
+          'timeToNext': timeToNext,
+          'timeToCurrentEnd': timeToCurrentEnd,
+          'isForbiddenTime': isForbiddenTime,
+          'isNaflTime': isNaflTime,
+        };
+      }
+    }
+    
+    // Forbidden time before dhuhr (zawal - sun at zenith)
+    if (zawalStart != null && dhuhrStart != null) {
+      if (now.isAfter(zawalStart) && now.isBefore(dhuhrStart)) {
+        currentPrayer = null;
+        nextPrayer = 'dhuhr';
+        timeToNext = formatTimeToNext(dhuhrStart.difference(now));
+        timeToCurrentEnd = timeToNext;
+        isForbiddenTime = true;
+        return {
+          'currentPrayer': currentPrayer,
+          'nextPrayer': nextPrayer,
+          'timeToNext': timeToNext,
+          'timeToCurrentEnd': timeToCurrentEnd,
+          'isForbiddenTime': isForbiddenTime,
+          'isNaflTime': isNaflTime,
+        };
+      }
+    }
+    
+    // During Dhuhr time
+    if (dhuhrStart != null && dhuhrEnd != null) {
+      if (now.isAfter(dhuhrStart) && now.isBefore(dhuhrEnd)) {
+        currentPrayer = 'dhuhr';
+        nextPrayer = 'asr';
+        timeToCurrentEnd = formatTimeToNext(dhuhrEnd.difference(now));
+        if (asrStart != null) {
+          timeToNext = formatTimeToNext(asrStart.difference(now));
+        }
+      }
+    }
+    
+    // During Asr time (but not in forbidden sunset period)
+    if (asrStart != null && asrEnd != null) {
+      if (now.isAfter(asrStart) && now.isBefore(asrEnd)) {
+        currentPrayer = 'asr';
+        nextPrayer = 'maghrib';
+        timeToCurrentEnd = formatTimeToNext(asrEnd.difference(now));
+        if (maghribStart != null) {
+          timeToNext = formatTimeToNext(maghribStart.difference(now));
+        }
+      }
+    }
+    
+    // Forbidden time before maghrib (sunset - 15 min before)
+    if (sunsetForbiddenStart != null && maghribStart != null) {
+      if (now.isAfter(sunsetForbiddenStart) && now.isBefore(maghribStart)) {
+        currentPrayer = null;
+        nextPrayer = 'maghrib';
+        timeToNext = formatTimeToNext(maghribStart.difference(now));
+        timeToCurrentEnd = timeToNext;
+        isForbiddenTime = true;
+        return {
+          'currentPrayer': currentPrayer,
+          'nextPrayer': nextPrayer,
+          'timeToNext': timeToNext,
+          'timeToCurrentEnd': timeToCurrentEnd,
+          'isForbiddenTime': isForbiddenTime,
+          'isNaflTime': isNaflTime,
+        };
+      }
+    }
+    
+    // During Maghrib time
+    if (maghribStart != null && maghribEnd != null) {
+      if (now.isAfter(maghribStart) && now.isBefore(maghribEnd)) {
+        currentPrayer = 'maghrib';
+        nextPrayer = 'isha';
+        timeToCurrentEnd = formatTimeToNext(maghribEnd.difference(now));
+        if (ishaStart != null) {
+          timeToNext = formatTimeToNext(ishaStart.difference(now));
+        }
+      }
+    }
+    
+    // During Isha time (after isha starts)
+    if (ishaStart != null && ishaEnd != null) {
+      if (now.isAfter(ishaStart)) {
+        currentPrayer = 'isha';
+        nextPrayer = 'fajr';
+        // Isha ends at fajr next day
+        timeToCurrentEnd = formatTimeToNext(ishaEnd.difference(now));
+        timeToNext = timeToCurrentEnd;
+      }
+    }
+    
+    return {
+      'currentPrayer': currentPrayer,
+      'nextPrayer': nextPrayer,
+      'timeToNext': timeToNext,
+      'timeToCurrentEnd': timeToCurrentEnd,
+      'isForbiddenTime': isForbiddenTime,
+      'isNaflTime': isNaflTime,
+    };
   }
 
   Future<void> fetchPrayerTimes() async {
@@ -166,79 +336,53 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       print('  Isha: ${prayerTimes.isha}');
 
       // adhan_dart returns UTC times, convert to local
+      // Include sunrise for waqt end time calculation
       final times = {
         'fajr': prayerTimes.fajr!.toLocal(),
+        'sunrise': prayerTimes.sunrise!.toLocal(), // Important: Fajr ends at sunrise
         'dhuhr': prayerTimes.dhuhr!.toLocal(),
         'asr': prayerTimes.asr!.toLocal(),
         'maghrib': prayerTimes.maghrib!.toLocal(),
         'isha': prayerTimes.isha!.toLocal(),
       };
       
+      // Calculate waqt end times for each prayer
+      // These are the ACTUAL end times, not just when next prayer starts
+      final waqtEndTimes = <String, DateTime>{
+        'fajr': times['sunrise']!,           // Fajr ends at sunrise
+        'dhuhr': times['asr']!,              // Dhuhr ends when Asr starts
+        'asr': times['maghrib']!,            // Asr ends at sunset (Maghrib)
+        'maghrib': times['isha']!,           // Maghrib ends when Isha starts
+        // Isha ends at Fajr next day (calculated in _calculateCurrentAndNextPrayer)
+      };
+      
       print('🕌 Local Prayer Times:');
       print('  Fajr: ${times['fajr']}');
+      print('  Sunrise: ${times['sunrise']}');
       print('  Dhuhr: ${times['dhuhr']}');
       print('  Asr: ${times['asr']}');
       print('  Maghrib: ${times['maghrib']}');
       print('  Isha: ${times['isha']}');
+      print('📍 Waqt End Times:');
+      print('  Fajr ends: ${waqtEndTimes['fajr']}');
+      print('  Dhuhr ends: ${waqtEndTimes['dhuhr']}');
+      print('  Asr ends: ${waqtEndTimes['asr']}');
+      print('  Maghrib ends: ${waqtEndTimes['maghrib']}');
       print('  Current time: ${DateTime.now()}');
 
-      // Calculate next prayer and current prayer using proper local time comparison
+      // Calculate current and next prayer using proper waqt end times
       final now = DateTime.now();
-      String? nextPrayer;
-      String? timeToNext;
-      String? currentPrayer;
-      String? timeToCurrentEnd;
-      
-      final prayerOrder = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
-      
-      for (int i = 0; i < prayerOrder.length; i++) {
-        final prayer = prayerOrder[i];
-        final prayerTime = times[prayer];
-        if (prayerTime == null) continue;
-        
-        final prayerTimeToday = DateTime(
-          now.year, now.month, now.day,
-          prayerTime.hour, prayerTime.minute, prayerTime.second
-        );
-        
-        if (prayerTimeToday.isAfter(now)) {
-          nextPrayer = prayer;
-          final duration = prayerTimeToday.difference(now);
-          timeToNext = formatTimeToNext(duration);
-          
-          // Current prayer is the previous one
-          if (i > 0) {
-            currentPrayer = prayerOrder[i - 1];
-            timeToCurrentEnd = timeToNext;
-          } else {
-            // Before Fajr - current is Isha from previous day
-            currentPrayer = 'isha';
-            timeToCurrentEnd = timeToNext;
-          }
-          break;
-        }
-      }
-
-      // If no next prayer found (after Isha), current is Isha and next is Fajr tomorrow
-      if (nextPrayer == null) {
-        currentPrayer = 'isha';
-        nextPrayer = 'fajr';
-        final fajrTime = times['fajr']!;
-        final tomorrowFajr = DateTime(
-          now.year, now.month, now.day + 1,
-          fajrTime.hour, fajrTime.minute, fajrTime.second
-        );
-        final duration = tomorrowFajr.difference(now);
-        timeToNext = formatTimeToNext(duration);
-        timeToCurrentEnd = timeToNext;
-      }
+      final result = _calculateCurrentAndNextPrayer(now, times, waqtEndTimes);
 
       state = PrayerTimesState(
         prayerTimes: times,
-        nextPrayer: nextPrayer,
-        currentPrayer: currentPrayer,
-        timeToCurrentPrayerEnd: timeToCurrentEnd,
-        timeToNextPrayer: timeToNext,
+        waqtEndTimes: waqtEndTimes,
+        nextPrayer: result['nextPrayer'],
+        currentPrayer: result['currentPrayer'],
+        timeToCurrentPrayerEnd: result['timeToCurrentEnd'],
+        timeToNextPrayer: result['timeToNext'],
+        isForbiddenTime: result['isForbiddenTime'] ?? false,
+        isNaflTime: result['isNaflTime'] ?? false,
         isLoading: false,
       );
     } catch (e) {

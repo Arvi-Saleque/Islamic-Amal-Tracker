@@ -59,10 +59,15 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
 
     if (data != null) {
       try {
-        final model = PrayerTrackingModel.fromJson(
+        var model = PrayerTrackingModel.fromJson(
           Map<String, dynamic>.from(data),
         );
+        
+        // Migrate old data: Fix Zuhr prayer from 2 to 4 rakat farz
+        model = _migrateOldData(model);
+        
         state = state.copyWith(todayData: model);
+        await _saveTodayData(); // Save migrated data
       } catch (e) {
         print('Error loading prayer data: $e');
         state = state.copyWith(
@@ -77,6 +82,109 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
       );
       await _saveTodayData();
     }
+  }
+  
+  // Migrate old data format to new format with 2 fard options
+  PrayerTrackingModel _migrateOldData(PrayerTrackingModel model) {
+    final oldRakatsDone = model.rakatsDone;
+    final newRakatsDone = <String, Map<String, bool>>{};
+    final prayerDone = Map<String, bool>.from(model.prayerDone);
+    bool needsMigration = false;
+    
+    // Define new format for each prayer
+    final newFormats = {
+      'ফজর': {
+        '২ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+        '২ রাকাত ফরয (দেরী করে)': false,
+        '২ রাকাত সুন্নাত': false,
+      },
+      'যুহর': {
+        '৪ রাকাত সুন্নাত (আগে)': false,
+        '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+        '৪ রাকাত ফরয (দেরী করে)': false,
+        '২ রাকাত সুন্নাত (পরে)': false,
+      },
+      'আসর': {
+        '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+        '৪ রাকাত ফরয (দেরী করে)': false,
+      },
+      'মাগরিব': {
+        '৩ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+        '৩ রাকাত ফরয (দেরী করে)': false,
+        '২ রাকাত সুন্নাত': false,
+      },
+      'এশা': {
+        '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
+        '৪ রাকাত ফরয (দেরী করে)': false,
+        '২ রাকাত সুন্নাত': false,
+        '৩ রাকাত বেতের': false,
+      },
+    };
+    
+    // Check each prayer and migrate
+    for (final prayer in ['ফজর', 'যুহর', 'আসর', 'মাগরিব', 'এশা']) {
+      final newRakats = Map<String, bool>.from(newFormats[prayer]!);
+      final validKeys = newFormats[prayer]!.keys.toSet();
+      
+      if (oldRakatsDone.containsKey(prayer)) {
+        final oldRakats = oldRakatsDone[prayer]!;
+        
+        // Check if keys match exactly
+        final oldKeys = oldRakats.keys.toSet();
+        if (oldKeys.length != validKeys.length || !oldKeys.containsAll(validKeys)) {
+          needsMigration = true;
+          
+          // Transfer old values to new format
+          for (final oldKey in oldRakats.keys) {
+            if (oldRakats[oldKey] == true) {
+              // Map old fard to first fard option (জামাতে/আউয়াল ওয়াক্তে)
+              if (oldKey.contains('ফরয') && !oldKey.contains('(জামাতে') && !oldKey.contains('(দেরী')) {
+                for (final newKey in newRakats.keys) {
+                  if (newKey.contains('ফরয (জামাতে')) {
+                    newRakats[newKey] = true;
+                    break;
+                  }
+                }
+              }
+              // If already new format fard, keep it
+              if (newRakats.containsKey(oldKey)) {
+                newRakats[oldKey] = true;
+              }
+              // Map sunnah values  
+              if (oldKey.contains('সুন্নাত')) {
+                for (final newKey in newRakats.keys) {
+                  if (newKey.contains('সুন্নাত') && 
+                      ((oldKey.contains('(আগে)') && newKey.contains('(আগে)')) ||
+                       (oldKey.contains('(পরে)') && newKey.contains('(পরে)')) ||
+                       (!oldKey.contains('(') && !newKey.contains('(')))) {
+                    newRakats[newKey] = true;
+                  }
+                }
+              }
+            }
+          }
+          
+          // Update prayerDone based on any fard being done
+          final anyFardDone = newRakats.entries.any((e) => e.key.contains('ফরয') && e.value);
+          prayerDone[prayer] = anyFardDone;
+        } else {
+          // Keys match, keep old values
+          for (final key in validKeys) {
+            newRakats[key] = oldRakats[key] ?? false;
+          }
+        }
+      } else {
+        needsMigration = true;
+      }
+      
+      newRakatsDone[prayer] = newRakats;
+    }
+    
+    if (needsMigration) {
+      return model.copyWith(rakatsDone: newRakatsDone, prayerDone: prayerDone);
+    }
+    
+    return model.copyWith(rakatsDone: newRakatsDone);
   }
 
   // Save today's data to Hive
@@ -103,13 +211,29 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
     final newPrayerDone = Map<String, bool>.from(state.todayData.prayerDone);
     newPrayerDone[prayer] = newValue;
 
-    // Update all rakats
+    // Update rakats - when toggling on, check first fard option only
+    // When toggling off, uncheck all
     final newRakatsDone =
         Map<String, Map<String, bool>>.from(state.todayData.rakatsDone);
     if (newRakatsDone.containsKey(prayer)) {
       final rakats = Map<String, bool>.from(newRakatsDone[prayer]!);
-      for (var rakat in rakats.keys) {
-        rakats[rakat] = newValue;
+      if (newValue) {
+        // Find first fard option and check it
+        bool firstFardChecked = false;
+        for (var rakat in rakats.keys) {
+          if (rakat.contains('ফরয') && !firstFardChecked) {
+            rakats[rakat] = true;
+            firstFardChecked = true;
+          } else if (rakat.contains('ফরয')) {
+            rakats[rakat] = false; // Uncheck other fard options
+          }
+          // Don't change sunnah/witr status when toggling prayer
+        }
+      } else {
+        // Uncheck all when toggling off
+        for (var rakat in rakats.keys) {
+          rakats[rakat] = false;
+        }
       }
       newRakatsDone[prayer] = rakats;
     }
@@ -131,13 +255,25 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
 
     if (newRakatsDone.containsKey(prayer)) {
       final rakats = Map<String, bool>.from(newRakatsDone[prayer]!);
+      
+      // If selecting a fard option, uncheck the other fard option (they are mutually exclusive)
+      final isFardOption = rakat.contains('ফরয');
+      if (isFardOption && !(rakats[rakat] ?? false)) {
+        // Uncheck other fard options when checking this one
+        for (final key in rakats.keys.toList()) {
+          if (key.contains('ফরয') && key != rakat) {
+            rakats[key] = false;
+          }
+        }
+      }
+      
       rakats[rakat] = !(rakats[rakat] ?? false);
       newRakatsDone[prayer] = rakats;
 
-      // Check if all rakats are done
-      final allDone = rakats.values.every((done) => done);
+      // Check if any fard is done - prayer is complete if any fard option is checked
+      final anyFardDone = rakats.entries.any((e) => e.key.contains('ফরয') && e.value);
       final newPrayerDone = Map<String, bool>.from(state.todayData.prayerDone);
-      newPrayerDone[prayer] = allDone;
+      newPrayerDone[prayer] = anyFardDone;
 
       state = state.copyWith(
         todayData: state.todayData.copyWith(

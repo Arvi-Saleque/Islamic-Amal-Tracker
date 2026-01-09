@@ -24,6 +24,7 @@ class RemindersScreenWidget extends ConsumerWidget {
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: appBarBg,
+        titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),

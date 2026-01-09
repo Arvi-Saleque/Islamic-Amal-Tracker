@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../data/services/firestore_sync_service.dart';
 import '../home/home_screen.dart';
 import '../auth/auth_screen.dart';
 
@@ -32,6 +33,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       }
       
       if (user != null) {
+        // User is signed in, restore data from cloud first
+        print('🔄 User logged in, syncing data from cloud...');
+        await firestoreSyncService.restoreAllData();
+        print('✅ Data sync complete, navigating to home...');
+        
         // User is signed in, go to home
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -53,10 +59,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.mosque,
-              size: 100,
-              color: Color(0xFFD4AF37),
+            Image.asset(
+              'assets/images/logo.png',
+              width: 120,
+              height: 120,
             ),
             const SizedBox(height: 24),
             Text(

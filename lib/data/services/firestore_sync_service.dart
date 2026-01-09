@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive/hive.dart';
 
 /// Firestore Sync Service
@@ -20,11 +21,13 @@ class FirestoreSyncService {
       _auth = FirebaseAuth.instance;
       _isAvailable = true;
       
-      // Enable offline persistence
-      _firestore!.settings = const Settings(
-        persistenceEnabled: true,
-        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-      );
+      // Enable offline persistence (only for mobile - web uses IndexedDB by default)
+      if (!kIsWeb) {
+        _firestore!.settings = const Settings(
+          persistenceEnabled: true,
+          cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+        );
+      }
     } catch (e) {
       _isAvailable = false;
       print('Firestore not available: $e');
@@ -144,6 +147,33 @@ class FirestoreSyncService {
     }
   }
 
+  /// Sync qaza prayer data
+  Future<void> syncQazaPrayer(String key, Map<String, dynamic> data) async {
+    if (!canSync) return;
+    try {
+      await _userDataCollection!.doc('qaza_prayers').collection('items').doc(key).set({
+        ...data,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error syncing qaza prayer: $e');
+    }
+  }
+
+  /// Sync statistics data
+  Future<void> syncStatistics(Map<String, dynamic> data) async {
+    if (!canSync) return;
+    try {
+      await _userDataCollection!.doc('statistics').set({
+        ...data,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      print('✅ Synced statistics');
+    } catch (e) {
+      print('Error syncing statistics: $e');
+    }
+  }
+
   // ==================== RESTORE METHODS ====================
 
   /// Restore all data from cloud to local
@@ -165,6 +195,7 @@ class FirestoreSyncService {
         _restoreSinTracker(),
         _restoreSinTypes(),
         _restoreCustomReminders(),
+        _restoreStatistics(),
       ]);
       print('✅ All data restored successfully!');
       return true;
@@ -275,6 +306,17 @@ class FirestoreSyncService {
     }
   }
 
+  Future<void> _restoreStatistics() async {
+    final doc = await _userDataCollection!.doc('statistics').get();
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      data.remove('updatedAt');
+      final box = await Hive.openBox('statistics');
+      await box.put('statistics_data', data);
+      print('📥 Restored statistics data');
+    }
+  }
+
   // ==================== BACKUP ALL LOCAL DATA ====================
 
   /// Backup all local data to cloud
@@ -288,6 +330,7 @@ class FirestoreSyncService {
       await _backupReadingTracker();
       await _backupSinTracker();
       await _backupCustomReminders();
+      await _backupStatistics();
       return true;
     } catch (e) {
       print('Error backing up data: $e');
@@ -366,6 +409,14 @@ class FirestoreSyncService {
     }
     if (reminders.isNotEmpty) {
       await syncCustomReminders(reminders);
+    }
+  }
+
+  Future<void> _backupStatistics() async {
+    final box = await Hive.openBox('statistics');
+    final data = box.get('statistics_data');
+    if (data != null) {
+      await syncStatistics(Map<String, dynamic>.from(data));
     }
   }
 

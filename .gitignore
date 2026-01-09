@@ -13,3 +13,7 @@ output/
 # OS
 .DS_Store
 Thumbs.db
+# Android signing
+android/key.properties
+*.jks
+*.keystore
