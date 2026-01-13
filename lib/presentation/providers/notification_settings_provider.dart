@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../../data/models/notification_settings_model.dart';
 import '../../services/notification_service.dart';
-import 'prayer_times_provider.dart';
 
 class NotificationSettingsState {
   final NotificationSettingsModel settings;
@@ -41,32 +40,43 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettingsSta
   }
 
   Future<void> _initBox() async {
-    _box = await Hive.openBox('notification_settings');
-    _initialize();
+    try {
+      _box = await Hive.openBox('notification_settings');
+      await _initialize();
+    } catch (e) {
+      print('Error initializing notification settings: $e');
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> _initialize() async {
     state = state.copyWith(isLoading: true);
     
-    // Initialize notification service
-    await _notificationService.initialize();
-    
-    // Load saved settings
-    final data = _box?.get('settings');
-    if (data != null) {
-      final settings = NotificationSettingsModel.fromJson(
-        Map<String, dynamic>.from(data),
-      );
-      state = state.copyWith(settings: settings);
-    }
-    
-    // Check permission status
-    final hasPermission = await _notificationService.requestPermissions();
-    state = state.copyWith(hasPermission: hasPermission, isLoading: false);
-    
-    // Schedule notifications if enabled
-    if (hasPermission) {
-      await _scheduleAllNotifications();
+    try {
+      // Initialize local notification service
+      await _notificationService.initialize();
+      
+      // Load saved settings from local storage
+      final data = _box?.get('settings');
+      if (data != null) {
+        final settings = NotificationSettingsModel.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+        state = state.copyWith(settings: settings);
+      }
+      
+      // Just CHECK permission status, don't request (to avoid blocking UI)
+      final permissions = await _notificationService.checkAllPermissions();
+      final hasPermission = permissions['notification'] == true;
+      state = state.copyWith(hasPermission: hasPermission, isLoading: false);
+      
+      // Schedule local notifications based on saved settings
+      if (hasPermission) {
+        await _scheduleAllNotifications();
+      }
+    } catch (e) {
+      print('Error in _initialize: $e');
+      state = state.copyWith(isLoading: false);
     }
   }
 
@@ -82,25 +92,23 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettingsSta
   Future<void> _scheduleAllNotifications() async {
     final settings = state.settings;
     
-    // Schedule prayer reminders
-    if (settings.prayerNotificationsEnabled) {
-      await _schedulePrayerNotifications();
-    }
-    
-    // Schedule morning dhikr
+    // Schedule dhikr reminders
     if (settings.morningDhikrEnabled) {
       await _notificationService.scheduleMorningDhikrReminder(
         hour: settings.morningDhikrHour,
         minute: settings.morningDhikrMinute,
       );
+    } else {
+      await _notificationService.cancelNotification(NotificationService.morningDhikrId);
     }
     
-    // Schedule evening dhikr
     if (settings.eveningDhikrEnabled) {
       await _notificationService.scheduleEveningDhikrReminder(
         hour: settings.eveningDhikrHour,
         minute: settings.eveningDhikrMinute,
       );
+    } else {
+      await _notificationService.cancelNotification(NotificationService.eveningDhikrId);
     }
     
     // Schedule daily amal reminder
@@ -109,70 +117,16 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettingsSta
         hour: settings.dailyAmalReminderHour,
         minute: settings.dailyAmalReminderMinute,
       );
+    } else {
+      await _notificationService.cancelNotification(NotificationService.dailyAmalReminderId);
     }
-  }
-
-  Future<void> _schedulePrayerNotifications() async {
-    final prayerTimesState = _ref.read(prayerTimesProvider);
-    final settings = state.settings;
-    
-    if (prayerTimesState.prayerTimes.isEmpty) return;
-    
-    // Cancel existing prayer notifications
-    await _notificationService.cancelAllPrayerNotifications();
-    
-    final prayerTimes = <String, DateTime>{};
-    final waqtEndTimes = <String, DateTime>{};
-    
-    // Get all prayer times
-    final fajr = prayerTimesState.prayerTimes['fajr'];
-    final sunrise = prayerTimesState.prayerTimes['sunrise'];
-    final dhuhr = prayerTimesState.prayerTimes['dhuhr'];
-    final asr = prayerTimesState.prayerTimes['asr'];
-    final maghrib = prayerTimesState.prayerTimes['maghrib'];
-    final isha = prayerTimesState.prayerTimes['isha'];
-    
-    // Fajr waqt ends at sunrise
-    if (settings.fajrEnabled && fajr != null && sunrise != null) {
-      prayerTimes['fajr'] = fajr;
-      waqtEndTimes['fajr'] = sunrise;
-    }
-    // Dhuhr waqt ends at Asr
-    if (settings.dhuhrEnabled && dhuhr != null && asr != null) {
-      prayerTimes['dhuhr'] = dhuhr;
-      waqtEndTimes['dhuhr'] = asr;
-    }
-    // Asr waqt ends at Maghrib
-    if (settings.asrEnabled && asr != null && maghrib != null) {
-      prayerTimes['asr'] = asr;
-      waqtEndTimes['asr'] = maghrib;
-    }
-    // Maghrib waqt ends at Isha
-    if (settings.maghribEnabled && maghrib != null && isha != null) {
-      prayerTimes['maghrib'] = maghrib;
-      waqtEndTimes['maghrib'] = isha;
-    }
-    // Isha waqt ends at Fajr (next day - use midnight as approximation)
-    if (settings.ishaEnabled && isha != null) {
-      prayerTimes['isha'] = isha;
-      // Isha ends at Fajr next day, but we use midnight as safe approximation
-      final midnight = DateTime(isha.year, isha.month, isha.day, 23, 59);
-      waqtEndTimes['isha'] = midnight;
-    }
-    
-    await _notificationService.scheduleAllPrayerReminders(
-      prayerTimes: prayerTimes,
-      waqtEndTimes: waqtEndTimes,
-      minutesBefore: settings.prayerReminderMinutesBefore,
-    );
   }
 
   Future<void> updateSettings(NotificationSettingsModel newSettings) async {
     state = state.copyWith(settings: newSettings);
     await _saveSettings();
     
-    // Reschedule notifications
-    await _notificationService.cancelAllNotifications();
+    // Reschedule local notifications
     if (state.hasPermission) {
       await _scheduleAllNotifications();
     }
@@ -256,18 +210,10 @@ class NotificationSettingsNotifier extends StateNotifier<NotificationSettingsSta
     _box?.put('settings', state.settings.toJson());
   }
 
-  // Test notification
-  Future<void> sendTestNotification() async {
-    await _notificationService.showInstantNotification(
-      title: 'টেস্ট নোটিফিকেশন ✅',
-      body: 'নোটিফিকেশন সঠিকভাবে কাজ করছে!',
-    );
-  }
-
-  // Refresh prayer notifications (call after prayer times update)
-  Future<void> refreshPrayerNotifications() async {
-    if (state.hasPermission && state.settings.prayerNotificationsEnabled) {
-      await _schedulePrayerNotifications();
+  // Refresh reminder settings (call after prayer times update)
+  Future<void> refreshReminderSettings() async {
+    if (state.hasPermission) {
+      await _scheduleAllNotifications();
     }
   }
 }

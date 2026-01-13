@@ -53,14 +53,21 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'নামাজের হিসাব',
-          textAlign: TextAlign.left,
-          style: TextStyle(
-            color: Color(0xFFD4AF37),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Row(
+          children: [
+            Expanded(
+              child: Text(
+                'নামাজের হিসাব',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Color(0xFFD4AF37),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         actions: [

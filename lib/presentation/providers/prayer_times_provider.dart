@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive/hive.dart';
+import '../../services/notification_service.dart';
 
 class PrayerTimesState {
   final Map<String, DateTime> prayerTimes;
@@ -385,11 +387,89 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         isNaflTime: result['isNaflTime'] ?? false,
         isLoading: false,
       );
+      
+      // Schedule prayer reminders
+      await _schedulePrayerReminders(times, waqtEndTimes);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
       );
+    }
+  }
+  
+  /// Schedule prayer reminders based on user settings
+  Future<void> _schedulePrayerReminders(
+    Map<String, DateTime> prayerTimes,
+    Map<String, DateTime> waqtEndTimes,
+  ) async {
+    try {
+      // Get notification settings from Hive
+      final settingsBox = await Hive.openBox('notification_settings');
+      final settingsData = settingsBox.get('settings');
+      
+      if (settingsData == null) {
+        print('⚠️ No notification settings found');
+        return;
+      }
+      
+      final settings = Map<String, dynamic>.from(settingsData);
+      final prayerEnabled = settings['prayerNotificationsEnabled'] ?? false;
+      
+      if (!prayerEnabled) {
+        print('⚠️ Prayer notifications disabled');
+        return;
+      }
+      
+      final minutesBefore = settings['prayerReminderMinutesBefore'] ?? 10;
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      
+      print('📿 Scheduling prayer reminders ($minutesBefore min before waqt ends)...');
+      
+      // Schedule enabled prayers
+      if (settings['fajrEnabled'] ?? true) {
+        await notificationService.schedulePrayerReminder(
+          id: NotificationService.fajrNotificationId,
+          prayerName: 'ফজর',
+          waqtEndTime: waqtEndTimes['fajr']!,
+          minutesBefore: minutesBefore,
+        );
+      }
+      
+      if (settings['dhuhrEnabled'] ?? true) {
+        await notificationService.schedulePrayerReminder(
+          id: NotificationService.dhuhrNotificationId,
+          prayerName: 'যোহর',
+          waqtEndTime: waqtEndTimes['dhuhr']!,
+          minutesBefore: minutesBefore,
+        );
+      }
+      
+      if (settings['asrEnabled'] ?? true) {
+        await notificationService.schedulePrayerReminder(
+          id: NotificationService.asrNotificationId,
+          prayerName: 'আসর',
+          waqtEndTime: waqtEndTimes['asr']!,
+          minutesBefore: minutesBefore,
+        );
+      }
+      
+      if (settings['maghribEnabled'] ?? true) {
+        await notificationService.schedulePrayerReminder(
+          id: NotificationService.maghribNotificationId,
+          prayerName: 'মাগরিব',
+          waqtEndTime: waqtEndTimes['maghrib']!,
+          minutesBefore: minutesBefore,
+        );
+      }
+      
+      // Note: Isha doesn't have waqtEndTime calculated here, would need next day's Fajr
+      // For now, skip Isha or calculate separately
+      
+      print('✅ Prayer reminders scheduling complete');
+    } catch (e) {
+      print('❌ Error scheduling prayer reminders: $e');
     }
   }
   

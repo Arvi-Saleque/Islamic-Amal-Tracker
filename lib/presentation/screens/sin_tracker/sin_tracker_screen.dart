@@ -19,10 +19,11 @@ class SinTrackerScreen extends ConsumerWidget {
         title: const Text(
           'প্রতিদিনের গুনাহ',
           style: TextStyle(
-            color: const Color(0xFFD4AF37),
-            fontSize: 20,
+            color: Color(0xFFD4AF37),
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+          overflow: TextOverflow.ellipsis,
         ),
         iconTheme: const IconThemeData(color: Color(0xFFD4AF37)),
         actions: [

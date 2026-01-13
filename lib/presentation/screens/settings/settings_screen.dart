@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../providers/notification_settings_provider.dart';
 import '../profile/profile_screen.dart';
-import '../notifications/reminders_screen.dart';
+import 'reminder_settings_screen.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final settingsState = ref.watch(notificationSettingsProvider);
-    final settings = settingsState.settings;
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
@@ -33,329 +29,58 @@ class SettingsScreen extends ConsumerWidget {
         ),
         centerTitle: true,
       ),
-      body: settingsState.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Quick Access Section
-                  const SizedBox(height: 30),
-                  _buildSettingsCard(
-                    children: [
-                      _buildNavigationTile(
-                        context: context,
-                        icon: Icons.person_outline,
-                        title: 'প্রোফাইল',
-                        subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ProfileScreen(),
-                            ),
-                          );
-                        },
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Quick Access Section
+            const SizedBox(height: 30),
+            _buildSettingsCard(
+              children: [
+                _buildNavigationTile(
+                  context: context,
+                  icon: Icons.person_outline,
+                  title: 'প্রোফাইল',
+                  subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
                       ),
-                      const Divider(color: Color(0xFF2A2A2A)),
-                      _buildNavigationTile(
-                        context: context,
-                        icon: Icons.alarm,
-                        title: 'কাস্টম রিমাইন্ডার',
-                        subtitle: 'নিজের রিমাইন্ডার তৈরি করুন',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const RemindersScreenWidget(),
-                            ),
-                          );
-                        },
+                    );
+                  },
+                ),
+                const Divider(color: Color(0xFF2A2A2A)),
+                _buildNavigationTile(
+                  context: context,
+                  icon: Icons.notifications_active,
+                  title: 'রিমাইন্ডার',
+                  subtitle: 'পুশ নোটিফিকেশন সেটিংস',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ReminderSettingsScreen(),
                       ),
-                    ],
-                  ),
-
-                  // Permission Card
-                  if (!settingsState.hasPermission)
-                    _buildPermissionCard(context, ref),
-
-                  // Prayer Notifications Section
-                  _buildSectionHeader('নামাজের রিমাইন্ডার 🕌'),
-                  _buildSettingsCard(
-                    children: [
-                      _buildSwitchTile(
-                        title: 'নামাজের রিমাইন্ডার',
-                        subtitle: 'নামাজের সময়ের আগে নোটিফিকেশন পান',
-                        value: settings.prayerNotificationsEnabled,
-                        onChanged: (value) {
-                          ref
-                              .read(notificationSettingsProvider.notifier)
-                              .togglePrayerNotifications(value);
-                        },
-                      ),
-                      if (settings.prayerNotificationsEnabled) ...[
-                        const Divider(color: Color(0xFF2A2A2A)),
-                        _buildMinuteSelector(
-                          title: 'ওয়াক্ত শেষের আগে',
-                          value: settings.prayerReminderMinutesBefore,
-                          onChanged: (value) {
-                            ref
-                                .read(notificationSettingsProvider.notifier)
-                                .setPrayerReminderMinutes(value);
-                          },
-                        ),
-                        const Divider(color: Color(0xFF2A2A2A)),
-                        _buildPrayerToggle(
-                          'ফজর',
-                          settings.fajrEnabled,
-                          (value) => ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleFajr(value),
-                        ),
-                        _buildPrayerToggle(
-                          'যোহর',
-                          settings.dhuhrEnabled,
-                          (value) => ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleDhuhr(value),
-                        ),
-                        _buildPrayerToggle(
-                          'আসর',
-                          settings.asrEnabled,
-                          (value) => ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleAsr(value),
-                        ),
-                        _buildPrayerToggle(
-                          'মাগরিব',
-                          settings.maghribEnabled,
-                          (value) => ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleMaghrib(value),
-                        ),
-                        _buildPrayerToggle(
-                          'এশা',
-                          settings.ishaEnabled,
-                          (value) => ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleIsha(value),
-                        ),
-                      ],
-                    ],
-                  ),
-
-                  // Dhikr Notifications Section
-                  _buildSectionHeader('যিকির রিমাইন্ডার 💛'),
-                  _buildSettingsCard(
-                    children: [
-                      _buildSwitchTile(
-                        title: 'সকালের যিকির',
-                        subtitle: 'সময়: ${settings.morningDhikrTime}',
-                        value: settings.morningDhikrEnabled,
-                        onChanged: (value) {
-                          ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleMorningDhikr(value);
-                        },
-                        onTap: settings.morningDhikrEnabled
-                            ? () => _showTimePicker(
-                                  context,
-                                  ref,
-                                  settings.morningDhikrHour,
-                                  settings.morningDhikrMinute,
-                                  (hour, minute) {
-                                    ref
-                                        .read(notificationSettingsProvider
-                                            .notifier)
-                                        .setMorningDhikrTime(hour, minute);
-                                  },
-                                )
-                            : null,
-                      ),
-                      const Divider(color: Color(0xFF2A2A2A)),
-                      _buildSwitchTile(
-                        title: 'সন্ধ্যার যিকির',
-                        subtitle: 'সময়: ${settings.eveningDhikrTime}',
-                        value: settings.eveningDhikrEnabled,
-                        onChanged: (value) {
-                          ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleEveningDhikr(value);
-                        },
-                        onTap: settings.eveningDhikrEnabled
-                            ? () => _showTimePicker(
-                                  context,
-                                  ref,
-                                  settings.eveningDhikrHour,
-                                  settings.eveningDhikrMinute,
-                                  (hour, minute) {
-                                    ref
-                                        .read(notificationSettingsProvider
-                                            .notifier)
-                                        .setEveningDhikrTime(hour, minute);
-                                  },
-                                )
-                            : null,
-                      ),
-                    ],
-                  ),
-
-                  // Daily Amal Reminder
-                  _buildSectionHeader('দৈনিক আমল রিমাইন্ডার ✨'),
-                  _buildSettingsCard(
-                    children: [
-                      _buildSwitchTile(
-                        title: 'দৈনিক আমল রিমাইন্ডার',
-                        subtitle: 'সময়: ${settings.dailyAmalReminderTime}',
-                        value: settings.dailyAmalReminderEnabled,
-                        onChanged: (value) {
-                          ref
-                              .read(notificationSettingsProvider.notifier)
-                              .toggleDailyAmalReminder(value);
-                        },
-                        onTap: settings.dailyAmalReminderEnabled
-                            ? () => _showTimePicker(
-                                  context,
-                                  ref,
-                                  settings.dailyAmalReminderHour,
-                                  settings.dailyAmalReminderMinute,
-                                  (hour, minute) {
-                                    ref
-                                        .read(notificationSettingsProvider
-                                            .notifier)
-                                        .setDailyAmalReminderTime(hour, minute);
-                                  },
-                                )
-                            : null,
-                      ),
-                    ],
-                  ),
-
-                  // Test Notification
-                  _buildSectionHeader('টেস্ট'),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ElevatedButton.icon(
-                      onPressed: settingsState.hasPermission
-                          ? () {
-                              ref
-                                  .read(notificationSettingsProvider.notifier)
-                                  .sendTestNotification();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('টেস্ট নোটিফিকেশন পাঠানো হয়েছে'),
-                                  backgroundColor: Color(0xFFD4AF37),
-                                ),
-                              );
-                            }
-                          : null,
-                      icon: const Icon(Icons.notifications_active),
-                      label: const Text('টেস্ট নোটিফিকেশন পাঠান'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
-                        foregroundColor: const Color(0xFF0A0A0A),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // About Section
-                  buildAboutSection(context),
-
-                  const SizedBox(height: 40),
-                ],
-              ),
+                    );
+                  },
+                ),
+              ],
             ),
-    );
-  }
 
-  Widget _buildPermissionCard(BuildContext context, WidgetRef ref) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.red.withOpacity(0.2),
-            const Color(0xFF1A1A1A),
+            // About Section
+            const SizedBox(height: 20),
+            buildAboutSection(context),
+
+            const SizedBox(height: 40),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.red.withOpacity(0.3),
-        ),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.notifications_off,
-            color: Colors.red,
-            size: 40,
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'নোটিফিকেশন পারমিশন প্রয়োজন',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'রিমাইন্ডার পেতে নোটিফিকেশন পারমিশন দিন',
-            style: TextStyle(
-              color: Color(0xFF888888),
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              ref
-                  .read(notificationSettingsProvider.notifier)
-                  .requestPermission();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('পারমিশন দিন'),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Color(0xFFD4AF37),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingsCard({required List<Widget> children}) {
+  static Widget _buildSettingsCard({required List<Widget> children}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
@@ -412,161 +137,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSwitchTile({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-    VoidCallback? onTap,
-  }) {
-    return ListTile(
-      onTap: onTap,
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Color(0xFFE0E0E0),
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(
-          color: Color(0xFF888888),
-          fontSize: 13,
-        ),
-      ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeColor: const Color(0xFFD4AF37),
-        activeTrackColor: const Color(0xFFD4AF37).withOpacity(0.3),
-        inactiveThumbColor: const Color(0xFF666666),
-        inactiveTrackColor: const Color(0xFF2A2A2A),
-      ),
-    );
-  }
-
-  Widget _buildPrayerToggle(
-    String name,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            name,
-            style: const TextStyle(
-              color: Color(0xFFE0E0E0),
-              fontSize: 14,
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: const Color(0xFFD4AF37),
-            activeTrackColor: const Color(0xFFD4AF37).withOpacity(0.3),
-            inactiveThumbColor: const Color(0xFF666666),
-            inactiveTrackColor: const Color(0xFF2A2A2A),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMinuteSelector({
-    required String title,
-    required int value,
-    required ValueChanged<int> onChanged,
-  }) {
-    final options = [5, 10, 15, 20, 30];
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFFE0E0E0),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            children: options.map((minutes) {
-              final isSelected = value == minutes;
-              return GestureDetector(
-                onTap: () => onChanged(minutes),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFFD4AF37)
-                        : const Color(0xFF0A0A0A),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFFD4AF37)
-                          : const Color(0xFF2A2A2A),
-                    ),
-                  ),
-                  child: Text(
-                    '$minutes মিনিট',
-                    style: TextStyle(
-                      color: isSelected
-                          ? const Color(0xFF0A0A0A)
-                          : const Color(0xFF888888),
-                      fontSize: 13,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showTimePicker(
-    BuildContext context,
-    WidgetRef ref,
-    int currentHour,
-    int currentMinute,
-    Function(int, int) onTimeSelected,
-  ) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: currentHour, minute: currentMinute),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFD4AF37),
-              onPrimary: Color(0xFF0A0A0A),
-              surface: Color(0xFF1A1A1A),
-              onSurface: Color(0xFFE0E0E0),
-            ),
-            dialogBackgroundColor: const Color(0xFF1A1A1A),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      onTimeSelected(picked.hour, picked.minute);
-    }
-  }
-
   // About section with help and bug report
   static Widget buildAboutSection(BuildContext context) {
     return Padding(
@@ -606,7 +176,7 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           _buildOptionCard(
             title: 'সংস্করণ',
-            subtitle: 'v1.0.0',
+            subtitle: 'v1.0.4',
             icon: Icons.info,
             onTap: () => _showVersionDialog(context),
           ),
@@ -663,7 +233,7 @@ class SettingsScreen extends ConsumerWidget {
   static Future<void> _sendBugReport(BuildContext context) async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'alifsalek.as@gmail.com',
+      path: 'effttech@gmail.com',
       query: encodeQueryParameters(<String, String>{
         'subject': 'আমাল ট্র্যাকার - বাগ রিপোর্ট',
         'body': 'দয়া করে এখানে বাগের বিবরণ লিখুন:\n\n',
@@ -676,7 +246,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('ইমেইল অ্যাপ খুলতে পারছে না। alifsalek.as@gmail.com এ ইমেইল করুন।'),
+            content: Text('ইমেইল অ্যাপ খুলতে পারছে না। effttech@gmail.com এ ইমেইল করুন।'),
             backgroundColor: Colors.red,
           ),
         );
@@ -704,17 +274,17 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'সংস্করণ: v1.0.0',
+              'সংস্করণ: v1.0.4',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             const SizedBox(height: 8),
             const Text(
-              'বিল্ড: 1',
+              'বিল্ড: 6',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 16),
             const Text(
-              'ডেভেলপার: Salek Bin Hossain',
+              'ডেভেলপার: Salek Bin Hossain, Effy Tech',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 8),
@@ -722,7 +292,7 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () async {
                 final Uri emailUri = Uri(
                   scheme: 'mailto',
-                  path: 'alifsalek.as@gmail.com',
+                  path: 'effttech@gmail.com',
                 );
                 try {
                   await launchUrl(emailUri, mode: LaunchMode.externalApplication);
@@ -731,7 +301,7 @@ class SettingsScreen extends ConsumerWidget {
                 }
               },
               child: const Text(
-                'alifsalek.as@gmail.com',
+                'effttech@gmail.com',
                 style: TextStyle(
                   color: Color(0xFFD4AF37),
                   fontSize: 14,
@@ -819,6 +389,18 @@ class ManualScreen extends StatelessWidget {
             
             // Reminders Section
             _buildRemindersSection(),
+            const SizedBox(height: 24),
+            
+            // Cloud Sync Section
+            _buildCloudSyncSection(),
+            const SizedBox(height: 24),
+            
+            // Settings Section
+            _buildSettingsSection(),
+            const SizedBox(height: 24),
+            
+            // Troubleshooting Section
+            _buildTroubleshootingSection(context),
             const SizedBox(height: 24),
             
             // Contact Section
@@ -1162,46 +744,268 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildRemindersSection() {
     return _buildFeatureCard(
       icon: '🔔',
-      title: 'রিমাইন্ডার ও নোটিফিকেশন',
+      title: 'স্মার্ট লোকাল নোটিফিকেশন',
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '🕌 নামাজের রিমাইন্ডার:',
+          title: '🕌 নামাজের রিমাইন্ডার (ওয়াক্ত শেষের আগে):',
           items: [
-            'প্রতিটি ওয়াক্তের জন্য আলাদা সেটিংস',
-            'নামাজের কত মিনিট আগে রিমাইন্ডার চান সেট করুন',
-            'কোন কোন নামাজের জন্য চান সিলেক্ট করুন',
-            'সেটিংস > Notifications থেকে কনফিগার করুন',
+            'সেটিংস → রিমাইন্ডার সেটিংস → নামাজের রিমাইন্ডার ON করুন',
+            'ওয়াক্ত শেষের কত মিনিট আগে: 10/15/20/30 মিনিট সিলেক্ট করুন',
+            'প্রতিটি নামাজ আলাদা ON/OFF করুন (ফজর, যোহর, আসর, মাগরিব, এশা)',
+            'স্বয়ংক্রিয়ভাবে প্রতিদিন prayer times calculate হয়',
+            'উদাহরণ: মাগরিব 5:30 PM, ১৫ min আগে → 5:15 PM এ notification',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '✨ দৈনিক আমল রিমাইন্ডার:',
+          title: '📿 যিকির রিমাইন্ডার (সকাল/সন্ধ্যা):',
           items: [
-            'প্রতিদিন একটি নির্দিষ্ট সময়ে রিমাইন্ডার',
-            'সময় সেট করুন (যেমন: সকাল ৮টা)',
-            'আমল করতে ভুলে যাবেন না',
+            'সেটিংস → রিমাইন্ডার সেটিংস → সকালের যিকির ON করুন',
+            'সময় সিলেক্ট করুন (যেমন: সকাল 8:00 AM)',
+            'সন্ধ্যার যিকির আলাদাভাবে সেট করুন (যেমন: 6:00 PM)',
+            'প্রতিদিন নির্দিষ্ট সময়ে reminder পাবেন',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '⏰ কাস্টম রিমাইন্ডার:',
+          title: '⏰ কাস্টম রিমাইন্ডার (Unlimited):',
           items: [
-            'Reminders পেজে + বাটনে ক্লিক করুন',
-            'রিমাইন্ডারের টাইটেল লিখুন',
-            'সময় এবং দিন সিলেক্ট করুন',
-            'Repeat অপশন সেট করুন (Daily/Weekly)',
-            'নির্দিষ্ট দিনগুলো সিলেক্ট করুন',
+            'সেটিংস → রিমাইন্ডার সেটিংস → যোগ করুন (+) বাটন',
+            'Title: রিমাইন্ডারের নাম লিখুন (যেমন: তাহাজ্জুদ নামাজ)',
+            'Description: বিবরণ লিখুন (ঐচ্ছিক)',
+            'Time: সঠিক সময় সিলেক্ট করুন (যেমন: 3:30 AM)',
+            'Days: দিন সিলেক্ট করুন (একাধিক সিলেক্ট করতে পারবেন):',
+            '  • রবিবার, সোমবার, মঙ্গলবার, বুধবার, বৃহস্পতিবার, শুক্রবার, শনিবার',
+            'Save করুন → প্রতি সপ্তাহে নির্দিষ্ট দিনে notification পাবেন',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '🔧 ম্যানেজমেন্ট:',
+          title: '🔧 রিমাইন্ডার ম্যানেজমেন্ট:',
           items: [
-            'Reminders পেজে সব রিমাইন্ডার দেখুন',
-            'On/Off টগল করুন',
-            'এডিট বা ডিলিট করুন',
-            'পরমিশন ঠিক আছে কিনা চেক করুন',
+            'Custom Reminders screen এ সব রিমাইন্ডার দেখুন',
+            'Toggle switch দিয়ে সাময়িক ON/OFF করুন',
+            'Edit icon (✏️) দিয়ে পরিবর্তন করুন',
+            'Delete icon (🗑️) দিয়ে ডিলিট করুন',
+            'View Pending Notifications - সব scheduled notifications দেখুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '⚙️ Permission Setup (Android 13+):',
+          items: [
+            '1. Notification Permission: সেটিংস → Apps → Amal Tracker → Notifications → Allow',
+            '2. Exact Alarm Permission: সেটিংস → Apps → Special Access → Alarms & Reminders → Allow',
+            '3. Battery Optimization: সেটিংস → Apps → Battery → Unrestricted',
+            'অ্যাপ এই permissions চাইলে "Allow" করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📱 OnePlus/Xiaomi/Samsung Phone Setup (গুরুত্বপূর্ণ!):',
+          items: [
+            '⚠️ এই ফোনগুলোতে রিমাইন্ডার সঠিকভাবে কাজ করতে অবশ্যই:',
+            '',
+            '🔋 Battery Optimization বন্ধ করুন:',
+            '  • Settings → Battery → Battery optimization',
+            '  • Find "আমল ট্র্যাকার" → Don\'t optimize',
+            '',
+            '⏰ Alarms & Reminders Permission দিন:',
+            '  • Settings → Apps → Special app access',
+            '  • Alarms & reminders → আমল ট্র্যাকার → Allow',
+            '',
+            '🚀 Auto-start Permission (OnePlus/Xiaomi):',
+            '  • Settings → Apps → Autostart',
+            '  • আমল ট্র্যাকার → Enable',
+            '',
+            '🛡️ App Lock Disable (OnePlus):',
+            '  • Settings → Security → App Lock',
+            '  • আমল ট্র্যাকার → Disable',
+            '',
+            '💡 এই সেটিংস না করলে রিমাইন্ডার কাজ নাও করতে পারে!',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🌍 Technical Features:',
+          items: [
+            '✅ Alarm Manager: OS-level reliable alarms',
+            '✅ Battery optimization bypass: Deep sleep এও কাজ করে',
+            '✅ Timezone-aware: Asia/Dhaka timezone এ সঠিক সময়',
+            '✅ Offline-capable: Internet ছাড়াই কাজ করে',
+            '✅ Exact scheduling: নির্দিষ্ট সময়ে notification',
+            '✅ Device restart: ফোন restart হলেও notification থাকে',
+            '✅ Multiple channels: Prayer, Dhikr, Custom আলাদা',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildCloudSyncSection() {
+    return _buildFeatureCard(
+      icon: '☁️',
+      title: 'ক্লাউড সিঙ্ক ও Backup',
+      color: Colors.blue,
+      children: [
+        _buildSubSection(
+          title: '🔄 Auto Sync (স্বয়ংক্রিয়):',
+          items: [
+            'প্রতিটি ডেটা পরিবর্তন স্বয়ংক্রিয়ভাবে cloud এ sync হয়',
+            'নামাজ mark, আমল check, যিকির save - সব auto sync',
+            'Internet থাকলে সঙ্গে সঙ্গে, না থাকলে queue তে',
+            'কোনো বাটন চাপতে হয় না',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '💾 Manual Backup:',
+          items: [
+            'Profile screen এ যান',
+            'Backup Data বাটনে ট্যাপ করুন',
+            'সব ডেটা Firebase Firestore এ upload হবে',
+            'Success message দেখাবে',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📥 Manual Restore:',
+          items: [
+            'Profile screen এ যান',
+            'Restore Data বাটনে ট্যাপ করুন',
+            'Firestore থেকে সব ডেটা download হবে',
+            'Local Hive database update হবে',
+            'UI refresh হবে',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📱 Multi-Device ব্যবহার:',
+          items: [
+            'একই email/password দিয়ে অন্য device এ login করুন',
+            'স্বয়ংক্রিয়ভাবে সব ডেটা restore হবে',
+            'দুই device এই change করলে auto-sync হবে',
+            'Last-write-wins - সর্বশেষ পরিবর্তন টিকে থাকবে',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📶 Offline Mode:',
+          items: [
+            'Internet ছাড়াই সম্পূর্ণ কাজ করে',
+            'সব ডেটা local এ থাকে',
+            'Internet আসলে auto-sync হয়',
+            '"Syncing..." indicator sync এর সময় দেখাবে',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildSettingsSection() {
+    return _buildFeatureCard(
+      icon: '⚙️',
+      title: 'সেটিংস কাস্টমাইজ',
+      color: const Color(0xFFD4AF37),
+      children: [
+        _buildSubSection(
+          title: '🕌 Prayer Time Adjustments:',
+          items: [
+            'যদি আপনার এলাকায় সময় একটু আলাদা হয়',
+            'সেটিংস → Prayer Time Adjustment',
+            'প্রতিটি নামাজের জন্য +/- minutes করতে পারবেন',
+            'উদাহরণ: ফজর +2 min, মাগরিব -1 min',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🎨 Theme & Language:',
+          items: [
+            'Dark mode (default - পরিবর্তন করা যায় না এখন)',
+            'Gold accent color (#D4AF37)',
+            'বাংলা ভাষা (default)',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '👤 Profile Management:',
+          items: [
+            'Display Name পরিবর্তন করুন',
+            'Email verification status চেক করুন',
+            'Backup/Restore data manually',
+            'Logout option',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildTroubleshootingSection(BuildContext context) {
+    return _buildFeatureCard(
+      icon: '🔧',
+      title: 'সমস্যা সমাধান',
+      color: Colors.orange,
+      children: [
+        _buildSubSection(
+          title: '⚠️ Notification কাজ করছে না:',
+          items: [
+            '1. সেটিংস → Apps → Amal Tracker → Notifications → Allow',
+            '2. সেটিংস → Apps → Special Access → Alarms & Reminders → Allow',
+            '3. সেটিংস → Apps → Battery → Unrestricted',
+            '4. Do Not Disturb mode OFF করুন',
+            '5. অ্যাপ restart করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📍 Prayer times update হচ্ছে না:',
+          items: [
+            '1. Location permission allow করুন',
+            '2. GPS চালু করুন',
+            '3. Internet connection check করুন',
+            '4. Home screen এ pull down করে refresh করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '☁️ Cloud sync কাজ করছে না:',
+          items: [
+            '1. Internet connection check করুন',
+            '2. Email verified কিনা দেখুন (Profile screen)',
+            '3. Manual backup করে দেখুন',
+            '4. অ্যাপ restart করুন',
+            '5. Re-login করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 Statistics খালি দেখাচ্ছে:',
+          items: [
+            '1. অন্তত একটি activity complete করুন',
+            '2. কয়েক সেকেন্ড অপেক্ষা করুন',
+            '3. Weekly/Monthly toggle করুন',
+            '4. Pull down করে refresh করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '💥 App crash হচ্ছে:',
+          items: [
+            '1. সেটিংস → Apps → Clear Cache',
+            '2. App reinstall করুন',
+            '3. Android version check করুন (minimum: 5.0)',
+            '4. Developer কে bug report করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📱 Performance Tips:',
+          items: [
+            '• GPS শুধু প্রথমবার চালু রাখুন',
+            '• Important notifications রাখুন',
+            '• নিয়মিত statistics check করুন',
+            '• 60%+ daily progress maintain করুন',
           ],
         ),
       ],
@@ -1243,7 +1047,7 @@ class ManualScreen extends StatelessWidget {
             onTap: () {
               final Uri emailUri = Uri(
                 scheme: 'mailto',
-                path: 'alifsalek.as@gmail.com',
+                path: 'effttech@gmail.com',
                 queryParameters: {
                   'subject': 'আমল ট্র্যাকার - সাপোর্ট',
                 },
@@ -1262,7 +1066,7 @@ class ManualScreen extends StatelessWidget {
                   Icon(Icons.email, color: Color(0xFFD4AF37), size: 18),
                   SizedBox(width: 8),
                   Text(
-                    'alifsalek.as@gmail.com',
+                    'effttech@gmail.com',
                     style: TextStyle(
                       color: Color(0xFFD4AF37),
                       decoration: TextDecoration.underline,

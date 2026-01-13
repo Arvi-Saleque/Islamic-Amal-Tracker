@@ -1003,52 +1003,59 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     required String content,
     bool isHadithSection = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF2A2A2A),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isSmallScreen = screenWidth < 360;
+        
+        return Container(
+          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0A0A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFF2A2A2A),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: const Color(0xFFD4AF37),
-                size: 22,
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: const Color(0xFFD4AF37),
+                    size: isSmallScreen ? 18 : 22,
+                  ),
+                  SizedBox(width: isSmallScreen ? 8 : 10),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: const Color(0xFFD4AF37),
+                        fontSize: isSmallScreen ? 14 : 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+              if (content.isNotEmpty) ...[
+                SizedBox(height: isSmallScreen ? 10 : 14),
+                Text(
+                  content,
+                  style: TextStyle(
+                    color: const Color(0xFFE0E0E0),
+                    fontSize: isSmallScreen ? 12 : 14,
+                    height: 1.7,
                   ),
                 ),
-              ),
+              ],
             ],
           ),
-          if (content.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Text(
-              content,
-              style: const TextStyle(
-                color: Color(0xFFE0E0E0),
-                fontSize: 14,
-                height: 1.7,
-              ),
-            ),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -1056,66 +1063,76 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     required String hadith,
     required String reference,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFD4AF37).withOpacity(0.08),
-            const Color(0xFFD4AF37).withOpacity(0.03),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isSmallScreen = screenWidth < 360;
+        
+        return Container(
+          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFFD4AF37).withOpacity(0.08),
+                const Color(0xFFD4AF37).withOpacity(0.03),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFFD4AF37).withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.format_quote,
-                color: Color(0xFFD4AF37),
-                size: 20,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.format_quote,
+                    color: const Color(0xFFD4AF37),
+                    size: isSmallScreen ? 16 : 20,
+                  ),
+                  SizedBox(width: isSmallScreen ? 8 : 10),
+                  Expanded(
+                    child: Text(
+                      hadith,
+                      style: TextStyle(
+                        color: const Color(0xFFE0E0E0),
+                        fontSize: isSmallScreen ? 12 : 14,
+                        height: 1.6,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
+              SizedBox(height: isSmallScreen ? 8 : 12),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 8 : 10, 
+                  vertical: isSmallScreen ? 4 : 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4AF37).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Text(
-                  hadith,
-                  style: const TextStyle(
-                    color: Color(0xFFE0E0E0),
-                    fontSize: 14,
-                    height: 1.6,
-                    fontStyle: FontStyle.italic,
+                  '📚 $reference',
+                  style: TextStyle(
+                    color: const Color(0xFFD4AF37).withOpacity(0.9),
+                    fontSize: isSmallScreen ? 10 : 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '📚 $reference',
-              style: TextStyle(
-                color: const Color(0xFFD4AF37).withOpacity(0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

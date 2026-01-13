@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
+import 'package:hive/hive.dart';
 import '../../providers/prayer_times_provider.dart';
 import '../../providers/prayer_tracking_provider.dart';
 import '../../providers/daily_amal_provider.dart';
@@ -19,15 +22,250 @@ import '../settings/settings_screen.dart';
 import '../notifications/reminders_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../../services/notification_service.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _permissionChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check permissions after first frame (only once per session)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndRequestPermissions();
+    });
+  }
+
+  Future<void> _checkAndRequestPermissions() async {
+    if (_permissionChecked) return;
+    if (kIsWeb || !Platform.isAndroid) return;
+    
+    _permissionChecked = true;
+    
+    final notificationService = NotificationService();
+    await notificationService.initialize();
+    
+    final permissions = await notificationService.checkAllPermissions();
+    
+    // Check if we've already shown the dialog and user has all permissions
+    final settingsBox = await Hive.openBox('app_settings');
+    final hasShownPermissionDialog = settingsBox.get('hasShownPermissionDialog', defaultValue: false);
+    final allPermissionsGranted = permissions['notification'] == true && 
+                                   permissions['exactAlarm'] == true &&
+                                   permissions['batteryOptimization'] == true;
+    
+    // Show dialog if:
+    // 1. Never shown before, OR
+    // 2. Permissions are still missing
+    if (!hasShownPermissionDialog || !allPermissionsGranted) {
+      if (!allPermissionsGranted && mounted) {
+        _showPermissionDialog(permissions);
+        // Mark as shown
+        await settingsBox.put('hasShownPermissionDialog', true);
+      }
+    }
+  }
+
+  void _showPermissionDialog(Map<String, bool> permissions) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(
+              Icons.notifications_active,
+              color: Colors.amber[400],
+              size: 28,
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'রিমাইন্ডার পারমিশন',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'নামাজ ও আমলের রিমাইন্ডার পেতে নিচের পারমিশনগুলো দিন:',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              _buildPermissionItem(
+                'নোটিফিকেশন',
+                permissions['notification'] == true,
+                'রিমাইন্ডার দেখানোর জন্য',
+              ),
+              const SizedBox(height: 8),
+              _buildPermissionItem(
+                'সঠিক সময়ে অ্যালার্ম',
+                permissions['exactAlarm'] == true,
+                'ঠিক সময়ে রিমাইন্ডার দেওয়ার জন্য',
+              ),
+              const SizedBox(height: 8),
+              _buildPermissionItem(
+                'ব্যাটারি অপটিমাইজেশন বন্ধ',
+                permissions['batteryOptimization'] == true,
+                'Background এ কাজ করার জন্য',
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange[300], size: 20),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'OnePlus, Xiaomi, Samsung ফোনে Battery Optimization বন্ধ করুন',
+                        style: TextStyle(color: Colors.orange, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'পরে',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD4AF37),
+              foregroundColor: Colors.black,
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              final notificationService = NotificationService();
+              await notificationService.requestPermissions();
+              
+              // Check again after requesting
+              final newPermissions = await notificationService.checkAllPermissions();
+              if (newPermissions['exactAlarm'] != true) {
+                if (mounted) {
+                  _showExactAlarmSettingsDialog();
+                }
+              }
+            },
+            child: const Text('পারমিশন দিন'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPermissionItem(String title, bool granted, String description) {
+    return Row(
+      children: [
+        Icon(
+          granted ? Icons.check_circle : Icons.cancel,
+          color: granted ? Colors.green : Colors.red,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: granted ? Colors.green[300] : Colors.red[300],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                description,
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showExactAlarmSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.alarm, color: Colors.amber[400]),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'অ্যালার্ম পারমিশন',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'সঠিক সময়ে রিমাইন্ডার পেতে Settings > Apps > আমল ট্র্যাকার > Alarms & reminders থেকে অনুমতি দিন।',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('বুঝেছি', style: TextStyle(color: Color(0xFFD4AF37))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD4AF37),
+              foregroundColor: Colors.black,
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              await NotificationService().openNotificationSettings();
+            },
+            child: const Text('সেটিংস'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, d MMMM yyyy', 'bn');
     final prayerTimesState = ref.watch(prayerTimesProvider);
+    
+    // Watch notification settings to trigger permission request on app start
+    ref.watch(notificationSettingsProvider);
     
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
@@ -54,8 +292,7 @@ class HomeScreen extends ConsumerWidget {
               ref.read(dhikrCounterProvider.notifier).loadTodayData();
               ref.read(readingTrackerProvider.notifier).loadTodayData();
               ref.read(statisticsProvider.notifier).updateTodayStats();
-              ref.read(notificationSettingsProvider.notifier).refreshPrayerNotifications();
-              ref.read(customRemindersProvider.notifier).rescheduleAll();
+              ref.read(notificationSettingsProvider.notifier).refreshReminderSettings();
               
               // Show feedback
               ScaffoldMessenger.of(context).showSnackBar(
@@ -105,10 +342,8 @@ class HomeScreen extends ConsumerWidget {
           ref.read(readingTrackerProvider.notifier).loadTodayData();
           // Refresh statistics
           ref.read(statisticsProvider.notifier).updateTodayStats();
-          // Refresh prayer notifications
-          ref.read(notificationSettingsProvider.notifier).refreshPrayerNotifications();
-          // Refresh custom reminders
-          ref.read(customRemindersProvider.notifier).rescheduleAll();
+          // Refresh reminder settings to cloud
+          ref.read(notificationSettingsProvider.notifier).refreshReminderSettings();
           await Future.delayed(const Duration(milliseconds: 500));
         },
         color: const Color(0xFFD4AF37),

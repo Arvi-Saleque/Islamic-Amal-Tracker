@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/custom_reminder_model.dart';
 import '../../services/notification_service.dart';
 
@@ -20,6 +22,9 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
     try {
       _customRemindersBox = await Hive.openBox('custom_reminders');
       
+      // Initialize notification service first
+      await _notificationService.initialize();
+      
       // Load existing reminders
       final List<CustomReminder> reminders = [];
       for (var key in _customRemindersBox.keys) {
@@ -35,14 +40,74 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
       }
       state = reminders;
       
-      // Schedule all enabled reminders
-      for (var reminder in state) {
-        if (reminder.isEnabled) {
-          await _scheduleReminder(reminder);
-        }
-      }
+      // Schedule notifications for enabled reminders
+      await _scheduleAllReminders();
+      
+      // Sync to Firestore
+      await _syncRemindersToCloud();
     } catch (e) {
       print('Error initializing custom reminders: $e');
+    }
+  }
+
+  // Schedule all enabled reminders
+  Future<void> _scheduleAllReminders() async {
+    for (final reminder in state) {
+      if (reminder.isEnabled) {
+        await _scheduleReminder(reminder);
+      }
+    }
+  }
+
+  // Schedule single reminder for all its days
+  Future<void> _scheduleReminder(CustomReminder reminder) async {
+    final timeParts = reminder.time.split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+
+    print('🔔 Scheduling reminder: ${reminder.title}');
+    print('   Time: $hour:$minute');
+    print('   Days: ${reminder.daysOfWeek}');
+
+    for (final dayOfWeek in reminder.daysOfWeek) {
+      print('   Scheduling for day $dayOfWeek...');
+      await _notificationService.scheduleCustomReminder(
+        id: reminder.id.hashCode + dayOfWeek, // Unique ID for each day
+        title: reminder.title,
+        body: reminder.description,
+        hour: hour,
+        minute: minute,
+        dayOfWeek: dayOfWeek,
+      );
+    }
+    print('✅ Reminder scheduled!');
+  }
+
+  // Cancel reminder notifications
+  Future<void> _cancelReminder(CustomReminder reminder) async {
+    for (final dayOfWeek in reminder.daysOfWeek) {
+      await _notificationService.cancelNotification(reminder.id.hashCode + dayOfWeek);
+    }
+  }
+
+  Future<void> _syncRemindersToCloud() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final remindersData = state.map((r) => r.toJson()).toList();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('settings')
+          .doc('custom_reminders')
+          .set({
+        'reminders': remindersData,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      print('✅ Custom reminders synced to cloud');
+    } catch (e) {
+      print('❌ Failed to sync custom reminders: $e');
     }
   }
 
@@ -65,9 +130,13 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
       );
 
       _customRemindersBox.put(id, reminder.toJson());
+      state = [...state, reminder];
+      
+      // Schedule notification
       await _scheduleReminder(reminder);
       
-      state = [...state, reminder];
+      // Sync to cloud
+      await _syncRemindersToCloud();
     } catch (e) {
       print('Error adding reminder: $e');
       rethrow;
@@ -96,19 +165,20 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
       );
 
       _customRemindersBox.put(id, updated.toJson());
-      
-      // Cancel old reminders
-      await _cancelReminderNotifications(existing);
-      
-      // Schedule new ones if enabled
-      if (updated.isEnabled) {
-        await _scheduleReminder(updated);
-      }
 
       state = [
         for (final r in state)
           if (r.id == id) updated else r,
       ];
+      
+      // Cancel old notification and schedule new one if enabled
+      await _cancelReminder(existing);
+      if (updated.isEnabled) {
+        await _scheduleReminder(updated);
+      }
+      
+      // Sync to cloud
+      await _syncRemindersToCloud();
     } catch (e) {
       print('Error updating reminder: $e');
       rethrow;
@@ -117,13 +187,15 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
 
   Future<void> deleteReminder(String id) async {
     try {
-      final existingData = _customRemindersBox.get(id);
-      if (existingData != null) {
-        final existing = CustomReminder.fromJson(Map<String, dynamic>.from(existingData));
-        await _cancelReminderNotifications(existing);
-      }
+      // Cancel notification first
+      final reminder = state.firstWhere((r) => r.id == id, orElse: () => throw Exception('Reminder not found'));
+      await _cancelReminder(reminder);
+      
       _customRemindersBox.delete(id);
       state = state.where((r) => r.id != id).toList();
+      
+      // Sync to cloud
+      await _syncRemindersToCloud();
     } catch (e) {
       print('Error deleting reminder: $e');
       rethrow;
@@ -140,69 +212,23 @@ class CustomRemindersNotifier extends StateNotifier<List<CustomReminder>> {
       
       _customRemindersBox.put(id, updated.toJson());
 
-      if (updated.isEnabled) {
-        await _scheduleReminder(updated);
-      } else {
-        await _cancelReminderNotifications(updated);
-      }
-
       state = [
         for (final r in state)
           if (r.id == id) updated else r,
       ];
+      
+      // Schedule or cancel notification based on new state
+      if (updated.isEnabled) {
+        await _scheduleReminder(updated);
+      } else {
+        await _cancelReminder(updated);
+      }
+      
+      // Sync to cloud
+      await _syncRemindersToCloud();
     } catch (e) {
       print('Error toggling reminder: $e');
       rethrow;
-    }
-  }
-
-  Future<void> _scheduleReminder(CustomReminder reminder) async {
-    try {
-      final timeParts = reminder.time.split(':');
-      final hour = int.parse(timeParts[0]);
-      final minute = int.parse(timeParts[1]);
-
-      // Generate a stable notification ID from reminder ID
-      final baseNotificationId = reminder.id.hashCode.abs() % 100000;
-
-      // Schedule for each selected day
-      for (int day in reminder.daysOfWeek) {
-        await _notificationService.scheduleCustomReminder(
-          id: baseNotificationId + day,
-          title: reminder.title,
-          body: reminder.description,
-          hour: hour,
-          minute: minute,
-          dayOfWeek: day,
-        );
-      }
-    } catch (e) {
-      print('Error scheduling reminder: $e');
-    }
-  }
-
-  Future<void> _cancelReminderNotifications(CustomReminder reminder) async {
-    try {
-      final baseNotificationId = reminder.id.hashCode.abs() % 100000;
-      
-      // Cancel for each day
-      for (int day in reminder.daysOfWeek) {
-        await _notificationService.cancelNotification(baseNotificationId + day);
-      }
-    } catch (e) {
-      print('Error cancelling reminder notifications: $e');
-    }
-  }
-
-  Future<void> rescheduleAll() async {
-    try {
-      for (var reminder in state) {
-        if (reminder.isEnabled) {
-          await _scheduleReminder(reminder);
-        }
-      }
-    } catch (e) {
-      print('Error rescheduling reminders: $e');
     }
   }
 }
