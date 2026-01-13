@@ -390,42 +390,50 @@ class NotificationService {
         return;
       }
 
-      // Use AlarmManager on Android for reliability
-      if (Platform.isAndroid) {
-        await AndroidAlarmManager.oneShotAt(
-          scheduledTime,
-          id,
-          prayerAlarmCallback,
-          exact: true,
-          wakeup: true,
-          rescheduleOnReboot: true,
-        );
-        print('   ✅ Prayer alarm scheduled with AlarmManager!');
-      } else {
-        // iOS fallback - use zonedSchedule
-        final String timeZoneName = await FlutterTimezone.getLocalTimezone();
-        final location = tz.getLocation(timeZoneName);
-        final tzScheduledTime = tz.TZDateTime.from(scheduledTime, location);
-        
-        await _notifications.zonedSchedule(
-          id,
-          '$prayerName এর ওয়াক্ত শেষ হয়ে যাচ্ছে! 🕌',
-          '$prayerName এর ওয়াক্ত শেষ হতে আর $minutesBefore মিনিট বাকি',
-          tzScheduledTime,
-          NotificationDetails(
-            iOS: const DarwinNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            ),
-          ),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          payload: 'prayer_$prayerName',
-        );
-        print('   ✅ Prayer reminder scheduled for iOS!');
+      // Ensure timezone is initialized
+      if (!_isInitialized) {
+        await initialize();
       }
+
+      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+      final location = tz.getLocation(timeZoneName);
+      final tzScheduledTime = tz.TZDateTime.from(scheduledTime, location);
+      
+      print('   TZ Scheduled: $tzScheduledTime (${location.name})');
+
+      await _notifications.zonedSchedule(
+        id,
+        '$prayerName এর ওয়াক্ত শেষ হয়ে যাচ্ছে! 🕌',
+        '$prayerName এর ওয়াক্ত শেষ হতে আর $minutesBefore মিনিট বাকি',
+        tzScheduledTime,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            prayerChannelId,
+            'নামাজের রিমাইন্ডার',
+            channelDescription: 'ওয়াক্ত শেষ হওয়ার আগে রিমাইন্ডার',
+            importance: Importance.max,
+            priority: Priority.max,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFFD4AF37),
+            styleInformation: BigTextStyleInformation(
+              '$prayerName এর ওয়াক্ত শেষ হতে আর মাত্র $minutesBefore মিনিট বাকি! এখনো নামাজ না পড়ে থাকলে দ্রুত আদায় করুন।',
+            ),
+            enableVibration: true,
+            playSound: true,
+            fullScreenIntent: true,
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'prayer_$prayerName',
+      );
+      print('   ✅ Prayer reminder scheduled!');
     } catch (e) {
       print('   ❌ Error scheduling prayer reminder: $e');
     }
@@ -529,44 +537,47 @@ class NotificationService {
     required String channelId,
     required String payload,
   }) async {
-    final now = DateTime.now();
-    var scheduledDate = DateTime(now.year, now.month, now.day, hour, minute);
-    
-    // If time has passed today, schedule for tomorrow
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
-    print('📅 Scheduling daily reminder: $title');
-    print('   Scheduled for: $scheduledDate');
-    print('   ID: $id');
-
-    // Use AlarmManager on Android for reliability
-    if (Platform.isAndroid) {
-      // Determine which callback to use based on channel ID
-      final callback = channelId == dhikrChannelId 
-          ? dhikrAlarmCallback 
-          : amalAlarmCallback;
+    try {
+      // Ensure timezone is initialized
+      if (!_isInitialized) {
+        await initialize();
+      }
       
-      await AndroidAlarmManager.oneShotAt(
-        scheduledDate,
-        id,
-        callback,
-        exact: true,
-        wakeup: true,
-        rescheduleOnReboot: true,
-      );
-      print('   ✅ Alarm scheduled with AlarmManager!');
-    } else {
-      // iOS fallback - use zonedSchedule
-      final tzScheduledTime = tz.TZDateTime.from(scheduledDate, tz.local);
+      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+      final location = tz.getLocation(timeZoneName);
       
+      final now = tz.TZDateTime.now(location);
+      var scheduledDate = tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
+      
+      // If time has passed today, schedule for tomorrow
+      if (scheduledDate.isBefore(now)) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+
+      print('📅 Scheduling daily reminder: $title');
+      print('   Timezone: ${location.name}');
+      print('   Now: $now');
+      print('   Scheduled for: $scheduledDate');
+      print('   ID: $id');
+
       await _notifications.zonedSchedule(
         id,
         title,
         body,
-        tzScheduledTime,
+        scheduledDate,
         NotificationDetails(
+          android: AndroidNotificationDetails(
+            channelId,
+            channelId == dhikrChannelId ? 'যিকির রিমাইন্ডার' : 'দৈনিক আমল রিমাইন্ডার',
+            channelDescription: 'দৈনিক রিমাইন্ডার',
+            importance: Importance.max,
+            priority: Priority.max,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFFD4AF37),
+            enableVibration: true,
+            playSound: true,
+            fullScreenIntent: true,
+          ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
@@ -579,7 +590,9 @@ class NotificationService {
         matchDateTimeComponents: DateTimeComponents.time, // Repeat daily
         payload: payload,
       );
-      print('   ✅ Reminder scheduled for iOS!');
+      print('   ✅ Daily reminder scheduled!');
+    } catch (e) {
+      print('   ❌ Error scheduling daily reminder: $e');
     }
   }
 
@@ -771,28 +784,6 @@ class NotificationService {
             enableVibration: true,
             playSound: true,
             fullScreenIntent: true,
-          ),
-          iOS: const DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-      );
-      print('✅ Custom reminder scheduled successfully!');
-    } catch (e) {
-      print('❌ Error scheduling custom reminder: $e');
-    }
-  }
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-            color: const Color(0xFFD4AF37),
-            enableVibration: true,
-            playSound: true,
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
