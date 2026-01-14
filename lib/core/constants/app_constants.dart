@@ -7,14 +7,6 @@ class AppConstants {
   static const double bangladeshIshaAngle = 17.5;
   static const String calculationMethod = 'Islamic Foundation Bangladesh';
   
-  // Notification IDs
-  static const int fajrNotificationId = 100;
-  static const int dhuhrNotificationId = 101;
-  static const int asrNotificationId = 102;
-  static const int maghribNotificationId = 103;
-  static const int ishaNotificationId = 104;
-  static const int customReminderBaseId = 200;
-  
   // Hive Box Names
   static const String prayerBoxName = 'prayers';
   static const String dhikrBoxName = 'dhikr';

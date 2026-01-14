@@ -181,7 +181,6 @@ class FirestoreSyncService {
         _restoreReadingTracker(),
         _restoreSinTracker(),
         _restoreSinTypes(),
-        _restoreCustomReminders(),
         _restoreStatistics(),
       ]);
       print('✅ All data restored successfully!');

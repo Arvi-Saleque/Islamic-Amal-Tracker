@@ -826,17 +826,6 @@ class ManualScreen extends StatelessWidget {
       color: Colors.orange,
       children: [
         _buildSubSection(
-          title: '⚠️ Notification কাজ করছে না:',
-          items: [
-            '1. সেটিংস → Apps → Amal Tracker → Notifications → Allow',
-            '2. সেটিংস → Apps → Special Access → Alarms & Reminders → Allow',
-            '3. সেটিংস → Apps → Battery → Unrestricted',
-            '4. Do Not Disturb mode OFF করুন',
-            '5. অ্যাপ restart করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
           title: '📍 Prayer times update হচ্ছে না:',
           items: [
             '1. Location permission allow করুন',
@@ -881,7 +870,6 @@ class ManualScreen extends StatelessWidget {
           title: '📱 Performance Tips:',
           items: [
             '• GPS শুধু প্রথমবার চালু রাখুন',
-            '• Important notifications রাখুন',
             '• নিয়মিত statistics check করুন',
             '• 60%+ daily progress maintain করুন',
           ],

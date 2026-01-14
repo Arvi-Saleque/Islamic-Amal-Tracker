@@ -44,8 +44,6 @@ class HiveService {
       final defaultSettings = AppSettings(
         id: 'app_settings',
         isFirstTime: true,
-        notificationsEnabled: true,
-        prayerNotificationsEnabled: true,
         theme: 'system',
         language: 'bn',
         modelVersion: AppConstants.currentModelVersion,
@@ -173,6 +171,6 @@ class HiveService {
     readingBox.close();
     statsBox.close();
     settingsBox.close();
-    customRemindersBox.close();
+    sinTrackerBox.close();
   }
 }

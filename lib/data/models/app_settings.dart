@@ -8,11 +8,6 @@ class AppSettings {
   String language;
   String theme; // 'light', 'dark', 'system'
   
-  // Notification settings
-  bool notificationsEnabled;
-  bool prayerNotificationsEnabled;
-  int prayerNotificationMinutesBefore;
-  
   // Prayer settings
   double latitude;
   double longitude;
@@ -38,9 +33,6 @@ class AppSettings {
     this.isFirstTime = true,
     this.language = 'bn',
     this.theme = 'system',
-    this.notificationsEnabled = true,
-    this.prayerNotificationsEnabled = true,
-    this.prayerNotificationMinutesBefore = 15,
     this.latitude = 23.8103, // Default Dhaka
     this.longitude = 90.4125,
     this.locationName,
@@ -66,9 +58,6 @@ class AppSettings {
         'isFirstTime': isFirstTime,
         'language': language,
         'theme': theme,
-        'notificationsEnabled': notificationsEnabled,
-        'prayerNotificationsEnabled': prayerNotificationsEnabled,
-        'prayerNotificationMinutesBefore': prayerNotificationMinutesBefore,
         'latitude': latitude,
         'longitude': longitude,
         'locationName': locationName,
@@ -88,9 +77,6 @@ class AppSettings {
         isFirstTime: json['isFirstTime'] ?? true,
         language: json['language'] ?? 'bn',
         theme: json['theme'] ?? 'system',
-        notificationsEnabled: json['notificationsEnabled'] ?? true,
-        prayerNotificationsEnabled: json['prayerNotificationsEnabled'] ?? true,
-        prayerNotificationMinutesBefore: json['prayerNotificationMinutesBefore'] ?? 15,
         latitude: json['latitude'] ?? 23.8103,
         longitude: json['longitude'] ?? 90.4125,
         locationName: json['locationName'],
@@ -111,9 +97,6 @@ class AppSettings {
     bool? isFirstTime,
     String? language,
     String? theme,
-    bool? notificationsEnabled,
-    bool? prayerNotificationsEnabled,
-    int? prayerNotificationMinutesBefore,
     double? latitude,
     double? longitude,
     String? locationName,
@@ -129,9 +112,6 @@ class AppSettings {
       isFirstTime: isFirstTime ?? this.isFirstTime,
       language: language ?? this.language,
       theme: theme ?? this.theme,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-      prayerNotificationsEnabled: prayerNotificationsEnabled ?? this.prayerNotificationsEnabled,
-      prayerNotificationMinutesBefore: prayerNotificationMinutesBefore ?? this.prayerNotificationMinutesBefore,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,

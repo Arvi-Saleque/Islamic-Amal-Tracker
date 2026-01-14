@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 
 class PermissionService {
   // Request location permission for accurate prayer times
   static Future<bool> requestLocationPermission(BuildContext context) async {
-    final status = await Permission.location.status;
-    
-    if (status.isGranted) {
-      return true;
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await _showPermissionDialog(
+        context,
+        title: 'লোকেশন সার্ভিস বন্ধ',
+        message: 'দয়া করে আপনার ডিভাইসের লোকেশন সার্ভিস চালু করুন।',
+      );
+      return false;
     }
-    
-    if (status.isDenied || status.isPermanentlyDenied) {
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
       // Show explanation dialog
       final shouldRequest = await _showPermissionDialog(
         context,
@@ -20,64 +29,30 @@ class PermissionService {
       
       if (!shouldRequest) return false;
       
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
         return false;
       }
-      
-      final result = await Permission.location.request();
-      return result.isGranted;
     }
     
-    final result = await Permission.location.request();
-    return result.isGranted;
-  }
-  
-  // Request notification permission (Android 13+)
-  static Future<bool> requestNotificationPermission(BuildContext context) async {
-    final status = await Permission.notification.status;
-    
-    if (status.isGranted) {
-      return true;
-    }
-    
-    if (status.isDenied || status.isPermanentlyDenied) {
-      // Show explanation dialog
-      final shouldRequest = await _showPermissionDialog(
+    if (permission == LocationPermission.deniedForever) {
+      await _showPermissionDialog(
         context,
-        title: 'নোটিফিকেশন অনুমতি প্রয়োজন',
-        message: 'নামাজের সময় এবং রিমাইন্ডারের জন্য নোটিফিকেশন অনুমতি প্রয়োজন। এটি আপনাকে সময়মত নামাজ পড়তে সাহায্য করবে।',
+        title: 'লোকেশন অনুমতি স্থায়ীভাবে বন্ধ',
+        message: 'দয়া করে সেটিংস থেকে লোকেশন অনুমতি চালু করুন।',
       );
-      
-      if (!shouldRequest) return false;
-      
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
-        return false;
-      }
-      
-      final result = await Permission.notification.request();
-      return result.isGranted;
+      await Geolocator.openAppSettings();
+      return false;
     }
     
-    final result = await Permission.notification.request();
-    return result.isGranted;
+    return true;
   }
   
-  // Check if all required permissions are granted
-  static Future<Map<String, bool>> checkAllPermissions() async {
-    return {
-      'location': await Permission.location.isGranted,
-      'notification': await Permission.notification.isGranted,
-    };
-  }
-  
-  // Request all permissions at once (for onboarding)
-  static Future<bool> requestAllPermissions(BuildContext context) async {
-    final locationGranted = await requestLocationPermission(context);
-    final notificationGranted = await requestNotificationPermission(context);
-    
-    return locationGranted && notificationGranted;
+  // Check if location permission is granted
+  static Future<bool> checkLocationPermission() async {
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.whileInUse || 
+           permission == LocationPermission.always;
   }
   
   static Future<bool> _showPermissionDialog(
