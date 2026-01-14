@@ -16,6 +16,8 @@ import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../../services/notification_permission_service.dart';
+import '../../../services/daily_amal_notification_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +27,36 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _permissionsRequested = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_permissionsRequested) {
+      _permissionsRequested = true;
+      _initializeNotifications();
+    }
+  }
+
+  Future<void> _initializeNotifications() async {
+    // Initialize notification service
+    try {
+      await DailyAmalNotificationService().initialize();
+    } catch (e) {
+      print('Error initializing notifications: $e');
+    }
+
+    // Request permissions after a short delay
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      final permissionService = NotificationPermissionService();
+      final allGranted = await permissionService.areAllPermissionsGranted();
+      
+      if (!allGranted) {
+        await permissionService.requestAllPermissions(context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

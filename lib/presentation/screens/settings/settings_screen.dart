@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../profile/profile_screen.dart';
+import 'daily_amal_reminder_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -46,6 +47,21 @@ class SettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(color: Color(0xFF2A2A2A), height: 1),
+                _buildNavigationTile(
+                  context: context,
+                  icon: Icons.notifications_active,
+                  title: 'দৈনিক আমল রিমাইন্ডার',
+                  subtitle: 'প্রতিদিনের আমল রিমাইন্ডার সেট করুন',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DailyAmalReminderScreen(),
                       ),
                     );
                   },
