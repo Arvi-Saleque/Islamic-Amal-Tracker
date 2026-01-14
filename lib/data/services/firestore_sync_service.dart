@@ -134,19 +134,6 @@ class FirestoreSyncService {
     }
   }
 
-  /// Sync custom reminders
-  Future<void> syncCustomReminders(List<Map<String, dynamic>> reminders) async {
-    if (!canSync) return;
-    try {
-      await _userDataCollection!.doc('custom_reminders').set({
-        'reminders': reminders,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      print('Error syncing custom reminders: $e');
-    }
-  }
-
   /// Sync qaza prayer data
   Future<void> syncQazaPrayer(String key, Map<String, dynamic> data) async {
     if (!canSync) return;
@@ -290,22 +277,6 @@ class FirestoreSyncService {
     }
   }
 
-  Future<void> _restoreCustomReminders() async {
-    final doc = await _userDataCollection!.doc('custom_reminders').get();
-    if (doc.exists) {
-      final data = doc.data() as Map<String, dynamic>;
-      final reminders = data['reminders'] as List<dynamic>?;
-      if (reminders != null) {
-        final box = await Hive.openBox('custom_reminders');
-        await box.clear();
-        for (var reminder in reminders) {
-          final r = reminder as Map<String, dynamic>;
-          await box.put(r['id'], r);
-        }
-      }
-    }
-  }
-
   Future<void> _restoreStatistics() async {
     final doc = await _userDataCollection!.doc('statistics').get();
     if (doc.exists) {
@@ -329,7 +300,6 @@ class FirestoreSyncService {
       await _backupDhikrCounter();
       await _backupReadingTracker();
       await _backupSinTracker();
-      await _backupCustomReminders();
       await _backupStatistics();
       return true;
     } catch (e) {
@@ -398,20 +368,6 @@ class FirestoreSyncService {
     }
   }
 
-  Future<void> _backupCustomReminders() async {
-    final box = await Hive.openBox('custom_reminders');
-    final reminders = <Map<String, dynamic>>[];
-    for (var key in box.keys) {
-      final data = box.get(key);
-      if (data != null) {
-        reminders.add(Map<String, dynamic>.from(data));
-      }
-    }
-    if (reminders.isNotEmpty) {
-      await syncCustomReminders(reminders);
-    }
-  }
-
   Future<void> _backupStatistics() async {
     final box = await Hive.openBox('statistics');
     final data = box.get('statistics_data');
@@ -449,7 +405,6 @@ class FirestoreSyncService {
       
       // Delete config docs
       await _userDataCollection!.doc('sin_types').delete();
-      await _userDataCollection!.doc('custom_reminders').delete();
       
       // Delete user doc
       await _firestore!.collection('users').doc(userId).delete();

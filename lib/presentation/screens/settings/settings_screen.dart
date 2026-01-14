@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../profile/profile_screen.dart';
-import 'reminder_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -47,21 +46,6 @@ class SettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const ProfileScreen(),
-                      ),
-                    );
-                  },
-                ),
-                const Divider(color: Color(0xFF2A2A2A)),
-                _buildNavigationTile(
-                  context: context,
-                  icon: Icons.notifications_active,
-                  title: 'রিমাইন্ডার',
-                  subtitle: 'পুশ নোটিফিকেশন সেটিংস',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ReminderSettingsScreen(),
                       ),
                     );
                   },
@@ -385,10 +369,6 @@ class ManualScreen extends StatelessWidget {
             
             // Statistics Section
             _buildStatisticsSection(),
-            const SizedBox(height: 24),
-            
-            // Reminders Section
-            _buildRemindersSection(),
             const SizedBox(height: 24),
             
             // Cloud Sync Section
@@ -735,108 +715,6 @@ class ManualScreen extends StatelessWidget {
             'কমপ্লিশন রেট (%) দেখুন',
             'স্ট্রিক (পরপর কতদিন) দেখুন',
             'উন্নতির হার বুঝতে পারবেন',
-          ],
-        ),
-      ],
-    );
-  }
-
-  static Widget _buildRemindersSection() {
-    return _buildFeatureCard(
-      icon: '🔔',
-      title: 'স্মার্ট লোকাল নোটিফিকেশন',
-      color: const Color(0xFFD4AF37),
-      children: [
-        _buildSubSection(
-          title: '🕌 নামাজের রিমাইন্ডার (ওয়াক্ত শেষের আগে):',
-          items: [
-            'সেটিংস → রিমাইন্ডার সেটিংস → নামাজের রিমাইন্ডার ON করুন',
-            'ওয়াক্ত শেষের কত মিনিট আগে: 10/15/20/30 মিনিট সিলেক্ট করুন',
-            'প্রতিটি নামাজ আলাদা ON/OFF করুন (ফজর, যোহর, আসর, মাগরিব, এশা)',
-            'স্বয়ংক্রিয়ভাবে প্রতিদিন prayer times calculate হয়',
-            'উদাহরণ: মাগরিব 5:30 PM, ১৫ min আগে → 5:15 PM এ notification',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📿 যিকির রিমাইন্ডার (সকাল/সন্ধ্যা):',
-          items: [
-            'সেটিংস → রিমাইন্ডার সেটিংস → সকালের যিকির ON করুন',
-            'সময় সিলেক্ট করুন (যেমন: সকাল 8:00 AM)',
-            'সন্ধ্যার যিকির আলাদাভাবে সেট করুন (যেমন: 6:00 PM)',
-            'প্রতিদিন নির্দিষ্ট সময়ে reminder পাবেন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '⏰ কাস্টম রিমাইন্ডার (Unlimited):',
-          items: [
-            'সেটিংস → রিমাইন্ডার সেটিংস → যোগ করুন (+) বাটন',
-            'Title: রিমাইন্ডারের নাম লিখুন (যেমন: তাহাজ্জুদ নামাজ)',
-            'Description: বিবরণ লিখুন (ঐচ্ছিক)',
-            'Time: সঠিক সময় সিলেক্ট করুন (যেমন: 3:30 AM)',
-            'Days: দিন সিলেক্ট করুন (একাধিক সিলেক্ট করতে পারবেন):',
-            '  • রবিবার, সোমবার, মঙ্গলবার, বুধবার, বৃহস্পতিবার, শুক্রবার, শনিবার',
-            'Save করুন → প্রতি সপ্তাহে নির্দিষ্ট দিনে notification পাবেন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🔧 রিমাইন্ডার ম্যানেজমেন্ট:',
-          items: [
-            'Custom Reminders screen এ সব রিমাইন্ডার দেখুন',
-            'Toggle switch দিয়ে সাময়িক ON/OFF করুন',
-            'Edit icon (✏️) দিয়ে পরিবর্তন করুন',
-            'Delete icon (🗑️) দিয়ে ডিলিট করুন',
-            'View Pending Notifications - সব scheduled notifications দেখুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '⚙️ Permission Setup (Android 13+):',
-          items: [
-            '1. Notification Permission: সেটিংস → Apps → Amal Tracker → Notifications → Allow',
-            '2. Exact Alarm Permission: সেটিংস → Apps → Special Access → Alarms & Reminders → Allow',
-            '3. Battery Optimization: সেটিংস → Apps → Battery → Unrestricted',
-            'অ্যাপ এই permissions চাইলে "Allow" করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📱 OnePlus/Xiaomi/Samsung Phone Setup (গুরুত্বপূর্ণ!):',
-          items: [
-            '⚠️ এই ফোনগুলোতে রিমাইন্ডার সঠিকভাবে কাজ করতে অবশ্যই:',
-            '',
-            '🔋 Battery Optimization বন্ধ করুন:',
-            '  • Settings → Battery → Battery optimization',
-            '  • Find "আমল ট্র্যাকার" → Don\'t optimize',
-            '',
-            '⏰ Alarms & Reminders Permission দিন:',
-            '  • Settings → Apps → Special app access',
-            '  • Alarms & reminders → আমল ট্র্যাকার → Allow',
-            '',
-            '🚀 Auto-start Permission (OnePlus/Xiaomi):',
-            '  • Settings → Apps → Autostart',
-            '  • আমল ট্র্যাকার → Enable',
-            '',
-            '🛡️ App Lock Disable (OnePlus):',
-            '  • Settings → Security → App Lock',
-            '  • আমল ট্র্যাকার → Disable',
-            '',
-            '💡 এই সেটিংস না করলে রিমাইন্ডার কাজ নাও করতে পারে!',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🌍 Technical Features:',
-          items: [
-            '✅ Alarm Manager: OS-level reliable alarms',
-            '✅ Battery optimization bypass: Deep sleep এও কাজ করে',
-            '✅ Timezone-aware: Asia/Dhaka timezone এ সঠিক সময়',
-            '✅ Offline-capable: Internet ছাড়াই কাজ করে',
-            '✅ Exact scheduling: নির্দিষ্ট সময়ে notification',
-            '✅ Device restart: ফোন restart হলেও notification থাকে',
-            '✅ Multiple channels: Prayer, Dhikr, Custom আলাদা',
           ],
         ),
       ],

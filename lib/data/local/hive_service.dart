@@ -14,7 +14,6 @@ class HiveService {
   static late Box readingBox;
   static late Box statsBox;
   static late Box settingsBox;
-  static late Box customRemindersBox;
   static late Box sinTrackerBox;
   
   static Future<void> init() async {
@@ -30,8 +29,6 @@ class HiveService {
     statsBox = await Hive.openBox(AppConstants.statsBoxName);
     
     settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
-    
-    customRemindersBox = await Hive.openBox('custom_reminders');
     
     sinTrackerBox = await Hive.openBox('sin_tracker');
     

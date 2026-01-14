@@ -7,23 +7,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:firebase_core/firebase_core.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'firebase_options.dart';
 
 import 'core/theme/app_theme.dart';
 import 'data/local/hive_service.dart';
 import 'data/services/firestore_sync_service.dart';
 import 'presentation/screens/splash/splash_screen.dart';
-import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Android Alarm Manager (for reliable alarms)
-  if (!kIsWeb && Platform.isAndroid) {
-    await AndroidAlarmManager.initialize();
-    print('✅ Android Alarm Manager initialized');
-  }
   
   // Initialize Firebase (optional - app works without it)
   try {
@@ -35,11 +27,6 @@ void main() async {
   } catch (e) {
     print('Firebase initialization failed: $e');
     // App will work in offline mode
-  }
-  
-  // Initialize local notification service
-  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    await NotificationService().initialize();
   }
   
   // Initialize localization

@@ -48,12 +48,7 @@
   "save": "সেভ করুন",
   "cancel": "বাতিল",
   
-  "notifications": "নোটিফিকেশন",
-  "reminders": "রিমাইন্ডার",
-  "set_reminder": "রিমাইন্ডার সেট করুন",
-  
   "permission_required": "অনুমতি প্রয়োজন",
-  "notification_permission_message": "নামাজের সময় এবং রিমাইন্ডারের জন্য নোটিফিকেশন অনুমতি প্রয়োজন।",
   "location_permission_message": "সঠিক নামাজের সময় নির্ধারণের জন্য লোকেশন অনুমতি প্রয়োজন।",
   "allow": "অনুমতি দিন",
   "deny": "না",
