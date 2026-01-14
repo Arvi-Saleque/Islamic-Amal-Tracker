@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/services/firestore_sync_service.dart';
+import '../../../services/permission_service.dart';
 import '../home/home_screen.dart';
 import '../auth/auth_screen.dart';
 
@@ -42,6 +45,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
+        
+        // Check permissions after navigation (Android only)
+        if (!kIsWeb && Platform.isAndroid) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              PermissionService.checkAndRequestPermissions(context);
+            }
+          });
+        }
       } else {
         // No user, show auth screen
         Navigator.of(context).pushReplacement(

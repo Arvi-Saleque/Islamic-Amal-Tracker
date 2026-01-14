@@ -13,6 +13,8 @@ import 'core/theme/app_theme.dart';
 import 'data/local/hive_service.dart';
 import 'data/services/firestore_sync_service.dart';
 import 'presentation/screens/splash/splash_screen.dart';
+import 'services/daily_reminder_service.dart';
+import 'services/permission_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,15 @@ void main() async {
   // Initialize Hive
   await Hive.initFlutter();
   await HiveService.init();
+  
+  // Initialize Daily Reminder Service (Android only)
+  if (!kIsWeb && Platform.isAndroid) {
+    try {
+      await DailyReminderService.initialize();
+    } catch (e) {
+      print('DailyReminderService initialization failed: $e');
+    }
+  }
   
   // Set preferred orientations (only for mobile platforms)
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
