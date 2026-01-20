@@ -266,14 +266,6 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
       ),
     );
   }
-              ),
-              child: Text(value),
-            ),
-          );
-        },
-      ),
-    );
-  }
 }
 
 /// Dialog wrapper for DigitalTimePicker
