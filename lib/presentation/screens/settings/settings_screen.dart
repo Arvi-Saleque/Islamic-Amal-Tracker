@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../profile/profile_screen.dart';
-import 'daily_reminder_screen.dart';
+import 'reminders_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -55,13 +55,13 @@ class SettingsScreen extends StatelessWidget {
                 _buildNavigationTile(
                   context: context,
                   icon: Icons.notifications_active,
-                  title: 'দৈনিক আমল রিমাইন্ডার',
+                  title: 'রিমাইন্ডারস',
                   subtitle: 'দৈনিক রিমাইন্ডার সেট করুন',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const DailyReminderScreen(),
+                        builder: (context) => const RemindersScreen(),
                       ),
                     );
                   },
