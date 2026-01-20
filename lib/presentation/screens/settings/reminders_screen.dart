@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
 import '../../providers/prayer_times_provider.dart';
+import '../../widgets/digital_time_picker.dart';
 import 'custom_reminders_screen.dart';
 import 'daily_reminder_screen.dart';
 
@@ -183,20 +184,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   Future<void> _selectTime(String type, TimeOfDay currentTime) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await DigitalTimePicker.show(
       context: context,
       initialTime: currentTime,
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFD4AF37),
-              surface: Color(0xFF1A1A1A),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     
     if (picked != null) {

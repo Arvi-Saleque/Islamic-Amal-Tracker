@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
+import '../../widgets/digital_time_picker.dart';
 
 class CustomRemindersScreen extends StatefulWidget {
   final VoidCallback? onRemindersChanged;
@@ -345,20 +346,9 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
   }
 
   Future<void> _selectTime() async {
-    final picked = await showTimePicker(
+    final picked = await DigitalTimePicker.show(
       context: context,
       initialTime: _fixedTime,
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFD4AF37),
-              surface: Color(0xFF1A1A1A),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     
     if (picked != null) {

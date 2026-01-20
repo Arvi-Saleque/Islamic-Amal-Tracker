@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import '../../../services/daily_reminder_service.dart';
+import '../../widgets/digital_time_picker.dart';
 
 class DailyReminderScreen extends StatefulWidget {
   const DailyReminderScreen({super.key});
@@ -148,21 +149,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
   }
 
   Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await DigitalTimePicker.show(
       context: context,
       initialTime: _selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFD4AF37),
-              surface: Color(0xFF1A1A1A),
-            ),
-            dialogBackgroundColor: const Color(0xFF1A1A1A),
-          ),
-          child: child!,
-        );
-      },
     );
     
     if (picked != null && picked != _selectedTime) {
