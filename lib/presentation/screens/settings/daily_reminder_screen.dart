@@ -354,7 +354,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37).withOpacity(0.2),
+                      color: const Color(0xFFD4AF37),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -497,12 +497,12 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (isGranted ? Colors.green : Colors.orange).withOpacity(0.2),
+              color: (isGranted ? const Color(0xFFD4AF37) : Colors.red),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
-              color: isGranted ? Colors.green : Colors.orange,
+              color: Colors.black,
               size: 24,
             ),
           ),
@@ -531,7 +531,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
                 Text(
                   isGranted ? '✓ অনুমতি দেওয়া হয়েছে' : '✗ অনুমতি প্রয়োজন',
                   style: TextStyle(
-                    color: isGranted ? Colors.green : Colors.orange,
+                    color: isGranted ? const Color(0xFFD4AF37) : Colors.red,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
