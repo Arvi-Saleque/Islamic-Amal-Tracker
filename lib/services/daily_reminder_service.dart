@@ -14,7 +14,7 @@ class DailyReminderService {
   static const String _reminderEnabledKey = 'daily_reminder_enabled';
   static const String _reminderHourKey = 'daily_reminder_hour';
   static const String _reminderMinuteKey = 'daily_reminder_minute';
-  
+
   // Dhikr keys
   static const String _morningDhikrEnabledKey = 'morning_dhikr_enabled';
   static const String _morningDhikrHourKey = 'morning_dhikr_hour';
@@ -22,13 +22,13 @@ class DailyReminderService {
   static const String _eveningDhikrEnabledKey = 'evening_dhikr_enabled';
   static const String _eveningDhikrHourKey = 'evening_dhikr_hour';
   static const String _eveningDhikrMinuteKey = 'evening_dhikr_minute';
-  
+
   // Prayer reminder keys
   static const String _prayerReminderPrefix = 'prayer_reminder_';
-  
+
   // Custom reminders key
   static const String _customRemindersKey = 'custom_reminders';
-  
+
   // Notification IDs
   static const int _dailyReminderId = 1001;
   static const int _morningDhikrId = 1002;
@@ -42,7 +42,7 @@ class DailyReminderService {
 
   static Future<void> initialize() async {
     tz.initializeTimeZones();
-    
+
     try {
       final String timeZoneName = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(timeZoneName));
@@ -51,14 +51,15 @@ class DailyReminderService {
       tz.setLocalLocation(tz.UTC);
     }
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _notifications.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
-    
+
     // Create notification channel
     await _createNotificationChannel();
   }
@@ -100,9 +101,8 @@ class DailyReminderService {
       enableVibration: true,
     );
 
-    final androidPlugin = _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
 
     await androidPlugin?.createNotificationChannel(dailyChannel);
     await androidPlugin?.createNotificationChannel(dhikrChannel);
@@ -127,7 +127,7 @@ class DailyReminderService {
     );
 
     const notificationDetails = NotificationDetails(android: androidDetails);
-    
+
     await _notifications.show(
       0,
       '🕌 আমল রিমাইন্ডার',
@@ -186,7 +186,7 @@ class DailyReminderService {
 
     // Save settings
     await _saveReminderSettings(true, hour, minute);
-    
+
     print('Daily reminder scheduled for $hour:$minute');
   }
 
@@ -198,7 +198,8 @@ class DailyReminderService {
   }
 
   /// Save reminder settings to SharedPreferences
-  static Future<void> _saveReminderSettings(bool enabled, int hour, int minute) async {
+  static Future<void> _saveReminderSettings(
+      bool enabled, int hour, int minute) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_reminderEnabledKey, enabled);
     await prefs.setInt(_reminderHourKey, hour);
@@ -228,10 +229,9 @@ class DailyReminderService {
 
   /// Check if notifications are permitted
   static Future<bool> areNotificationsEnabled() async {
-    final androidPlugin = _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
     if (androidPlugin != null) {
       return await androidPlugin.areNotificationsEnabled() ?? false;
     }
@@ -240,10 +240,9 @@ class DailyReminderService {
 
   /// Request notification permission (Android 13+)
   static Future<bool> requestNotificationPermission() async {
-    final androidPlugin = _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
     if (androidPlugin != null) {
       return await androidPlugin.requestNotificationsPermission() ?? false;
     }
@@ -302,7 +301,7 @@ class DailyReminderService {
     await prefs.setBool(_morningDhikrEnabledKey, true);
     await prefs.setInt(_morningDhikrHourKey, hour);
     await prefs.setInt(_morningDhikrMinuteKey, minute);
-    
+
     print('Morning dhikr reminder scheduled for $hour:$minute');
   }
 
@@ -364,7 +363,7 @@ class DailyReminderService {
     await prefs.setBool(_eveningDhikrEnabledKey, true);
     await prefs.setInt(_eveningDhikrHourKey, hour);
     await prefs.setInt(_eveningDhikrMinuteKey, minute);
-    
+
     print('Evening dhikr reminder scheduled for $hour:$minute');
   }
 
@@ -431,7 +430,7 @@ class DailyReminderService {
 
     final reminderTime = prayerTime.subtract(Duration(minutes: minutesBefore));
     final now = DateTime.now();
-    
+
     // If time has passed, schedule for tomorrow
     var scheduledDateTime = reminderTime;
     if (scheduledDateTime.isBefore(now)) {
@@ -471,16 +470,77 @@ class DailyReminderService {
     // Save settings
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
-    await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_minutesBefore', minutesBefore);
-    
+    await prefs.setInt(
+        '${_prayerReminderPrefix}${prayer.name}_minutesBefore', minutesBefore);
+
     print('${prayer.name} reminder scheduled for $scheduledDateTime');
+  }
+
+  /// Schedule prayer reminder at specific time (always enabled)
+  static Future<void> schedulePrayerReminderAtTime({
+    required PrayerName prayer,
+    required int hour,
+    required int minute,
+  }) async {
+    await cancelPrayerReminder(prayer);
+
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    // If time has passed today, schedule for tomorrow
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    final prayerName = CustomReminder.getPrayerBengaliName(prayer);
+    final emoji = _getPrayerEmoji(prayer);
+
+    final androidDetails = AndroidNotificationDetails(
+      'prayer_reminder_channel',
+      'নামাজের রিমাইন্ডার',
+      channelDescription: 'নামাজের সময় রিমাইন্ডার',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      styleInformation: BigTextStyleInformation(
+        '$prayerName এর সময় হয়েছে। নামাজ আদায় করুন।',
+        contentTitle: '$emoji $prayerName এর সময়',
+      ),
+    );
+
+    final notificationDetails = NotificationDetails(android: androidDetails);
+
+    await _notifications.zonedSchedule(
+      _getPrayerNotificationId(prayer),
+      '$emoji $prayerName এর সময়',
+      '$prayerName এর নামাজ আদায় করুন',
+      scheduledDate,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+
+    // Save settings
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
+    await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_minute', minute);
+
+    print('${prayer.name} reminder scheduled for $hour:$minute');
   }
 
   /// Cancel prayer reminder
   static Future<void> cancelPrayerReminder(PrayerName prayer) async {
     await _notifications.cancel(_getPrayerNotificationId(prayer));
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', false);
+    await prefs.setBool(
+        '${_prayerReminderPrefix}${prayer.name}_enabled', false);
     print('${prayer.name} reminder cancelled');
   }
 
@@ -488,14 +548,20 @@ class DailyReminderService {
   static Future<Map<String, dynamic>> getPrayerReminderSettings() async {
     final prefs = await SharedPreferences.getInstance();
     final settings = <String, dynamic>{};
-    
+
     for (final prayer in PrayerName.values) {
-      settings['${prayer.name}_enabled'] = 
-          prefs.getBool('${_prayerReminderPrefix}${prayer.name}_enabled') ?? false;
-      settings['${prayer.name}_minutesBefore'] = 
-          prefs.getInt('${_prayerReminderPrefix}${prayer.name}_minutesBefore') ?? 10;
+      settings['${prayer.name}_enabled'] =
+          prefs.getBool('${_prayerReminderPrefix}${prayer.name}_enabled') ??
+              false;
+      settings['${prayer.name}_minutesBefore'] = prefs
+              .getInt('${_prayerReminderPrefix}${prayer.name}_minutesBefore') ??
+          10;
+      settings['${prayer.name}_hour'] =
+          prefs.getInt('${_prayerReminderPrefix}${prayer.name}_hour');
+      settings['${prayer.name}_minute'] =
+          prefs.getInt('${_prayerReminderPrefix}${prayer.name}_minute');
     }
-    
+
     return settings;
   }
 
@@ -505,11 +571,11 @@ class DailyReminderService {
   static Future<List<CustomReminder>> getCustomReminders() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_customRemindersKey);
-    
+
     if (jsonString == null || jsonString.isEmpty) {
       return [];
     }
-    
+
     try {
       final List<dynamic> jsonList = json.decode(jsonString);
       return jsonList.map((j) => CustomReminder.fromJson(j)).toList();
@@ -520,7 +586,8 @@ class DailyReminderService {
   }
 
   /// Save custom reminders
-  static Future<void> _saveCustomReminders(List<CustomReminder> reminders) async {
+  static Future<void> _saveCustomReminders(
+      List<CustomReminder> reminders) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = json.encode(reminders.map((r) => r.toJson()).toList());
     await prefs.setString(_customRemindersKey, jsonString);
@@ -531,7 +598,7 @@ class DailyReminderService {
     final reminders = await getCustomReminders();
     reminders.add(reminder);
     await _saveCustomReminders(reminders);
-    
+
     if (reminder.isEnabled) {
       await _scheduleCustomReminderNotification(reminder);
     }
@@ -541,11 +608,11 @@ class DailyReminderService {
   static Future<void> updateCustomReminder(CustomReminder reminder) async {
     final reminders = await getCustomReminders();
     final index = reminders.indexWhere((r) => r.id == reminder.id);
-    
+
     if (index != -1) {
       reminders[index] = reminder;
       await _saveCustomReminders(reminders);
-      
+
       // Cancel existing and reschedule if enabled
       await _cancelCustomReminderNotification(reminder.id);
       if (reminder.isEnabled) {
@@ -563,12 +630,14 @@ class DailyReminderService {
   }
 
   /// Schedule notification for a custom reminder
-  static Future<void> _scheduleCustomReminderNotification(CustomReminder reminder) async {
+  static Future<void> _scheduleCustomReminderNotification(
+      CustomReminder reminder) async {
     final now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime? scheduledDate;
 
-    if (reminder.type == ReminderType.fixedTime && 
-        reminder.fixedHour != null && reminder.fixedMinute != null) {
+    if (reminder.type == ReminderType.fixedTime &&
+        reminder.fixedHour != null &&
+        reminder.fixedMinute != null) {
       scheduledDate = tz.TZDateTime(
         tz.local,
         now.year,
@@ -577,7 +646,7 @@ class DailyReminderService {
         reminder.fixedHour!,
         reminder.fixedMinute!,
       );
-      
+
       if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
@@ -585,7 +654,8 @@ class DailyReminderService {
 
     if (scheduledDate == null) return;
 
-    final notificationId = _customReminderBaseId + int.parse(reminder.id) % 1000;
+    final notificationId =
+        _customReminderBaseId + int.parse(reminder.id) % 1000;
 
     const androidDetails = AndroidNotificationDetails(
       'custom_reminder_channel',
@@ -596,7 +666,8 @@ class DailyReminderService {
       icon: '@mipmap/ic_launcher',
     );
 
-    final notificationDetails = const NotificationDetails(android: androidDetails);
+    final notificationDetails =
+        const NotificationDetails(android: androidDetails);
 
     await _notifications.zonedSchedule(
       notificationId,

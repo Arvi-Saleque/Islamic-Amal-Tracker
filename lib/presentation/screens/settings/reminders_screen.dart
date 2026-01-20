@@ -16,20 +16,17 @@ class RemindersScreen extends ConsumerStatefulWidget {
 
 class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   bool _isLoading = true;
-  
+
   // Daily Amal Reminder
-  bool _isDailyReminderEnabled = false;
   TimeOfDay _dailyReminderTime = const TimeOfDay(hour: 22, minute: 0);
-  
+
   // Dhikr Reminders
-  bool _isMorningDhikrEnabled = false;
   TimeOfDay _morningDhikrTime = const TimeOfDay(hour: 6, minute: 0);
-  bool _isEveningDhikrEnabled = false;
   TimeOfDay _eveningDhikrTime = const TimeOfDay(hour: 18, minute: 0);
-  
-  // Prayer Reminders - map of prayer name to settings
-  Map<PrayerName, PrayerReminderSettings> _prayerReminders = {};
-  
+
+  // Prayer Reminders - map of prayer name to custom reminder time
+  Map<PrayerName, TimeOfDay> _prayerReminderTimes = {};
+
   // Custom Reminders
   List<CustomReminder> _customReminders = [];
 
@@ -41,65 +38,122 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
   Future<void> _loadAllSettings() async {
     setState(() => _isLoading = true);
-    
+
     // Load daily reminder settings
     final dailySettings = await DailyReminderService.getReminderSettings();
-    
+
     // Load dhikr settings
     final dhikrSettings = await DailyReminderService.getDhikrReminderSettings();
-    
+
     // Load prayer reminder settings
-    final prayerSettings = await DailyReminderService.getPrayerReminderSettings();
-    
+    final prayerSettings =
+        await DailyReminderService.getPrayerReminderSettings();
+
     // Load custom reminders
     final customReminders = await DailyReminderService.getCustomReminders();
-    
+
+    // Get prayer times for default values
+    final prayerTimes = ref.read(prayerTimesProvider).prayerTimes;
+
     setState(() {
-      _isDailyReminderEnabled = dailySettings['enabled'] ?? false;
       _dailyReminderTime = TimeOfDay(
         hour: dailySettings['hour'] ?? 22,
         minute: dailySettings['minute'] ?? 0,
       );
-      
-      _isMorningDhikrEnabled = dhikrSettings['morningEnabled'] ?? false;
+
       _morningDhikrTime = TimeOfDay(
         hour: dhikrSettings['morningHour'] ?? 6,
         minute: dhikrSettings['morningMinute'] ?? 0,
       );
-      _isEveningDhikrEnabled = dhikrSettings['eveningEnabled'] ?? false;
       _eveningDhikrTime = TimeOfDay(
         hour: dhikrSettings['eveningHour'] ?? 18,
         minute: dhikrSettings['eveningMinute'] ?? 0,
       );
-      
-      // Initialize prayer reminders
+
+      // Initialize prayer reminder times - use saved custom times or prayer times
       for (final prayer in PrayerName.values) {
         final key = prayer.name;
-        _prayerReminders[prayer] = PrayerReminderSettings(
-          isEnabled: prayerSettings['${key}_enabled'] ?? false,
-          minutesBefore: prayerSettings['${key}_minutesBefore'] ?? 10,
-        );
+        final savedHour = prayerSettings['${key}_hour'];
+        final savedMinute = prayerSettings['${key}_minute'];
+
+        if (savedHour != null && savedMinute != null) {
+          _prayerReminderTimes[prayer] =
+              TimeOfDay(hour: savedHour, minute: savedMinute);
+        } else if (prayerTimes[key] != null) {
+          // Default to prayer time
+          _prayerReminderTimes[prayer] = TimeOfDay(
+            hour: prayerTimes[key]!.hour,
+            minute: prayerTimes[key]!.minute,
+          );
+        } else {
+          // Fallback defaults
+          _prayerReminderTimes[prayer] = _getDefaultPrayerTime(prayer);
+        }
       }
-      
+
       _customReminders = customReminders;
       _isLoading = false;
     });
+
+    // Schedule all reminders (always enabled)
+    await _scheduleAllReminders();
+  }
+
+  TimeOfDay _getDefaultPrayerTime(PrayerName prayer) {
+    switch (prayer) {
+      case PrayerName.fajr:
+        return const TimeOfDay(hour: 5, minute: 0);
+      case PrayerName.dhuhr:
+        return const TimeOfDay(hour: 12, minute: 30);
+      case PrayerName.asr:
+        return const TimeOfDay(hour: 15, minute: 30);
+      case PrayerName.maghrib:
+        return const TimeOfDay(hour: 18, minute: 0);
+      case PrayerName.isha:
+        return const TimeOfDay(hour: 20, minute: 0);
+    }
+  }
+
+  Future<void> _scheduleAllReminders() async {
+    // Schedule daily reminder
+    await DailyReminderService.scheduleDailyReminder(
+      hour: _dailyReminderTime.hour,
+      minute: _dailyReminderTime.minute,
+    );
+
+    // Schedule dhikr reminders
+    await DailyReminderService.scheduleMorningDhikrReminder(
+      hour: _morningDhikrTime.hour,
+      minute: _morningDhikrTime.minute,
+    );
+    await DailyReminderService.scheduleEveningDhikrReminder(
+      hour: _eveningDhikrTime.hour,
+      minute: _eveningDhikrTime.minute,
+    );
+
+    // Schedule prayer reminders
+    for (final prayer in PrayerName.values) {
+      final time = _prayerReminderTimes[prayer];
+      if (time != null) {
+        await DailyReminderService.schedulePrayerReminderAtTime(
+          prayer: prayer,
+          hour: time.hour,
+          minute: time.minute,
+        );
+      }
+    }
   }
 
   void _showTodaysRemindersPopup() {
     final prayerTimes = ref.read(prayerTimesProvider).prayerTimes;
-    
+
     showDialog(
       context: context,
       builder: (context) => TodaysRemindersDialog(
-        dailyReminderEnabled: _isDailyReminderEnabled,
         dailyReminderTime: _dailyReminderTime,
-        morningDhikrEnabled: _isMorningDhikrEnabled,
         morningDhikrTime: _morningDhikrTime,
-        eveningDhikrEnabled: _isEveningDhikrEnabled,
         eveningDhikrTime: _eveningDhikrTime,
-        prayerReminders: _prayerReminders,
-        prayerTimes: prayerTimes,
+        prayerReminderTimes: _prayerReminderTimes,
         customReminders: _customReminders,
         onNavigateToCustomReminders: () {
           Navigator.pop(context);
@@ -120,105 +174,55 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     );
   }
 
-  Future<void> _toggleDailyReminder(bool value) async {
-    setState(() => _isDailyReminderEnabled = value);
-    
-    if (value) {
-      await DailyReminderService.scheduleDailyReminder(
-        hour: _dailyReminderTime.hour,
-        minute: _dailyReminderTime.minute,
-      );
-    } else {
-      await DailyReminderService.cancelDailyReminder();
-    }
-    await _loadAllSettings();
-  }
-
-  Future<void> _toggleMorningDhikr(bool value) async {
-    setState(() => _isMorningDhikrEnabled = value);
-    
-    if (value) {
-      await DailyReminderService.scheduleMorningDhikrReminder(
-        hour: _morningDhikrTime.hour,
-        minute: _morningDhikrTime.minute,
-      );
-    } else {
-      await DailyReminderService.cancelMorningDhikrReminder();
-    }
-    await _loadAllSettings();
-  }
-
-  Future<void> _toggleEveningDhikr(bool value) async {
-    setState(() => _isEveningDhikrEnabled = value);
-    
-    if (value) {
-      await DailyReminderService.scheduleEveningDhikrReminder(
-        hour: _eveningDhikrTime.hour,
-        minute: _eveningDhikrTime.minute,
-      );
-    } else {
-      await DailyReminderService.cancelEveningDhikrReminder();
-    }
-    await _loadAllSettings();
-  }
-
-  Future<void> _togglePrayerReminder(PrayerName prayer, bool value) async {
-    final current = _prayerReminders[prayer] ?? PrayerReminderSettings();
-    setState(() {
-      _prayerReminders[prayer] = current.copyWith(isEnabled: value);
-    });
-    
-    final prayerTimes = ref.read(prayerTimesProvider).prayerTimes;
-    final prayerTime = prayerTimes[prayer.name];
-    
-    if (value && prayerTime != null) {
-      await DailyReminderService.schedulePrayerReminder(
-        prayer: prayer,
-        prayerTime: prayerTime,
-        minutesBefore: current.minutesBefore,
-      );
-    } else {
-      await DailyReminderService.cancelPrayerReminder(prayer);
-    }
-    await _loadAllSettings();
-  }
-
   Future<void> _selectTime(String type, TimeOfDay currentTime) async {
     final TimeOfDay? picked = await DigitalTimePicker.show(
       context: context,
       initialTime: currentTime,
     );
-    
+
     if (picked != null) {
       switch (type) {
         case 'daily':
           setState(() => _dailyReminderTime = picked);
-          if (_isDailyReminderEnabled) {
-            await DailyReminderService.scheduleDailyReminder(
-              hour: picked.hour,
-              minute: picked.minute,
-            );
-          }
+          await DailyReminderService.scheduleDailyReminder(
+            hour: picked.hour,
+            minute: picked.minute,
+          );
           break;
         case 'morningDhikr':
           setState(() => _morningDhikrTime = picked);
-          if (_isMorningDhikrEnabled) {
-            await DailyReminderService.scheduleMorningDhikrReminder(
-              hour: picked.hour,
-              minute: picked.minute,
-            );
-          }
+          await DailyReminderService.scheduleMorningDhikrReminder(
+            hour: picked.hour,
+            minute: picked.minute,
+          );
           break;
         case 'eveningDhikr':
           setState(() => _eveningDhikrTime = picked);
-          if (_isEveningDhikrEnabled) {
-            await DailyReminderService.scheduleEveningDhikrReminder(
-              hour: picked.hour,
-              minute: picked.minute,
-            );
-          }
+          await DailyReminderService.scheduleEveningDhikrReminder(
+            hour: picked.hour,
+            minute: picked.minute,
+          );
           break;
       }
+    }
+  }
+
+  Future<void> _selectPrayerTime(
+      PrayerName prayer, TimeOfDay currentTime) async {
+    final TimeOfDay? picked = await DigitalTimePicker.show(
+      context: context,
+      initialTime: currentTime,
+    );
+
+    if (picked != null) {
+      setState(() {
+        _prayerReminderTimes[prayer] = picked;
+      });
+      await DailyReminderService.schedulePrayerReminderAtTime(
+        prayer: prayer,
+        hour: picked.hour,
+        minute: picked.minute,
+      );
     }
   }
 
@@ -232,7 +236,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   @override
   Widget build(BuildContext context) {
     final prayerTimesState = ref.watch(prayerTimesProvider);
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
@@ -253,7 +257,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.notifications_active,
+                color: Color(0xFFD4AF37)),
             onPressed: _showTodaysRemindersPopup,
             tooltip: 'আজকের রিমাইন্ডারস',
           ),
@@ -286,9 +291,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   children: [
                     // Info card
                     _buildInfoCard(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Daily Amal Reminder Section
                     _buildSectionHeader('দৈনিক আমল রিমাইন্ডার'),
                     const SizedBox(height: 8),
@@ -297,13 +302,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       title: 'দৈনিক আমল রিমাইন্ডার',
                       subtitle: 'রিমাইন্ডার সময়',
                       time: _dailyReminderTime,
-                      isEnabled: _isDailyReminderEnabled,
-                      onToggle: _toggleDailyReminder,
                       onTimeTap: () => _selectTime('daily', _dailyReminderTime),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Dhikr Reminders Section
                     _buildSectionHeader('যিকির রিমাইন্ডার'),
                     const SizedBox(height: 8),
@@ -312,9 +315,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       title: 'সকালের যিকির',
                       subtitle: 'রিমাইন্ডার সময়',
                       time: _morningDhikrTime,
-                      isEnabled: _isMorningDhikrEnabled,
-                      onToggle: _toggleMorningDhikr,
-                      onTimeTap: () => _selectTime('morningDhikr', _morningDhikrTime),
+                      onTimeTap: () =>
+                          _selectTime('morningDhikr', _morningDhikrTime),
                     ),
                     const SizedBox(height: 8),
                     _buildReminderTile(
@@ -322,30 +324,29 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       title: 'সন্ধ্যার যিকির',
                       subtitle: 'রিমাইন্ডার সময়',
                       time: _eveningDhikrTime,
-                      isEnabled: _isEveningDhikrEnabled,
-                      onToggle: _toggleEveningDhikr,
-                      onTimeTap: () => _selectTime('eveningDhikr', _eveningDhikrTime),
+                      onTimeTap: () =>
+                          _selectTime('eveningDhikr', _eveningDhikrTime),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Prayer Reminders Section
                     _buildSectionHeader('নামাজের রিমাইন্ডার'),
                     const SizedBox(height: 8),
-                    ..._buildPrayerReminderTiles(prayerTimesState),
-                    
+                    ..._buildPrayerReminderTiles(),
+
                     const SizedBox(height: 24),
-                    
+
                     // Custom Reminders Section
                     _buildSectionHeader('কাস্টম রিমাইন্ডার'),
                     const SizedBox(height: 8),
                     _buildCustomReminderCard(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Permission Settings Button
                     _buildPermissionSettingsButton(),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -399,8 +400,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     required String title,
     required String subtitle,
     required TimeOfDay time,
-    required bool isEnabled,
-    required Function(bool) onToggle,
     required VoidCallback onTimeTap,
   }) {
     return Container(
@@ -415,14 +414,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isEnabled 
-                  ? const Color(0xFFD4AF37).withOpacity(0.2)
-                  : Colors.grey.withOpacity(0.2),
+              color: const Color(0xFFD4AF37).withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
-              color: isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
+              color: const Color(0xFFD4AF37),
               size: 24,
             ),
           ),
@@ -441,48 +438,46 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 ),
                 const SizedBox(height: 4),
                 GestureDetector(
-                  onTap: isEnabled ? onTimeTap : null,
+                  onTap: onTimeTap,
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.access_time,
                         size: 14,
-                        color: isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
+                        color: Color(0xFFD4AF37),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatTime(time),
-                        style: TextStyle(
-                          color: isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
+                        style: const TextStyle(
+                          color: Color(0xFFD4AF37),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (isEnabled) ...[
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.check,
-                          size: 14,
-                          color: Colors.green,
-                        ),
-                      ],
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.edit,
+                        size: 14,
+                        color: Color(0xFFD4AF37),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          Switch(
-            value: isEnabled,
-            onChanged: onToggle,
-            activeColor: const Color(0xFFD4AF37),
+          const Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: 24,
           ),
         ],
       ),
     );
   }
 
-  List<Widget> _buildPrayerReminderTiles(PrayerTimesState prayerTimesState) {
+  List<Widget> _buildPrayerReminderTiles() {
     final prayerIcons = {
       PrayerName.fajr: Icons.wb_twilight,
       PrayerName.dhuhr: Icons.wb_sunny,
@@ -500,16 +495,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     };
 
     return PrayerName.values.map((prayer) {
-      final settings = _prayerReminders[prayer] ?? PrayerReminderSettings();
-      final prayerTime = prayerTimesState.prayerTimes[prayer.name];
-      
-      String timeString = '--:-- --';
-      if (prayerTime != null) {
-        final hour = prayerTime.hour > 12 ? prayerTime.hour - 12 : (prayerTime.hour == 0 ? 12 : prayerTime.hour);
-        final minute = prayerTime.minute.toString().padLeft(2, '0');
-        final period = prayerTime.hour >= 12 ? 'PM' : 'AM';
-        timeString = '$hour:$minute $period';
-      }
+      final reminderTime =
+          _prayerReminderTimes[prayer] ?? _getDefaultPrayerTime(prayer);
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
@@ -525,14 +512,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: settings.isEnabled 
-                      ? const Color(0xFFD4AF37).withOpacity(0.2)
-                      : Colors.grey.withOpacity(0.2),
+                  color: const Color(0xFFD4AF37).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   prayerIcons[prayer],
-                  color: settings.isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
+                  color: const Color(0xFFD4AF37),
                   size: 24,
                 ),
               ),
@@ -550,39 +535,40 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: settings.isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          timeString,
-                          style: TextStyle(
-                            color: settings.isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () => _selectPrayerTime(prayer, reminderTime),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: Color(0xFFD4AF37),
                           ),
-                        ),
-                        if (settings.isEnabled) ...[
+                          const SizedBox(width: 4),
+                          Text(
+                            _formatTime(reminderTime),
+                            style: const TextStyle(
+                              color: Color(0xFFD4AF37),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           const SizedBox(width: 4),
                           const Icon(
-                            Icons.check,
+                            Icons.edit,
                             size: 14,
-                            color: Colors.green,
+                            color: Color(0xFFD4AF37),
                           ),
                         ],
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              Switch(
-                value: settings.isEnabled,
-                onChanged: (value) => _togglePrayerReminder(prayer, value),
-                activeColor: const Color(0xFFD4AF37),
+              const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 24,
               ),
             ],
           ),
@@ -678,50 +664,21 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 }
 
-// Helper class for prayer reminder settings
-class PrayerReminderSettings {
-  final bool isEnabled;
-  final int minutesBefore;
-
-  PrayerReminderSettings({
-    this.isEnabled = false,
-    this.minutesBefore = 10,
-  });
-
-  PrayerReminderSettings copyWith({
-    bool? isEnabled,
-    int? minutesBefore,
-  }) {
-    return PrayerReminderSettings(
-      isEnabled: isEnabled ?? this.isEnabled,
-      minutesBefore: minutesBefore ?? this.minutesBefore,
-    );
-  }
-}
-
 // Today's Reminders Popup Dialog
 class TodaysRemindersDialog extends StatelessWidget {
-  final bool dailyReminderEnabled;
   final TimeOfDay dailyReminderTime;
-  final bool morningDhikrEnabled;
   final TimeOfDay morningDhikrTime;
-  final bool eveningDhikrEnabled;
   final TimeOfDay eveningDhikrTime;
-  final Map<PrayerName, PrayerReminderSettings> prayerReminders;
-  final Map<String, DateTime> prayerTimes;
+  final Map<PrayerName, TimeOfDay> prayerReminderTimes;
   final List<CustomReminder> customReminders;
   final VoidCallback onNavigateToCustomReminders;
 
   const TodaysRemindersDialog({
     super.key,
-    required this.dailyReminderEnabled,
     required this.dailyReminderTime,
-    required this.morningDhikrEnabled,
     required this.morningDhikrTime,
-    required this.eveningDhikrEnabled,
     required this.eveningDhikrTime,
-    required this.prayerReminders,
-    required this.prayerTimes,
+    required this.prayerReminderTimes,
     required this.customReminders,
     required this.onNavigateToCustomReminders,
   });
@@ -734,7 +691,8 @@ class TodaysRemindersDialog extends StatelessWidget {
   }
 
   String _formatDateTime(DateTime time) {
-    final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
+    final hour =
+        time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
@@ -744,67 +702,65 @@ class TodaysRemindersDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final todaysReminders = <ReminderItem>[];
-    
-    // Add daily reminder
-    if (dailyReminderEnabled) {
-      final reminderTime = DateTime(now.year, now.month, now.day, 
-          dailyReminderTime.hour, dailyReminderTime.minute);
-      todaysReminders.add(ReminderItem(
-        title: 'দৈনিক আমল রিমাইন্ডার',
-        time: reminderTime,
-        isPassed: now.isAfter(reminderTime),
-      ));
-    }
-    
-    // Add dhikr reminders
-    if (morningDhikrEnabled) {
-      final reminderTime = DateTime(now.year, now.month, now.day, 
-          morningDhikrTime.hour, morningDhikrTime.minute);
-      todaysReminders.add(ReminderItem(
-        title: 'সকালের যিকির',
-        time: reminderTime,
-        isPassed: now.isAfter(reminderTime),
-      ));
-    }
-    if (eveningDhikrEnabled) {
-      final reminderTime = DateTime(now.year, now.month, now.day, 
-          eveningDhikrTime.hour, eveningDhikrTime.minute);
-      todaysReminders.add(ReminderItem(
-        title: 'সন্ধ্যার যিকির',
-        time: reminderTime,
-        isPassed: now.isAfter(reminderTime),
-      ));
-    }
-    
-    // Add prayer reminders
+
+    // Add daily reminder (always enabled)
+    final dailyReminderDateTime = DateTime(now.year, now.month, now.day,
+        dailyReminderTime.hour, dailyReminderTime.minute);
+    todaysReminders.add(ReminderItem(
+      title: 'দৈনিক আমল রিমাইন্ডার',
+      time: dailyReminderDateTime,
+      isPassed: now.isAfter(dailyReminderDateTime),
+    ));
+
+    // Add dhikr reminders (always enabled)
+    final morningDhikrDateTime = DateTime(now.year, now.month, now.day,
+        morningDhikrTime.hour, morningDhikrTime.minute);
+    todaysReminders.add(ReminderItem(
+      title: 'সকালের যিকির',
+      time: morningDhikrDateTime,
+      isPassed: now.isAfter(morningDhikrDateTime),
+    ));
+
+    final eveningDhikrDateTime = DateTime(now.year, now.month, now.day,
+        eveningDhikrTime.hour, eveningDhikrTime.minute);
+    todaysReminders.add(ReminderItem(
+      title: 'সন্ধ্যার যিকির',
+      time: eveningDhikrDateTime,
+      isPassed: now.isAfter(eveningDhikrDateTime),
+    ));
+
+    // Add prayer reminders (always enabled)
     for (final prayer in PrayerName.values) {
-      final settings = prayerReminders[prayer];
-      if (settings?.isEnabled == true) {
-        final prayerTime = prayerTimes[prayer.name];
-        if (prayerTime != null) {
-          todaysReminders.add(ReminderItem(
-            title: '${CustomReminder.getPrayerBengaliName(prayer)}ের নামাজ',
-            time: prayerTime,
-            isPassed: now.isAfter(prayerTime),
-          ));
-        }
+      final reminderTime = prayerReminderTimes[prayer];
+      if (reminderTime != null) {
+        final prayerReminderDateTime = DateTime(now.year, now.month, now.day,
+            reminderTime.hour, reminderTime.minute);
+        todaysReminders.add(ReminderItem(
+          title: '${CustomReminder.getPrayerBengaliName(prayer)}ের নামাজ',
+          time: prayerReminderDateTime,
+          isPassed: now.isAfter(prayerReminderDateTime),
+        ));
       }
     }
-    
+
     // Add custom reminders
     for (final reminder in customReminders.where((r) => r.isEnabled)) {
       DateTime? reminderTime;
-      if (reminder.type == ReminderType.fixedTime && 
-          reminder.fixedHour != null && reminder.fixedMinute != null) {
-        reminderTime = DateTime(now.year, now.month, now.day, 
+      if (reminder.type == ReminderType.fixedTime &&
+          reminder.fixedHour != null &&
+          reminder.fixedMinute != null) {
+        reminderTime = DateTime(now.year, now.month, now.day,
             reminder.fixedHour!, reminder.fixedMinute!);
       } else if (reminder.prayer != null) {
-        final prayerTime = prayerTimes[reminder.prayer!.name];
+        final prayerTime = prayerReminderTimes[reminder.prayer!];
         if (prayerTime != null) {
-          reminderTime = prayerTime.add(Duration(minutes: reminder.minutesOffset));
+          final prayerDateTime = DateTime(
+              now.year, now.month, now.day, prayerTime.hour, prayerTime.minute);
+          reminderTime =
+              prayerDateTime.add(Duration(minutes: reminder.minutesOffset));
         }
       }
-      
+
       if (reminderTime != null) {
         todaysReminders.add(ReminderItem(
           title: reminder.title,
@@ -814,10 +770,10 @@ class TodaysRemindersDialog extends StatelessWidget {
         ));
       }
     }
-    
+
     // Sort by time
     todaysReminders.sort((a, b) => a.time.compareTo(b.time));
-    
+
     // Separate pending and passed
     final pendingReminders = todaysReminders.where((r) => !r.isPassed).toList();
     final passedReminders = todaysReminders.where((r) => r.isPassed).toList();
@@ -852,7 +808,7 @@ class TodaysRemindersDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Pending reminders
             if (pendingReminders.isNotEmpty) ...[
               const Text(
@@ -878,10 +834,10 @@ class TodaysRemindersDialog extends StatelessWidget {
                 ),
               ),
             ],
-            
+
             if (passedReminders.isNotEmpty && pendingReminders.isNotEmpty)
               const Divider(color: Color(0xFF2A2A2A), height: 24),
-            
+
             // Passed reminders (collapsed)
             if (passedReminders.isNotEmpty) ...[
               Text(
@@ -892,7 +848,7 @@ class TodaysRemindersDialog extends StatelessWidget {
                 ),
               ),
             ],
-            
+
             if (todaysReminders.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
@@ -903,9 +859,9 @@ class TodaysRemindersDialog extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Buttons
             Row(
               children: [
