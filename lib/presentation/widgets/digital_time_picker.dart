@@ -80,10 +80,12 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
     if (widget.use24HourFormat) {
       hour = _selectedHour;
     } else {
-      hour = _selectedHour % 12;
-      if (!_isAM) hour += 12;
-      if (hour == 24) hour = 12;
-      if (hour == 0 && _isAM) hour = 0;
+      // 12-hour format to 24-hour conversion
+      if (_selectedHour == 12) {
+        hour = _isAM ? 0 : 12;
+      } else {
+        hour = _isAM ? _selectedHour : _selectedHour + 12;
+      }
     }
     return TimeOfDay(hour: hour, minute: _selectedMinute);
   }
