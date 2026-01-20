@@ -5,7 +5,7 @@ import '../../widgets/digital_time_picker.dart';
 
 class CustomRemindersScreen extends StatefulWidget {
   final VoidCallback? onRemindersChanged;
-  
+
   const CustomRemindersScreen({
     super.key,
     this.onRemindersChanged,
@@ -66,7 +66,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
         ],
       ),
     );
-    
+
     if (confirmed == true) {
       await DailyReminderService.deleteCustomReminder(reminder.id);
       await _loadReminders();
@@ -184,7 +184,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: reminder.isEnabled 
+          color: reminder.isEnabled
               ? const Color(0xFFD4AF37).withOpacity(0.3)
               : const Color(0xFF2A2A2A),
         ),
@@ -201,14 +201,16 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: reminder.isEnabled 
+                    color: reminder.isEnabled
                         ? const Color(0xFFD4AF37).withOpacity(0.2)
                         : Colors.grey.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     _getReminderIcon(reminder),
-                    color: reminder.isEnabled ? const Color(0xFFD4AF37) : Colors.grey,
+                    color: reminder.isEnabled
+                        ? const Color(0xFFD4AF37)
+                        : Colors.grey,
                     size: 24,
                   ),
                 ),
@@ -220,7 +222,8 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                       Text(
                         reminder.title,
                         style: TextStyle(
-                          color: reminder.isEnabled ? Colors.white : Colors.grey,
+                          color:
+                              reminder.isEnabled ? Colors.white : Colors.grey,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
@@ -229,13 +232,14 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                       Text(
                         reminder.getTimeDisplayString(),
                         style: TextStyle(
-                          color: reminder.isEnabled 
-                              ? const Color(0xFFD4AF37) 
+                          color: reminder.isEnabled
+                              ? const Color(0xFFD4AF37)
                               : Colors.grey.withOpacity(0.7),
                           fontSize: 13,
                         ),
                       ),
-                      if (reminder.description != null && reminder.description!.isNotEmpty) ...[
+                      if (reminder.description != null &&
+                          reminder.description!.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           reminder.description!,
@@ -258,7 +262,8 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                       activeColor: const Color(0xFFD4AF37),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                      icon: const Icon(Icons.delete_outline,
+                          color: Colors.red, size: 20),
                       onPressed: () => _deleteReminder(reminder),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -306,17 +311,14 @@ class AddCustomReminderScreen extends StatefulWidget {
   });
 
   @override
-  State<AddCustomReminderScreen> createState() => _AddCustomReminderScreenState();
+  State<AddCustomReminderScreen> createState() =>
+      _AddCustomReminderScreenState();
 }
 
 class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
   final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  
-  ReminderType _selectedType = ReminderType.beforePrayer;
-  PrayerName _selectedPrayer = PrayerName.fajr;
-  int _minutesOffset = 10;
-  TimeOfDay _fixedTime = const TimeOfDay(hour: 9, minute: 0);
+
+  TimeOfDay _reminderTime = const TimeOfDay(hour: 9, minute: 0);
   List<int> _selectedDays = [];
 
   bool get _isEditing => widget.existingReminder != null;
@@ -327,12 +329,8 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     if (widget.existingReminder != null) {
       final r = widget.existingReminder!;
       _titleController.text = r.title;
-      _descriptionController.text = r.description ?? '';
-      _selectedType = r.type;
-      _selectedPrayer = r.prayer ?? PrayerName.fajr;
-      _minutesOffset = r.minutesOffset.abs();
       if (r.fixedHour != null && r.fixedMinute != null) {
-        _fixedTime = TimeOfDay(hour: r.fixedHour!, minute: r.fixedMinute!);
+        _reminderTime = TimeOfDay(hour: r.fixedHour!, minute: r.fixedMinute!);
       }
       _selectedDays = List.from(r.repeatDays);
     }
@@ -341,18 +339,17 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
   Future<void> _selectTime() async {
     final picked = await DigitalTimePicker.show(
       context: context,
-      initialTime: _fixedTime,
+      initialTime: _reminderTime,
     );
-    
+
     if (picked != null) {
-      setState(() => _fixedTime = picked);
+      setState(() => _reminderTime = picked);
     }
   }
 
@@ -367,19 +364,25 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
       return;
     }
 
+    if (_selectedDays.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('অন্তত একটি দিন নির্বাচন করুন'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final reminder = CustomReminder(
       id: widget.existingReminder?.id ?? CustomReminder.generateId(),
       title: _titleController.text.trim(),
-      description: _descriptionController.text.trim().isEmpty 
-          ? null 
-          : _descriptionController.text.trim(),
-      type: _selectedType,
-      prayer: _selectedType != ReminderType.fixedTime ? _selectedPrayer : null,
-      minutesOffset: _selectedType == ReminderType.beforePrayer 
-          ? -_minutesOffset 
-          : (_selectedType == ReminderType.afterPrayer ? _minutesOffset : 0),
-      fixedHour: _selectedType == ReminderType.fixedTime ? _fixedTime.hour : null,
-      fixedMinute: _selectedType == ReminderType.fixedTime ? _fixedTime.minute : null,
+      description: null,
+      type: ReminderType.fixedTime,
+      prayer: null,
+      minutesOffset: 0,
+      fixedHour: _reminderTime.hour,
+      fixedMinute: _reminderTime.minute,
       isEnabled: widget.existingReminder?.isEnabled ?? true,
       repeatDays: _selectedDays,
       createdAt: widget.existingReminder?.createdAt,
@@ -392,12 +395,13 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     }
 
     widget.onSave();
-    
+
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditing ? 'রিমাইন্ডার আপডেট হয়েছে' : 'রিমাইন্ডার যোগ হয়েছে'),
+          content: Text(
+              _isEditing ? 'রিমাইন্ডার আপডেট হয়েছে' : 'রিমাইন্ডার যোগ হয়েছে'),
           backgroundColor: const Color(0xFF2A2A2A),
         ),
       );
@@ -437,57 +441,94 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title Input
-            _buildSectionHeader('রিমাইন্ডারের টাইটেল'),
-            const SizedBox(height: 8),
-            _buildTextField(
-              controller: _titleController,
-              hint: 'যেমন: তাহাজ্জুদ নামাজ, কুরআন তিলাওয়াত, ইত্যাদি',
-              maxLines: 1,
+            // Title Input Section
+            _buildSectionCard(
+              icon: Icons.title,
+              title: 'রিমাইন্ডার টাইটেল',
+              child: TextField(
+                controller: _titleController,
+                maxLength: 50,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'যেমন: কোরআন তেলাওয়াত, দোয়া পড়া...',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                  border: InputBorder.none,
+                  counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                ),
+              ),
             ),
-            
-            const SizedBox(height: 24),
-            
-            // Reminder Type Selection
-            _buildSectionHeader('রিমাইন্ডারের সময়'),
-            const SizedBox(height: 8),
-            _buildTypeSelector(),
-            
+
             const SizedBox(height: 16),
-            
-            // Time Configuration based on type
-            if (_selectedType == ReminderType.fixedTime)
-              _buildFixedTimeSelector()
-            else
-              _buildPrayerTimeSelector(),
-            
-            const SizedBox(height: 24),
-            
-            // Day Selection
-            _buildSectionHeader('কোন কোন দিন'),
-            const SizedBox(height: 8),
-            _buildDaySelector(),
-            
-            const SizedBox(height: 24),
-            
-            // Description (optional)
-            _buildSectionHeader('বিবরণ (ঐচ্ছিক)'),
-            const SizedBox(height: 8),
-            _buildTextField(
-              controller: _descriptionController,
-              hint: 'অতিরিক্ত নোট যোগ করুন...',
-              maxLines: 3,
+
+            // Time Selection Section
+            _buildSectionCard(
+              icon: Icons.access_time,
+              title: 'রিমাইন্ডার সময়',
+              child: GestureDetector(
+                onTap: _selectTime,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'সময় নির্বাচন করুন',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          _formatTime(_reminderTime),
+                          style: const TextStyle(
+                            color: Color(0xFFD4AF37),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.edit,
+                            color: Color(0xFFD4AF37), size: 18),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            
+
+            const SizedBox(height: 16),
+
+            // Day Selection Section
+            _buildSectionCard(
+              icon: Icons.calendar_today,
+              title: 'পুনরাবৃত্তির দিন',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDaySelector(),
+                  if (_selectedDays.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        'অন্তত একটি দিন নির্বাচন করুন',
+                        style: TextStyle(
+                          color: Colors.red.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 32),
-            
+
             // Save Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _saveReminder,
-                icon: Icon(_isEditing ? Icons.save : Icons.add),
-                label: Text(_isEditing ? 'রিমাইন্ডার সেভ করুন' : '+ রিমাইন্ডার যোগ করুন'),
+                icon: const Icon(Icons.add),
+                label: Text(_isEditing
+                    ? 'রিমাইন্ডার সেভ করুন'
+                    : '+ রিমাইন্ডার সংরক্ষণ করুন'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD4AF37),
                   foregroundColor: Colors.black,
@@ -498,7 +539,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 40),
           ],
         ),
@@ -506,284 +547,83 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: Color(0xFFD4AF37),
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    int maxLines = 1,
+  Widget _buildSectionCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
   }) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
       ),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTypeSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
-      ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTypeButton(ReminderType.beforePrayer, 'আগে'),
-          _buildTypeButton(ReminderType.afterPrayer, 'পরে'),
-          _buildTypeButton(ReminderType.fixedTime, 'নির্দিষ্ট'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTypeButton(ReminderType type, String label) {
-    final isSelected = _selectedType == type;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedType = type),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.black : Colors.white,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFixedTimeSelector() {
-    return GestureDetector(
-      onTap: _selectTime,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF2A2A2A)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.access_time, color: Color(0xFFD4AF37)),
-                SizedBox(width: 12),
-                Text(
-                  'সময় নির্বাচন করুন',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  _formatTime(_fixedTime),
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(Icons.check, color: Colors.green, size: 16),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPrayerTimeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Prayer Selection
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF2A2A2A)),
-          ),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: PrayerName.values.map((prayer) {
-              final isSelected = _selectedPrayer == prayer;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedPrayer = prayer),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected ? const Color(0xFFD4AF37) : const Color(0xFF3A3A3A),
-                    ),
-                  ),
-                  child: Text(
-                    CustomReminder.getPrayerBengaliName(prayer),
-                    style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Minutes offset
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF2A2A2A)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
+              Icon(icon, color: const Color(0xFFD4AF37), size: 20),
+              const SizedBox(width: 8),
               Text(
-                '${CustomReminder.getPrayerBengaliName(_selectedPrayer)} এর $_minutesOffset মিনিট ${_selectedType == ReminderType.beforePrayer ? 'আগে' : 'পরে'}',
+                title,
                 style: const TextStyle(
                   color: Color(0xFFD4AF37),
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 12),
-              SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: const Color(0xFFD4AF37),
-                  inactiveTrackColor: const Color(0xFF3A3A3A),
-                  thumbColor: const Color(0xFFD4AF37),
-                  overlayColor: const Color(0xFFD4AF37).withOpacity(0.2),
-                ),
-                child: Slider(
-                  value: _minutesOffset.toDouble(),
-                  min: 0,
-                  max: 60,
-                  divisions: 12,
-                  label: '$_minutesOffset মিনিট',
-                  onChanged: (value) {
-                    setState(() => _minutesOffset = value.toInt());
-                  },
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('0 মিনিট', style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 12)),
-                  Text('60 মিনিট', style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 12)),
-                ],
-              ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
     );
   }
 
   Widget _buildDaySelector() {
     final dayNames = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি', 'রবি'];
-    
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
-      ),
-      child: Column(
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: List.generate(7, (index) {
-              final day = index + 1;
-              final isSelected = _selectedDays.contains(day);
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      _selectedDays.remove(day);
-                    } else {
-                      _selectedDays.add(day);
-                    }
-                  });
-                },
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected ? const Color(0xFFD4AF37) : const Color(0xFF3A3A3A),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      dayNames[index],
-                      style: TextStyle(
-                        color: isSelected ? Colors.black : Colors.white,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _selectedDays.isEmpty 
-                ? 'প্রতিদিন রিমাইন্ডার দিবে' 
-                : 'নির্বাচিত দিন: ${_selectedDays.length}',
-            style: TextStyle(
-              color: Colors.grey.withOpacity(0.7),
-              fontSize: 12,
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: List.generate(7, (index) {
+        final day = index + 1;
+        final isSelected = _selectedDays.contains(day);
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              if (isSelected) {
+                _selectedDays.remove(day);
+              } else {
+                _selectedDays.add(day);
+              }
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? const Color(0xFFD4AF37)
+                    : const Color(0xFF3A3A3A),
+              ),
+            ),
+            child: Text(
+              dayNames[index],
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }
