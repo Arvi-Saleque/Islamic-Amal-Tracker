@@ -91,12 +91,12 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
   }
 
   void _onHourChanged(int index) {
-    final hourMax = widget.use24HourFormat ? 24 : 12;
-    final hourMin = widget.use24HourFormat ? 0 : 1;
     setState(() {
-      _selectedHour = (index % hourMax) + hourMin;
-      if (!widget.use24HourFormat && _selectedHour > 12) {
-        _selectedHour = _selectedHour - 12;
+      if (widget.use24HourFormat) {
+        _selectedHour = index % 24;
+      } else {
+        // 12-hour format: hour should be 1-12
+        _selectedHour = (index % 12) + 1;
       }
     });
     widget.onTimeChanged?.call(_currentTime);
@@ -169,11 +169,13 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
                 selectedValue: _selectedHour,
                 onChanged: _onHourChanged,
                 itemBuilder: (index) {
-                  final hourMax = widget.use24HourFormat ? 24 : 12;
-                  final hourMin = widget.use24HourFormat ? 0 : 1;
-                  int hour = (index % hourMax) + hourMin;
-                  if (!widget.use24HourFormat && hour > 12) hour -= 12;
-                  return hour.toString().padLeft(2, '0');
+                  if (widget.use24HourFormat) {
+                    return (index % 24).toString().padLeft(2, '0');
+                  } else {
+                    // 12-hour format: show 1-12
+                    final hour = (index % 12) + 1;
+                    return hour.toString().padLeft(2, '0');
+                  }
                 },
               ),
             ),
