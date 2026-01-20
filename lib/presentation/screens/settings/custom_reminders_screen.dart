@@ -261,12 +261,27 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                       onChanged: (_) => _toggleReminder(reminder),
                       activeColor: const Color(0xFFD4AF37),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          color: Colors.red, size: 20),
-                      onPressed: () => _deleteReminder(reminder),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined,
+                              color: Color(0xFFD4AF37), size: 20),
+                          onPressed: () => _openAddReminderScreen(reminder),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          tooltip: 'সম্পাদনা',
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red, size: 20),
+                          onPressed: () => _deleteReminder(reminder),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          tooltip: 'মুছুন',
+                        ),
+                      ],
                     ),
                   ],
                 ),
