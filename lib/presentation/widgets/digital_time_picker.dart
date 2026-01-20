@@ -158,61 +158,68 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Hour wheel
-          SizedBox(
-            width: 80,
-            child: _buildWheel(
-              controller: _hourController,
-              itemCount: (widget.use24HourFormat ? 24 : 12) * 2000,
-              selectedValue: _selectedHour,
-              onChanged: _onHourChanged,
-              itemBuilder: (index) {
-                final hourMax = widget.use24HourFormat ? 24 : 12;
-                final hourMin = widget.use24HourFormat ? 0 : 1;
-                int hour = (index % hourMax) + hourMin;
-                if (!widget.use24HourFormat && hour > 12) hour -= 12;
-                return hour.toString().padLeft(2, '0');
-              },
+          Flexible(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 65),
+              child: _buildWheel(
+                controller: _hourController,
+                itemCount: (widget.use24HourFormat ? 24 : 12) * 2000,
+                selectedValue: _selectedHour,
+                onChanged: _onHourChanged,
+                itemBuilder: (index) {
+                  final hourMax = widget.use24HourFormat ? 24 : 12;
+                  final hourMin = widget.use24HourFormat ? 0 : 1;
+                  int hour = (index % hourMax) + hourMin;
+                  if (!widget.use24HourFormat && hour > 12) hour -= 12;
+                  return hour.toString().padLeft(2, '0');
+                },
+              ),
             ),
           ),
           
           // Colon separator
-          const Text(
-            ':',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.w300,
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 2),
+            child: Text(
+              ':',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w300,
+              ),
             ),
           ),
           
           // Minute wheel
-          SizedBox(
-            width: 80,
-            child: _buildWheel(
-              controller: _minuteController,
-              itemCount: 60 * 2000,
-              selectedValue: _selectedMinute,
-              onChanged: _onMinuteChanged,
-              itemBuilder: (index) => (index % 60).toString().padLeft(2, '0'),
+          Flexible(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 65),
+              child: _buildWheel(
+                controller: _minuteController,
+                itemCount: 60 * 2000,
+                selectedValue: _selectedMinute,
+                onChanged: _onMinuteChanged,
+                itemBuilder: (index) => (index % 60).toString().padLeft(2, '0'),
+              ),
             ),
           ),
           
           // AM/PM selector (only for 12-hour format)
           if (!widget.use24HourFormat) ...[
-            const SizedBox(width: 16),
+            const SizedBox(width: 6),
             GestureDetector(
               onTap: _togglePeriod,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   _isAM ? 'AM' : 'PM',
                   style: const TextStyle(
                     color: Color(0xFFD4AF37),
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -233,7 +240,7 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
   }) {
     return ListWheelScrollView.useDelegate(
       controller: controller,
-      itemExtent: 60,
+      itemExtent: 50,
       perspective: 0.005,
       diameterRatio: 1.5,
       physics: const FixedExtentScrollPhysics(),
@@ -249,8 +256,16 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 color: isSelected ? Colors.white : Colors.white38,
-                fontSize: isSelected ? 40 : 28,
+                fontSize: isSelected ? 32 : 22,
                 fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
+              ),
+              child: Text(value),
+            ),
+          );
+        },
+      ),
+    );
+  }
               ),
               child: Text(value),
             ),
