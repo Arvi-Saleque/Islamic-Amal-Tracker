@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../../services/permission_service.dart';
 import '../../providers/prayer_times_provider.dart';
 import '../../providers/prayer_tracking_provider.dart';
 import '../../providers/daily_amal_provider.dart';
@@ -25,6 +27,27 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationAndShowNotificationPopup();
+  }
+
+  Future<void> _checkLocationAndShowNotificationPopup() async {
+    // Wait for location permission to be checked/granted
+    await Future.delayed(const Duration(seconds: 2));
+    
+    if (!mounted) return;
+    
+    // Check if location permission is granted
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.always || 
+        permission == LocationPermission.whileInUse) {
+      // Location granted, show notification popup
+      PermissionService.showNotificationPermissionPopup(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
