@@ -187,7 +187,7 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
             child: Text(
               ':',
               style: TextStyle(
-                color: Colors.white,
+                color: Color(0xFFD4AF37),
                 fontSize: 28,
                 fontWeight: FontWeight.w300,
               ),
@@ -210,24 +210,64 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
           
           // AM/PM selector (only for 12-hour format)
           if (!widget.use24HourFormat) ...[
-            const SizedBox(width: 6),
-            GestureDetector(
-              onTap: _togglePeriod,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  _isAM ? 'AM' : 'PM',
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+            const SizedBox(width: 10),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (!_isAM) {
+                      setState(() => _isAM = true);
+                      widget.onTimeChanged?.call(_currentTime);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _isAM ? const Color(0xFFD4AF37).withOpacity(0.2) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: _isAM ? const Color(0xFFD4AF37) : const Color(0xFF3A3A3A),
+                      ),
+                    ),
+                    child: Text(
+                      'AM',
+                      style: TextStyle(
+                        color: _isAM ? const Color(0xFFD4AF37) : Colors.white38,
+                        fontSize: 14,
+                        fontWeight: _isAM ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    if (_isAM) {
+                      setState(() => _isAM = false);
+                      widget.onTimeChanged?.call(_currentTime);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: !_isAM ? const Color(0xFFD4AF37).withOpacity(0.2) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: !_isAM ? const Color(0xFFD4AF37) : const Color(0xFF3A3A3A),
+                      ),
+                    ),
+                    child: Text(
+                      'PM',
+                      style: TextStyle(
+                        color: !_isAM ? const Color(0xFFD4AF37) : Colors.white38,
+                        fontSize: 14,
+                        fontWeight: !_isAM ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -259,9 +299,9 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
             child: AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white38,
+                color: isSelected ? const Color(0xFFD4AF37) : Colors.white38,
                 fontSize: isSelected ? 32 : 22,
-                fontWeight: isSelected ? FontWeight.w400 : FontWeight.w300,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w300,
               ),
               child: Text(value),
             ),
