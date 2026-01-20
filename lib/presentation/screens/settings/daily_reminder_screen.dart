@@ -261,7 +261,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'দৈনিক আমল রিমাইন্ডার',
+          'রিমাইন্ডার সেটিংস',
           style: TextStyle(
             color: Color(0xFFD4AF37),
             fontSize: 20,
@@ -285,11 +285,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
                   children: [
                     // Info Card
                     _buildInfoCard(),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // Reminder Toggle Card
-                    _buildReminderCard(),
                     
                     const SizedBox(height: 20),
                     
@@ -328,7 +323,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           SizedBox(width: 12),
           Expanded(
             child: Text(
-              'প্রতিদিন নির্দিষ্ট সময়ে আমল করার রিমাইন্ডার পাবেন',
+              'নোটিফিকেশন সঠিকভাবে কাজ করতে নিচের অনুমতিগুলো দিন',
               style: TextStyle(
                 color: Color(0xFFD4AF37),
                 fontSize: 14,
