@@ -177,34 +177,49 @@
 
 ## Android Manifest Permissions (Code Level)
 
-### Notification Related:
-1. **POST_NOTIFICATIONS** - Android 13+ notification দেখানোর জন্য
-2. **SCHEDULE_EXACT_ALARM** - Android 12+ সঠিক সময়ে alarm
-3. **USE_EXACT_ALARM** - Android 14+ exact alarm
-4. **RECEIVE_BOOT_COMPLETED** - ফোন restart এর পর reminder reschedule
-5. **VIBRATE** - Notification vibration
-6. **WAKE_LOCK** - Screen বন্ধ থাকলেও notification
+### ✅ Active Permissions (বর্তমানে ব্যবহৃত):
 
-### Prayer Times Related:
-7. **INTERNET** - Prayer times API
-8. **ACCESS_FINE_LOCATION** - সঠিক location থেকে prayer times
-9. **ACCESS_COARSE_LOCATION** - Approximate location থেকে prayer times
+**Notification Related:**
+1. **POST_NOTIFICATIONS** - Android 13+ notification দেখানোর জন্য
+2. **SCHEDULE_EXACT_ALARM** - Android 12+ সঠিক সময়ে alarm (Android 14+ এ user settings থেকে allow করতে হবে)
+3. **RECEIVE_BOOT_COMPLETED** - ফোন restart এর পর reminder reschedule
+4. **VIBRATE** - Notification vibration
+
+**Prayer Times Related:**
+5. **INTERNET** - Prayer times API / Firebase sync
+6. **ACCESS_FINE_LOCATION** - সঠিক location থেকে prayer times
+7. **ACCESS_COARSE_LOCATION** - Approximate location থেকে prayer times
+
+### ❌ Removed Permissions (সরিয়ে দেওয়া হয়েছে):
+- ~~USE_EXACT_ALARM~~ - Play Store restricted, SCHEDULE_EXACT_ALARM দিয়েই কাজ হয়
+- ~~WAKE_LOCK~~ - flutter_local_notifications এর জন্য দরকার নেই
+- ~~REQUEST_IGNORE_BATTERY_OPTIMIZATIONS~~ - User guide দিয়ে manually করাই ভালো
+- ~~FOREGROUND_SERVICE~~ - Reminder scheduling এর জন্য দরকার নেই
+- ~~FOREGROUND_SERVICE_SPECIAL_USE~~ - Play Store এ highly scrutinized
 
 ---
 
 ## Summary by Brand Priority:
 
-### ⭐⭐⭐ Most Critical (সবচেয়ে গুরুত্বপূর্ণ):
-- **Xiaomi/Redmi/Poco:** Auto-start
-- **Samsung:** Sleeping Apps বন্ধ
-- **OnePlus:** Auto-launch + Deep Optimization
-- **Oppo/Realme:** Auto-launch / Startup Manager
-- **Vivo/iQOO:** Auto-start
-- **Huawei/Honor:** App Launch (Manual mode)
-- **Tecno/Infinix/Itel:** Auto-start
+### ⭐⭐⭐ সবার আগে চেক করুন (Most Critical):
 
-### Common for All:
-1. Battery Optimization = Unrestricted
-2. Background Data = ON
-3. Notifications = Allow
-4. Exact Alarm = Allow
+| Brand | সবচেয়ে গুরুত্বপূর্ণ Setting |
+|-------|----------------------------|
+| **Xiaomi/Redmi/Poco** | Auto-start / Background autostart = ON |
+| **Samsung** | Sleeping Apps থেকে Remove করুন |
+| **OnePlus** | Auto-launch + Deep Optimization বন্ধ |
+| **Oppo/Realme** | Auto-launch / Startup Manager = Enable |
+| **Vivo/iQOO** | Auto-start = Allow |
+| **Huawei/Honor** | App Launch → Manual mode |
+| **Tecno/Infinix/Itel** | Auto-start = Enable |
+
+### ⭐⭐ এরপর চেক করুন (Common for All):
+1. **Battery Optimization** = Unrestricted / Don't optimize
+2. **Notifications** = Allow (সব category ON)
+3. **Exact Alarm** = Allow (Android 12+)
+4. **Background Data** = ON
+
+### ⭐ Optional (যদি এখনও কাজ না করে):
+- Recents Lock (Recent apps এ লং প্রেস করে Lock)
+- Do Not Disturb এ exception যোগ করুন
+- Data Saver এ Unrestricted data usage = ON
