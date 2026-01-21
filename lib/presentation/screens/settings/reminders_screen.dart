@@ -342,11 +342,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     const SizedBox(height: 8),
                     _buildCustomReminderCard(),
 
-                    const SizedBox(height: 24),
-
-                    // Permission Settings Button
-                    _buildPermissionSettingsButton(),
-
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -632,32 +627,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               color: Color(0xFFD4AF37),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPermissionSettingsButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DailyReminderScreen(),
-            ),
-          );
-        },
-        icon: const Icon(Icons.security),
-        label: const Text('নোটিফিকেশন অনুমতি সেটিংস'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFD4AF37),
-          foregroundColor: Colors.black,
-          padding: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
         ),
       ),
     );

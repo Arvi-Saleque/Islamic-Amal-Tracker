@@ -59,7 +59,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
     final permissions = [
       Permission.notification,
       Permission.scheduleExactAlarm,
-      Permission.ignoreBatteryOptimizations,
     ];
 
     final statuses = await Future.wait(
@@ -91,9 +90,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
         break;
       case Permission.scheduleExactAlarm:
         permissionName = 'সঠিক সময়ে অ্যালার্ম';
-        break;
-      case Permission.ignoreBatteryOptimizations:
-        permissionName = 'ব্যাটারি অপটিমাইজেশন';
         break;
       default:
         permissionName = 'এই';
@@ -132,21 +128,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
         ],
       ),
     );
-  }
-
-  Future<void> _openBatteryOptimizationSettings() async {
-    if (Platform.isAndroid) {
-      try {
-        const intent = AndroidIntent(
-          action: 'android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS',
-          data: 'package:com.amaltracker.app',
-        );
-        await intent.launch();
-      } catch (e) {
-        // Fallback to app settings
-        await openAppSettings();
-      }
-    }
   }
 
   Future<void> _selectTime() async {
@@ -466,13 +447,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           'নির্দিষ্ট সময়ে রিমাইন্ডার পাঠাতে প্রয়োজন',
           Icons.alarm,
         ),
-        const SizedBox(height: 8),
-        _buildPermissionTile(
-          Permission.ignoreBatteryOptimizations,
-          'ব্যাটারি অপটিমাইজেশন',
-          'অ্যাপ বন্ধ থাকলেও রিমাইন্ডার কাজ করবে',
-          Icons.battery_full,
-        ),
       ],
     );
   }
@@ -543,11 +517,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           if (!isGranted)
             ElevatedButton(
               onPressed: () {
-                if (permission == Permission.ignoreBatteryOptimizations) {
-                  _openBatteryOptimizationSettings();
-                } else {
-                  _requestPermission(permission);
-                }
+                _requestPermission(permission);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4AF37),
@@ -584,7 +554,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'গুরুত্বপূর্ণ: নোটিফিকেশন কাজ না করলে',
+                  'নোটিফিকেশন কাজ না করলে',
                   style: TextStyle(
                     color: Colors.red,
                     fontSize: 16,
@@ -596,7 +566,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           ),
           const SizedBox(height: 8),
           const Text(
-            'উপরের পার্মিশন দেওয়ার পরেও নোটিফিকেশন কাজ না করলে আপনার ডিভাইস অনুযায়ী নিচের অপশনগুলো চেক করুন।',
+            'উপরের পার্মিশন দেওয়ার পরেও নোটিফিকেশন কাজ না করলে আপনার ডিভাইস অনুযায়ী নিচের অপশনগুলো চেক করুন। অনেক ব্র্যান্ডের ফোনে বিশেষ সেটিংস থাকে যা ম্যানুয়ালি পরিবর্তন করতে হয়। গাইড অনুযায়ী আপনার ফোনে যে যে অপশন খুজে পান সেগুলো চেক করুন।',
             style: TextStyle(
               color: Colors.white70,
               fontSize: 13,
