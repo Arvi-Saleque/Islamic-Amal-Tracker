@@ -705,7 +705,7 @@ class TodaysRemindersDialog extends StatelessWidget {
         final prayerReminderDateTime = DateTime(now.year, now.month, now.day,
             reminderTime.hour, reminderTime.minute);
         todaysReminders.add(ReminderItem(
-          title: '${CustomReminder.getPrayerBengaliName(prayer)}ের নামাজ',
+          title: '${CustomReminder.getPrayerBengaliName(prayer)} নামাজ',
           time: prayerReminderDateTime,
           isPassed: now.isAfter(prayerReminderDateTime),
         ));
