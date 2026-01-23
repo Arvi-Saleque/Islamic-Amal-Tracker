@@ -1,8 +1,25 @@
 # Changelog
 
-## v1.0.5 (Build 7) - January 22, 2026
+## v1.0.5 (Build 9) - January 22, 2026
 
 ### 🎯 Major Improvements
+- **Dynamic Default Reminder Times**: Reminders now calculate defaults based on actual prayer times
+  - ফজর: ওয়াক্ত শুরু + ৩০ মিনিট
+  - যোহর: ওয়াক্ত শুরু + ৬০ মিনিট
+  - আসর: ওয়াক্ত শুরু + ১৫ মিনিট
+  - মাগরিব: ওয়াক্ত শুরু + ১০ মিনিট
+  - ইশা: ওয়াক্ত শুরু + ৩০ মিনিট
+  - সকালের যিকির: ফজর + ৬০ মিনিট
+  - সন্ধ্যার যিকির: মাগরিব + ২৫ মিনিট
+  - দৈনিক আমল: রাত ১০:০০ PM
+- **2-Tab Bell Icon Popup**: 
+  - Tab 1: "ডিফল্ট নিয়ম" - Shows how default times are calculated
+  - Tab 2: "আজকের সময়" - Shows all reminders for today with actual times
+- **Updated Notification Messages**:
+  - সালাত: "X এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।"
+  - সকালের যিকির: "সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।"
+  - সন্ধ্যার যিকির: "সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।"
+  - দৈনিক আমল: "প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।"
 - **Device-Specific Notification Guide**: Auto-detect phone brand (Xiaomi, Samsung, OnePlus, etc.) and show customized troubleshooting steps
 - **Tab System**: Browse notification settings for all major phone brands
 - **Notification Permission Popup**: Added popup after location permission to guide users to reminder settings

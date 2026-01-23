@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hijri/hijri_calendar.dart';
 import '../../../services/permission_service.dart';
 import '../../providers/prayer_times_provider.dart';
 import '../../providers/prayer_tracking_provider.dart';
@@ -17,7 +18,6 @@ import '../reading/reading_tracker_screen.dart';
 import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
-import '../profile/profile_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -139,8 +139,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Greeting Card
-              _buildGreetingCard(context, dateFormat.format(now)),
+              
+              
+              // Date & Sun Card
+              _buildDateSunCard(context, prayerTimesState),
               
               const SizedBox(height: 16),
               
@@ -163,22 +165,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildGreetingCard(BuildContext context, String date) {
+  Widget _buildDateSunCard(BuildContext context, PrayerTimesState state) {
+    final now = DateTime.now();
+    
+    // Hijri date
+    final hijri = HijriCalendar.fromDate(now);
+    final hijriMonthBengali = _getHijriMonthBengali(hijri.hMonth);
+    final hijriDay = _toBengaliNumber(hijri.hDay);
+    
+    // Bengali date (approximate - Magh is around Jan-Feb)
+    final bengaliDate = _getBengaliDate(now);
+    
+    // Gregorian date in Bengali
+    final dayName = _getBengaliDayName(now.weekday);
+    final dayNum = _toBengaliNumber(now.day);
+    final monthName = _getBengaliMonthName(now.month);
+    
+    // Prayer times for sunrise/sunset
+    String? sunriseTime;
+    String? sunsetTime;
+    if (state.prayerTimes.isNotEmpty) {
+      final sunrise = state.prayerTimes['sunrise'];
+      final maghrib = state.prayerTimes['maghrib'];
+      if (sunrise != null) {
+        sunriseTime = _formatTimeShort(sunrise);
+      }
+      if (maghrib != null) {
+        sunsetTime = _formatTimeShort(maghrib);
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A1A1A),
-            const Color(0xFF1A1A1A).withOpacity(0.8),
-          ],
-        ),
+        color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
+          color: const Color(0xFFD4AF37).withOpacity(0.3),
           width: 1,
         ),
         boxShadow: [
@@ -189,56 +213,253 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.calendar_today,
-                  color: Color(0xFFD4AF37),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  date,
+          // Left side - Dates
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Hijri date
+                Text(
+                  '$hijriDay $hijriMonthBengali',
                   style: const TextStyle(
-                    color: Color(0xFFB0B0B0),
-                    fontSize: 14,
+                    color: Color(0xFFD4AF37),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 6),
+                // Gregorian date
+                Text(
+                  '$dayNum $monthName',
+                  style: const TextStyle(
+                    color: Color(0xFFD4AF37),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  dayName,
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Bengali date
+                Text(
+                  bengaliDate,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Vertical Divider
+          Container(
+            height: 80,
+            width: 1,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFFD4AF37).withOpacity(0.3),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          
+          // Right side - Sunrise/Sunset
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Sunrise
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        sunriseTime ?? '--:--',
+                        style: const TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'সূর্যোদয়',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4AF37).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.wb_sunny,
+                      color: const Color(0xFFD4AF37),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Sunset
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        sunsetTime ?? '--:--',
+                        style: const TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'সূর্যাস্ত',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4AF37).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.nights_stay,
+                      color: const Color(0xFFD4AF37),
+                      size: 20,
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'আসসালামু আলাইকুম',
-            style: TextStyle(
-              color: Color(0xFFD4AF37),
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'আল্লাহ আপনার দিনকে বরকতময় করুন',
-            style: TextStyle(
-              color: Color(0xFF888888),
-              fontSize: 14,
-            ),
           ),
         ],
       ),
     );
+  }
+
+  String _formatTimeShort(DateTime time) {
+    final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '${_toBengaliNumber(hour)}:${_toBengaliNumber(int.parse(minute))}';
+  }
+
+  String _toBengaliNumber(int number) {
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return number.toString().split('').map((d) => bengaliDigits[int.parse(d)]).join();
+  }
+
+  String _getHijriMonthBengali(int month) {
+    const months = [
+      'মুহাররম', 'সফর', 'রবিউল আউয়াল', 'রবিউস সানি',
+      'জমাদিউল আউয়াল', 'জমাদিউস সানি', 'রজব', 'শা\'বান',
+      'রমজান', 'শাওয়াল', 'জিলক্বদ', 'জিলহজ্জ'
+    ];
+    return months[month - 1];
+  }
+
+  String _getBengaliDayName(int weekday) {
+    const days = ['সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার', 'রবিবার'];
+    return days[weekday - 1];
+  }
+
+  String _getBengaliMonthName(int month) {
+    const months = [
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+    ];
+    return months[month - 1];
+  }
+
+  String _getBengaliDate(DateTime date) {
+    // Approximate Bengali calendar calculation
+    // Bengali year starts around April 14
+    int bengaliYear = date.year - 593;
+    int bengaliMonth;
+    int bengaliDay;
+    
+    // Simplified calculation - this is approximate
+    final dayOfYear = date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+    
+    // Bengali months start dates (approximate)
+    final bengaliMonthStarts = [
+      14, // Poush starts ~Jan 14
+      13, // Magh starts ~Feb 13
+      14, // Falgun starts ~Mar 14
+      14, // Chaitra starts ~Apr 14
+      15, // Boishakh starts ~May 15
+      15, // Joishtho starts ~Jun 15
+      16, // Ashar starts ~Jul 16
+      16, // Srabon starts ~Aug 16
+      16, // Bhadro starts ~Sep 16
+      17, // Ashwin starts ~Oct 17
+      16, // Kartik starts ~Nov 16
+      15, // Ogrohayon starts ~Dec 15
+    ];
+    
+    const bengaliMonthNames = [
+      'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র', 'বৈশাখ', 'জ্যৈষ্ঠ',
+      'আষাঢ়', 'শ্রাবণ', 'ভাদ্র', 'আশ্বিন', 'কার্তিক', 'অগ্রহায়ণ'
+    ];
+    
+    // Find current Bengali month based on Gregorian date
+    if (date.month == 1) {
+      if (date.day >= 14) {
+        bengaliMonth = 1; // Magh
+        bengaliDay = date.day - 13;
+      } else {
+        bengaliMonth = 0; // Poush
+        bengaliDay = date.day + 17;
+      }
+    } else if (date.month == 2) {
+      if (date.day >= 13) {
+        bengaliMonth = 2; // Falgun
+        bengaliDay = date.day - 12;
+      } else {
+        bengaliMonth = 1; // Magh
+        bengaliDay = date.day + 18;
+      }
+    } else {
+      // Simplified for other months
+      bengaliMonth = (date.month + 8) % 12;
+      bengaliDay = (date.day + 15) % 30 + 1;
+    }
+    
+    if (bengaliMonth <= 3) {
+      bengaliYear = date.year - 594;
+    }
+    
+    return '${_toBengaliNumber(bengaliDay)} ${bengaliMonthNames[bengaliMonth]}';
   }
 
   Widget _buildPrayerTimesCard(BuildContext context, PrayerTimesState state) {

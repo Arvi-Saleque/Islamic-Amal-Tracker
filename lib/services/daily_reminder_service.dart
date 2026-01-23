@@ -167,8 +167,8 @@ class DailyReminderService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
-        'আজকের আমলগুলো সম্পন্ন করুন। আল্লাহ আমাদের সবাইকে আমল করার তৌফিক দান করুন।',
-        contentTitle: '🕌 দৈনিক আমল রিমাইন্ডার',
+        'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।',
+        contentTitle: '📋 দৈনিক আমল রিমাইন্ডার',
       ),
     );
 
@@ -176,8 +176,8 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _dailyReminderId,
-      '🕌 দৈনিক আমল রিমাইন্ডার',
-      'আজকের আমলগুলো সম্পন্ন করুন!',
+      '📋 দৈনিক আমল রিমাইন্ডার',
+      'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -280,7 +280,7 @@ class DailyReminderService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
-        'সকালের যিকির পড়ার সময় হয়েছে। আল্লাহর যিকির করুন।',
+        'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
         contentTitle: '☀️ সকালের যিকির',
       ),
     );
@@ -290,7 +290,7 @@ class DailyReminderService {
     await _notifications.zonedSchedule(
       _morningDhikrId,
       '☀️ সকালের যিকির',
-      'সকালের যিকির পড়ার সময় হয়েছে',
+      'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -342,8 +342,8 @@ class DailyReminderService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
-        'সন্ধ্যার যিকির পড়ার সময় হয়েছে। আল্লাহর যিকির করুন।',
-        contentTitle: '🌙 সন্ধ্যার যিকির',
+        'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
+        contentTitle: '🌆 সন্ধ্যার যিকির',
       ),
     );
 
@@ -351,8 +351,8 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _eveningDhikrId,
-      '🌙 সন্ধ্যার যিকির',
-      'সন্ধ্যার যিকির পড়ার সময় হয়েছে',
+      '🌆 সন্ধ্যার যিকির',
+      'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -510,8 +510,8 @@ class DailyReminderService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
-        '$prayerName এর সময় হয়েছে। নামাজ আদায় করুন।',
-        contentTitle: '$emoji $prayerName এর সময়',
+        '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
+        contentTitle: '$emoji $prayerName এর সালাত',
       ),
     );
 
@@ -519,8 +519,8 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _getPrayerNotificationId(prayer),
-      '$emoji $prayerName এর সময়',
-      '$prayerName এর নামাজ আদায় করুন',
+      '$emoji $prayerName এর সালাত',
+      '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

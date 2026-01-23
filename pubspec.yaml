@@ -1,7 +1,7 @@
 name: amal_tracker
 description: Professional Bengali Islamic Amal (practice) tracker app with prayer times, dhikr counters, and analytics
 publish_to: 'none'
-version: 1.0.5+7
+version: 1.0.5+9
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -32,6 +32,7 @@ dependencies:
   # Localization
   easy_localization: ^3.0.7
   intl: ^0.20.2
+  hijri: ^3.0.0
 
   # Home Widget (Android/iOS only)
   home_widget: ^0.6.0
