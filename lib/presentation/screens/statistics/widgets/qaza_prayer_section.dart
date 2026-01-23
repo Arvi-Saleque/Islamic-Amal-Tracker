@@ -25,7 +25,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   Widget build(BuildContext context) {
     final qazaState = ref.watch(qazaPrayerProvider);
     final qazaNotifier = ref.read(qazaPrayerProvider.notifier);
-    
+
     if (qazaState.isLoading) {
       return const Center(
         child: CircularProgressIndicator(
@@ -68,13 +68,12 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: totalPending > 0
-              ? AppTheme.primaryGold.withOpacity(0.5)
-              : AppTheme.primaryGold.withOpacity(0.3),
-          width: 1.5,
-        ),
         boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
           BoxShadow(
             color: totalPending > 0
                 ? AppTheme.primaryGold.withOpacity(0.1)
@@ -97,14 +96,18 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                 size: 32,
               ),
               const SizedBox(width: 12),
-              Text(
-                totalPending > 0
-                    ? 'বাকি কাজা নামাজ: ${_toBengaliNumber(totalPending)}'
-                    : 'আলহামদুলিল্লাহ! কোনো কাজা নেই',
-                style: TextStyle(
-                  color: totalPending > 0 ? AppTheme.primaryGold : Colors.green,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  totalPending > 0
+                      ? 'বাকি কাজা নামাজ: ${_toBengaliNumber(totalPending)}'
+                      : 'আলহামদুলিল্লাহ! কোনো কাজা নেই',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color:
+                        totalPending > 0 ? AppTheme.primaryGold : Colors.green,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -130,9 +133,6 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
       decoration: BoxDecoration(
         color: AppTheme.primaryGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppTheme.primaryGold.withOpacity(0.2),
-        ),
       ),
       child: Row(
         children: [
@@ -172,12 +172,20 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: hasPending
-                ? AppTheme.primaryGold.withOpacity(0.4)
-                : Colors.green.withOpacity(0.4),
-            width: 1.5,
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+            BoxShadow(
+              color: hasPending
+                  ? AppTheme.primaryGold.withOpacity(0.2)
+                  : Colors.green.withOpacity(0.15),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -329,10 +337,13 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           decoration: BoxDecoration(
             color: const Color(0xFF0A0A0A),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: const Color(0xFF2A2A2A),
-              width: 1,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -342,16 +353,17 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: qaza.isQazaDone
-                      ? Colors.green
-                      : Colors.transparent,
+                  color: qaza.isQazaDone ? Colors.green : Colors.transparent,
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: qaza.isQazaDone
-                        ? Colors.green
-                        : AppTheme.primaryGold.withOpacity(0.6),
-                    width: 2,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: qaza.isQazaDone
+                          ? Colors.green.withOpacity(0.4)
+                          : AppTheme.primaryGold.withOpacity(0.3),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
                 child: qaza.isQazaDone
                     ? const Icon(
@@ -370,14 +382,11 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                     Text(
                       formattedDate,
                       style: TextStyle(
-                        color: qaza.isQazaDone
-                            ? Colors.grey
-                            : Colors.white,
+                        color: qaza.isQazaDone ? Colors.grey : Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        decoration: qaza.isQazaDone
-                            ? TextDecoration.lineThrough
-                            : null,
+                        decoration:
+                            qaza.isQazaDone ? TextDecoration.lineThrough : null,
                       ),
                     ),
                     Text(
@@ -424,16 +433,31 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
 
   String _formatDateBengali(DateTime date) {
     final months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর'
     ];
     return '${_toBengaliNumber(date.day)} ${months[date.month - 1]}';
   }
 
   String _getWeekdayBengali(int weekday) {
     final days = [
-      'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার',
-      'শুক্রবার', 'শনিবার', 'রবিবার'
+      'সোমবার',
+      'মঙ্গলবার',
+      'বুধবার',
+      'বৃহস্পতিবার',
+      'শুক্রবার',
+      'শনিবার',
+      'রবিবার'
     ];
     return days[weekday - 1];
   }

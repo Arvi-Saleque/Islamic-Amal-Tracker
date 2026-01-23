@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/prayer_tracking_provider.dart';
+import '../../../core/theme/app_colors.dart';
 
 class PrayerTrackerScreen extends ConsumerStatefulWidget {
   const PrayerTrackerScreen({super.key});
@@ -44,13 +45,13 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final prayerNotifier = ref.read(prayerTrackingProvider.notifier);
     final completedPrayers = prayerState.todayData.completedPrayersCount;
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundDark,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Row(
@@ -60,7 +61,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 'নামাজের হিসাব',
                 textAlign: TextAlign.left,
                 style: TextStyle(
-                  color: Color(0xFFD4AF37),
+                  color: AppColors.textGolden,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -73,33 +74,36 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
         actions: [
           // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.info_outline, color: AppColors.primary),
             onPressed: () => _showInfoBottomSheet(context),
           ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.15),
+              color: AppColors.primaryOpacity15,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFFD4AF37).withOpacity(0.3),
-                width: 1,
-              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowGolden,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.check_circle,
-                  color: Color(0xFFD4AF37),
+                  color: AppColors.primary,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '$completedPrayers/৫',
                   style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                    color: AppColors.textGolden,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -137,23 +141,21 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.backgroundLight,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDone
-              ? const Color(0xFFD4AF37).withOpacity(0.4)
-              : const Color(0xFF2A2A2A),
-          width: 1.5,
-        ),
-        boxShadow: isDone
-            ? [
-                BoxShadow(
-                  color: const Color(0xFFD4AF37).withOpacity(0.15),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [],
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+          if (isDone)
+            BoxShadow(
+              color: AppColors.shadowGolden,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+        ],
       ),
       child: Column(
         children: [
@@ -177,20 +179,22 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       height: 28,
                       decoration: BoxDecoration(
                         color: isDone
-                            ? const Color(0xFFD4AF37)
-                            : Colors.transparent,
+                            ? AppColors.primary
+                            : AppColors.grey800,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isDone
-                              ? const Color(0xFFD4AF37)
-                              : const Color(0xFF666666),
-                          width: 2,
-                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDone ? AppColors.shadowGolden : Colors.black.withOpacity(0.4),
+                            blurRadius: isDone ? 8 : 6,
+                            offset: const Offset(0, 2),
+                            spreadRadius: isDone ? 1 : 0,
+                          ),
+                        ],
                       ),
                       child: isDone
                           ? const Icon(
                               Icons.check,
-                              color: Color(0xFF0A0A0A),
+                              color: AppColors.backgroundDark,
                               size: 18,
                             )
                           : null,
@@ -203,8 +207,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       prayer,
                       style: TextStyle(
                         color: isDone
-                            ? const Color(0xFFD4AF37)
-                            : const Color(0xFFE0E0E0),
+                            ? AppColors.textGolden
+                            : AppColors.textSecondary,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -218,8 +222,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     child: Icon(
                       Icons.keyboard_arrow_down,
                       color: isDone
-                          ? const Color(0xFFD4AF37)
-                          : const Color(0xFF888888),
+                          ? AppColors.textGolden
+                          : AppColors.grey500,
                       size: 28,
                     ),
                   ),
@@ -238,9 +242,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.transparent,
-                        const Color(0xFFD4AF37).withOpacity(0.2),
-                        Colors.transparent,
+                        AppColors.transparent,
+                        AppColors.primaryOpacity20,
+                        AppColors.transparent,
                       ],
                     ),
                   ),
@@ -282,15 +286,16 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: done
-                ? const Color(0xFFD4AF37).withOpacity(0.08)
-                : const Color(0xFF0A0A0A),
+                ? AppColors.primaryOpacity06
+                : AppColors.backgroundDark,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: done
-                  ? const Color(0xFFD4AF37).withOpacity(0.3)
-                  : const Color(0xFF2A2A2A),
-              width: 1,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: done ? AppColors.shadowGolden : AppColors.shadowDark,
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -299,18 +304,21 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 width: 22,
                 height: 22,
                 decoration: BoxDecoration(
-                  color: done ? const Color(0xFFD4AF37) : Colors.transparent,
+                  color: done ? AppColors.primary : AppColors.grey800,
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color:
-                        done ? const Color(0xFFD4AF37) : const Color(0xFF555555),
-                    width: 2,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: done ? AppColors.shadowGolden : Colors.black.withOpacity(0.3),
+                      blurRadius: done ? 6 : 4,
+                      offset: const Offset(0, 1),
+                      spreadRadius: done ? 0.5 : 0,
+                    ),
+                  ],
                 ),
                 child: done
                     ? const Icon(
                         Icons.check,
-                        color: Color(0xFF0A0A0A),
+                        color: AppColors.backgroundDark,
                         size: 14,
                       )
                     : null,
@@ -321,8 +329,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                   rakat,
                   style: TextStyle(
                     color: done
-                        ? const Color(0xFFD4AF37)
-                        : const Color(0xFFB0B0B0),
+                        ? AppColors.textGolden
+                        : AppColors.textTertiary,
                     fontSize: 15,
                     fontWeight: done ? FontWeight.w600 : FontWeight.w400,
                   ),
@@ -339,7 +347,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
   void _showInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.85,
@@ -347,7 +355,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: AppColors.backgroundLight,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -358,7 +366,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
+                  color: AppColors.grey600,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -370,12 +378,12 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        color: AppColors.primaryOpacity15,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.info_outline,
-                        color: Color(0xFFD4AF37),
+                        color: AppColors.primary,
                         size: 24,
                       ),
                     ),
@@ -383,7 +391,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     const Text(
                       'নামাজের তথ্য ও ফযিলত',
                       style: TextStyle(
-                        color: Color(0xFFD4AF37),
+                        color: AppColors.textGolden,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -393,7 +401,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
               ),
               Container(
                 height: 1,
-                color: const Color(0xFF2A2A2A),
+                color: AppColors.grey800,
               ),
               // Content
               Expanded(
@@ -522,12 +530,15 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: AppColors.backgroundDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF2A2A2A),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,7 +547,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             children: [
               Icon(
                 icon,
-                color: const Color(0xFFD4AF37),
+                color: AppColors.primary,
                 size: 22,
               ),
               const SizedBox(width: 10),
@@ -544,7 +555,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 child: Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                    color: AppColors.textGolden,
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
@@ -557,7 +568,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             Text(
               content,
               style: const TextStyle(
-                color: Color(0xFFE0E0E0),
+                color: AppColors.textSecondary,
                 fontSize: 14,
                 height: 1.7,
               ),
@@ -579,15 +590,18 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFD4AF37).withOpacity(0.08),
-            const Color(0xFFD4AF37).withOpacity(0.03),
+            AppColors.primaryOpacity06,
+            AppColors.primaryOpacity06,
           ],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowGolden,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -597,7 +611,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             children: [
               const Icon(
                 Icons.format_quote,
-                color: Color(0xFFD4AF37),
+                color: AppColors.primary,
                 size: 20,
               ),
               const SizedBox(width: 10),
@@ -605,7 +619,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 child: Text(
                   hadith,
                   style: const TextStyle(
-                    color: Color(0xFFE0E0E0),
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                     height: 1.6,
                     fontStyle: FontStyle.italic,
@@ -615,19 +629,12 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             ],
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '📚 $reference',
-              style: TextStyle(
-                color: const Color(0xFFD4AF37).withOpacity(0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+          Text(
+            '📚 $reference',
+            style: const TextStyle(
+              color: AppColors.textGolden,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

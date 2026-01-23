@@ -5,6 +5,7 @@ import '../../providers/statistics_provider.dart';
 import '../../providers/qaza_prayer_provider.dart';
 import '../../../data/models/statistics_model.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_colors.dart';
 import 'widgets/streak_card.dart';
 import 'widgets/tab_selector.dart';
 import 'widgets/weekly_progress_chart.dart';
@@ -31,9 +32,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final statsState = ref.watch(statisticsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundDark,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(

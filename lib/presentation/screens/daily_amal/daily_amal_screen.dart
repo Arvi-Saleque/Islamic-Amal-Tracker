@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/daily_amal_provider.dart';
 import '../../../data/models/daily_amal_model.dart';
+import '../../../core/theme/app_colors.dart';
 
 class DailyAmalScreen extends ConsumerStatefulWidget {
   const DailyAmalScreen({super.key});
@@ -44,19 +45,19 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     final totalCount = amalState.todayData.totalCount;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundDark,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'প্রতিদিনের আমল',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: AppColors.textGolden,
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -65,33 +66,36 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         actions: [
           // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.info_outline, color: AppColors.primary),
             onPressed: () => _showInfoBottomSheet(context),
           ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.15),
+              color: AppColors.primaryOpacity15,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFFD4AF37).withOpacity(0.3),
-                width: 1,
-              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowGolden,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.check_circle,
-                  color: Color(0xFFD4AF37),
+                  color: AppColors.primary,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '$completedCount/$totalCount',
                   style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                    color: AppColors.textGolden,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -129,10 +133,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
       floatingActionButton: FloatingActionButton(
         mini: true,
         onPressed: () => _showAddItemDialog(context, amalNotifier),
-        backgroundColor: const Color(0xFFD4AF37),
+        backgroundColor: AppColors.primary,
         child: const Icon(
           Icons.add,
-          color: Color(0xFF0A0A0A),
+          color: AppColors.backgroundDark,
           size: 20,
         ),
       ),
@@ -162,23 +166,24 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFFD4AF37)
-                    : const Color(0xFF1A1A1A),
+                    ? AppColors.primary
+                    : AppColors.backgroundLight,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFFD4AF37)
-                      : const Color(0xFF2A2A2A),
-                  width: 1.5,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isSelected ? AppColors.shadowGolden : AppColors.shadowDark,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Icon(
                     _categoryIcons[category],
                     color: isSelected
-                        ? const Color(0xFF0A0A0A)
-                        : const Color(0xFFD4AF37),
+                        ? AppColors.backgroundDark
+                        : AppColors.primary,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -186,8 +191,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     _categoryNames[category]!,
                     style: TextStyle(
                       color: isSelected
-                          ? const Color(0xFF0A0A0A)
-                          : const Color(0xFFE0E0E0),
+                          ? AppColors.backgroundDark
+                          : AppColors.textSecondary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -208,12 +213,27 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF2A2A2A),
-          width: 1,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.backgroundLight,
+            AppColors.backgroundLight,
+          ],
         ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: AppColors.shadowGolden,
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -221,31 +241,101 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'আজকের অগ্রগতি',
+                'আজকের মোট',
                 style: TextStyle(
-                  color: Color(0xFFE0E0E0),
-                  fontSize: 16,
+                  color: AppColors.textSecondary,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
-                '${(percentage * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Color(0xFFD4AF37),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOpacity20,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadowGolden,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '$completed/$total সম্পন্ন',
+                  style: const TextStyle(
+                    color: AppColors.textGolden,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$completed',
+                      style: const TextStyle(
+                        color: AppColors.textGolden,
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        height: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'লক্ষ্য: $total',
+                      style: const TextStyle(
+                        color: AppColors.grey500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CircularProgressIndicator(
+                        value: percentage,
+                        strokeWidth: 8,
+                        backgroundColor: AppColors.grey800,
+                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    ),
+                    Text(
+                      '${(percentage * 100).toInt()}%',
+                      style: const TextStyle(
+                        color: AppColors.textGolden,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: percentage,
-              minHeight: 8,
-              backgroundColor: const Color(0xFF0A0A0A),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+              minHeight: 6,
+              backgroundColor: AppColors.backgroundDark,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
         ],
@@ -260,14 +350,15 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.backgroundLight,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: item.isCompleted
-              ? const Color(0xFFD4AF37).withOpacity(0.3)
-              : const Color(0xFF2A2A2A),
-          width: 1.5,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: item.isCompleted ? AppColors.shadowGolden : AppColors.shadowDark,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -284,20 +375,21 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   height: 26,
                   decoration: BoxDecoration(
                     color: item.isCompleted
-                        ? const Color(0xFFD4AF37)
-                        : Colors.transparent,
+                        ? AppColors.primary
+                        : AppColors.transparent,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: item.isCompleted
-                          ? const Color(0xFFD4AF37)
-                          : const Color(0xFF666666),
-                      width: 2,
-                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: item.isCompleted ? AppColors.shadowGolden : AppColors.shadowDark,
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
                   ),
                   child: item.isCompleted
                       ? const Icon(
                           Icons.check,
-                          color: Color(0xFF0A0A0A),
+                          color: AppColors.backgroundDark,
                           size: 16,
                         )
                       : null,
@@ -325,7 +417,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         Text(
                           'সম্পন্ন: ${_formatTime(item.completedAt!)}',
                           style: const TextStyle(
-                            color: Color(0xFF888888),
+                            color: AppColors.grey500,
                             fontSize: 12,
                           ),
                         ),
@@ -337,7 +429,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   IconButton(
                     icon: const Icon(
                       Icons.delete_outline,
-                      color: Color(0xFF666666),
+                      color: AppColors.grey600,
                       size: 20,
                     ),
                     onPressed: () => _confirmDelete(context, item, notifier),
@@ -357,14 +449,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         children: [
           Icon(
             _categoryIcons[_selectedCategory],
-            color: const Color(0xFF666666),
+            color: AppColors.grey600,
             size: 64,
           ),
           const SizedBox(height: 16),
           Text(
             'কোনো ${_categoryNames[_selectedCategory]} নেই',
             style: const TextStyle(
-              color: Color(0xFF888888),
+              color: AppColors.grey500,
               fontSize: 16,
             ),
           ),
@@ -387,18 +479,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(
-            color: Color(0xFFD4AF37),
-            width: 1,
-          ),
         ),
         title: const Text(
           'নতুন আমল যোগ করুন',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: AppColors.textGolden,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -408,23 +496,23 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           children: [
             TextField(
               controller: titleController,
-              style: const TextStyle(color: Color(0xFFE0E0E0)),
+              style: const TextStyle(color: AppColors.textSecondary),
               decoration: InputDecoration(
                 hintText: 'আমলের নাম লিখুন',
-                hintStyle: const TextStyle(color: Color(0xFF666666)),
+                hintStyle: const TextStyle(color: AppColors.grey600),
                 filled: true,
-                fillColor: const Color(0xFF0A0A0A),
+                fillColor: AppColors.backgroundDark,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                  borderSide: const BorderSide(color: AppColors.grey800),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                  borderSide: const BorderSide(color: AppColors.grey800),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+                  borderSide: const BorderSide(color: AppColors.primary),
                 ),
               ),
             ),
@@ -432,18 +520,18 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             StatefulBuilder(
               builder: (context, setState) => DropdownButtonFormField<String>(
                 value: selectedCategory,
-                dropdownColor: const Color(0xFF1A1A1A),
-                style: const TextStyle(color: Color(0xFFE0E0E0)),
+                dropdownColor: AppColors.backgroundLight,
+                style: const TextStyle(color: AppColors.textSecondary),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
+                  fillColor: AppColors.backgroundDark,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                    borderSide: const BorderSide(color: AppColors.grey800),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                    borderSide: const BorderSide(color: AppColors.grey800),
                   ),
                 ),
                 items: _categoryNames.entries
@@ -467,7 +555,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'বাতিল',
-              style: TextStyle(color: Color(0xFF888888)),
+              style: TextStyle(color: AppColors.grey500),
             ),
           ),
           ElevatedButton(
@@ -481,8 +569,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
-              foregroundColor: const Color(0xFF0A0A0A),
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.backgroundDark,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -502,32 +590,28 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(
-            color: Color(0xFFD4AF37),
-            width: 1,
-          ),
         ),
         title: const Text(
           'মুছে ফেলবেন?',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: AppColors.textGolden,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           '"${item.title}" মুছে ফেলতে চান?',
-          style: const TextStyle(color: Color(0xFFE0E0E0)),
+          style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'না',
-              style: TextStyle(color: Color(0xFF888888)),
+              style: TextStyle(color: AppColors.grey500),
             ),
           ),
           ElevatedButton(
@@ -536,8 +620,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.danger,
+              foregroundColor: AppColors.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -553,7 +637,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   void _showInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.85,
@@ -561,7 +645,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1A1A1A),
+            color: AppColors.backgroundLight,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -572,7 +656,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
+                  color: AppColors.grey600,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -584,12 +668,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        color: AppColors.primaryOpacity15,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.info_outline,
-                        color: Color(0xFFD4AF37),
+                        color: AppColors.primary,
                         size: 24,
                       ),
                     ),
@@ -598,7 +682,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       child: Text(
                         'প্রতিদিনের আমল - তথ্য ও ফযিলত',
                         style: TextStyle(
-                          color: Color(0xFFD4AF37),
+                          color: AppColors.textGolden,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -609,7 +693,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               ),
               Container(
                 height: 1,
-                color: const Color(0xFF2A2A2A),
+                color: AppColors.grey800,
               ),
               // Content
               Expanded(
@@ -758,12 +842,15 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: AppColors.backgroundDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF2A2A2A),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -772,7 +859,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             children: [
               Icon(
                 icon,
-                color: const Color(0xFFD4AF37),
+                color: AppColors.primary,
                 size: 22,
               ),
               const SizedBox(width: 10),
@@ -780,7 +867,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 child: Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                    color: AppColors.textGolden,
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
@@ -793,7 +880,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             Text(
               content,
               style: const TextStyle(
-                color: Color(0xFFE0E0E0),
+                color: AppColors.textSecondary,
                 fontSize: 14,
                 height: 1.7,
               ),
@@ -820,10 +907,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -833,7 +923,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             children: [
               const Icon(
                 Icons.format_quote,
-                color: Color(0xFFD4AF37),
+                color: AppColors.primary,
                 size: 20,
               ),
               const SizedBox(width: 10),
@@ -841,7 +931,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 child: Text(
                   hadith,
                   style: const TextStyle(
-                    color: Color(0xFFE0E0E0),
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                     height: 1.6,
                     fontStyle: FontStyle.italic,
@@ -851,19 +941,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '📚 $reference',
-              style: TextStyle(
-                color: const Color(0xFFD4AF37).withOpacity(0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+          Text(
+            '📚 $reference',
+            style: const TextStyle(
+              color: AppColors.textGolden,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -875,27 +958,30 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   Widget _buildExpandableDuaSection() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: AppColors.backgroundDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF2A2A2A),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        data: Theme.of(context).copyWith(dividerColor: AppColors.transparent),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.15),
+              color: AppColors.primaryOpacity15,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.wb_twilight,
-              color: Color(0xFFD4AF37),
+              color: AppColors.primary,
               size: 20,
             ),
           ),
@@ -1114,10 +1200,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowDark,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -1142,10 +1231,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFFD4AF37).withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: const Color(0xFFD4AF37).withOpacity(0.3),
-                width: 1,
-              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowGolden,
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
             child: Text(
               count,
@@ -1166,10 +1258,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFF0A0A0A).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFF2A2A2A),
-                  width: 1,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1312,10 +1407,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   ],
                 ),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: const Color(0xFFD4AF37).withOpacity(0.2),
-                  width: 1,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowDark,
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1355,20 +1453,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // Reference
             Align(
               alignment: Alignment.centerRight,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '📚 $reference',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
+              child: Text(
+                '📚 $reference',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

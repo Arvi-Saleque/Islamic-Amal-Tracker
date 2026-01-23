@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../../../services/daily_reminder_service.dart';
 import '../../widgets/digital_time_picker.dart';
@@ -13,11 +11,12 @@ class DailyReminderScreen extends StatefulWidget {
   State<DailyReminderScreen> createState() => _DailyReminderScreenState();
 }
 
-class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsBindingObserver {
+class _DailyReminderScreenState extends State<DailyReminderScreen>
+    with WidgetsBindingObserver {
   bool _isReminderEnabled = false;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
   bool _isLoading = true;
-  
+
   // Permission statuses
   Map<Permission, PermissionStatus> _permissionStatuses = {};
 
@@ -75,7 +74,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
   Future<void> _requestPermission(Permission permission) async {
     final status = await permission.request();
     await _checkPermissions();
-    
+
     // Show message if permanently denied
     if (status.isPermanentlyDenied && mounted) {
       _showPermissionDeniedDialog(permission);
@@ -135,12 +134,12 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
       context: context,
       initialTime: _selectedTime,
     );
-    
+
     if (picked != null && picked != _selectedTime) {
       setState(() {
         _selectedTime = picked;
       });
-      
+
       if (_isReminderEnabled) {
         await _scheduleReminder();
       }
@@ -154,13 +153,17 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
 
     if (value) {
       // Check permissions first
-      final notificationGranted = _permissionStatuses[Permission.notification]?.isGranted ?? false;
-      final alarmGranted = _permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ?? false;
-      
+      final notificationGranted =
+          _permissionStatuses[Permission.notification]?.isGranted ?? false;
+      final alarmGranted =
+          _permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ??
+              false;
+
       if (!notificationGranted) {
         await _requestPermission(Permission.notification);
         await _checkPermissions();
-        if (!(_permissionStatuses[Permission.notification]?.isGranted ?? false)) {
+        if (!(_permissionStatuses[Permission.notification]?.isGranted ??
+            false)) {
           setState(() {
             _isReminderEnabled = false;
           });
@@ -168,11 +171,12 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           return;
         }
       }
-      
+
       if (!alarmGranted) {
         await _requestPermission(Permission.scheduleExactAlarm);
         await _checkPermissions();
-        if (!(_permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ?? false)) {
+        if (!(_permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ??
+            false)) {
           setState(() {
             _isReminderEnabled = false;
           });
@@ -180,7 +184,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
           return;
         }
       }
-      
+
       await _scheduleReminder();
     } else {
       await DailyReminderService.cancelDailyReminder();
@@ -216,8 +220,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
   }
 
   Future<void> _testNotification() async {
-    final notificationGranted = _permissionStatuses[Permission.notification]?.isGranted ?? false;
-    
+    final notificationGranted =
+        _permissionStatuses[Permission.notification]?.isGranted ?? false;
+
     if (!notificationGranted) {
       await _requestPermission(Permission.notification);
       await _checkPermissions();
@@ -226,7 +231,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
         return;
       }
     }
-    
+
     await DailyReminderService.showTestNotification();
     _showSnackBar('টেস্ট নোটিফিকেশন পাঠানো হয়েছে');
   }
@@ -267,22 +272,22 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
                   children: [
                     // Info Card
                     _buildInfoCard(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Permission Status Section
                     _buildPermissionSection(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // OEM Settings Card
                     _buildOemSettingsCard(),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Test Notification Button
                     _buildTestButton(),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -297,7 +302,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
       decoration: BoxDecoration(
         color: const Color(0xFFD4AF37).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
       ),
       child: const Row(
         children: [
@@ -362,10 +366,10 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
               ),
             ],
           ),
-          
+
           if (_isReminderEnabled) ...[
             const Divider(color: Color(0xFF2A2A2A), height: 24),
-            
+
             // Time Selector
             InkWell(
               onTap: _selectTime,
@@ -522,7 +526,8 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4AF37),
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -543,7 +548,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -573,7 +577,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Auto-detect button
           SizedBox(
             width: double.infinity,
@@ -592,7 +596,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // All brands button
           SizedBox(
             width: double.infinity,
@@ -618,7 +622,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
   Future<void> _showDeviceSpecificGuide() async {
     String brand = 'Unknown';
     String model = 'Unknown';
-    
+
     try {
       final deviceInfo = DeviceInfoPlugin();
       final androidInfo = await deviceInfo.androidInfo;
@@ -627,9 +631,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen> with WidgetsB
     } catch (e) {
       brand = 'unknown';
     }
-    
+
     if (!mounted) return;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -695,7 +699,8 @@ class _DeviceGuideSheet extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: const Color(0xFFD4AF37).withOpacity(0.1),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
               children: [
@@ -743,7 +748,7 @@ class _DeviceGuideSheet extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Content
           Expanded(
             child: SingleChildScrollView(
@@ -752,17 +757,19 @@ class _DeviceGuideSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Common settings first
-                  _buildSectionTitle('সব Android ফোনের জন্য (আগে এগুলো চেক করুন)'),
+                  _buildSectionTitle(
+                      'সব Android ফোনের জন্য (আগে এগুলো চেক করুন)'),
                   _buildCommonSettings(),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Brand specific
-                  _buildSectionTitle('${_getBrandDisplayName(brand)} এর জন্য বিশেষ সেটিংস'),
+                  _buildSectionTitle(
+                      '${_getBrandDisplayName(brand)} এর জন্য বিশেষ সেটিংস'),
                   _buildBrandSpecificSettings(brand),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Open settings button
                   SizedBox(
                     width: double.infinity,
@@ -819,7 +826,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       case 'itel':
         return 'Tecno / Infinix / Itel';
       default:
-        return brand.isNotEmpty 
+        return brand.isNotEmpty
             ? '${brand[0].toUpperCase()}${brand.substring(1)}'
             : 'Unknown';
     }
@@ -846,30 +853,30 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           'A) App Notifications',
           'Settings → Apps → (Your app) → Notifications\n'
-          '• Allow notifications = ON\n'
-          '• Lock screen / Pop-up / Banner / Sound = ON',
+              '• Allow notifications = ON\n'
+              '• Lock screen / Pop-up / Banner / Sound = ON',
         ),
         _buildSettingItem(
           'B) Battery Optimization বন্ধ',
           'Settings → Apps → (Your app) → Battery\n'
-          '• Unrestricted / Don\'t optimize সিলেক্ট করুন',
+              '• Unrestricted / Don\'t optimize সিলেক্ট করুন',
         ),
         _buildSettingItem(
           'C) Background Data',
           'Settings → Apps → (Your app) → Mobile data & Wi-Fi\n'
-          '• Background data = ON\n'
-          '• Unrestricted data usage = ON',
+              '• Background data = ON\n'
+              '• Unrestricted data usage = ON',
         ),
         _buildSettingItem(
           'D) Unused app বন্ধ',
           'App info → (Your app)\n'
-          '• Pause app activity if unused = OFF\n'
-          '• Remove permissions if unused = OFF',
+              '• Pause app activity if unused = OFF\n'
+              '• Remove permissions if unused = OFF',
         ),
         _buildSettingItem(
           'E) Exact Alarm (Android 12+)',
           'Settings → Special app access → Alarms & reminders\n'
-          '• Allow',
+              '• Allow',
         ),
       ],
     );
@@ -914,14 +921,14 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
           'Settings → Apps → Permissions → Autostart / Background autostart\n'
-          '• আমল ট্র্যাকার = ON',
+              '• আমল ট্র্যাকার = ON',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery Settings',
           'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n'
-          '• No restrictions / Unrestricted\n'
-          '• Allow background activity = ON',
+              '• No restrictions / Unrestricted\n'
+              '• Allow background activity = ON',
         ),
         _buildSettingItem(
           'Recents Lock',
@@ -930,7 +937,7 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           'Security App',
           'Security app → Battery → App battery saver\n'
-          '• No restrictions',
+              '• No restrictions',
         ),
       ],
     );
@@ -943,20 +950,20 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Sleeping Apps বন্ধ',
           'Settings → Battery → Background usage limits\n'
-          '• Put unused apps to sleep = OFF\n'
-          '• Sleeping apps / Deep sleeping apps থেকে আমল ট্র্যাকার Remove করুন',
+              '• Put unused apps to sleep = OFF\n'
+              '• Sleeping apps / Deep sleeping apps থেকে আমল ট্র্যাকার Remove করুন',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery',
           'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-          '• Unrestricted',
+              '• Unrestricted',
         ),
         _buildSettingItem(
           'Notifications',
           'Settings → Notifications → App notifications\n'
-          '• আমল ট্র্যাকার = ON\n'
-          '• Notification categories সব ON',
+              '• আমল ট্র্যাকার = ON\n'
+              '• Notification categories সব ON',
         ),
       ],
     );
@@ -969,19 +976,19 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Auto-launch Enable',
           'Settings → Apps → Special app access → Auto-launch\n'
-          '• আমল ট্র্যাকার = Enable',
+              '• আমল ট্র্যাকার = Enable',
           isImportant: true,
         ),
         _buildSettingItem(
           '⭐ Deep Optimization বন্ধ',
           'Settings → Battery → Deep optimization\n'
-          '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
+              '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery Optimization',
           'Settings → Battery → Battery optimization\n'
-          '• আমল ট্র্যাকার → Don\'t optimize',
+              '• আমল ট্র্যাকার → Don\'t optimize',
         ),
       ],
     );
@@ -994,14 +1001,14 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Auto-launch / Startup Manager',
           'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
-          '• আমল ট্র্যাকার = Enable\n'
-          '• Secondary launch / Background launch = Allow',
+              '• আমল ট্র্যাকার = Enable\n'
+              '• Secondary launch / Background launch = Allow',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery Optimization',
           'Settings → Battery → Battery optimization\n'
-          '• আমল ট্র্যাকার → Don\'t optimize',
+              '• আমল ট্র্যাকার → Don\'t optimize',
         ),
       ],
     );
@@ -1014,18 +1021,18 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Auto-start',
           'Settings → Battery → Background power consumption management / Autostart\n'
-          '• আমল ট্র্যাকার = Allow',
+              '• আমল ট্র্যাকার = Allow',
           isImportant: true,
         ),
         _buildSettingItem(
           'High Background Power',
           'Settings → Battery → High background power consumption\n'
-          '• আমল ট্র্যাকার = Allow / Don\'t restrict',
+              '• আমল ট্র্যাকার = Allow / Don\'t restrict',
         ),
         _buildSettingItem(
           'Battery Optimization',
           'Apps → আমল ট্র্যাকার → Battery\n'
-          '• No restrictions',
+              '• No restrictions',
         ),
       ],
     );
@@ -1038,16 +1045,16 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ App Launch (Manual)',
           'Settings → Apps → App launch → আমল ট্র্যাকার\n'
-          '• Manage manually = ON\n'
-          '• Auto-launch = ON\n'
-          '• Secondary launch = ON\n'
-          '• Run in background = ON',
+              '• Manage manually = ON\n'
+              '• Auto-launch = ON\n'
+              '• Secondary launch = ON\n'
+              '• Run in background = ON',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery Optimization',
           'Battery optimization\n'
-          '• Don\'t allow optimize / Unrestricted',
+              '• Don\'t allow optimize / Unrestricted',
         ),
       ],
     );
@@ -1060,12 +1067,12 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           'Battery',
           'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-          '• Unrestricted',
+              '• Unrestricted',
         ),
         _buildSettingItem(
           'Battery Optimization',
           'Settings → Battery → Battery optimization\n'
-          '• আমল ট্র্যাকার → Not optimized',
+              '• আমল ট্র্যাকার → Not optimized',
         ),
         _buildSettingItem(
           'Data',
@@ -1082,17 +1089,17 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           'Battery Optimization',
           'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-          '• Unrestricted',
+              '• Unrestricted',
         ),
         _buildSettingItem(
           'Battery Saver',
           'Settings → Battery → Battery Saver\n'
-          '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)',
+              '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)',
         ),
         _buildSettingItem(
           'Exact Alarm',
           'Settings → Apps → Special app access → Alarms & reminders\n'
-          '• আমল ট্র্যাকার = Allow',
+              '• আমল ট্র্যাকার = Allow',
         ),
       ],
     );
@@ -1105,13 +1112,13 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           '⭐ Auto-start',
           'Settings → Apps → Autostart manager\n'
-          '• আমল ট্র্যাকার = Enable',
+              '• আমল ট্র্যাকার = Enable',
           isImportant: true,
         ),
         _buildSettingItem(
           'Battery/Power Manager',
           'Battery lab / Power manager\n'
-          '• Don\'t restrict',
+              '• Don\'t restrict',
         ),
         _buildSettingItem(
           'Background Activity',
@@ -1132,12 +1139,12 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           'Battery Optimization',
           'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-          '• Unrestricted / Don\'t optimize',
+              '• Unrestricted / Don\'t optimize',
         ),
         _buildSettingItem(
           'Auto-start (যদি থাকে)',
           'Settings → Apps → Special app access → Auto-launch\n'
-          '• Enable করুন',
+              '• Enable করুন',
         ),
         _buildSettingItem(
           'Background Data',
@@ -1147,16 +1154,17 @@ class _DeviceGuideSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem(String title, String description, {bool isImportant = false}) {
+  Widget _buildSettingItem(String title, String description,
+      {bool isImportant = false}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isImportant 
+        color: isImportant
             ? const Color(0xFFD4AF37).withOpacity(0.15)
             : const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(8),
-        border: isImportant 
+        border: isImportant
             ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5))
             : null,
       ),
@@ -1194,9 +1202,10 @@ class _AllBrandsGuideSheet extends StatefulWidget {
   State<_AllBrandsGuideSheet> createState() => _AllBrandsGuideSheetState();
 }
 
-class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleTickerProviderStateMixin {
+class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   final List<Map<String, dynamic>> _brands = [
     {'name': 'সবার জন্য', 'icon': Icons.android},
     {'name': 'Xiaomi', 'icon': Icons.phone_android},
@@ -1272,7 +1281,7 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
               ],
             ),
           ),
-          
+
           // Tab Bar
           Container(
             color: const Color(0xFF0A0A0A),
@@ -1283,12 +1292,14 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
               labelColor: const Color(0xFFD4AF37),
               unselectedLabelColor: Colors.white54,
               tabAlignment: TabAlignment.start,
-              tabs: _brands.map((brand) => Tab(
-                text: brand['name'],
-              )).toList(),
+              tabs: _brands
+                  .map((brand) => Tab(
+                        text: brand['name'],
+                      ))
+                  .toList(),
             ),
           ),
-          
+
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -1319,26 +1330,31 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('সব Android ফোনে আগে এগুলো চেক করুন'),
           const SizedBox(height: 16),
-          _buildStep('A) App Notifications', 
-            'Settings → Apps → আমল ট্র্যাকার → Notifications\n'
-            '• Allow notifications = ON\n'
-            '• Lock screen / Pop-up / Banner / Sound = ON'),
-          _buildStep('B) Battery Optimization বন্ধ', 
-            'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-            '• Unrestricted / Don\'t optimize সিলেক্ট করুন'),
-          _buildStep('C) Background Data', 
-            'Settings → Apps → আমল ট্র্যাকার → Mobile data & Wi-Fi\n'
-            '• Background data = ON\n'
-            '• Unrestricted data usage = ON'),
-          _buildStep('D) Unused app বন্ধ', 
-            'App info → আমল ট্র্যাকার\n'
-            '• Pause app activity if unused = OFF\n'
-            '• Remove permissions if unused = OFF'),
-          _buildStep('E) Do Not Disturb', 
-            'Do Not Disturb / Focus mode OFF রাখুন অথবা exception এ যোগ করুন'),
-          _buildStep('F) Exact Alarm (Android 12+)', 
-            'Settings → Special app access → Alarms & reminders\n'
-            '• Allow'),
+          _buildStep(
+              'A) App Notifications',
+              'Settings → Apps → আমল ট্র্যাকার → Notifications\n'
+                  '• Allow notifications = ON\n'
+                  '• Lock screen / Pop-up / Banner / Sound = ON'),
+          _buildStep(
+              'B) Battery Optimization বন্ধ',
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
+                  '• Unrestricted / Don\'t optimize সিলেক্ট করুন'),
+          _buildStep(
+              'C) Background Data',
+              'Settings → Apps → আমল ট্র্যাকার → Mobile data & Wi-Fi\n'
+                  '• Background data = ON\n'
+                  '• Unrestricted data usage = ON'),
+          _buildStep(
+              'D) Unused app বন্ধ',
+              'App info → আমল ট্র্যাকার\n'
+                  '• Pause app activity if unused = OFF\n'
+                  '• Remove permissions if unused = OFF'),
+          _buildStep('E) Do Not Disturb',
+              'Do Not Disturb / Focus mode OFF রাখুন অথবা exception এ যোগ করুন'),
+          _buildStep(
+              'F) Exact Alarm (Android 12+)',
+              'Settings → Special app access → Alarms & reminders\n'
+                  '• Allow'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1353,20 +1369,23 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Xiaomi / Redmi / Poco (MIUI / HyperOS)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)', 
-            'Settings → Apps → Permissions → Autostart / Background autostart\n'
-            '• আমল ট্র্যাকার = ON ✅', 
-            isImportant: true),
-          _buildStep('Battery Settings', 
-            'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n'
-            '• No restrictions / Unrestricted\n'
-            '• Allow background activity = ON'),
-          _buildStep('Recents Lock', 
-            'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস করুন → Lock icon এ ট্যাপ'),
-          _buildStep('Security App', 
-            'Security app → Battery → App battery saver\n'
-            '• No restrictions\n'
-            '• "Clear cache/Boost speed" এ আমল ট্র্যাকার exclude করুন'),
+          _buildStep(
+              '⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
+              'Settings → Apps → Permissions → Autostart / Background autostart\n'
+                  '• আমল ট্র্যাকার = ON ✅',
+              isImportant: true),
+          _buildStep(
+              'Battery Settings',
+              'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n'
+                  '• No restrictions / Unrestricted\n'
+                  '• Allow background activity = ON'),
+          _buildStep('Recents Lock',
+              'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস করুন → Lock icon এ ট্যাপ'),
+          _buildStep(
+              'Security App',
+              'Security app → Battery → App battery saver\n'
+                  '• No restrictions\n'
+                  '• "Clear cache/Boost speed" এ আমল ট্র্যাকার exclude করুন'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1381,18 +1400,21 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Samsung (One UI)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Sleeping Apps বন্ধ', 
-            'Settings → Battery → Background usage limits\n'
-            '• Put unused apps to sleep = OFF\n'
-            '• Sleeping apps / Deep sleeping apps এ থাকলে Remove করুন', 
-            isImportant: true),
-          _buildStep('Battery', 
-            'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-            '• Unrestricted'),
-          _buildStep('Notifications', 
-            'Settings → Notifications → App notifications\n'
-            '• আমল ট্র্যাকার = ON\n'
-            '• Notification categories এ সব category ON করুন'),
+          _buildStep(
+              '⭐ Sleeping Apps বন্ধ',
+              'Settings → Battery → Background usage limits\n'
+                  '• Put unused apps to sleep = OFF\n'
+                  '• Sleeping apps / Deep sleeping apps এ থাকলে Remove করুন',
+              isImportant: true),
+          _buildStep(
+              'Battery',
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
+                  '• Unrestricted'),
+          _buildStep(
+              'Notifications',
+              'Settings → Notifications → App notifications\n'
+                  '• আমল ট্র্যাকার = ON\n'
+                  '• Notification categories এ সব category ON করুন'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1407,20 +1429,22 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('OnePlus (OxygenOS)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Auto-launch Enable', 
-            'Settings → Apps → Special app access → Auto-launch\n'
-            '• আমল ট্র্যাকার = Enable\n'
-            '• Secondary launch / Background launch = Allow', 
-            isImportant: true),
-          _buildStep('⭐ Deep Optimization বন্ধ', 
-            'Settings → Battery → Deep optimization\n'
-            '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন', 
-            isImportant: true),
-          _buildStep('Battery Optimization', 
-            'Settings → Battery → Battery optimization\n'
-            '• আমল ট্র্যাকার → Don\'t optimize'),
-          _buildStep('Recents Lock', 
-            'Recents → Lock (কিছু মডেলে আছে)'),
+          _buildStep(
+              '⭐ Auto-launch Enable',
+              'Settings → Apps → Special app access → Auto-launch\n'
+                  '• আমল ট্র্যাকার = Enable\n'
+                  '• Secondary launch / Background launch = Allow',
+              isImportant: true),
+          _buildStep(
+              '⭐ Deep Optimization বন্ধ',
+              'Settings → Battery → Deep optimization\n'
+                  '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
+              isImportant: true),
+          _buildStep(
+              'Battery Optimization',
+              'Settings → Battery → Battery optimization\n'
+                  '• আমল ট্র্যাকার → Don\'t optimize'),
+          _buildStep('Recents Lock', 'Recents → Lock (কিছু মডেলে আছে)'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1435,14 +1459,16 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Oppo / Realme (ColorOS / Realme UI)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Auto-launch / Startup', 
-            'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
-            '• আমল ট্র্যাকার = Enable\n'
-            '• Secondary launch / Background launch = Allow', 
-            isImportant: true),
-          _buildStep('Battery Optimization', 
-            'Settings → Battery → Battery optimization\n'
-            '• আমল ট্র্যাকার → Don\'t optimize'),
+          _buildStep(
+              '⭐ Auto-launch / Startup',
+              'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
+                  '• আমল ট্র্যাকার = Enable\n'
+                  '• Secondary launch / Background launch = Allow',
+              isImportant: true),
+          _buildStep(
+              'Battery Optimization',
+              'Settings → Battery → Battery optimization\n'
+                  '• আমল ট্র্যাকার → Don\'t optimize'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1457,16 +1483,19 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Vivo / iQOO (Funtouch OS)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Auto-start', 
-            'Settings → Battery → Background power consumption management / Autostart\n'
-            '• আমল ট্র্যাকার = Allow', 
-            isImportant: true),
-          _buildStep('High Background Power', 
-            'Settings → Battery → High background power consumption\n'
-            '• আমল ট্র্যাকার = Allow / Don\'t restrict'),
-          _buildStep('Battery Optimization', 
-            'Apps → আমল ট্র্যাকার → Battery\n'
-            '• No restrictions'),
+          _buildStep(
+              '⭐ Auto-start',
+              'Settings → Battery → Background power consumption management / Autostart\n'
+                  '• আমল ট্র্যাকার = Allow',
+              isImportant: true),
+          _buildStep(
+              'High Background Power',
+              'Settings → Battery → High background power consumption\n'
+                  '• আমল ট্র্যাকার = Allow / Don\'t restrict'),
+          _buildStep(
+              'Battery Optimization',
+              'Apps → আমল ট্র্যাকার → Battery\n'
+                  '• No restrictions'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1481,16 +1510,18 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Huawei / Honor (EMUI / MagicOS)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ App Launch (Manual)', 
-            'Settings → Apps → App launch → আমল ট্র্যাকার\n'
-            '• Manage manually = ON\n'
-            '• Auto-launch = ON\n'
-            '• Secondary launch = ON\n'
-            '• Run in background = ON', 
-            isImportant: true),
-          _buildStep('Battery Optimization', 
-            'Battery optimization\n'
-            '• Don\'t allow optimize / Unrestricted'),
+          _buildStep(
+              '⭐ App Launch (Manual)',
+              'Settings → Apps → App launch → আমল ট্র্যাকার\n'
+                  '• Manage manually = ON\n'
+                  '• Auto-launch = ON\n'
+                  '• Secondary launch = ON\n'
+                  '• Run in background = ON',
+              isImportant: true),
+          _buildStep(
+              'Battery Optimization',
+              'Battery optimization\n'
+                  '• Don\'t allow optimize / Unrestricted'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1505,15 +1536,18 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Google Pixel / Stock Android'),
           const SizedBox(height: 16),
-          _buildStep('Battery Optimization', 
-            'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-            '• Unrestricted'),
-          _buildStep('Battery Saver', 
-            'Settings → Battery → Battery Saver\n'
-            '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)'),
-          _buildStep('Exact Alarm', 
-            'Settings → Apps → Special app access → Alarms & reminders\n'
-            '• আমল ট্র্যাকার = Allow'),
+          _buildStep(
+              'Battery Optimization',
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
+                  '• Unrestricted'),
+          _buildStep(
+              'Battery Saver',
+              'Settings → Battery → Battery Saver\n'
+                  '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)'),
+          _buildStep(
+              'Exact Alarm',
+              'Settings → Apps → Special app access → Alarms & reminders\n'
+                  '• আমল ট্র্যাকার = Allow'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1528,17 +1562,17 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
         children: [
           _buildInfoCard('Tecno / Infinix / Itel (HiOS / XOS)'),
           const SizedBox(height: 16),
-          _buildStep('⭐ Auto-start', 
-            'Settings → Apps → Autostart manager\n'
-            '• আমল ট্র্যাকার = Enable', 
-            isImportant: true),
-          _buildStep('Battery / Power Manager', 
-            'Battery lab / Power manager\n'
-            '• Don\'t restrict'),
-          _buildStep('Background Activity', 
-            'Allow background activity = ON'),
-          _buildStep('Recents Lock', 
-            'Lock in recent apps (যদি থাকে)'),
+          _buildStep(
+              '⭐ Auto-start',
+              'Settings → Apps → Autostart manager\n'
+                  '• আমল ট্র্যাকার = Enable',
+              isImportant: true),
+          _buildStep(
+              'Battery / Power Manager',
+              'Battery lab / Power manager\n'
+                  '• Don\'t restrict'),
+          _buildStep('Background Activity', 'Allow background activity = ON'),
+          _buildStep('Recents Lock', 'Lock in recent apps (যদি থাকে)'),
           const SizedBox(height: 40),
         ],
       ),
@@ -1551,7 +1585,6 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
       decoration: BoxDecoration(
         color: const Color(0xFFD4AF37).withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -1572,17 +1605,24 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet> with SingleT
     );
   }
 
-  Widget _buildStep(String title, String description, {bool isImportant = false}) {
+  Widget _buildStep(String title, String description,
+      {bool isImportant = false}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isImportant 
+        color: isImportant
             ? const Color(0xFFD4AF37).withOpacity(0.15)
             : const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(8),
-        border: isImportant 
-            ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5))
+        boxShadow: isImportant
+            ? [
+                BoxShadow(
+                  color: const Color(0xFFD4AF37).withOpacity(0.2),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ]
             : null,
       ),
       child: Column(

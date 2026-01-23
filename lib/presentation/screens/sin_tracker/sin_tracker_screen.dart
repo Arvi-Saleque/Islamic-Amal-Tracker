@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/sin_tracker_model.dart';
 import '../../providers/sin_tracker_provider.dart';
+import '../../../core/theme/app_colors.dart';
 
 class SinTrackerScreen extends ConsumerWidget {
   const SinTrackerScreen({super.key});
@@ -12,28 +13,28 @@ class SinTrackerScreen extends ConsumerWidget {
     final state = ref.watch(sinTrackerProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundDark,
         titleSpacing: 0,
         title: const Text(
           'প্রতিদিনের গুনাহ',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: AppColors.textGolden,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        iconTheme: const IconThemeData(color: Color(0xFFD4AF37)),
+        iconTheme: const IconThemeData(color: AppColors.primary),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.add, color: AppColors.primary),
             onPressed: () => _showAddSinTypeDialog(context, ref),
             tooltip: 'নতুন গুনাহ যোগ করুন',
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.refresh, color: AppColors.primary),
             onPressed: () => _showResetConfirmation(context, ref),
             tooltip: 'রিসেট',
           ),
@@ -41,7 +42,7 @@ class SinTrackerScreen extends ConsumerWidget {
       ),
       body: state.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),

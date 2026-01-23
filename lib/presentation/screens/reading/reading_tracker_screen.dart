@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/reading_tracker_provider.dart';
 import '../../../data/models/reading_tracker_model.dart';
+import '../../../core/theme/app_colors.dart';
 
 class ReadingTrackerScreen extends ConsumerStatefulWidget {
   const ReadingTrackerScreen({super.key});
@@ -22,19 +23,19 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     final hadithProgress = readingState.todayData.hadithProgress;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.backgroundDark,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'পড়াশোনা ট্র্যাকার',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: AppColors.textGolden,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -43,11 +44,11 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         actions: [
           // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.info_outline, color: AppColors.primary),
             onPressed: () => _showInfoBottomSheet(context),
           ),
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
             onPressed: () => _showGoalSettingsDialog(context, readingNotifier),
           ),
         ],
@@ -118,11 +119,12 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.3),
-          width: 1.5,
-        ),
         boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
           BoxShadow(
             color: const Color(0xFFD4AF37).withOpacity(0.15),
             blurRadius: 20,
@@ -144,7 +146,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD4AF37).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -239,12 +242,20 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: progress >= 1.0
-              ? const Color(0xFFD4AF37).withOpacity(0.5)
-              : const Color(0xFF2A2A2A),
-          width: 1.5,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: progress >= 1.0
+                ? const Color(0xFFD4AF37).withOpacity(0.25)
+                : const Color(0xFFD4AF37).withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -330,11 +341,11 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           ),
           if (sessions.isNotEmpty)
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: Color(0xFF2A2A2A),
-                    width: 1,
+                    color: const Color(0xFF2A2A2A).withOpacity(0.5),
+                    width: 0.5,
                   ),
                 ),
               ),
@@ -355,10 +366,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFF2A2A2A),
+            color: const Color(0xFF2A2A2A).withOpacity(0.3),
             width: 0.5,
           ),
         ),
@@ -512,7 +523,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFD4AF37)),
                           ),
                         ),
                       ),
@@ -533,7 +545,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFD4AF37)),
                           ),
                         ),
                       ),
@@ -600,9 +613,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 notifier.addSession(
                   type: type,
                   title: titleController.text,
-                  surahName: type == ReadingType.quran
-                      ? titleController.text
-                      : null,
+                  surahName:
+                      type == ReadingType.quran ? titleController.text : null,
                   fromAyah: fromAyah,
                   toAyah: toAyah,
                   notes: notesController.text.isEmpty
@@ -638,10 +650,6 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFFD4AF37),
-            width: 1,
-          ),
         ),
         title: const Text(
           'মুছে ফেলবেন?',
@@ -702,10 +710,6 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFFD4AF37),
-            width: 1,
-          ),
         ),
         title: const Text(
           'দৈনিক লক্ষ্য নির্ধারণ করুন',
@@ -865,10 +869,6 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   ],
                 ),
               ),
-              Container(
-                height: 1,
-                color: const Color(0xFF2A2A2A),
-              ),
               // Content
               Expanded(
                 child: ListView(
@@ -967,8 +967,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 16),
 
                     _buildHadithCard(
-                      hadith:
-                          'ইলম অর্জন করা প্রতিটি মুসলিম নর-নারীর জন্য ফরজ।',
+                      hadith: 'ইলম অর্জন করা প্রতিটি মুসলিম নর-নারীর জন্য ফরজ।',
                       reference: 'সুনানে ইবনে মাজাহ: ২২৬',
                     ),
                     const SizedBox(height: 12),
@@ -1007,16 +1006,24 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
         final isSmallScreen = screenWidth < 360;
-        
+
         return Container(
           padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
           decoration: BoxDecoration(
             color: const Color(0xFF0A0A0A),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFF2A2A2A),
-              width: 1,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+              BoxShadow(
+                color: const Color(0xFFD4AF37).withOpacity(0.1),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1067,7 +1074,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
         final isSmallScreen = screenWidth < 360;
-        
+
         return Container(
           padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
           decoration: BoxDecoration(
@@ -1080,10 +1087,13 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               ],
             ),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFFD4AF37).withOpacity(0.2),
-              width: 1,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1111,22 +1121,12 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 ],
               ),
               SizedBox(height: isSmallScreen ? 8 : 12),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSmallScreen ? 8 : 10, 
-                  vertical: isSmallScreen ? 4 : 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '📚 $reference',
-                  style: TextStyle(
-                    color: const Color(0xFFD4AF37).withOpacity(0.9),
-                    fontSize: isSmallScreen ? 10 : 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+              Text(
+                reference,
+                style: TextStyle(
+                  color: const Color(0xFFD4AF37).withOpacity(0.7),
+                  fontSize: isSmallScreen ? 10 : 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

@@ -33,20 +33,20 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
   Future<void> _loadData() async {
     final dateKey = _formatDate(widget.date);
     final data = await widget.statsNotifier.getDetailedDataForDate(dateKey);
-    
+
     // Load sin data and sin types
     DailySinRecord? sinData;
     List<SinType> sinTypes = getDefaultSinTypes();
-    
+
     try {
       final box = Hive.box('sin_tracker');
-      
+
       // Load sin record for the date
       final sinJson = box.get(dateKey);
       if (sinJson != null) {
         sinData = DailySinRecord.fromJson(Map<String, dynamic>.from(sinJson));
       }
-      
+
       // Load all sin types (default + custom)
       final sinTypesData = box.get('sin_types');
       if (sinTypesData != null) {
@@ -59,7 +59,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     } catch (e) {
       // Handle error silently
     }
-    
+
     if (mounted) {
       setState(() {
         detailedData = data;
@@ -84,20 +84,38 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
   String _formatDateBengali(DateTime date) {
     final months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর'
     ];
     return '${_toBengaliNumber(date.day)} ${months[date.month - 1]}, ${_toBengaliNumber(date.year)}';
   }
 
   String _getWeekdayBengali(int weekday) {
-    final days = ['সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার', 'রবিবার'];
+    final days = [
+      'সোমবার',
+      'মঙ্গলবার',
+      'বুধবার',
+      'বৃহস্পতিবার',
+      'শুক্রবার',
+      'শনিবার',
+      'রবিবার'
+    ];
     return days[weekday - 1];
   }
 
   int _calculateOverallScore() {
     if (detailedData == null) return 0;
-    
+
     double prayerScore = 0;
     double amalScore = 0;
     double dhikrScore = 0;
@@ -120,10 +138,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
     final reading = detailedData!.readingModel;
     if (reading != null && reading.goal.totalMinutes > 0) {
-      readingScore = (reading.totalMinutes / reading.goal.totalMinutes).clamp(0.0, 1.0);
+      readingScore =
+          (reading.totalMinutes / reading.goal.totalMinutes).clamp(0.0, 1.0);
     }
 
-    return ((prayerScore + amalScore + dhikrScore + readingScore) / 4 * 100).toInt();
+    return ((prayerScore + amalScore + dhikrScore + readingScore) / 4 * 100)
+        .toInt();
   }
 
   @override
@@ -150,7 +170,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: isLoading
@@ -198,7 +218,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
   Widget _buildDateHeader() {
     final overallScore = _calculateOverallScore();
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -299,7 +319,8 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     return _CategoryCard(
       icon: Icons.check_circle_outline,
       title: 'প্রতিদিনের আমল',
-      subtitle: '${_toBengaliNumber(completedCount)} টি / ${_toBengaliNumber(totalCount)} টি সম্পন্ন',
+      subtitle:
+          '${_toBengaliNumber(completedCount)} টি / ${_toBengaliNumber(totalCount)} টি সম্পন্ন',
       progress: progress,
       isExpandable: true,
       child: amal != null
@@ -322,12 +343,14 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     final dhikr = detailedData?.dhikrModel;
     final totalCount = dhikr?.totalCount ?? 0;
     final totalTarget = dhikr?.totalTarget ?? 600;
-    final progress = totalTarget > 0 ? (totalCount / totalTarget).clamp(0.0, 1.0) : 0.0;
+    final progress =
+        totalTarget > 0 ? (totalCount / totalTarget).clamp(0.0, 1.0) : 0.0;
 
     return _CategoryCard(
       icon: Icons.favorite,
       title: 'যিকির',
-      subtitle: '${_toBengaliNumber(totalCount)} বার / ${_toBengaliNumber(totalTarget)} বার সম্পন্ন',
+      subtitle:
+          '${_toBengaliNumber(totalCount)} বার / ${_toBengaliNumber(totalTarget)} বার সম্পন্ন',
       progress: progress,
       isExpandable: true,
       child: dhikr != null
@@ -353,12 +376,15 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     final reading = detailedData?.readingModel;
     final totalMinutes = reading?.totalMinutes ?? 0;
     final targetMinutes = reading?.goal.totalMinutes ?? 35;
-    final progress = targetMinutes > 0 ? (totalMinutes / targetMinutes).clamp(0.0, 1.0) : 0.0;
+    final progress = targetMinutes > 0
+        ? (totalMinutes / targetMinutes).clamp(0.0, 1.0)
+        : 0.0;
 
     return _CategoryCard(
       icon: Icons.menu_book,
       title: 'পড়াশোনা',
-      subtitle: '${_toBengaliNumber(totalMinutes)} মিনিট / ${_toBengaliNumber(targetMinutes)} মিনিট সম্পন্ন',
+      subtitle:
+          '${_toBengaliNumber(totalMinutes)} মিনিট / ${_toBengaliNumber(targetMinutes)} মিনিট সম্পন্ন',
       progress: progress,
       child: reading != null
           ? Column(
@@ -462,7 +488,9 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                           ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
                           : '${_toBengaliNumber(totalSins)} টি গুনাহ, ${_toBengaliNumber(kaffaraDone)} টি কাফফারা দেওয়া',
                       style: TextStyle(
-                        color: totalSins == 0 ? const Color(0xFF4CAF50) : Colors.grey,
+                        color: totalSins == 0
+                            ? const Color(0xFF4CAF50)
+                            : Colors.grey,
                         fontSize: 12,
                       ),
                     ),
@@ -471,24 +499,27 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               ),
             ],
           ),
-          
+
           if (committedSins.isNotEmpty) ...[
             const SizedBox(height: 16),
             const Divider(color: Colors.grey, height: 1),
             const SizedBox(height: 12),
-            
+
             // Sin list
             ...committedSins.map((sin) {
               final sinName = getSinName(sin.sinTypeId);
-              final kaffaraName = sin.kaffaraDone ? getKaffaraName(sin.kaffaraType) : '';
-              
+              final kaffaraName =
+                  sin.kaffaraDone ? getKaffaraName(sin.kaffaraType) : '';
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
                     Icon(
                       sin.kaffaraDone ? Icons.check_circle : Icons.cancel,
-                      color: sin.kaffaraDone ? const Color(0xFF4CAF50) : Colors.red.shade300,
+                      color: sin.kaffaraDone
+                          ? const Color(0xFF4CAF50)
+                          : Colors.red.shade300,
                       size: 18,
                     ),
                     const SizedBox(width: 8),
@@ -503,7 +534,8 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                     ),
                     if (sin.kaffaraDone)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -518,7 +550,8 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                       )
                     else
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.red.shade300.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -646,7 +679,8 @@ class _CategoryCardState extends State<_CategoryCard> {
                     child: LinearProgressIndicator(
                       value: widget.progress.clamp(0.0, 1.0),
                       backgroundColor: Colors.grey[800],
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryGold),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppTheme.primaryGold),
                       minHeight: 6,
                     ),
                   ),
@@ -686,11 +720,15 @@ class _PrayerChip extends StatelessWidget {
             ? AppTheme.primaryGold.withOpacity(0.2)
             : Colors.grey[800],
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isCompleted
-              ? AppTheme.primaryGold.withOpacity(0.5)
-              : Colors.grey[700]!,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: isCompleted
+                ? AppTheme.primaryGold.withOpacity(0.3)
+                : Colors.black.withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -183,11 +183,19 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: reminder.isEnabled
-              ? const Color(0xFFD4AF37).withOpacity(0.3)
-              : const Color(0xFF2A2A2A),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+          if (reminder.isEnabled)
+            BoxShadow(
+              color: const Color(0xFFD4AF37).withOpacity(0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -572,7 +580,6 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -622,11 +629,15 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFFD4AF37)
-                    : const Color(0xFF3A3A3A),
-              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFFD4AF37).withOpacity(0.4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
             ),
             child: Text(
               dayNames[index],

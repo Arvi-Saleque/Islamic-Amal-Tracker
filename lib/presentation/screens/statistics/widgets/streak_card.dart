@@ -33,9 +33,18 @@ class StreakCard extends StatelessWidget {
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.primaryGold.withOpacity(0.3),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: AppTheme.primaryGold.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -125,9 +134,6 @@ class StreakCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.primaryGold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppTheme.primaryGold.withOpacity(0.2),
-              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
