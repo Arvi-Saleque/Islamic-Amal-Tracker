@@ -353,7 +353,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         'dhuhr': times['asr']!,              // Dhuhr ends when Asr starts
         'asr': times['maghrib']!,            // Asr ends at sunset (Maghrib)
         'maghrib': times['isha']!,           // Maghrib ends when Isha starts
-        // Isha ends at Fajr next day (calculated in _calculateCurrentAndNextPrayer)
+        'isha': times['fajr']!.add(const Duration(days: 1)), // Isha ends at next day Fajr
       };
       
       print('🕌 Local Prayer Times:');
@@ -368,6 +368,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       print('  Dhuhr ends: ${waqtEndTimes['dhuhr']}');
       print('  Asr ends: ${waqtEndTimes['asr']}');
       print('  Maghrib ends: ${waqtEndTimes['maghrib']}');
+      print('  Isha ends: ${waqtEndTimes['isha']}');
       print('  Current time: ${DateTime.now()}');
 
       // Calculate current and next prayer using proper waqt end times
