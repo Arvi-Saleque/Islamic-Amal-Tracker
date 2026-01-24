@@ -63,7 +63,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
           Column(
             children: [
               // Overall Progress Card
-              _buildOverallProgress(totalCount, totalTarget, completedItems, totalItems),
+              _buildOverallProgress(
+                  totalCount, totalTarget, completedItems, totalItems),
 
               // Dhikr List
               Expanded(
@@ -95,14 +96,14 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-  
-  Widget _buildOverallProgress(int count, int target, int completed, int total) {
+  Widget _buildOverallProgress(
+      int count, int target, int completed, int total) {
     final percentage = target > 0 ? (count / target).clamp(0.0, 1.0) : 0.0;
 
     return _PremiumCard(
       margin: const EdgeInsets.fromLTRB(20, 18, 20, 14),
       padding: const EdgeInsets.all(20),
-      glow: true,
+      glow: false,
       child: Column(
         children: [
           Row(
@@ -118,7 +119,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -213,7 +215,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           child: CircularProgressIndicator(
                             value: value,
                             strokeWidth: 8,
-                            backgroundColor: AppColors.grey800.withOpacity(0.45),
+                            backgroundColor:
+                                AppColors.grey800.withOpacity(0.45),
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               AppColors.primary,
                             ),
@@ -224,10 +227,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     Container(
                       width: 72,
                       height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.backgroundDark.withOpacity(0.70),
-                      ),
                       alignment: Alignment.center,
                       child: Text(
                         '${(percentage * 100).toInt()}%',
@@ -249,8 +248,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-
-  
   Widget _buildDhikrCard(DhikrItem dhikr, DhikrCounterNotifier notifier) {
     final isCompleted = dhikr.isCompleted;
     final progress = dhikr.progress.clamp(0.0, 1.0);
@@ -328,7 +325,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                 // Counter Display (Glass + 3D)
                 _GlassPanel(
-                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
                   borderRadius: 18,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -415,10 +413,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.backgroundDark.withOpacity(0.35),
+                                    color: AppColors.backgroundDark
+                                        .withOpacity(0.35),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                      color: AppColors.primary.withOpacity(0.20),
+                                      color:
+                                          AppColors.primary.withOpacity(0.20),
                                       width: 1,
                                     ),
                                   ),
@@ -458,7 +458,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             ? () {
                                 HapticFeedback.mediumImpact();
                                 notifier.incrementDhikr(dhikr.id);
-                                if (dhikr.currentCount + 1 == dhikr.targetCount) {
+                                if (dhikr.currentCount + 1 ==
+                                    dhikr.targetCount) {
                                   HapticFeedback.heavyImpact();
                                 }
                               }
@@ -567,7 +568,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           return LinearProgressIndicator(
                             value: value,
                             minHeight: 7,
-                            backgroundColor: AppColors.backgroundDark.withOpacity(0.55),
+                            backgroundColor:
+                                AppColors.backgroundDark.withOpacity(0.55),
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               Color(0xFFD4AF37),
                             ),
@@ -585,8 +587,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-
-  
   Widget _buildCounterButton({
     required IconData icon,
     required VoidCallback? onPressed,
@@ -598,9 +598,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         ? const Color(0xFFD4AF37)
         : const Color(0xFF1B1B1B).withOpacity(0.85);
 
-    final border = isPrimary
-        ? const Color(0xFFD4AF37)
-        : const Color(0xFF2A2A2A);
+    final border =
+        isPrimary ? const Color(0xFFD4AF37) : const Color(0xFF2A2A2A);
 
     return Opacity(
       opacity: enabled ? 1 : 0.55,
@@ -635,7 +634,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         base.withOpacity(0.70),
                       ],
                     ),
-              border: isPrimary ? Border.all(color: border.withOpacity(0.75), width: 1) : null,
+              border: isPrimary
+                  ? Border.all(color: border.withOpacity(0.75), width: 1)
+                  : null,
               boxShadow: [
                 // Lift
                 BoxShadow(
@@ -652,9 +653,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 // Golden glow
                 if (isPrimary || enabled)
                   BoxShadow(
-                    color: AppColors.shadowGolden.withOpacity(isPrimary ? 0.75 : 0.30),
-                    blurRadius: isPrimary ? 20 : 14,
-                    offset: const Offset(0, 10),
+                    color: AppColors.shadowGolden
+                        .withOpacity(isPrimary ? 0.75 : 0.30),
+                    blurRadius: isPrimary ? 10 : 6,
+                    offset: const Offset(0, 5),
                   ),
               ],
             ),
@@ -674,8 +676,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-
-  void _showAddDhikrDialog(BuildContext context, DhikrCounterNotifier notifier) {
+  void _showAddDhikrDialog(
+      BuildContext context, DhikrCounterNotifier notifier) {
     final titleController = TextEditingController();
     final arabicController = TextEditingController();
     final targetController = TextEditingController(text: '100');
@@ -815,7 +817,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     DhikrItem dhikr,
     DhikrCounterNotifier notifier,
   ) {
-    final targetController = TextEditingController(text: '${dhikr.targetCount}');
+    final targetController =
+        TextEditingController(text: '${dhikr.targetCount}');
 
     showDialog(
       context: context,
@@ -1046,7 +1049,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-  void _showResetConfirmDialog(BuildContext context, DhikrCounterNotifier notifier) {
+  void _showResetConfirmDialog(
+      BuildContext context, DhikrCounterNotifier notifier) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1426,7 +1430,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 }
 
-
 // =====================================================
 //                 PREMIUM UI HELPERS
 // =====================================================
@@ -1450,25 +1453,6 @@ class _PremiumBackground extends StatelessWidget {
                   AppColors.backgroundDark.withOpacity(0.92),
                   const Color(0xFF0F0F12),
                 ],
-              ),
-            ),
-          ),
-
-          // Top glow
-          Positioned(
-            top: -140,
-            left: -120,
-            child: Container(
-              width: 340,
-              height: 340,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.22),
-                    Colors.transparent,
-                  ],
-                ),
               ),
             ),
           ),
@@ -1566,36 +1550,12 @@ class _PremiumCard extends StatelessWidget {
           if (glow)
             BoxShadow(
               color: AppColors.shadowGolden.withOpacity(0.35),
-              blurRadius: 18,
-              offset: const Offset(0, 12),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
         ],
       ),
-      child: Stack(
-        children: [
-          // Inner highlight (top-left)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withOpacity(0.06),
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.10),
-                    ],
-                    stops: const [0.0, 0.55, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
+      child: child,
     );
   }
 }
@@ -1731,5 +1691,6 @@ class _NoisePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _NoisePainter oldDelegate) => oldDelegate.seed != seed;
+  bool shouldRepaint(covariant _NoisePainter oldDelegate) =>
+      oldDelegate.seed != seed;
 }
