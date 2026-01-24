@@ -109,27 +109,23 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   blurRadius: 16,
                   offset: const Offset(0, 10),
                 ),
-                if (isAllDone)
-                  BoxShadow(
-                    color: AppColors.shadowGolden.withOpacity(0.55),
-                    blurRadius: 26,
-                    offset: const Offset(0, 12),
-                  ),
               ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle,
-                  color: AppColors.primary,
+                  color: isAllDone ? AppColors.backgroundDark : AppColors.primary,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '$completedCount/$totalCount',
-                  style: const TextStyle(
-                    color: AppColors.textGolden,
+                  style: TextStyle(
+                    color: isAllDone
+                        ? AppColors.backgroundDark
+                        : AppColors.primary,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -238,12 +234,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     blurRadius: 16,
                     offset: const Offset(0, 10),
                   ),
-                  if (isSelected)
-                    BoxShadow(
-                      color: AppColors.shadowGolden.withOpacity(0.55),
-                      blurRadius: 26,
-                      offset: const Offset(0, 12),
-                    ),
                 ],
               ),
               child: Row(
@@ -461,12 +451,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             blurRadius: 20,
             offset: const Offset(0, 14),
           ),
-          if (item.isCompleted)
-            BoxShadow(
-              color: AppColors.shadowGolden.withOpacity(0.40),
-              blurRadius: 28,
-              offset: const Offset(0, 16),
-            ),
         ],
       ),
       child: ClipRRect(
@@ -497,15 +481,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                                 width: 2,
                               ),
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: item.isCompleted
-                                ? AppColors.shadowGolden
-                                : AppColors.shadowDark,
-                            blurRadius: 4,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
                       ),
                       child: item.isCompleted
                           ? const Icon(
@@ -1402,13 +1377,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFFD4AF37).withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.shadowGolden,
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+              
             ),
             child: Text(
               count,

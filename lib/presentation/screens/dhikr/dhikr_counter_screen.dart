@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,23 +57,28 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Overall Progress Card
-          _buildOverallProgress(totalCount, totalTarget, completedItems, totalItems),
+          const _PremiumBackground(),
+          Column(
+            children: [
+              // Overall Progress Card
+              _buildOverallProgress(totalCount, totalTarget, completedItems, totalItems),
 
-          // Dhikr List
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: dhikrState.todayData.items.length,
-              itemBuilder: (context, index) {
-                return _buildDhikrCard(
-                  dhikrState.todayData.items[index],
-                  dhikrNotifier,
-                );
-              },
-            ),
+              // Dhikr List
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: dhikrState.todayData.items.length,
+                  itemBuilder: (context, index) {
+                    return _buildDhikrCard(
+                      dhikrState.todayData.items[index],
+                      dhikrNotifier,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -87,35 +95,14 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
+  
   Widget _buildOverallProgress(int count, int target, int completed, int total) {
-    final percentage = target > 0 ? count / target : 0.0;
+    final percentage = target > 0 ? (count / target).clamp(0.0, 1.0) : 0.0;
 
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.backgroundLight,
-            AppColors.backgroundLight,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowDark,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: AppColors.shadowGolden,
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    return _PremiumCard(
+      margin: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+      padding: const EdgeInsets.all(20),
+      glow: true,
       child: Column(
         children: [
           Row(
@@ -126,19 +113,30 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOpacity20,
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primary.withOpacity(0.18),
+                      AppColors.primary.withOpacity(0.07),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  // No border (clean)
+                  border: null,
+                  // Softer shadow (premium but not odd)
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.shadowGolden,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -146,14 +144,15 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   '$completed/$total সম্পন্ন',
                   style: const TextStyle(
                     color: AppColors.textGolden,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -164,44 +163,80 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       '$count',
                       style: const TextStyle(
                         color: AppColors.textGolden,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w900,
                         height: 1,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       'লক্ষ্য: $target',
                       style: const TextStyle(
                         color: AppColors.grey500,
                         fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 1,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.55),
+                            Colors.transparent,
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 14),
               SizedBox(
-                width: 100,
-                height: 100,
+                width: 104,
+                height: 104,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: CircularProgressIndicator(
-                        value: percentage,
-                        strokeWidth: 8,
-                        backgroundColor: AppColors.grey800,
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                      ),
+                    // Simple progress ring (clean)
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: percentage),
+                      duration: const Duration(milliseconds: 700),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, _) {
+                        return SizedBox(
+                          width: 104,
+                          height: 104,
+                          child: CircularProgressIndicator(
+                            value: value,
+                            strokeWidth: 8,
+                            backgroundColor: AppColors.grey800.withOpacity(0.45),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    Text(
-                      '${(percentage * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: AppColors.textGolden,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.backgroundDark.withOpacity(0.70),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${(percentage * 100).toInt()}%',
+                        style: const TextStyle(
+                          color: AppColors.textGolden,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
+                        ),
                       ),
                     ),
                   ],
@@ -214,38 +249,24 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
+
+  
   Widget _buildDhikrCard(DhikrItem dhikr, DhikrCounterNotifier notifier) {
     final isCompleted = dhikr.isCompleted;
-    final progress = dhikr.progress;
+    final progress = dhikr.progress.clamp(0.0, 1.0);
 
-    return Container(
+    return _PremiumCard(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowDark,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-          if (isCompleted)
-            BoxShadow(
-              color: AppColors.shadowGolden,
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-        ],
-      ),
+      glow: isCompleted,
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -259,6 +280,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Arial',
+                                height: 1.25,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -270,34 +292,29 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                   ? AppColors.textGolden
                                   : AppColors.textSecondary,
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 10),
                     if (dhikr.isCustom)
                       Row(
                         children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              color: AppColors.grey500,
-                              size: 20,
-                            ),
-                            onPressed: () => _showEditTargetDialog(
+                          _IconPillButton(
+                            icon: Icons.edit_outlined,
+                            onTap: () => _showEditTargetDialog(
                               context,
                               dhikr,
                               notifier,
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: AppColors.grey500,
-                              size: 20,
-                            ),
-                            onPressed: () => _confirmDeleteDhikr(
+                          const SizedBox(width: 8),
+                          _IconPillButton(
+                            icon: Icons.delete_outline,
+                            onTap: () => _confirmDeleteDhikr(
                               context,
                               dhikr,
                               notifier,
@@ -307,25 +324,15 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                // Counter Display
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundDark,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadowDark,
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: 14),
+
+                // Counter Display (Glass + 3D)
+                _GlassPanel(
+                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
+                  borderRadius: 18,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Decrement Button
                       _buildCounterButton(
                         icon: Icons.remove,
                         onPressed: dhikr.currentCount > 0
@@ -336,6 +343,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             : null,
                       ),
                       const SizedBox(width: 16),
+
                       // Count Display (Tappable for manual input)
                       Flexible(
                         child: InkWell(
@@ -344,94 +352,106 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             dhikr,
                             notifier,
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                           child: Container(
+                            constraints: const BoxConstraints(minWidth: 120),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.primary.withOpacity(0.2),
-                                AppColors.primary.withOpacity(0.1),
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.primary.withOpacity(0.22),
+                                  AppColors.primary.withOpacity(0.08),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              border: null,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.35),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 8),
+                                ),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.shadowGolden,
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                '${dhikr.currentCount}',
-                                style: const TextStyle(
-                                  color: AppColors.textGolden,
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'লক্ষ্য: ${dhikr.targetCount}',
-                                style: TextStyle(
-                                  color: AppColors.grey400,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.edit,
-                                      size: 8,
-                                      color: AppColors.textGolden,
-                                    ),
-                                    SizedBox(width: 3),
-                                    Flexible(
-                                      child: Text(
-                                        'সংখ্যা লিখুন',
-                                        style: TextStyle(
-                                          color: AppColors.textGolden,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  height: 42,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '${dhikr.currentCount}',
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: const TextStyle(
+                                        color: AppColors.textGolden,
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1,
+                                        letterSpacing: -0.6,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 6),
+                                Text(
+                                  'লক্ষ্য: ${dhikr.targetCount}',
+                                  style: TextStyle(
+                                    color: AppColors.grey400,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundDark.withOpacity(0.35),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: AppColors.primary.withOpacity(0.20),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.edit,
+                                        size: 10,
+                                        color: AppColors.textGolden,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Flexible(
+                                        child: Text(
+                                          'সংখ্যা লিখুন',
+                                          style: TextStyle(
+                                            color: AppColors.textGolden,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      ),
+
                       const SizedBox(width: 16),
-                      // Increment Button
                       _buildCounterButton(
                         icon: Icons.add,
                         onPressed: dhikr.currentCount < dhikr.targetCount
@@ -448,8 +468,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Progress Bar
+
+                const SizedBox(height: 14),
+
+                // Progress Bar + actions
                 Column(
                   children: [
                     Row(
@@ -460,17 +482,29 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           style: const TextStyle(
                             color: AppColors.grey500,
                             fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         if (isCompleted)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
+                              horizontal: 12,
+                              vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryOpacity20,
-                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.primary.withOpacity(0.28),
+                                  AppColors.primary.withOpacity(0.10),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: AppColors.primary.withOpacity(0.22),
+                                width: 1,
+                              ),
                             ),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
@@ -480,7 +514,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                   color: AppColors.primary,
                                   size: 14,
                                 ),
-                                SizedBox(width: 4),
+                                SizedBox(width: 6),
                                 Text(
                                   'সম্পূর্ণ',
                                   style: TextStyle(
@@ -508,6 +542,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                               style: TextStyle(
                                 color: AppColors.grey600,
                                 fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             style: TextButton.styleFrom(
@@ -523,14 +558,21 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     ),
                     const SizedBox(height: 8),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 6,
-                        backgroundColor: AppColors.backgroundDark,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          Color(0xFFD4AF37),
-                        ),
+                      borderRadius: BorderRadius.circular(10),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: progress),
+                        duration: const Duration(milliseconds: 650),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, _) {
+                          return LinearProgressIndicator(
+                            value: value,
+                            minHeight: 7,
+                            backgroundColor: AppColors.backgroundDark.withOpacity(0.55),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFFD4AF37),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -543,44 +585,95 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
+
+  
   Widget _buildCounterButton({
     required IconData icon,
     required VoidCallback? onPressed,
     bool isPrimary = false,
   }) {
-    return Material(
-      color: isPrimary
-          ? const Color(0xFFD4AF37)
-          : const Color(0xFF2A2A2A).withOpacity(0.5),
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isPrimary
-                  ? const Color(0xFFD4AF37)
-                  : const Color(0xFF2A2A2A),
-              width: 1,
+    final enabled = onPressed != null;
+
+    final base = isPrimary
+        ? const Color(0xFFD4AF37)
+        : const Color(0xFF1B1B1B).withOpacity(0.85);
+
+    final border = isPrimary
+        ? const Color(0xFFD4AF37)
+        : const Color(0xFF2A2A2A);
+
+    return Opacity(
+      opacity: enabled ? 1 : 0.55,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOut,
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: isPrimary
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFE5C86B),
+                        Color(0xFFD4AF37),
+                        Color(0xFFC79B2E),
+                      ],
+                    )
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        base.withOpacity(0.95),
+                        base.withOpacity(0.70),
+                      ],
+                    ),
+              border: isPrimary ? Border.all(color: border.withOpacity(0.75), width: 1) : null,
+              boxShadow: [
+                // Lift
+                BoxShadow(
+                  color: Colors.black.withOpacity(isPrimary ? 0.60 : 0.75),
+                  blurRadius: isPrimary ? 18 : 14,
+                  offset: const Offset(0, 10),
+                ),
+                // Soft top highlight
+                BoxShadow(
+                  color: Colors.white.withOpacity(isPrimary ? 0.14 : 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(-2, -2),
+                ),
+                // Golden glow
+                if (isPrimary || enabled)
+                  BoxShadow(
+                    color: AppColors.shadowGolden.withOpacity(isPrimary ? 0.75 : 0.30),
+                    blurRadius: isPrimary ? 20 : 14,
+                    offset: const Offset(0, 10),
+                  ),
+              ],
             ),
-          ),
-          child: Icon(
-            icon,
-            color: isPrimary
-                ? const Color(0xFF0A0A0A)
-                : onPressed != null
-                    ? const Color(0xFFD4AF37)
-                    : const Color(0xFF444444),
-            size: 28,
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              color: isPrimary
+                  ? const Color(0xFF0A0A0A)
+                  : enabled
+                      ? const Color(0xFFD4AF37)
+                      : const Color(0xFF444444),
+              size: 28,
+            ),
           ),
         ),
       ),
     );
   }
+
 
   void _showAddDhikrDialog(BuildContext context, DhikrCounterNotifier notifier) {
     final titleController = TextEditingController();
@@ -1331,4 +1424,312 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
       ),
     );
   }
+}
+
+
+// =====================================================
+//                 PREMIUM UI HELPERS
+// =====================================================
+
+class _PremiumBackground extends StatelessWidget {
+  const _PremiumBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: Stack(
+        children: [
+          // Base gradient
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.backgroundDark,
+                  AppColors.backgroundDark.withOpacity(0.92),
+                  const Color(0xFF0F0F12),
+                ],
+              ),
+            ),
+          ),
+
+          // Top glow
+          Positioned(
+            top: -140,
+            left: -120,
+            child: Container(
+              width: 340,
+              height: 340,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.22),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Bottom glow
+          Positioned(
+            bottom: -180,
+            right: -140,
+            child: Container(
+              width: 380,
+              height: 380,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.16),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Subtle vignette
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.6),
+                  radius: 1.2,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.40),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Noise texture (very light)
+          IgnorePointer(
+            child: CustomPaint(
+              painter: _NoisePainter(seed: 7),
+              size: Size.infinite,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PremiumCard extends StatelessWidget {
+  const _PremiumCard({
+    required this.child,
+    this.margin,
+    this.padding,
+    this.glow = false,
+  });
+
+  final Widget child;
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
+  final bool glow;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      padding: padding ?? const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.backgroundLight.withOpacity(0.98),
+            const Color(0xFF151515).withOpacity(0.94),
+          ],
+        ),
+        border: null,
+        boxShadow: [
+          // Softer lift shadow (less odd/heavy)
+          BoxShadow(
+            color: Colors.black.withOpacity(0.55),
+            blurRadius: 14,
+            offset: const Offset(0, 10),
+          ),
+          // Very subtle top highlight
+          BoxShadow(
+            color: Colors.white.withOpacity(0.035),
+            blurRadius: 8,
+            offset: const Offset(-2, -2),
+          ),
+          if (glow)
+            BoxShadow(
+              color: AppColors.shadowGolden.withOpacity(0.35),
+              blurRadius: 18,
+              offset: const Offset(0, 12),
+            ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Inner highlight (top-left)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.06),
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.10),
+                    ],
+                    stops: const [0.0, 0.55, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassPanel extends StatelessWidget {
+  const _GlassPanel({
+    required this.child,
+    this.padding,
+    this.borderRadius = 16,
+  });
+
+  final Widget child;
+  final EdgeInsets? padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: padding ?? const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.06),
+                Colors.white.withOpacity(0.03),
+                Colors.black.withOpacity(0.15),
+              ],
+            ),
+            border: null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.40),
+                blurRadius: 12,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _IconPillButton extends StatelessWidget {
+  const _IconPillButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF2A2A2A).withOpacity(0.55),
+                const Color(0xFF101010).withOpacity(0.65),
+              ],
+            ),
+            border: null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.40),
+                blurRadius: 8,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(0.03),
+                blurRadius: 6,
+                offset: const Offset(-2, -2),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.grey500,
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NoisePainter extends CustomPainter {
+  _NoisePainter({required this.seed});
+
+  final int seed;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+
+    final rnd = Random(seed);
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    // Density scales with screen size (kept very light)
+    final n = (size.width * size.height / 4500).clamp(120.0, 520.0).toInt();
+
+    for (var i = 0; i < n; i++) {
+      final x = rnd.nextDouble() * size.width;
+      final y = rnd.nextDouble() * size.height;
+      final r = rnd.nextDouble() * 0.9 + 0.25;
+
+      // Mostly dark specks, few bright specks
+      final isBright = rnd.nextDouble() > 0.88;
+      paint.color = (isBright ? Colors.white : Colors.black)
+          .withOpacity(isBright ? 0.022 : 0.030);
+
+      canvas.drawCircle(Offset(x, y), r, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NoisePainter oldDelegate) => oldDelegate.seed != seed;
 }
