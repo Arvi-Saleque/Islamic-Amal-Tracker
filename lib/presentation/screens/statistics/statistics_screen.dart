@@ -28,6 +28,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   DateTime? selectedDate;
 
   @override
+  void initState() {
+    super.initState();
+    // Rebuild statistics when screen opens to ensure data is fresh
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(statisticsProvider.notifier).rebuildFromBoxes();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final statsState = ref.watch(statisticsProvider);
 

@@ -1122,10 +1122,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               ),
               SizedBox(height: isSmallScreen ? 8 : 12),
               Text(
-                reference,
+                '📚 $reference',
                 style: TextStyle(
-                  color: const Color(0xFFD4AF37).withOpacity(0.7),
-                  fontSize: isSmallScreen ? 10 : 11,
+                  color: const Color(0xFFD4AF37),
+                  fontSize: isSmallScreen ? 11 : 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),

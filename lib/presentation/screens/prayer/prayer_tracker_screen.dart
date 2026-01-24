@@ -590,15 +590,15 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryOpacity06,
-            AppColors.primaryOpacity06,
+            const Color(0xFFD4AF37).withOpacity(0.08),
+            const Color(0xFFD4AF37).withOpacity(0.03),
           ],
         ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowGolden,
-            blurRadius: 8,
+            color: AppColors.shadowDark,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],

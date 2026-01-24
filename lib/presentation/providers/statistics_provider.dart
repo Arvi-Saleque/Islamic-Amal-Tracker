@@ -65,8 +65,19 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
   }
 
   Future<void> _init() async {
+    state = state.copyWith(isLoading: true);
     _box = await Hive.openBox('statistics');
+    await _waitForOtherBoxes();
     loadData();
+  }
+
+  // Wait for other data boxes to be ready
+  Future<void> _waitForOtherBoxes() async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 300));
+    } catch (e) {
+      // Ignore
+    }
   }
 
   String get _todayKey {
@@ -76,21 +87,32 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
 
   void loadData() {
     if (_box == null) return;
+    state = state.copyWith(isLoading: true);
     final data = _box!.get('statistics_data');
     if (data != null) {
       final statsModel = StatisticsModel.fromJson(_deepConvert(data));
       state = state.copyWith(
         data: statsModel,
         weeklyStats: statsModel.getWeeklyStats(),
+        isLoading: false,
       );
     }
     // Rebuild from all boxes to ensure data is up-to-date
     rebuildFromBoxes();
   }
 
+  /// Force refresh weekly stats from current data
+  void refreshWeeklyStats() {
+    state = state.copyWith(
+      weeklyStats: state.data.getWeeklyStats(),
+    );
+  }
+
   /// Rebuild statistics from all individual data boxes
   Future<void> rebuildFromBoxes() async {
     try {
+      state = state.copyWith(isLoading: true);
+      
       final prayerBox = await Hive.openBox('prayer_tracking');
       final amalBox = await Hive.openBox('daily_amal');
       final dhikrBox = await Hive.openBox('dhikr_counter');
@@ -173,7 +195,7 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
           if (sessions != null) {
             for (var session in sessions) {
               if (session is Map) {
-                readingMinutes += (session['duration'] as int? ?? 0);
+                readingMinutes += (session['durationMinutes'] as int? ?? session['duration'] as int? ?? 0);
               }
             }
           }
@@ -214,11 +236,13 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
       state = state.copyWith(
         data: updatedModel,
         weeklyStats: updatedModel.getWeeklyStats(),
+        isLoading: false,
       );
 
       _saveToHive();
     } catch (e) {
       print('Error rebuilding stats from boxes: $e');
+      state = state.copyWith(isLoading: false);
       // Fallback to updating today's stats only
       updateTodayStats();
     }
