@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/daily_amal_provider.dart';
@@ -43,6 +46,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
     final completedCount = amalState.todayData.completedCount;
     final totalCount = amalState.todayData.totalCount;
+    final bool isAllDone = totalCount > 0 && completedCount == totalCount;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -73,14 +77,44 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primaryOpacity15,
-              borderRadius: BorderRadius.circular(20),
+              gradient: isAllDone
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFE6C35C),
+                        Color(0xFFD4AF37),
+                        Color(0xFFB8891A),
+                      ],
+                      stops: [0.0, 0.55, 1.0],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF1C1C1C),
+                        Color(0xFF121212),
+                      ],
+                    ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isAllDone
+                    ? Colors.black.withOpacity(0.18)
+                    : AppColors.primary.withOpacity(0.18),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadowGolden,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withOpacity(0.65),
+                  blurRadius: 16,
+                  offset: const Offset(0, 10),
                 ),
+                if (isAllDone)
+                  BoxShadow(
+                    color: AppColors.shadowGolden.withOpacity(0.55),
+                    blurRadius: 26,
+                    offset: const Offset(0, 12),
+                  ),
               ],
             ),
             child: Row(
@@ -105,33 +139,40 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Category Filter
-          _buildCategoryFilter(),
+          const _PremiumBackground(),
+          Column(
+            children: [
+              // Category Filter
+              _buildCategoryFilter(),
 
-          // Progress Bar
-          _buildProgressBar(completedCount, totalCount),
+              // Progress Bar
+              _buildProgressBar(completedCount, totalCount),
 
-          // Checklist Items
-          Expanded(
-            child: items.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return _buildChecklistItem(
-                        items[index],
-                        amalNotifier,
-                      );
-                    },
-                  ),
+              // Checklist Items
+              Expanded(
+                child: items.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return _buildChecklistItem(
+                            items[index],
+                            amalNotifier,
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         mini: true,
+        elevation: 10,
+        highlightElevation: 14,
         onPressed: () => _showAddItemDialog(context, amalNotifier),
         backgroundColor: AppColors.primary,
         child: const Icon(
@@ -165,16 +206,44 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.backgroundLight,
-                borderRadius: BorderRadius.circular(12),
+                gradient: isSelected
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFFE6C35C),
+                          Color(0xFFD4AF37),
+                          Color(0xFFB8891A),
+                        ],
+                        stops: [0.0, 0.55, 1.0],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF1C1C1C),
+                          Color(0xFF121212),
+                        ],
+                      ),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isSelected
+                      ? Colors.black.withOpacity(0.18)
+                      : AppColors.primary.withOpacity(0.18),
+                  width: 1,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: isSelected ? AppColors.shadowGolden : AppColors.shadowDark,
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withOpacity(0.65),
+                    blurRadius: 16,
+                    offset: const Offset(0, 10),
                   ),
+                  if (isSelected)
+                    BoxShadow(
+                      color: AppColors.shadowGolden.withOpacity(0.55),
+                      blurRadius: 26,
+                      offset: const Offset(0, 12),
+                    ),
                 ],
               ),
               child: Row(
@@ -217,21 +286,25 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.backgroundLight,
-            AppColors.backgroundLight,
+            Color(0xFF1E1E1E),
+            Color(0xFF121212),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.16),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowDark,
+            color: Colors.black.withOpacity(0.35),
             blurRadius: 12,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: AppColors.shadowGolden,
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: AppColors.shadowGolden.withOpacity(0.18),
+            blurRadius: 16,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -249,15 +322,32 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOpacity20,
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF2A2413),
+                      Color(0xFF19150B),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.30),
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.shadowGolden,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withOpacity(0.30),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: AppColors.shadowGolden.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -312,7 +402,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         value: percentage,
                         strokeWidth: 8,
                         backgroundColor: AppColors.grey800,
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.primary),
                       ),
                     ),
                     Text(
@@ -340,97 +431,134 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.circular(14),
+        gradient: item.isCompleted
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF2A2413),
+                  Color(0xFF17130A),
+                ],
+              )
+            : const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1D1D1D),
+                  Color(0xFF121212),
+                ],
+              ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: item.isCompleted
+              ? AppColors.primary.withOpacity(0.35)
+              : Colors.white.withOpacity(0.06),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: item.isCompleted ? AppColors.shadowGolden : AppColors.shadowDark,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.78),
+            blurRadius: 20,
+            offset: const Offset(0, 14),
           ),
+          if (item.isCompleted)
+            BoxShadow(
+              color: AppColors.shadowGolden.withOpacity(0.40),
+              blurRadius: 28,
+              offset: const Offset(0, 16),
+            ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => notifier.toggleItem(item.id),
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 26,
-                  height: 26,
-                  decoration: BoxDecoration(
-                    color: item.isCompleted
-                        ? AppColors.primary
-                        : const Color(0xFF2A2A2A),
-                    border: item.isCompleted
-                        ? null
-                        : Border.all(
-                            color: const Color(0xFF3A3A3A),
-                            width: 2,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => notifier.toggleItem(item.id),
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: item.isCompleted
+                            ? AppColors.primary
+                            : const Color(0xFF2A2A2A),
+                        border: item.isCompleted
+                            ? null
+                            : Border.all(
+                                color: const Color(0xFF3A3A3A),
+                                width: 2,
+                              ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: item.isCompleted
+                                ? AppColors.shadowGolden
+                                : AppColors.shadowDark,
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
                           ),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: item.isCompleted ? AppColors.shadowGolden : AppColors.shadowDark,
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: item.isCompleted
-                      ? const Icon(
-                          Icons.check,
-                          color: AppColors.backgroundDark,
-                          size: 16,
-                        )
-                      : null,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: TextStyle(
-                          color: item.isCompleted
-                              ? const Color(0xFFD4AF37)
-                              : const Color(0xFFE0E0E0),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          decoration: item.isCompleted
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
-                      ),
-                      if (item.completedAt != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          'সম্পন্ন: ${_formatTime(item.completedAt!)}',
-                          style: const TextStyle(
-                            color: AppColors.grey500,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (item.id.startsWith('custom_'))
-                  IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: AppColors.grey600,
-                      size: 20,
+                      child: item.isCompleted
+                          ? const Icon(
+                              Icons.check,
+                              color: AppColors.backgroundDark,
+                              size: 16,
+                            )
+                          : null,
                     ),
-                    onPressed: () => _confirmDelete(context, item, notifier),
-                  ),
-              ],
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.title,
+                            style: TextStyle(
+                              color: item.isCompleted
+                                  ? const Color(0xFFD4AF37)
+                                  : const Color(0xFFE0E0E0),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              decoration: item.isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                          if (item.completedAt != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'সম্পন্ন: ${_formatTime(item.completedAt!)}',
+                              style: const TextStyle(
+                                color: AppColors.grey500,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (item.id.startsWith('custom_'))
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.grey600,
+                          size: 20,
+                        ),
+                        onPressed: () =>
+                            _confirmDelete(context, item, notifier),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -721,7 +849,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       content: '',
                       isHadithSection: true,
                     ),
-                    const SizedBox(height: 16), 
+                    const SizedBox(height: 16),
 
                     _buildHadithCard(
                       hadith:
@@ -1004,13 +1132,17 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           children: [
             const SizedBox(height: 8),
             // 27.2: Ayatul Kursi
-            _buildExpandableDuaCard( 
-              title: 'সকাল ও বিকালের যিক্‌র #১ - আয়াতুল কুরসি', 
-              arabic: 'اللّٰهُ لَآ اِلٰهَ اِلَّا هُوَ ۚ اَلْحَـيُّ الْقَيُّوْمُ ۚ لَا تَاْخُذُهٗ سِنَةٌ وَّلَا نَوْمٌ ۚ لَهٗ مَا فِي السَّمٰوٰتِ وَمَا فِي الْاَرْضِ ۗ مَنْ ذَا الَّذِيْ يَشْفَعُ عِنْدَهٗٓ اِلَّا بِاِذْنِهٖ ۗ يَعْلَمُ مَا بَيْنَ اَيْدِيْهِمْ وَمَا خَلْفَهُمْ ۚ وَلَا يُحِيْطُوْنَ بِشَيْءٍ مِّنْ عِلْمِهٖٓ اِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمٰوٰتِ وَالْاَرْضَ ۚ وَلَا يَـُٔوْدُهٗ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيْمُ',
-              pronunciation: 'আল্লা-হু লা ইলা-হা ইল্লা হুওয়াল হাইয়্যুল ক্বাইয়্যুম। লা তা\'খুযুহু সিনাতুঁও ওয়ালা নাউম। লাহু মা ফিস সামা-ওয়া-তি ওয়ামা ফিল আরদ। মান যাল্লাযী ইয়াশফা\'উ ইন্দাহু ইল্লা বি-ইযনিহ। ইয়া\'লামু মা বাইনা আইদীহিম ওয়ামা খালফাহুম। ওয়ালা ইউহীতূনা বিশাইইম মিন ইলমিহী ইল্লা বিমা শা-আ। ওয়াসি\'আ কুরসিয়্যুহুস সামা-ওয়া-তি ওয়াল আরদ। ওয়ালা ইয়া\'ঊদুহু হিফযুহুমা ওয়া হুয়াল \'আলিয়্যুল \'আযীম।',
-              meaning: 'আল্লাহ, তিনি ছাড়া কোনো (সত্য) ইলাহ নেই। তিনি চিরঞ্জীব, সর্বসত্তার ধারক। তাঁকে তন্দ্রা ও নিদ্রা স্পর্শ করে না। আসমানসমূহে ও যমীনে যা কিছু আছে সব তাঁরই। কে সে, যে তাঁর অনুমতি ব্যতীত তাঁর কাছে সুপারিশ করবে? তাদের সামনে ও পেছনে যা কিছু আছে তা তিনি জানেন। আর তাঁর জ্ঞানের কোনো কিছুকেই তারা পরিবেষ্টন করতে পারে না, তবে তিনি যতটুকু চান। তাঁর কুরসী আসমানসমূহ ও যমীনকে পরিব্যাপ্ত করে আছে এবং এ দু\'টোর রক্ষণাবেক্ষণ তাঁকে ক্লান্ত করে না। আর তিনি সুউচ্চ, মহান।',
+            _buildExpandableDuaCard(
+              title: 'সকাল ও বিকালের যিক্‌র #১ - আয়াতুল কুরসি',
+              arabic:
+                  'اللّٰهُ لَآ اِلٰهَ اِلَّا هُوَ ۚ اَلْحَـيُّ الْقَيُّوْمُ ۚ لَا تَاْخُذُهٗ سِنَةٌ وَّلَا نَوْمٌ ۚ لَهٗ مَا فِي السَّمٰوٰتِ وَمَا فِي الْاَرْضِ ۗ مَنْ ذَا الَّذِيْ يَشْفَعُ عِنْدَهٗٓ اِلَّا بِاِذْنِهٖ ۗ يَعْلَمُ مَا بَيْنَ اَيْدِيْهِمْ وَمَا خَلْفَهُمْ ۚ وَلَا يُحِيْطُوْنَ بِشَيْءٍ مِّنْ عِلْمِهٖٓ اِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمٰوٰتِ وَالْاَرْضَ ۚ وَلَا يَـُٔوْدُهٗ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيْمُ',
+              pronunciation:
+                  'আল্লা-হু লা ইলা-হা ইল্লা হুওয়াল হাইয়্যুল ক্বাইয়্যুম। লা তা\'খুযুহু সিনাতুঁও ওয়ালা নাউম। লাহু মা ফিস সামা-ওয়া-তি ওয়ামা ফিল আরদ। মান যাল্লাযী ইয়াশফা\'উ ইন্দাহু ইল্লা বি-ইযনিহ। ইয়া\'লামু মা বাইনা আইদীহিম ওয়ামা খালফাহুম। ওয়ালা ইউহীতূনা বিশাইইম মিন ইলমিহী ইল্লা বিমা শা-আ। ওয়াসি\'আ কুরসিয়্যুহুস সামা-ওয়া-তি ওয়াল আরদ। ওয়ালা ইয়া\'ঊদুহু হিফযুহুমা ওয়া হুয়াল \'আলিয়্যুল \'আযীম।',
+              meaning:
+                  'আল্লাহ, তিনি ছাড়া কোনো (সত্য) ইলাহ নেই। তিনি চিরঞ্জীব, সর্বসত্তার ধারক। তাঁকে তন্দ্রা ও নিদ্রা স্পর্শ করে না। আসমানসমূহে ও যমীনে যা কিছু আছে সব তাঁরই। কে সে, যে তাঁর অনুমতি ব্যতীত তাঁর কাছে সুপারিশ করবে? তাদের সামনে ও পেছনে যা কিছু আছে তা তিনি জানেন। আর তাঁর জ্ঞানের কোনো কিছুকেই তারা পরিবেষ্টন করতে পারে না, তবে তিনি যতটুকু চান। তাঁর কুরসী আসমানসমূহ ও যমীনকে পরিব্যাপ্ত করে আছে এবং এ দু\'টোর রক্ষণাবেক্ষণ তাঁকে ক্লান্ত করে না। আর তিনি সুউচ্চ, মহান।',
               reference: 'সূরা আল-বাকারাহ: ২৫৫',
-              fazilat: 'যে ব্যক্তি সকালে আয়াতুল কুরসি পড়বে, সন্ধ্যা পর্যন্ত শয়তান থেকে তার হেফাযত করা হবে। আর যে সন্ধ্যায় পড়বে, সকাল পর্যন্ত হেফাযত করা হবে।',
+              fazilat:
+                  'যে ব্যক্তি সকালে আয়াতুল কুরসি পড়বে, সন্ধ্যা পর্যন্ত শয়তান থেকে তার হেফাযত করা হবে। আর যে সন্ধ্যায় পড়বে, সকাল পর্যন্ত হেফাযত করা হবে।',
               count: '১ বার',
             ),
             const SizedBox(height: 12),
@@ -1018,35 +1150,43 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.3: Surah Ikhlas, Falaq, Nas
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #২ - সূরা ইখলাস, ফালাক ও নাস',
-              arabic: '''قُلْ هُوَ اللّٰهُ اَحَدٌ ۚ اَللّٰهُ الصَّمَدُ ۚ لَمْ يَلِدْ وَلَمْ يُوْلَدْ ۙ وَلَمْ يَكُنْ لَّهٗ كُفُوًا اَحَدٌ
+              arabic:
+                  '''قُلْ هُوَ اللّٰهُ اَحَدٌ ۚ اَللّٰهُ الصَّمَدُ ۚ لَمْ يَلِدْ وَلَمْ يُوْلَدْ ۙ وَلَمْ يَكُنْ لَّهٗ كُفُوًا اَحَدٌ
 
             قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۙ مِن شَرِّ مَا خَلَقَ ۙ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۙ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۙ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ
 
             قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۙ مَلِكِ النَّاسِ ۙ إِلَٰهِ النَّاسِ ۙ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۙ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۙ مِنَ الْجِنَّةِ وَالنَّاسِ''',
-              pronunciation: '''(সূরা ইখলাস): ক্বুল হুওয়াল্লা-হু আহাদ। আল্লা-হুস সামাদ। লাম ইয়ালিদ ওয়া লাম ইউলাদ। ওয়া লাম ইয়াকুল্লাহু কুফুওয়ান আহাদ।
+              pronunciation:
+                  '''(সূরা ইখলাস): ক্বুল হুওয়াল্লা-হু আহাদ। আল্লা-হুস সামাদ। লাম ইয়ালিদ ওয়া লাম ইউলাদ। ওয়া লাম ইয়াকুল্লাহু কুফুওয়ান আহাদ।
 
             (সূরা ফালাক): ক্বুল আ‘উযু বিরাব্বিল ফালাক্ব। মিন শাররি মা খালাক্ব। ওয়া মিন শাররি গ-সিক্বিন ইযা ওয়াক্বাব। ওয়া মিন শাররি নাফফ-ছা-তি ফিল ‘উক্বাদ। ওয়া মিন শাররি হা-সিদিন ইযা হাসাদ।
 
             (সূরা নাস): ক্বুল আ‘উযু বিরাব্বিন না-স। মালিকিন না-স। ইলা-হিন না-স। মিন শাররিল ওয়াসওয়া-সিল খান্না-স। আল্লাযী ইউওয়াসউইসু ফী সুদূরিন না-স। মিনাল জিন্নাতি ওয়ান না-স।''',
-              meaning: '''(সূরা ইখলাস): বলুন, তিনি আল্লাহ, এক, অদ্বিতীয়। আল্লাহ অমুখাপেক্ষী; সবাই তাঁর মুখাপেক্ষী। তিনি কাউকে জন্ম দেননি এবং তাঁকেও জন্ম দেয়া হয়নি। আর তাঁর সমতুল্য কেউ নেই।
+              meaning:
+                  '''(সূরা ইখলাস): বলুন, তিনি আল্লাহ, এক, অদ্বিতীয়। আল্লাহ অমুখাপেক্ষী; সবাই তাঁর মুখাপেক্ষী। তিনি কাউকে জন্ম দেননি এবং তাঁকেও জন্ম দেয়া হয়নি। আর তাঁর সমতুল্য কেউ নেই।
 
             (সূরা ফালাক): বলুন, আমি আশ্রয় গ্রহণ করছি প্রভাতের রবের। তিনি যা সৃষ্টি করেছেন, তার অনিষ্ট থেকে। অন্ধকার রাত্রির অনিষ্ট থেকে, যখন তা সমাগত হয়। গ্রন্থিতে ফুঁৎকার দিয়ে জাদুকরিনীদের অনিষ্ট থেকে। এবং হিংসুকের অনিষ্ট থেকে, যখন সে হিংসা করে।
 
             (সূরা নাস): বলুন, আমি আশ্রয় গ্রহণ করছি মানুষের রবের, মানুষের অধিপতির, মানুষের মাবুদের। তার কুমন্ত্রণার অনিষ্ট থেকে, যে কুমন্ত্রণা দিয়ে আত্মগোপন করে। যে মানুষের অন্তরে কুমন্ত্রণা দেয়। জিন ও মানুষের মধ্য থেকে।''',
               reference: 'আবু দাউদ: ৫০৮২, তিরমিজি: ৩৫৭৫',
-              fazilat: 'এই তিন সূরা সকালে ও সন্ধ্যায় তিনবার করে পড়লে সব কিছু থেকে নিরাপত্তা ও হেফাজতের জন্য যথেষ্ট হবে।',
+              fazilat:
+                  'এই তিন সূরা সকালে ও সন্ধ্যায় তিনবার করে পড়লে সব কিছু থেকে নিরাপত্তা ও হেফাজতের জন্য যথেষ্ট হবে।',
               count: '৩ বার',
             ),
             const SizedBox(height: 12),
 
             // 27.6: Sayyidul Istighfar
             _buildExpandableDuaCard(
-              title: 'সকাল ও বিকালের যিক্‌র #৩ - সাইয়্যিদুল ইস্তিগফার',  
-              arabic: 'اَللّٰهُمَّ اَنْتَ رَبِّيْ لَا اِلٰهَ اِلَّا اَنْتَ، خَلَقْتَنِيْ وَاَنَا عَبْدُكَ، وَاَنَا عَلٰى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، اَعُوْذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، اَبُوْءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَاَبُوْءُ بِذَنْبِيْ، فَاغْفِرْ لِيْ فَاِنَّهٗ لَا يَغْفِرُ الذُّنُوْبَ اِلَّا اَنْتَ',
-              pronunciation: 'আল্লা-হুম্মা আনতা রব্বী, লা ইলা-হা ইল্লা আনতা, খালাক্বতানী ওয়া আনা \'আবদুকা, ওয়া আনা \'আলা \'আহদিকা ওয়া ওয়া\'দিকা মাস্তাত্বা\'তু, আ\'ঊযু বিকা মিন শাররি মা সানা\'তু, আবূউ লাকা বিনি\'মাতিকা \'আলাইয়্যা, ওয়া আবূউ বিযানবী, ফাগফির লী, ফা-ইন্নাহু লা ইয়াগফিরুয যুনূবা ইল্লা আনতা।',
-              meaning: 'হে আল্লাহ! আপনি আমার রব, আপনি ছাড়া কোনো (সত্য) ইলাহ নেই। আপনি আমাকে সৃষ্টি করেছেন এবং আমি আপনার বান্দা। আমি আমার সাধ্যমত আপনার নিকট দেওয়া অঙ্গীকার ও প্রতিশ্রুতির উপর আছি। আমি আমার কৃতকর্মের অনিষ্ট থেকে আপনার নিকট আশ্রয় চাই। আমার প্রতি আপনার নেয়ামত স্বীকার করছি এবং আমার গুনাহও স্বীকার করছি। অতএব, আপনি আমাকে ক্ষমা করুন। কেননা, আপনি ছাড়া গুনাহ ক্ষমা করার কেউ নেই।',
+              title: 'সকাল ও বিকালের যিক্‌র #৩ - সাইয়্যিদুল ইস্তিগফার',
+              arabic:
+                  'اَللّٰهُمَّ اَنْتَ رَبِّيْ لَا اِلٰهَ اِلَّا اَنْتَ، خَلَقْتَنِيْ وَاَنَا عَبْدُكَ، وَاَنَا عَلٰى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، اَعُوْذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، اَبُوْءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَاَبُوْءُ بِذَنْبِيْ، فَاغْفِرْ لِيْ فَاِنَّهٗ لَا يَغْفِرُ الذُّنُوْبَ اِلَّا اَنْتَ',
+              pronunciation:
+                  'আল্লা-হুম্মা আনতা রব্বী, লা ইলা-হা ইল্লা আনতা, খালাক্বতানী ওয়া আনা \'আবদুকা, ওয়া আনা \'আলা \'আহদিকা ওয়া ওয়া\'দিকা মাস্তাত্বা\'তু, আ\'ঊযু বিকা মিন শাররি মা সানা\'তু, আবূউ লাকা বিনি\'মাতিকা \'আলাইয়্যা, ওয়া আবূউ বিযানবী, ফাগফির লী, ফা-ইন্নাহু লা ইয়াগফিরুয যুনূবা ইল্লা আনতা।',
+              meaning:
+                  'হে আল্লাহ! আপনি আমার রব, আপনি ছাড়া কোনো (সত্য) ইলাহ নেই। আপনি আমাকে সৃষ্টি করেছেন এবং আমি আপনার বান্দা। আমি আমার সাধ্যমত আপনার নিকট দেওয়া অঙ্গীকার ও প্রতিশ্রুতির উপর আছি। আমি আমার কৃতকর্মের অনিষ্ট থেকে আপনার নিকট আশ্রয় চাই। আমার প্রতি আপনার নেয়ামত স্বীকার করছি এবং আমার গুনাহও স্বীকার করছি। অতএব, আপনি আমাকে ক্ষমা করুন। কেননা, আপনি ছাড়া গুনাহ ক্ষমা করার কেউ নেই।',
               reference: 'সহীহ বুখারী: ৬৩০৬',
-              fazilat: 'যে ব্যক্তি দৃঢ় বিশ্বাসের সাথে সকালে এটি পড়বে এবং সন্ধ্যার আগে মারা যাবে, সে জান্নাতি হবে। আর যে সন্ধ্যায় পড়বে এবং সকাল হওয়ার আগে মারা যাবে, সেও জান্নাতি হবে।',
+              fazilat:
+                  'যে ব্যক্তি দৃঢ় বিশ্বাসের সাথে সকালে এটি পড়বে এবং সন্ধ্যার আগে মারা যাবে, সে জান্নাতি হবে। আর যে সন্ধ্যায় পড়বে এবং সকাল হওয়ার আগে মারা যাবে, সেও জান্নাতি হবে।',
               count: '১ বার',
             ),
             const SizedBox(height: 12),
@@ -1054,9 +1194,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.9: Morning Evening Dhikr #4
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #৪',
-              arabic: 'اَللّٰهُمَّ بِكَ اَصْبَحْنَا، وَبِكَ اَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوْتُ، وَاِلَيْكَ النُّشُوْرُ',
-              pronunciation: 'আল্লা-হুম্মা বিকা আসবাহনা, ওয়া বিকা আমসাইনা, ওয়া বিকা নাহ্ইয়া, ওয়া বিকা নামূতু, ওয়া ইলাইকান নুশূর।',
-              meaning: 'হে আল্লাহ! আপনার (রহমতে) আমরা সকালে উপনীত হলাম, আপনার (রহমতে) সন্ধ্যায় উপনীত হলাম, আপনার ইচ্ছায় জীবন ধারণ করি, আপনার ইচ্ছায় মৃত্যুবরণ করি এবং আপনার দিকেই প্রত্যাবর্তন।',
+              arabic:
+                  'اَللّٰهُمَّ بِكَ اَصْبَحْنَا، وَبِكَ اَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوْتُ، وَاِلَيْكَ النُّشُوْرُ',
+              pronunciation:
+                  'আল্লা-হুম্মা বিকা আসবাহনা, ওয়া বিকা আমসাইনা, ওয়া বিকা নাহ্ইয়া, ওয়া বিকা নামূতু, ওয়া ইলাইকান নুশূর।',
+              meaning:
+                  'হে আল্লাহ! আপনার (রহমতে) আমরা সকালে উপনীত হলাম, আপনার (রহমতে) সন্ধ্যায় উপনীত হলাম, আপনার ইচ্ছায় জীবন ধারণ করি, আপনার ইচ্ছায় মৃত্যুবরণ করি এবং আপনার দিকেই প্রত্যাবর্তন।',
               reference: 'তিরমিযী: ৩৩৯১',
               fazilat: 'সকালে পড়লে আল্লাহর যিম্মায় থাকবে।',
               count: '১ বার',
@@ -1066,9 +1209,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.10: For all worries
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #৫ - সব দুশ্চিন্তার জন্য',
-              arabic: 'اَللّٰهُمَّ اِنِّيْ اَسْاَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْاٰخِرَةِ، اَللّٰهُمَّ اِنِّيْ اَسْاَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِيْ دِيْنِيْ وَدُنْيَايَ وَاَهْلِيْ وَمَالِيْ، اَللّٰهُمَّ اسْتُرْ عَوْرَاتِيْ وَاٰمِنْ رَوْعَاتِيْ، اَللّٰهُمَّ احْفَظْنِيْ مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِيْ وَعَنْ يَمِيْنِيْ وَعَنْ شِمَالِيْ وَمِنْ فَوْقِيْ، وَاَعُوْذُ بِعَظَمَتِكَ اَنْ اُغْتَالَ مِنْ تَحْتِيْ',
-              pronunciation: 'আল্লা-হুম্মা ইন্নী আসআলুকাল \'আ-ফিয়াতা ফিদ্দুনইয়া ওয়াল আ-খিরাহ। আল্লা-হুম্মা ইন্নী আসআলুকাল \'আফওয়া ওয়াল \'আ-ফিয়াতা ফী দীনী ওয়া দুনইয়া-ইয়া ওয়া আহলী ওয়া মা-লী। আল্লা-হুম্মাসতুর \'আওরা-তী ওয়া আ-মিন রাও\'আ-তী। আল্লা-হুম্মাহফাযনী মিম বাইনি ইয়াদাইয়্যা ওয়া মিন খালফী ওয়া \'আন ইয়ামীনী ওয়া \'আন শিমা-লী ওয়া মিন ফাওক্বী, ওয়া আ\'ঊযু বি\'আযামাতিকা আন উগতা-লা মিন তাহতী।',
-              meaning: 'হে আল্লাহ! আমি আপনার কাছে দুনিয়া ও আখিরাতে নিরাপত্তা প্রার্থনা করছি। হে আল্লাহ! আমি আপনার কাছে আমার দীন, দুনিয়া, পরিবার ও সম্পদের ক্ষেত্রে ক্ষমা ও নিরাপত্তা প্রার্থনা করছি। হে আল্লাহ! আমার দোষত্রুটি ঢেকে রাখুন এবং আমার ভয়-ভীতি দূর করুন। হে আল্লাহ! আমাকে হেফাযত করুন আমার সামনে, পেছনে, ডানে, বামে ও উপর থেকে। আর আমি আপনার মহত্ত্বের আশ্রয় নিচ্ছি যেন আমার নিচ থেকে আমাকে ধ্বংস করা না হয়।',
+              arabic:
+                  'اَللّٰهُمَّ اِنِّيْ اَسْاَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْاٰخِرَةِ، اَللّٰهُمَّ اِنِّيْ اَسْاَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِيْ دِيْنِيْ وَدُنْيَايَ وَاَهْلِيْ وَمَالِيْ، اَللّٰهُمَّ اسْتُرْ عَوْرَاتِيْ وَاٰمِنْ رَوْعَاتِيْ، اَللّٰهُمَّ احْفَظْنِيْ مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِيْ وَعَنْ يَمِيْنِيْ وَعَنْ شِمَالِيْ وَمِنْ فَوْقِيْ، وَاَعُوْذُ بِعَظَمَتِكَ اَنْ اُغْتَالَ مِنْ تَحْتِيْ',
+              pronunciation:
+                  'আল্লা-হুম্মা ইন্নী আসআলুকাল \'আ-ফিয়াতা ফিদ্দুনইয়া ওয়াল আ-খিরাহ। আল্লা-হুম্মা ইন্নী আসআলুকাল \'আফওয়া ওয়াল \'আ-ফিয়াতা ফী দীনী ওয়া দুনইয়া-ইয়া ওয়া আহলী ওয়া মা-লী। আল্লা-হুম্মাসতুর \'আওরা-তী ওয়া আ-মিন রাও\'আ-তী। আল্লা-হুম্মাহফাযনী মিম বাইনি ইয়াদাইয়্যা ওয়া মিন খালফী ওয়া \'আন ইয়ামীনী ওয়া \'আন শিমা-লী ওয়া মিন ফাওক্বী, ওয়া আ\'ঊযু বি\'আযামাতিকা আন উগতা-লা মিন তাহতী।',
+              meaning:
+                  'হে আল্লাহ! আমি আপনার কাছে দুনিয়া ও আখিরাতে নিরাপত্তা প্রার্থনা করছি। হে আল্লাহ! আমি আপনার কাছে আমার দীন, দুনিয়া, পরিবার ও সম্পদের ক্ষেত্রে ক্ষমা ও নিরাপত্তা প্রার্থনা করছি। হে আল্লাহ! আমার দোষত্রুটি ঢেকে রাখুন এবং আমার ভয়-ভীতি দূর করুন। হে আল্লাহ! আমাকে হেফাযত করুন আমার সামনে, পেছনে, ডানে, বামে ও উপর থেকে। আর আমি আপনার মহত্ত্বের আশ্রয় নিচ্ছি যেন আমার নিচ থেকে আমাকে ধ্বংস করা না হয়।',
               reference: 'আবূ দাউদ: ৫০৭৪',
               fazilat: 'রাসূলুল্লাহ ﷺ প্রতিদিন সকাল-সন্ধ্যায় এই দোয়া পড়তেন।',
               count: '১ বার',
@@ -1078,9 +1224,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.11: Morning Evening Dhikr #6
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #৬ - শয়তানের অনিষ্ট থেকে হেফাযত',
-              arabic: 'اَللّٰهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمٰوَاتِ وَالْاَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيْكَهٗ، اَشْهَدُ اَنْ لَّا اِلٰهَ اِلَّا اَنْتَ، اَعُوْذُ بِكَ مِنْ شَرِّ نَفْسِيْ، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهٖ، وَاَنْ اَقْتَرِفَ عَلٰى نَفْسِيْ سُوْءًا اَوْ اَجُرَّهٗ اِلٰى مُسْلِمٍ',
-              pronunciation: 'আল্লা-হুম্মা \'আ-লিমাল গাইবি ওয়াশশাহা-দাতি ফা-ত্বিরাস সামা-ওয়া-তি ওয়াল আরদ, রব্বা কুল্লি শাইইন ওয়া মালীকাহু, আশহাদু আল্লা- ইলা-হা ইল্লা আনতা, আ\'ঊযু বিকা মিন শাররি নাফসী, ওয়া মিন শাররিশ শাইত্বা-নি ওয়া শিরকিহী, ওয়া আন আক্বতারিফা \'আলা নাফসী সূআন আও আজুররাহু ইলা মুসলিম।',
-              meaning: 'হে আল্লাহ! অদৃশ্য ও দৃশ্যের জ্ঞাতা, আসমানসমূহ ও যমীনের সৃষ্টিকর্তা, সব কিছুর রব ও মালিক! আমি সাক্ষ্য দিচ্ছি যে, আপনি ছাড়া কোনো (সত্য) ইলাহ নেই। আমি আপনার কাছে আশ্রয় চাই আমার নফসের অনিষ্ট থেকে, শয়তানের অনিষ্ট ও তার শিরক থেকে এবং আমার নিজের উপর কোনো মন্দ কাজ করা অথবা কোনো মুসলিমের প্রতি তা টেনে আনা থেকে।',
+              arabic:
+                  'اَللّٰهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمٰوَاتِ وَالْاَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيْكَهٗ، اَشْهَدُ اَنْ لَّا اِلٰهَ اِلَّا اَنْتَ، اَعُوْذُ بِكَ مِنْ شَرِّ نَفْسِيْ، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهٖ، وَاَنْ اَقْتَرِفَ عَلٰى نَفْسِيْ سُوْءًا اَوْ اَجُرَّهٗ اِلٰى مُسْلِمٍ',
+              pronunciation:
+                  'আল্লা-হুম্মা \'আ-লিমাল গাইবি ওয়াশশাহা-দাতি ফা-ত্বিরাস সামা-ওয়া-তি ওয়াল আরদ, রব্বা কুল্লি শাইইন ওয়া মালীকাহু, আশহাদু আল্লা- ইলা-হা ইল্লা আনতা, আ\'ঊযু বিকা মিন শাররি নাফসী, ওয়া মিন শাররিশ শাইত্বা-নি ওয়া শিরকিহী, ওয়া আন আক্বতারিফা \'আলা নাফসী সূআন আও আজুররাহু ইলা মুসলিম।',
+              meaning:
+                  'হে আল্লাহ! অদৃশ্য ও দৃশ্যের জ্ঞাতা, আসমানসমূহ ও যমীনের সৃষ্টিকর্তা, সব কিছুর রব ও মালিক! আমি সাক্ষ্য দিচ্ছি যে, আপনি ছাড়া কোনো (সত্য) ইলাহ নেই। আমি আপনার কাছে আশ্রয় চাই আমার নফসের অনিষ্ট থেকে, শয়তানের অনিষ্ট ও তার শিরক থেকে এবং আমার নিজের উপর কোনো মন্দ কাজ করা অথবা কোনো মুসলিমের প্রতি তা টেনে আনা থেকে।',
               reference: 'তিরমিযী: ৩৩৯২, আবূ দাউদ: ৫০৬৭',
               fazilat: 'শয়তানের অনিষ্ট থেকে হেফাযত হবে।',
               count: '১ বার',
@@ -1090,33 +1239,46 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.13: Protection from harm
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #৭ - ক্ষতি থেকে রক্ষা',
-              arabic: 'بِسْمِ اللّٰهِ الَّذِيْ لَا يَضُرُّ مَعَ اسْمِهٖ شَيْءٌ فِي الْاَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيْعُ الْعَلِيْمُ',
-              pronunciation: 'বিসমিল্লা-হিল্লাযী লা ইয়াদুররু মা\'আসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামা-ই ওয়া হুওয়াস সামী\'উল \'আলীম।',
-              meaning: 'আল্লাহর নামে, যাঁর নামের সাথে আসমান ও যমীনের কোনো কিছুই ক্ষতি করতে পারে না। তিনি সর্বশ্রোতা, সর্বজ্ঞ।',
+              arabic:
+                  'بِسْمِ اللّٰهِ الَّذِيْ لَا يَضُرُّ مَعَ اسْمِهٖ شَيْءٌ فِي الْاَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيْعُ الْعَلِيْمُ',
+              pronunciation:
+                  'বিসমিল্লা-হিল্লাযী লা ইয়াদুররু মা\'আসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামা-ই ওয়া হুওয়াস সামী\'উল \'আলীম।',
+              meaning:
+                  'আল্লাহর নামে, যাঁর নামের সাথে আসমান ও যমীনের কোনো কিছুই ক্ষতি করতে পারে না। তিনি সর্বশ্রোতা, সর্বজ্ঞ।',
               reference: 'আবূ দাউদ: ৫০৮৮, তিরমিযী: ৩৩৮৮',
-              fazilat: 'যে ব্যক্তি সকাল-সন্ধ্যায় তিনবার এটি পড়বে, তাকে কোনো কিছু ক্ষতি করতে পারবে না।',
+              fazilat:
+                  'যে ব্যক্তি সকাল-সন্ধ্যায় তিনবার এটি পড়বে, তাকে কোনো কিছু ক্ষতি করতে পারবে না।',
               count: '৩ বার',
             ),
             const SizedBox(height: 12),
 
             // 27.14: Allah's pleasure on Judgement Day
             _buildExpandableDuaCard(
-              title: 'সকাল ও বিকালের যিক্‌র #৮ - কিয়ামতের দিনে আল্লাহর সন্তুষ্টি', 
-              arabic: 'رَضِيْتُ بِاللّٰهِ رَبًّا، وَبِالْاِسْلَامِ دِيْنًا، وَبِمُحَمَّدٍ صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',
-              pronunciation: 'রাদীতু বিল্লা-হি রব্বান, ওয়া বিল ইসলা-মি দীনান, ওয়া বিমুহাম্মাদিন সাল্লাল্লাহু \'আলাইহি ওয়াসাল্লামা নাবিয়্যান।',
-              meaning: 'আমি আল্লাহকে রব হিসেবে, ইসলামকে দীন হিসেবে এবং মুহাম্মাদ সাল্লাল্লাহু আলাইহি ওয়াসাল্লামকে নবী হিসেবে সন্তুষ্টচিত্তে গ্রহণ করলাম।',
+              title:
+                  'সকাল ও বিকালের যিক্‌র #৮ - কিয়ামতের দিনে আল্লাহর সন্তুষ্টি',
+              arabic:
+                  'رَضِيْتُ بِاللّٰهِ رَبًّا، وَبِالْاِسْلَامِ دِيْنًا، وَبِمُحَمَّدٍ صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',
+              pronunciation:
+                  'রাদীতু বিল্লা-হি রব্বান, ওয়া বিল ইসলা-মি দীনান, ওয়া বিমুহাম্মাদিন সাল্লাল্লাহু \'আলাইহি ওয়াসাল্লামা নাবিয়্যান।',
+              meaning:
+                  'আমি আল্লাহকে রব হিসেবে, ইসলামকে দীন হিসেবে এবং মুহাম্মাদ সাল্লাল্লাহু আলাইহি ওয়াসাল্লামকে নবী হিসেবে সন্তুষ্টচিত্তে গ্রহণ করলাম।',
               reference: 'আবূ দাউদ: ৫০৭২, তিরমিযী: ৩৩৮৯',
-              fazilat: 'যে ব্যক্তি এটি সকাল-সন্ধ্যায় তিনবার পড়বে, কিয়ামাতের দিন আল্লাহ তাকে সন্তুষ্ট করবেন।',
+              fazilat:
+                  'যে ব্যক্তি এটি সকাল-সন্ধ্যায় তিনবার পড়বে, কিয়ামাতের দিন আল্লাহ তাকে সন্তুষ্ট করবেন।',
               count: '৩ বার',
             ),
             const SizedBox(height: 12),
 
             // 27.15: Ya Hayyu Ya Qayyum
             _buildExpandableDuaCard(
-              title: 'সকাল ও বিকালের যিক্‌র #৯ - ইয়্যা হাইয়্যু ইয়্যা ক্বাইয়্যুম',
-              arabic: 'يَا حَيُّ يَا قَيُّوْمُ بِرَحْمَتِكَ اَسْتَغِيْثُ، اَصْلِحْ لِيْ شَاْنِيْ كُلَّهٗ، وَلَا تَكِلْنِيْ اِلٰى نَفْسِيْ طَرْفَةَ عَيْنٍ',
-              pronunciation: 'ইয়া হাইয়্যু ইয়া ক্বাইয়্যুমু বিরাহমাতিকা আসতাগীস, আসলিহ লী শা\'নী কুল্লাহু, ওয়ালা তাকিলনী ইলা নাফসী ত্বারফাতা \'আইন।',
-              meaning: 'হে চিরঞ্জীব! হে সর্বসত্তার ধারক! আপনার রহমতের মাধ্যমে আপনার কাছে সাহায্য চাই। আমার সকল বিষয় সংশোধন করে দিন এবং এক পলকের জন্যও আমাকে আমার নিজের উপর ছেড়ে দিবেন না।',
+              title:
+                  'সকাল ও বিকালের যিক্‌র #৯ - ইয়্যা হাইয়্যু ইয়্যা ক্বাইয়্যুম',
+              arabic:
+                  'يَا حَيُّ يَا قَيُّوْمُ بِرَحْمَتِكَ اَسْتَغِيْثُ، اَصْلِحْ لِيْ شَاْنِيْ كُلَّهٗ، وَلَا تَكِلْنِيْ اِلٰى نَفْسِيْ طَرْفَةَ عَيْنٍ',
+              pronunciation:
+                  'ইয়া হাইয়্যু ইয়া ক্বাইয়্যুমু বিরাহমাতিকা আসতাগীস, আসলিহ লী শা\'নী কুল্লাহু, ওয়ালা তাকিলনী ইলা নাফসী ত্বারফাতা \'আইন।',
+              meaning:
+                  'হে চিরঞ্জীব! হে সর্বসত্তার ধারক! আপনার রহমতের মাধ্যমে আপনার কাছে সাহায্য চাই। আমার সকল বিষয় সংশোধন করে দিন এবং এক পলকের জন্যও আমাকে আমার নিজের উপর ছেড়ে দিবেন না।',
               reference: 'হাকিম: ১/৫৪৫, সহীহুল জামি\': ৫৮২০',
               fazilat: 'সকল বিষয়ে সাহায্য পাওয়া যায়।',
               count: '১ বার',
@@ -1130,7 +1292,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               pronunciation: 'সুবহা-নাল্লা-হি ওয়া বিহামদিহী।',
               meaning: 'আল্লাহর পবিত্রতা ঘোষণা করছি এবং তাঁর প্রশংসা করছি।',
               reference: 'মুসলিম: ২৬৯২',
-              fazilat: 'যে ব্যক্তি সকাল-সন্ধ্যায় ১০০ বার এটি পড়বে, কিয়ামাতের দিন তার চেয়ে উত্তম আমল নিয়ে কেউ আসবে না, তবে সে ব্যক্তি ছাড়া যে এর সমান বা এর চেয়ে বেশি আমল করেছে।',
+              fazilat:
+                  'যে ব্যক্তি সকাল-সন্ধ্যায় ১০০ বার এটি পড়বে, কিয়ামাতের দিন তার চেয়ে উত্তম আমল নিয়ে কেউ আসবে না, তবে সে ব্যক্তি ছাড়া যে এর সমান বা এর চেয়ে বেশি আমল করেছে।',
               count: '১০০ বার',
             ),
             const SizedBox(height: 12),
@@ -1138,23 +1301,32 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // 27.24: La ilaha illallah
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #১১ - লা ইলাহা ইল্লাল্লাহু',
-              arabic: 'لَا اِلٰهَ اِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',
-              pronunciation: 'লা ইলা-হা ইল্লাল্লা-হু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুওয়া \'আলা কুল্লি শাইইন ক্বাদীর।',
-              meaning: 'আল্লাহ ছাড়া কোনো (সত্য) ইলাহ নেই, তিনি একক, তাঁর কোনো শরীক নেই। রাজত্ব তাঁরই এবং সকল প্রশংসা তাঁরই। আর তিনি সব কিছুর উপর ক্ষমতাবান।',
+              arabic:
+                  'لَا اِلٰهَ اِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',
+              pronunciation:
+                  'লা ইলা-হা ইল্লাল্লা-হু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুওয়া \'আলা কুল্লি শাইইন ক্বাদীর।',
+              meaning:
+                  'আল্লাহ ছাড়া কোনো (সত্য) ইলাহ নেই, তিনি একক, তাঁর কোনো শরীক নেই। রাজত্ব তাঁরই এবং সকল প্রশংসা তাঁরই। আর তিনি সব কিছুর উপর ক্ষমতাবান।',
               reference: 'বুখারী: ৩২৯৩, মুসলিম: ২৬৯১',
-              fazilat: 'সকালে ১০ বার পড়লে ১০টি গোলাম আযাদ করার সমান সওয়াব, ১০টি নেকী লেখা হয়, ১০টি গুনাহ মাফ হয়, ১০ ধাপ মর্যাদা বৃদ্ধি পায় এবং সন্ধ্যা পর্যন্ত শয়তান থেকে হেফাযত থাকে।',
+              fazilat:
+                  'সকালে ১০ বার পড়লে ১০টি গোলাম আযাদ করার সমান সওয়াব, ১০টি নেকী লেখা হয়, ১০টি গুনাহ মাফ হয়, ১০ ধাপ মর্যাদা বৃদ্ধি পায় এবং সন্ধ্যা পর্যন্ত শয়তান থেকে হেফাযত থাকে।',
               count: '১০ বার',
             ),
             const SizedBox(height: 12),
 
             // 27.26: Hasbiyallahu la ilaha illa huwa (7 times)
             _buildExpandableDuaCard(
-              title: 'সকাল ও বিকালের যিক্‌র #১২ - হাসবিয়াল্লাহু লা ইলাহা ইল্লা হুওয়া ',
-              arabic: 'حَسْبِيَ اللّٰهُ لَا اِلٰهَ اِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيْمِ',
-              pronunciation: 'হাসবিয়াল্লা-হু লা ইলা-হা ইল্লা হুওয়া, \'আলাইহি তাওয়াক্কালতু, ওয়া হুওয়া রব্বুল \'আরশিল \'আযীম।',
-              meaning: 'আমার জন্য আল্লাহই যথেষ্ট, তিনি ছাড়া কোনো (সত্য) ইলাহ নেই। আমি তাঁর উপরই ভরসা করি এবং তিনি মহান আরশের রব।',
+              title:
+                  'সকাল ও বিকালের যিক্‌র #১২ - হাসবিয়াল্লাহু লা ইলাহা ইল্লা হুওয়া ',
+              arabic:
+                  'حَسْبِيَ اللّٰهُ لَا اِلٰهَ اِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيْمِ',
+              pronunciation:
+                  'হাসবিয়াল্লা-হু লা ইলা-হা ইল্লা হুওয়া, \'আলাইহি তাওয়াক্কালতু, ওয়া হুওয়া রব্বুল \'আরশিল \'আযীম।',
+              meaning:
+                  'আমার জন্য আল্লাহই যথেষ্ট, তিনি ছাড়া কোনো (সত্য) ইলাহ নেই। আমি তাঁর উপরই ভরসা করি এবং তিনি মহান আরশের রব।',
               reference: 'আবূ দাউদ: ৫০৮১',
-              fazilat: 'যে ব্যক্তি সকাল-সন্ধ্যায় সাতবার এটি পড়বে, আল্লাহ তার দুনিয়া ও আখিরাতের চিন্তা দূর করে দেবেন।',
+              fazilat:
+                  'যে ব্যক্তি সকাল-সন্ধ্যায় সাতবার এটি পড়বে, আল্লাহ তার দুনিয়া ও আখিরাতের চিন্তা দূর করে দেবেন।',
               count: '৭ বার',
             ),
             const SizedBox(height: 12),
@@ -1163,10 +1335,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             _buildExpandableDuaCard(
               title: 'সকাল ও বিকালের যিক্‌র #১৩ - নবীজীর উপর দরূদ',
               arabic: 'اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلٰى نَبِيِّنَا مُحَمَّدٍ',
-              pronunciation: 'আল্লা-হুম্মা সাল্লি ওয়া সাল্লিম \'আলা নাবিয়্যিনা মুহাম্মাদ।',
-              meaning: 'হে আল্লাহ! আমাদের নবী মুহাম্মাদের উপর রহমত ও শান্তি বর্ষণ করুন।',
+              pronunciation:
+                  'আল্লা-হুম্মা সাল্লি ওয়া সাল্লিম \'আলা নাবিয়্যিনা মুহাম্মাদ।',
+              meaning:
+                  'হে আল্লাহ! আমাদের নবী মুহাম্মাদের উপর রহমত ও শান্তি বর্ষণ করুন।',
               reference: 'তিরমিযী: ৪৭৮',
-              fazilat: 'যে ব্যক্তি সকালে ও সন্ধ্যায় দশবার আমার উপর দরূদ পাঠ করবে, কিয়ামাতের দিন তার জন্য আমার সুপারিশ ওয়াজিব হয়ে যাবে।',
+              fazilat:
+                  'যে ব্যক্তি সকালে ও সন্ধ্যায় দশবার আমার উপর দরূদ পাঠ করবে, কিয়ামাতের দিন তার জন্য আমার সুপারিশ ওয়াজিব হয়ে যাবে।',
               count: '১০ বার',
             ),
           ],
@@ -1462,5 +1637,142 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         ),
       ),
     );
+  }
+}
+
+// ------------------------------------------------------------
+// Premium background (gradient + soft glows + subtle noise)
+// ------------------------------------------------------------
+class _PremiumBackground extends StatelessWidget {
+  const _PremiumBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF0D0D0D),
+                    Color(0xFF070707),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Soft golden glow (top-right)
+          Positioned(
+            top: -120,
+            right: -140,
+            child: _GlowBlob(
+              size: 340,
+              colors: [
+                const Color(0xFFD4AF37).withOpacity(0.22),
+                const Color(0xFFD4AF37).withOpacity(0.0),
+              ],
+            ),
+          ),
+
+          // Soft highlight (top-left)
+          Positioned(
+            top: -140,
+            left: -140,
+            child: _GlowBlob(
+              size: 300,
+              colors: [
+                Colors.white.withOpacity(0.08),
+                Colors.white.withOpacity(0.0),
+              ],
+            ),
+          ),
+
+          // Subtle vignette
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.topCenter,
+                  radius: 1.2,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.65),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const Positioned.fill(child: _NoiseOverlay()),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlowBlob extends StatelessWidget {
+  final double size;
+  final List<Color> colors;
+  const _GlowBlob({required this.size, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(colors: colors),
+        ),
+      ),
+    );
+  }
+}
+
+class _NoiseOverlay extends StatelessWidget {
+  const _NoiseOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _NoisePainter(seed: 2026, density: 1400),
+      ),
+    );
+  }
+}
+
+class _NoisePainter extends CustomPainter {
+  final int seed;
+  final int density;
+
+  _NoisePainter({required this.seed, required this.density});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rnd = math.Random(seed);
+
+    // Tiny specks (light)
+    final lightPaint = Paint()..color = Colors.white.withOpacity(0.035);
+    final darkPaint = Paint()..color = Colors.black.withOpacity(0.08);
+
+    for (int i = 0; i < density; i++) {
+      final x = rnd.nextDouble() * size.width;
+      final y = rnd.nextDouble() * size.height;
+      final r = 0.35 + rnd.nextDouble() * 0.9;
+
+      canvas.drawCircle(Offset(x, y), r, (i % 3 == 0) ? darkPaint : lightPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NoisePainter oldDelegate) {
+    return oldDelegate.seed != seed || oldDelegate.density != density;
   }
 }
