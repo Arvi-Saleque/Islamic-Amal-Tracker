@@ -209,16 +209,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: percentage,
-              minHeight: 6,
-              backgroundColor: AppColors.backgroundDark,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
-          ),
         ],
       ),
     );

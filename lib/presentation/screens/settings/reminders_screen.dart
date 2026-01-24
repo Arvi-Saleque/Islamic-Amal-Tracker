@@ -822,24 +822,6 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
                 ],
               ),
             ),
-
-            // Bottom button
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: widget.onNavigateToCustomReminders,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFD4AF37),
-                  side: const BorderSide(color: Color(0xFFD4AF37)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text('কাস্টম রিমাইন্ডার'),
-              ),
-            ),
           ],
         ),
       ),

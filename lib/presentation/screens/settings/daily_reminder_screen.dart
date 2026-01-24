@@ -43,31 +43,51 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   }
 
   Future<void> _loadSettings() async {
-    final settings = await DailyReminderService.getReminderSettings();
-    setState(() {
-      _isReminderEnabled = settings['enabled'] ?? false;
-      _selectedTime = TimeOfDay(
-        hour: settings['hour'] ?? 8,
-        minute: settings['minute'] ?? 0,
-      );
-      _isLoading = false;
-    });
+    try {
+      final settings = await DailyReminderService.getReminderSettings();
+      if (mounted) {
+        setState(() {
+          _isReminderEnabled = settings['enabled'] ?? false;
+          _selectedTime = TimeOfDay(
+            hour: settings['hour'] ?? 8,
+            minute: settings['minute'] ?? 0,
+          );
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading reminder settings: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _checkPermissions() async {
-    final permissions = [
-      Permission.notification,
-      Permission.scheduleExactAlarm,
-    ];
+    try {
+      final permissions = [
+        Permission.notification,
+        Permission.scheduleExactAlarm,
+      ];
 
-    final statuses = await Future.wait(
-      permissions.map((permission) => permission.status),
-    );
+      final statuses = await Future.wait(
+        permissions.map((permission) => permission.status),
+      );
 
-    if (mounted) {
-      setState(() {
-        _permissionStatuses = Map.fromIterables(permissions, statuses);
-      });
+      if (mounted) {
+        setState(() {
+          _permissionStatuses = Map.fromIterables(permissions, statuses);
+        });
+      }
+    } catch (e) {
+      print('Error checking permissions: $e');
+      if (mounted) {
+        setState(() {
+          _permissionStatuses = {};
+        });
+      }
     }
   }
 

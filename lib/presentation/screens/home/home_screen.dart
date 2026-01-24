@@ -162,8 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDateSunCard(
-      BuildContext context, PrayerTimesState state) {
+  Widget _buildDateSunCard(BuildContext context, PrayerTimesState state) {
     final now = DateTime.now();
 
     // Hijri date (adjust by -1 day for correct date)
@@ -479,19 +478,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return '${_toBengaliNumber(bengaliDay)} ${bengaliMonthNames[bengaliMonth]}';
   }
 
-  Widget _buildPrayerTimesCard(
-      BuildContext context, PrayerTimesState state) {
+  Widget _buildPrayerTimesCard(BuildContext context, PrayerTimesState state) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: const Color(0xFF1C1C1C), // namajer wakter section
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+            spreadRadius: -4,
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.02),
+            blurRadius: 1,
+            offset: const Offset(0, -1),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -502,9 +506,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (!state.isLoading && state.error == null)
             _buildCurrentPrayerSection(state),
 
+          // Golden Divider
+          if (!state.isLoading && state.error == null)
+            Container(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    const Color(0xFFD4AF37).withOpacity(0.3),
+                    const Color(0xFFD4AF37).withOpacity(0.6),
+                    const Color(0xFFD4AF37).withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+
           // Prayer Times List
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -539,28 +561,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         'ফজর',
                         _formatTime(state.prayerTimes['fajr']!),
                         state.currentPrayer == 'fajr'),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   if (state.prayerTimes['dhuhr'] != null)
                     _buildPrayerTimeRow(
                         context,
                         _getPrayerDisplayName('dhuhr'),
                         _formatTime(state.prayerTimes['dhuhr']!),
                         state.currentPrayer == 'dhuhr'),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   if (state.prayerTimes['asr'] != null)
                     _buildPrayerTimeRow(
                         context,
                         'আসর',
                         _formatTime(state.prayerTimes['asr']!),
                         state.currentPrayer == 'asr'),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   if (state.prayerTimes['maghrib'] != null)
                     _buildPrayerTimeRow(
                         context,
                         'মাগরিব',
                         _formatTime(state.prayerTimes['maghrib']!),
                         state.currentPrayer == 'maghrib'),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   if (state.prayerTimes['isha'] != null)
                     _buildPrayerTimeRow(
                         context,
@@ -592,11 +614,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           : null;
     } else if (state.isNaflTime) {
       statusColor = const Color(0xFFD4AF37);
-      statusText = 'নফল সময়';
-      mainText = 'নফল নামাজ';
-      subtitleText = state.timeToNextPrayer != null
-          ? 'যোহর শুরু: ${state.timeToNextPrayer} বাকি'
-          : null;
+      statusText = 'এখন চলছে';
+      mainText = 'নফল';
+      subtitleText = null;
     } else if (state.currentPrayer != null) {
       statusColor = const Color(0xFFD4AF37);
       statusText = 'এখন চলছে';
@@ -619,21 +639,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (currentPrayerTime != null && prayerEndTime != null) {
         final now = DateTime.now();
-        
+
         // For Isha after midnight: adjust times
-        // If current time is before Fajr and we're in Isha, 
+        // If current time is before Fajr and we're in Isha,
         // isha started yesterday, ends today at Fajr
         if (state.currentPrayer == 'isha' && now.hour < 6) {
           // Isha started yesterday
-          currentPrayerTime = currentPrayerTime.subtract(const Duration(days: 1));
-          // Isha ends today at Fajr (prayerEndTime is already set to fajr + 1 day, 
+          currentPrayerTime =
+              currentPrayerTime.subtract(const Duration(days: 1));
+          // Isha ends today at Fajr (prayerEndTime is already set to fajr + 1 day,
           // but we need today's fajr)
           final todayFajr = state.prayerTimes['fajr'];
           if (todayFajr != null) {
             prayerEndTime = todayFajr;
           }
         }
-        
+
         final totalDuration =
             prayerEndTime.difference(currentPrayerTime).inSeconds;
         final elapsedDuration = now.difference(currentPrayerTime).inSeconds;
@@ -659,12 +680,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         nextPrayerName = 'ফজর';
         nextPrayerTimeStr = null;
       }
+    } else if (state.isNaflTime && state.prayerTimes.isNotEmpty) {
+      // For Nafl time, calculate progress from sunrise to dhuhr
+      final sunrise = state.prayerTimes['sunrise'];
+      final dhuhr = state.prayerTimes['dhuhr'];
+
+      if (sunrise != null && dhuhr != null) {
+        final now = DateTime.now();
+        final totalDuration = dhuhr.difference(sunrise).inSeconds;
+        final elapsedDuration = now.difference(sunrise).inSeconds;
+        if (totalDuration > 0 && elapsedDuration > 0) {
+          progress = (elapsedDuration / totalDuration).clamp(0.0, 1.0);
+        }
+        currentPrayerTimeStr = _formatTimeShort2(sunrise);
+        prayerEndTimeStr = _formatTimeShort2(dhuhr);
+      }
+
+      // Next prayer after nafl is dhuhr
+      nextPrayerName = 'যোহর';
+      final dhuhrTime = state.prayerTimes['dhuhr'];
+      if (dhuhrTime != null) {
+        nextPrayerTimeStr = _formatTime(dhuhrTime);
+      }
     }
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: Color.fromARGB(255, 255, 0, 0), // current prayer section
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -708,6 +751,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // Main prayer name
           Text(
             mainText,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Color(0xFFD4AF37),
               fontSize: 32,
@@ -715,12 +759,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Countdown timer (if current prayer)
-          if (state.currentPrayer != null &&
-              state.timeToCurrentPrayerEnd != null) ...[
+          // Countdown timer (if current prayer or nafl time)
+          if ((state.currentPrayer != null &&
+                  state.timeToCurrentPrayerEnd != null) ||
+              (state.isNaflTime && state.timeToNextPrayer != null)) ...[
             const SizedBox(height: 8),
             Text(
-              state.timeToCurrentPrayerEnd!,
+              state.isNaflTime
+                  ? state.timeToNextPrayer!
+                  : state.timeToCurrentPrayerEnd!,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFFD4AF37),
                 fontSize: 48,
@@ -730,7 +778,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              subtitleText ?? '',
+              state.isNaflTime
+                  ? 'পরবর্তী ওয়াক্তের বাকি'
+                  : (subtitleText ?? 'পরবর্তী ওয়াক্তের বাকি'),
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey[500],
                 fontSize: 12,
@@ -740,6 +791,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 8),
             Text(
               subtitleText,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: statusColor.withOpacity(0.8),
                 fontSize: 14,
@@ -748,7 +802,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
 
           // Progress bar
-          if (state.currentPrayer != null) ...[
+          if (state.currentPrayer != null || state.isNaflTime) ...[
             const SizedBox(height: 20),
             Row(
               children: [
@@ -931,7 +985,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildPrayerTimeRow(
       BuildContext context, String name, String time, bool isActive) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: isActive
+          ? BoxDecoration(
+              color: const Color(0xFFD4AF37),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFD4AF37).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            )
+          : null,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -943,7 +1011,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   height: 8,
                   margin: const EdgeInsets.only(right: 10),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFD4AF37),
+                    color: Color(0xFF0A0A0A),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -951,9 +1019,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 name,
                 style: TextStyle(
-                  color: isActive ? const Color(0xFFD4AF37) : Colors.white,
+                  color: isActive ? const Color(0xFF0A0A0A) : Colors.white,
                   fontSize: 16,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
                 ),
               ),
             ],
@@ -961,7 +1029,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             time,
             style: TextStyle(
-              color: isActive ? const Color(0xFFD4AF37) : Colors.white,
+              color: isActive ? const Color(0xFF0A0A0A) : Colors.white,
               fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
@@ -1003,14 +1071,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: const Color(0xFF1C1C1C),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            spreadRadius: -2,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+            spreadRadius: -4,
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.02),
+            blurRadius: 1,
+            offset: const Offset(0, -1),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -1349,17 +1423,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: const Color(0xFF1C1C1C),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: -2,
           ),
           BoxShadow(
-            color: const Color(0xFFD4AF37).withOpacity(0.06),
+            color: const Color(0xFFD4AF37).withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -1437,17 +1511,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: const Color(0xFF1C1C1C),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: -2,
           ),
           BoxShadow(
-            color: const Color(0xFFD4AF37).withOpacity(0.06),
+            color: const Color(0xFFD4AF37).withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),

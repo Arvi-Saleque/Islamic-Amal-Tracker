@@ -328,16 +328,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: percentage,
-              minHeight: 6,
-              backgroundColor: AppColors.backgroundDark,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
-          ),
         ],
       ),
     );
@@ -376,7 +366,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   decoration: BoxDecoration(
                     color: item.isCompleted
                         ? AppColors.primary
-                        : AppColors.transparent,
+                        : const Color(0xFF2A2A2A),
+                    border: item.isCompleted
+                        ? null
+                        : Border.all(
+                            color: const Color(0xFF3A3A3A),
+                            width: 2,
+                          ),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(

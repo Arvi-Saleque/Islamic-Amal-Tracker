@@ -551,7 +551,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                 icon: const Icon(Icons.add),
                 label: Text(_isEditing
                     ? 'রিমাইন্ডার সেভ করুন'
-                    : '+ রিমাইন্ডার সংরক্ষণ করুন'),
+                    : 'রিমাইন্ডার সংরক্ষণ করুন'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD4AF37),
                   foregroundColor: Colors.black,

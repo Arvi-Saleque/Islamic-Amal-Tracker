@@ -353,7 +353,15 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: qaza.isQazaDone ? Colors.green : Colors.transparent,
+                  color: qaza.isQazaDone 
+                      ? Colors.green 
+                      : const Color(0xFF2A2A2A),
+                  border: qaza.isQazaDone
+                      ? null
+                      : Border.all(
+                          color: const Color(0xFF3A3A3A),
+                          width: 2,
+                        ),
                   borderRadius: BorderRadius.circular(6),
                   boxShadow: [
                     BoxShadow(
