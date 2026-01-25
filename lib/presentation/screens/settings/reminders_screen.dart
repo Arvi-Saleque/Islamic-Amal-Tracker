@@ -1533,21 +1533,7 @@ class TodaysRemindersDialog extends StatefulWidget {
   State<TodaysRemindersDialog> createState() => _TodaysRemindersDialogState();
 }
 
-class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
 
   String _formatDateTime(DateTime time) {
     final hour =
@@ -1593,180 +1579,14 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
                   ],
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white.withOpacity(0.06)),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      color: _Premium.gold,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelColor: Colors.black,
-                    unselectedLabelColor: Colors.grey.shade300,
-                    labelStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.1,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    dividerColor: Colors.transparent,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    tabs: const [
-                      Tab(text: 'ডিফল্ট নিয়ম'),
-                      Tab(text: 'আজকের সময়'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.45,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildDefaultRulesTab(),
-                      _buildTodaysRemindersTab(),
-                    ],
-                  ),
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  child: _buildTodaysRemindersTab(),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDefaultRulesTab() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildRuleSection(
-            'ডিফল্ট রিমাইন্ডার',
-            [
-              _buildRuleItem('ফজরের পর রিমাইন্ডার', 'ফজর + ৩০ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('যোহরের পর রিমাইন্ডার', 'যোহর + ৬০ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('আসরের পর রিমাইন্ডার', 'আসর + ১৫ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('মাগরিবের পর রিমাইন্ডার', 'মাগরিব + ১০ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('ইশার পর রিমাইন্ডার', 'ইশা + ৬০ মিনিট (সবসময় সক্রিয়)'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildRuleSection(
-            'সালাত রিমাইন্ডার',
-            [
-              _buildRuleItem('ফজর', 'ওয়াক্ত শুরু + ৩০ মিনিট'),
-              _buildRuleItem('যোহর', 'ওয়াক্ত শুরু + ৬০ মিনিট'),
-              _buildRuleItem('আসর', 'ওয়াক্ত শুরু + ১৫ মিনিট'),
-              _buildRuleItem('মাগরিব', 'ওয়াক্ত শুরু + ১০ মিনিট'),
-              _buildRuleItem('ইশা', 'ওয়াক্ত শুরু + ৩০ মিনিট'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildRuleSection(
-            'ডিফল্ট যিকির ও আমল রিমাইন্ডার',
-            [
-              _buildRuleItem('সকালের যিকির', 'ফজর + ৬০ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('সন্ধ্যার যিকির', 'মাগরিব + ৩০ মিনিট (সবসময় সক্রিয়)'),
-              _buildRuleItem('দৈনিক আমল', 'রাত ১০:০০ PM (সবসময় সক্রিয়)'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildRuleSection(
-            'যিকির রিমাইন্ডার',
-            [
-              _buildRuleItem('সকালের যিকির', 'ফজর + ৬০ মিনিট'),
-              _buildRuleItem('সন্ধ্যার যিকির', 'মাগরিব + ২৫ মিনিট'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildRuleSection(
-            'দৈনিক আমল রিমাইন্ডার',
-            [
-              _buildRuleItem('আমল সম্পন্ন করুন', 'রাত ১০:০০ PM'),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1C),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.06)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.grey.shade400, size: 16),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    'সময় পরিবর্তন করতে রিমাইন্ডার সেকশনে গিয়ে সময় এডিট করুন',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRuleSection(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: _Premium.gold,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.1,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: _Premium.dialogSectionDecoration(),
-          child: Column(children: items),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRuleItem(String name, String rule) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                height: 1.2,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            rule,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 12,
-              height: 1.2,
-            ),
-          ),
-        ],
       ),
     );
   }
