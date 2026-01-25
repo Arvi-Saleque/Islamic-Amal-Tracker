@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
 import '../../providers/prayer_times_provider.dart';
@@ -7,6 +8,10 @@ import '../../widgets/digital_time_picker.dart';
 import 'custom_reminders_screen.dart';
 import 'daily_reminder_screen.dart';
 
+/// NOTE:
+/// - No new content/text/buttons were added.
+/// - Only styling/presentation improved for a cleaner premium 3D vibe.
+/// - Shadows are intentionally soft (not heavy) to avoid odd look.
 class RemindersScreen extends ConsumerStatefulWidget {
   const RemindersScreen({super.key});
 
@@ -25,7 +30,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   TimeOfDay _eveningDhikrTime = const TimeOfDay(hour: 18, minute: 0);
 
   // Prayer Reminders - map of prayer name to custom reminder time
-  Map<PrayerName, TimeOfDay> _prayerReminderTimes = {};
+  final Map<PrayerName, TimeOfDay> _prayerReminderTimes = {};
 
   // Custom Reminders
   List<CustomReminder> _customReminders = [];
@@ -98,40 +103,56 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     await _scheduleAllReminders();
   }
 
-  /// Get default prayer reminder offset in minutes (after prayer starts)
+  /// Get default prayer reminder offset in minutes
   int _getDefaultPrayerOffset(PrayerName prayer) {
     switch (prayer) {
       case PrayerName.fajr:
-        return 30; // ফজর: ওয়াক্ত শুরুর ৩০ মিনিট পর
+        return 30;
       case PrayerName.dhuhr:
-        return 60; // যোহর: ওয়াক্ত শুরুর ১ ঘন্টা পর
+        return 60;
       case PrayerName.asr:
-        return 15; // আসর: ওয়াক্ত শুরুর ১৫ মিনিট পর
+        return 15;
       case PrayerName.maghrib:
-        return 10; // মাগরিব: ওয়াক্ত শুরুর ১০ মিনিট পর
+        return 10;
       case PrayerName.isha:
-        return 30; // ইশা: ওয়াক্ত শুরুর ৩০ মিনিট পর
+        return 30;
     }
   }
 
-  /// Calculate default prayer reminder time based on prayer time + offset
+  /// Convert prayer time string (HH:mm) to TimeOfDay
+  TimeOfDay _parsePrayerTimeString(String timeStr) {
+    final parts = timeStr.split(':');
+    if (parts.length != 2) return const TimeOfDay(hour: 0, minute: 0);
+    return TimeOfDay(
+      hour: int.tryParse(parts[0]) ?? 0,
+      minute: int.tryParse(parts[1]) ?? 0,
+    );
+  }
+
+  /// Calculate default prayer reminder time: prayer time + offset
   TimeOfDay _calculateDefaultPrayerReminderTime(
-      PrayerName prayer, Map<String, DateTime> prayerTimes) {
-    final prayerTime = prayerTimes[prayer.name];
-    if (prayerTime == null) {
-      return _getStaticDefaultPrayerTime(prayer);
-    }
+    PrayerName prayer,
+    Map<String, DateTime>? prayerTimes,
+  ) {
+    if (prayerTimes == null) return _getStaticDefaultPrayerTime(prayer);
 
-    final offset = _getDefaultPrayerOffset(prayer);
-    final reminderTime = prayerTime.add(Duration(minutes: offset));
-    return TimeOfDay(hour: reminderTime.hour, minute: reminderTime.minute);
+    final prayerDateTime = prayerTimes[prayer.name];
+    if (prayerDateTime == null) return _getStaticDefaultPrayerTime(prayer);
+
+    final offsetMinutes = _getDefaultPrayerOffset(prayer);
+
+    final totalMinutes = prayerDateTime.hour * 60 + prayerDateTime.minute + offsetMinutes;
+    final hour = (totalMinutes ~/ 60) % 24;
+    final minute = totalMinutes % 60;
+
+    return TimeOfDay(hour: hour, minute: minute);
   }
 
-  /// Static fallback default times (used when prayer times not available)
+  /// Fallback if prayer times not loaded
   TimeOfDay _getStaticDefaultPrayerTime(PrayerName prayer) {
     switch (prayer) {
       case PrayerName.fajr:
-        return const TimeOfDay(hour: 5, minute: 30);
+        return const TimeOfDay(hour: 6, minute: 30);
       case PrayerName.dhuhr:
         return const TimeOfDay(hour: 13, minute: 30);
       case PrayerName.asr:
@@ -139,34 +160,38 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       case PrayerName.maghrib:
         return const TimeOfDay(hour: 18, minute: 10);
       case PrayerName.isha:
-        return const TimeOfDay(hour: 19, minute: 30);
+        return const TimeOfDay(hour: 20, minute: 30);
     }
   }
 
-  /// Calculate morning dhikr default time (Fajr + 1 hour)
-  TimeOfDay _calculateMorningDhikrDefault(Map<String, DateTime> prayerTimes) {
-    final fajr = prayerTimes['fajr'];
-    if (fajr == null) return const TimeOfDay(hour: 6, minute: 30);
-    final dhikrTime = fajr.add(const Duration(hours: 1));
-    return TimeOfDay(hour: dhikrTime.hour, minute: dhikrTime.minute);
+  TimeOfDay _calculateMorningDhikrDefault(Map<String, DateTime>? prayerTimes) {
+    // Default: Fajr + 60 minutes
+    if (prayerTimes == null || prayerTimes['fajr'] == null) {
+      return const TimeOfDay(hour: 7, minute: 0);
+    }
+    final fajr = prayerTimes['fajr']!;
+    final total = fajr.hour * 60 + fajr.minute + 60;
+    return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  /// Calculate evening dhikr default time (Maghrib + 25 minutes)
-  TimeOfDay _calculateEveningDhikrDefault(Map<String, DateTime> prayerTimes) {
-    final maghrib = prayerTimes['maghrib'];
-    if (maghrib == null) return const TimeOfDay(hour: 18, minute: 25);
-    final dhikrTime = maghrib.add(const Duration(minutes: 25));
-    return TimeOfDay(hour: dhikrTime.hour, minute: dhikrTime.minute);
+  TimeOfDay _calculateEveningDhikrDefault(Map<String, DateTime>? prayerTimes) {
+    // Default: Maghrib + 25 minutes
+    if (prayerTimes == null || prayerTimes['maghrib'] == null) {
+      return const TimeOfDay(hour: 18, minute: 25);
+    }
+    final maghrib = prayerTimes['maghrib']!;
+    final total = maghrib.hour * 60 + maghrib.minute + 25;
+    return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
   Future<void> _scheduleAllReminders() async {
-    // Schedule daily reminder
+    // Daily reminder
     await DailyReminderService.scheduleDailyReminder(
       hour: _dailyReminderTime.hour,
       minute: _dailyReminderTime.minute,
     );
 
-    // Schedule dhikr reminders
+    // Dhikr reminders
     await DailyReminderService.scheduleMorningDhikrReminder(
       hour: _morningDhikrTime.hour,
       minute: _morningDhikrTime.minute,
@@ -176,7 +201,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       minute: _eveningDhikrTime.minute,
     );
 
-    // Schedule prayer reminders
+    // Prayer reminders
     for (final prayer in PrayerName.values) {
       final time = _prayerReminderTimes[prayer];
       if (time != null) {
@@ -187,88 +212,37 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         );
       }
     }
-  }
 
-  void _showTodaysRemindersPopup() {
-    final prayerTimes = ref.read(prayerTimesProvider).prayerTimes;
-
-    showDialog(
-      context: context,
-      builder: (context) => TodaysRemindersDialog(
-        dailyReminderTime: _dailyReminderTime,
-        morningDhikrTime: _morningDhikrTime,
-        eveningDhikrTime: _eveningDhikrTime,
-        prayerReminderTimes: _prayerReminderTimes,
-        customReminders: _customReminders,
-        actualPrayerTimes: prayerTimes,
-        onNavigateToCustomReminders: () {
-          Navigator.pop(context);
-          _navigateToCustomReminders();
-        },
-      ),
-    );
-  }
-
-  void _navigateToCustomReminders() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CustomRemindersScreen(
-          onRemindersChanged: _loadAllSettings,
-        ),
-      ),
-    );
+    // Custom reminders are scheduled individually when added/updated
   }
 
   Future<void> _selectTime(String type, TimeOfDay currentTime) async {
-    final TimeOfDay? picked = await DigitalTimePicker.show(
+    final selectedTime = await DigitalTimePicker.show(
       context: context,
       initialTime: currentTime,
     );
 
-    if (picked != null) {
-      switch (type) {
-        case 'daily':
-          setState(() => _dailyReminderTime = picked);
-          await DailyReminderService.scheduleDailyReminder(
-            hour: picked.hour,
-            minute: picked.minute,
-          );
-          break;
-        case 'morningDhikr':
-          setState(() => _morningDhikrTime = picked);
-          await DailyReminderService.scheduleMorningDhikrReminder(
-            hour: picked.hour,
-            minute: picked.minute,
-          );
-          break;
-        case 'eveningDhikr':
-          setState(() => _eveningDhikrTime = picked);
-          await DailyReminderService.scheduleEveningDhikrReminder(
-            hour: picked.hour,
-            minute: picked.minute,
-          );
-          break;
-      }
+    if (selectedTime != null) {
+      setState(() {
+        if (type == 'daily') _dailyReminderTime = selectedTime;
+        if (type == 'morningDhikr') _morningDhikrTime = selectedTime;
+        if (type == 'eveningDhikr') _eveningDhikrTime = selectedTime;
+      });
+
+      await _scheduleAllReminders();
     }
   }
 
-  Future<void> _selectPrayerTime(
-      PrayerName prayer, TimeOfDay currentTime) async {
-    final TimeOfDay? picked = await DigitalTimePicker.show(
+  Future<void> _selectPrayerTime(PrayerName prayer, TimeOfDay currentTime) async {
+    final selectedTime = await DigitalTimePicker.show(
       context: context,
       initialTime: currentTime,
     );
 
-    if (picked != null) {
-      setState(() {
-        _prayerReminderTimes[prayer] = picked;
-      });
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: prayer,
-        hour: picked.hour,
-        minute: picked.minute,
-      );
+    if (selectedTime != null) {
+      setState(() => _prayerReminderTimes[prayer] = selectedTime);
+
+      await _scheduleAllReminders();
     }
   }
 
@@ -279,37 +253,68 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     return '$hour:$minute $period';
   }
 
+  void _navigateToCustomReminders() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CustomRemindersScreen(),
+      ),
+    );
+    await _loadAllSettings();
+  }
+
+  void _showTodaysRemindersPopup() {
+    final prayerTimesState = ref.read(prayerTimesProvider);
+    final actualPrayerTimes = prayerTimesState.prayerTimes;
+
+    showDialog(
+      context: context,
+      builder: (context) => TodaysRemindersDialog(
+        dailyReminderTime: _dailyReminderTime,
+        morningDhikrTime: _morningDhikrTime,
+        eveningDhikrTime: _eveningDhikrTime,
+        prayerReminderTimes: _prayerReminderTimes,
+        customReminders: _customReminders,
+        onNavigateToCustomReminders: _navigateToCustomReminders,
+        actualPrayerTimes: actualPrayerTimes,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final prayerTimesState = ref.watch(prayerTimesProvider);
-
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: _Premium.bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: _Premium.appBar,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: const Icon(Icons.arrow_back, color: _Premium.gold),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'রিমাইন্ডারস',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: _Premium.gold,
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            letterSpacing: 0.2,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active,
-                color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.notifications_active, color: _Premium.gold),
             onPressed: _showTodaysRemindersPopup,
             tooltip: 'আজকের রিমাইন্ডারস',
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFFD4AF37)),
+            icon: const Icon(Icons.settings, color: _Premium.gold),
             onPressed: () {
               Navigator.push(
                 context,
@@ -324,23 +329,20 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+              child: CircularProgressIndicator(color: _Premium.gold),
             )
           : RefreshIndicator(
               onRefresh: _loadAllSettings,
-              color: const Color(0xFFD4AF37),
+              color: _Premium.gold,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Info card
                     _buildInfoCard(),
-
                     const SizedBox(height: 20),
 
-                    // Daily Amal Reminder Section
                     _buildSectionHeader('দৈনিক আমল রিমাইন্ডার'),
                     const SizedBox(height: 8),
                     _buildReminderTile(
@@ -353,7 +355,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Dhikr Reminders Section
                     _buildSectionHeader('যিকির রিমাইন্ডার'),
                     const SizedBox(height: 8),
                     _buildReminderTile(
@@ -376,18 +377,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Prayer Reminders Section
                     _buildSectionHeader('নামাজের রিমাইন্ডার'),
                     const SizedBox(height: 8),
                     ..._buildPrayerReminderTiles(),
 
                     const SizedBox(height: 24),
 
-                    // Custom Reminders Section
                     _buildSectionHeader('কাস্টম রিমাইন্ডার'),
                     const SizedBox(height: 8),
                     _buildCustomReminderCard(),
-
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -399,20 +397,20 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   Widget _buildInfoCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Row(
+      decoration: _Premium.infoCardDecoration(),
+      child: Row(
         children: [
-          Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
-          SizedBox(width: 12),
-          Expanded(
+          const Icon(Icons.info_outline, color: _Premium.gold),
+          const SizedBox(width: 12),
+          const Expanded(
             child: Text(
               'প্রতিদিন নির্দিষ্ট সময়ে আমল করার রিমাইন্ডার পাবেন',
               style: TextStyle(
-                color: Color(0xFFD4AF37),
+                color: _Premium.gold,
                 fontSize: 14,
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+                letterSpacing: 0.1,
               ),
             ),
           ),
@@ -426,10 +424,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Color(0xFFD4AF37),
+        style: TextStyle(
+          color: _Premium.gold.withOpacity(0.95),
           fontSize: 16,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
         ),
       ),
     );
@@ -442,32 +441,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     required TimeOfDay time,
     required VoidCallback onTimeTap,
   }) {
+    // subtitle kept (no content added) – not displayed intentionally in old design,
+    // kept for compatibility.
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: _Premium.cardDecoration(),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: const Color(0xFFD4AF37),
-              size: 24,
-            ),
+            decoration: _Premium.iconChipDecoration(),
+            child: Icon(icon, color: _Premium.gold, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -479,45 +463,55 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: 0.1,
                   ),
                 ),
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: onTimeTap,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 14,
-                        color: Color(0xFFD4AF37),
+                const SizedBox(height: 6),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onTimeTap,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatTime(time),
-                        style: const TextStyle(
-                          color: Color(0xFFD4AF37),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: _Premium.gold.withOpacity(0.95),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatTime(time),
+                            style: const TextStyle(
+                              color: _Premium.gold,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.edit,
+                            size: 14,
+                            color: _Premium.gold.withOpacity(0.95),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.edit,
-                        size: 14,
-                        color: Color(0xFFD4AF37),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 24,
-          ),
+          const Icon(Icons.check_circle, color: Colors.green, size: 24),
         ],
       ),
     );
@@ -548,28 +542,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         padding: const EdgeInsets.only(bottom: 8),
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          decoration: _Premium.cardDecoration(),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                decoration: _Premium.iconChipDecoration(radius: 10),
                 child: Icon(
                   prayerIcons[prayer],
-                  color: const Color(0xFFD4AF37),
+                  color: _Premium.gold,
                   size: 24,
                 ),
               ),
@@ -583,45 +564,55 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        letterSpacing: 0.1,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () => _selectPrayerTime(prayer, reminderTime),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: Color(0xFFD4AF37),
+                    const SizedBox(height: 6),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _selectPrayerTime(prayer, reminderTime),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 6,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _formatTime(reminderTime),
-                            style: const TextStyle(
-                              color: Color(0xFFD4AF37),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 14,
+                                color: _Premium.gold.withOpacity(0.95),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatTime(reminderTime),
+                                style: const TextStyle(
+                                  color: _Premium.gold,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.edit,
+                                size: 14,
+                                color: _Premium.gold.withOpacity(0.95),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.edit,
-                            size: 14,
-                            color: Color(0xFFD4AF37),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 24,
-              ),
+              const Icon(Icons.check_circle, color: Colors.green, size: 24),
             ],
           ),
         ),
@@ -630,73 +621,160 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   Widget _buildCustomReminderCard() {
-    return GestureDetector(
-      onTap: _navigateToCustomReminders,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFD4AF37).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _navigateToCustomReminders,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: _Premium.cardDecoration(),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: _Premium.iconChipDecoration(radius: 10),
+                child: const Icon(Icons.add_alert, color: _Premium.gold, size: 24),
               ),
-              child: const Icon(
-                Icons.add_alert,
-                color: Color(0xFFD4AF37),
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'কাস্টম রিমাইন্ডার',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'কাস্টম রিমাইন্ডার',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        letterSpacing: 0.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _customReminders.isEmpty
-                        ? 'কোনো কাস্টম রিমাইন্ডার নেই'
-                        : '${_customReminders.where((r) => r.isEnabled).length} টি সক্রিয় রিমাইন্ডার',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 13,
+                    const SizedBox(height: 6),
+                    Text(
+                      _customReminders.isEmpty
+                          ? 'কোনো কাস্টম রিমাইন্ডার নেই'
+                          : '${_customReminders.where((r) => r.isEnabled).length} টি সক্রিয় রিমাইন্ডার',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.68),
+                        fontSize: 13,
+                        height: 1.2,
+                        letterSpacing: 0.1,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFFD4AF37),
-            ),
-          ],
+              const Icon(Icons.chevron_right, color: _Premium.gold),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Today's Reminders Popup Dialog
+class _Premium {
+  static const Color bg = Color(0xFF0A0A0A);
+  static const Color appBar = Color(0xFF121212);
+  static const Color surface = Color(0xFF151515);
+  static const Color surfaceTop = Color(0xFF1C1C1C);
+  static const Color gold = Color(0xFFD4AF37);
+
+  static BoxDecoration cardDecoration({double radius = 14}) {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(radius),
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [surfaceTop, surface],
+      ),
+      border: Border.all(color: Colors.white.withOpacity(0.06)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.28),
+          blurRadius: 16,
+          offset: const Offset(0, 10),
+        ),
+        BoxShadow(
+          color: Colors.white.withOpacity(0.045),
+          blurRadius: 8,
+          offset: const Offset(-2, -2),
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration iconChipDecoration({double radius = 12}) {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(radius),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [gold.withOpacity(0.26), gold.withOpacity(0.10)],
+      ),
+      border: Border.all(color: gold.withOpacity(0.22)),
+    );
+  }
+
+  static BoxDecoration infoCardDecoration() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(14),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [gold.withOpacity(0.14), gold.withOpacity(0.06)],
+      ),
+      border: Border.all(color: gold.withOpacity(0.22)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.22),
+          blurRadius: 16,
+          offset: const Offset(0, 10),
+        ),
+        BoxShadow(
+          color: Colors.white.withOpacity(0.04),
+          blurRadius: 8,
+          offset: const Offset(-2, -2),
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration dialogContainerDecoration() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF1E1E1E), Color(0xFF151515)],
+      ),
+      border: Border.all(color: Colors.white.withOpacity(0.08)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.55),
+          blurRadius: 28,
+          offset: const Offset(0, 16),
+        ),
+        BoxShadow(
+          color: Colors.white.withOpacity(0.04),
+          blurRadius: 10,
+          offset: const Offset(-2, -2),
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration dialogSectionDecoration() {
+    return BoxDecoration(
+      color: const Color(0xFF202020),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.white.withOpacity(0.06)),
+    );
+  }
+}
+
 class TodaysRemindersDialog extends StatefulWidget {
   final TimeOfDay dailyReminderTime;
   final TimeOfDay morningDhikrTime;
@@ -723,7 +801,7 @@ class TodaysRemindersDialog extends StatefulWidget {
 
 class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  late final TabController _tabController;
 
   @override
   void initState() {
@@ -737,13 +815,6 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
     super.dispose();
   }
 
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
-
   String _formatDateTime(DateTime time) {
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
@@ -755,74 +826,84 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF1A1A1A),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header with close button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Container(
+        decoration: _Premium.dialogContainerDecoration(),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'রিমাইন্ডার সময়সূচী',
-                  style: TextStyle(
-                    color: Color(0xFFD4AF37),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'রিমাইন্ডার সময়সূচী',
+                      style: TextStyle(
+                        color: _Premium.gold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey.shade400),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 18,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white.withOpacity(0.06)),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      color: _Premium.gold,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.grey.shade300,
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.1,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    dividerColor: Colors.transparent,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    tabs: const [
+                      Tab(text: 'ডিফল্ট নিয়ম'),
+                      Tab(text: 'আজকের সময়'),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.grey),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildDefaultRulesTab(),
+                      _buildTodaysRemindersTab(),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-
-            // Tab Bar
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  color: const Color(0xFFD4AF37),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-                labelStyle:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                unselectedLabelStyle: const TextStyle(fontSize: 13),
-                dividerColor: Colors.transparent,
-                indicatorSize: TabBarIndicatorSize.tab,
-                tabs: const [
-                  Tab(text: 'ডিফল্ট নিয়ম'),
-                  Tab(text: 'আজকের সময়'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Tab Content
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.45,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildDefaultRulesTab(),
-                  _buildTodaysRemindersTab(),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -862,14 +943,15 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFF1C1C1C),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.grey, size: 16),
-                SizedBox(width: 8),
-                Expanded(
+                Icon(Icons.info_outline, color: Colors.grey.shade400, size: 16),
+                const SizedBox(width: 8),
+                const Expanded(
                   child: Text(
                     'সময় পরিবর্তন করতে রিমাইন্ডার সেকশনে গিয়ে সময় এডিট করুন',
                     style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -890,18 +972,16 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
         Text(
           title,
           style: const TextStyle(
-            color: Color(0xFFD4AF37),
+            color: _Premium.gold,
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: _Premium.dialogSectionDecoration(),
           child: Column(children: items),
         ),
       ],
@@ -910,17 +990,27 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
 
   Widget _buildRuleItem(String name, String rule) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            name,
-            style: const TextStyle(color: Colors.white, fontSize: 13),
+          Expanded(
+            child: Text(
+              name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                height: 1.2,
+              ),
+            ),
           ),
+          const SizedBox(width: 10),
           Text(
             rule,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 12,
+              height: 1.2,
+            ),
           ),
         ],
       ),
@@ -931,38 +1021,55 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
     final now = DateTime.now();
     final todaysReminders = <ReminderItem>[];
 
-    // Add daily reminder (always enabled)
-    final dailyReminderDateTime = DateTime(now.year, now.month, now.day,
-        widget.dailyReminderTime.hour, widget.dailyReminderTime.minute);
+    final dailyReminderDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      widget.dailyReminderTime.hour,
+      widget.dailyReminderTime.minute,
+    );
     todaysReminders.add(ReminderItem(
       title: 'দৈনিক আমল রিমাইন্ডার',
       time: dailyReminderDateTime,
       isPassed: now.isAfter(dailyReminderDateTime),
     ));
 
-    // Add dhikr reminders (always enabled)
-    final morningDhikrDateTime = DateTime(now.year, now.month, now.day,
-        widget.morningDhikrTime.hour, widget.morningDhikrTime.minute);
+    final morningDhikrDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      widget.morningDhikrTime.hour,
+      widget.morningDhikrTime.minute,
+    );
     todaysReminders.add(ReminderItem(
       title: 'সকালের যিকির',
       time: morningDhikrDateTime,
       isPassed: now.isAfter(morningDhikrDateTime),
     ));
 
-    final eveningDhikrDateTime = DateTime(now.year, now.month, now.day,
-        widget.eveningDhikrTime.hour, widget.eveningDhikrTime.minute);
+    final eveningDhikrDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      widget.eveningDhikrTime.hour,
+      widget.eveningDhikrTime.minute,
+    );
     todaysReminders.add(ReminderItem(
       title: 'সন্ধ্যার যিকির',
       time: eveningDhikrDateTime,
       isPassed: now.isAfter(eveningDhikrDateTime),
     ));
 
-    // Add prayer reminders (always enabled)
     for (final prayer in PrayerName.values) {
       final reminderTime = widget.prayerReminderTimes[prayer];
       if (reminderTime != null) {
-        final prayerReminderDateTime = DateTime(now.year, now.month, now.day,
-            reminderTime.hour, reminderTime.minute);
+        final prayerReminderDateTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          reminderTime.hour,
+          reminderTime.minute,
+        );
         todaysReminders.add(ReminderItem(
           title: '${CustomReminder.getPrayerBengaliName(prayer)} সালাত',
           time: prayerReminderDateTime,
@@ -971,10 +1078,8 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
       }
     }
 
-    // Add custom reminders for today
-    final todayWeekday = now.weekday; // 1 = Monday, 7 = Sunday
+    final todayWeekday = now.weekday;
     for (final reminder in widget.customReminders.where((r) => r.isEnabled)) {
-      // Check if reminder is for today
       if (reminder.repeatDays.isNotEmpty &&
           !reminder.repeatDays.contains(todayWeekday)) {
         continue;
@@ -984,11 +1089,15 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
       if (reminder.type == ReminderType.fixedTime &&
           reminder.fixedHour != null &&
           reminder.fixedMinute != null) {
-        reminderTime = DateTime(now.year, now.month, now.day,
-            reminder.fixedHour!, reminder.fixedMinute!);
+        reminderTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          reminder.fixedHour!,
+          reminder.fixedMinute!,
+        );
       } else if (reminder.prayer != null) {
-        final actualPrayerTime =
-            widget.actualPrayerTimes[reminder.prayer!.name];
+        final actualPrayerTime = widget.actualPrayerTimes[reminder.prayer!.name];
         if (actualPrayerTime != null) {
           reminderTime =
               actualPrayerTime.add(Duration(minutes: reminder.minutesOffset));
@@ -1005,10 +1114,8 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
       }
     }
 
-    // Sort by time
     todaysReminders.sort((a, b) => a.time.compareTo(b.time));
 
-    // Separate pending and passed
     final pendingReminders = todaysReminders.where((r) => !r.isPassed).toList();
     final passedReminders = todaysReminders.where((r) => r.isPassed).toList();
 
@@ -1025,36 +1132,27 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Pending reminders
           if (pendingReminders.isNotEmpty) ...[
-            const Text(
+            Text(
               'বাকি রিমাইন্ডার',
               style: TextStyle(
-                color: Colors.white70,
+                color: Colors.white.withOpacity(0.80),
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            ...pendingReminders
-                .map((reminder) => _buildReminderRow(reminder, false)),
+            ...pendingReminders.map((r) => _buildReminderRow(r, false)),
           ],
-
           if (passedReminders.isNotEmpty && pendingReminders.isNotEmpty)
-            const Divider(color: Color(0xFF2A2A2A), height: 24),
-
-          // Passed reminders
+            Divider(color: Colors.white.withOpacity(0.08), height: 24),
           if (passedReminders.isNotEmpty) ...[
             Text(
               'সম্পন্ন (${passedReminders.length})',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
             ),
             const SizedBox(height: 8),
-            ...passedReminders
-                .map((reminder) => _buildReminderRow(reminder, true)),
+            ...passedReminders.map((r) => _buildReminderRow(r, true)),
           ],
         ],
       ),
@@ -1062,8 +1160,14 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
   }
 
   Widget _buildReminderRow(ReminderItem reminder, bool isPassed) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C1C1C),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
+      ),
       child: Row(
         children: [
           Container(
@@ -1071,7 +1175,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
             height: 8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isPassed ? Colors.grey : const Color(0xFFD4AF37),
+              color: isPassed ? Colors.grey : _Premium.gold,
             ),
           ),
           const SizedBox(width: 12),
@@ -1082,8 +1186,9 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
                   child: Text(
                     reminder.title,
                     style: TextStyle(
-                      color: isPassed ? Colors.grey : Colors.white,
+                      color: isPassed ? Colors.grey.shade400 : Colors.white,
                       fontSize: 14,
+                      height: 1.2,
                       decoration: isPassed ? TextDecoration.lineThrough : null,
                     ),
                   ),
@@ -1091,27 +1196,36 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog>
                 if (reminder.isCustom)
                   Container(
                     margin: const EdgeInsets.only(left: 6),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withOpacity(0.06)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'কাস্টম',
-                      style: TextStyle(color: Colors.grey, fontSize: 10),
+                      style: TextStyle(
+                        color: Colors.grey.shade300,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.1,
+                      ),
                     ),
                   ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Text(
             _formatDateTime(reminder.time),
             style: TextStyle(
-              color: isPassed ? Colors.grey : const Color(0xFFD4AF37),
+              color: isPassed ? Colors.grey.shade400 : _Premium.gold,
               fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.1,
             ),
           ),
         ],

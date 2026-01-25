@@ -1,6 +1,8 @@
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+
 import '../../../services/daily_reminder_service.dart';
 import '../../widgets/digital_time_picker.dart';
 
@@ -15,7 +17,11 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     with WidgetsBindingObserver {
   bool _isReminderEnabled = false;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
+
   bool _isLoading = true;
+
+  // Platform info
+  bool _isAndroid12Plus = true;
 
   // Permission statuses
   Map<Permission, PermissionStatus> _permissionStatuses = {};
@@ -24,8 +30,39 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadSettings();
-    _checkPermissions();
+    _init();
+  }
+
+  Future<void> _init() async {
+    try {
+      await _loadSettings();
+      await _loadPlatformInfo();
+      await _checkPermissions();
+    } catch (e) {
+      debugPrint('DailyReminderScreen init error: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loadPlatformInfo() async {
+    if (!Platform.isAndroid) {
+      _isAndroid12Plus = false;
+      return;
+    }
+
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+      final sdk = androidInfo.version.sdkInt;
+      _isAndroid12Plus = sdk >= 31; // Android 12 = 31
+    } catch (e) {
+      // safe default
+      _isAndroid12Plus = true;
+      debugPrint('Platform info error: $e');
+    }
   }
 
   @override
@@ -45,49 +82,46 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   Future<void> _loadSettings() async {
     try {
       final settings = await DailyReminderService.getReminderSettings();
-      if (mounted) {
-        setState(() {
-          _isReminderEnabled = settings['enabled'] ?? false;
-          _selectedTime = TimeOfDay(
-            hour: settings['hour'] ?? 8,
-            minute: settings['minute'] ?? 0,
-          );
-          _isLoading = false;
-        });
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _isReminderEnabled = settings['enabled'] ?? false;
+        _selectedTime = TimeOfDay(
+          hour: settings['hour'] ?? 8,
+          minute: settings['minute'] ?? 0,
+        );
+      });
     } catch (e) {
-      print('Error loading reminder settings: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      debugPrint('Error loading reminder settings: $e');
     }
+  }
+
+  List<Permission> _requiredPermissions() {
+    final list = <Permission>[Permission.notification];
+    if (_isAndroid12Plus) {
+      list.add(Permission.scheduleExactAlarm);
+    }
+    return list;
   }
 
   Future<void> _checkPermissions() async {
     try {
-      final permissions = [
-        Permission.notification,
-        Permission.scheduleExactAlarm,
-      ];
+      final permissions = _requiredPermissions();
 
       final statuses = await Future.wait(
         permissions.map((permission) => permission.status),
       );
 
-      if (mounted) {
-        setState(() {
-          _permissionStatuses = Map.fromIterables(permissions, statuses);
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _permissionStatuses = Map.fromIterables(permissions, statuses);
+      });
     } catch (e) {
-      print('Error checking permissions: $e');
-      if (mounted) {
-        setState(() {
-          _permissionStatuses = {};
-        });
-      }
+      debugPrint('Error checking permissions: $e');
+      if (!mounted) return;
+      setState(() {
+        _permissionStatuses = {};
+      });
     }
   }
 
@@ -95,8 +129,10 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     final status = await permission.request();
     await _checkPermissions();
 
+    if (!mounted) return;
+
     // Show message if permanently denied
-    if (status.isPermanentlyDenied && mounted) {
+    if (status.isPermanentlyDenied) {
       _showPermissionDeniedDialog(permission);
     }
   }
@@ -117,22 +153,20 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const Color(0xFF121212),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           'অনুমতি প্রয়োজন',
           style: TextStyle(color: Color(0xFFD4AF37)),
         ),
         content: Text(
           '$permissionName অনুমতি সেটিংস থেকে দিতে হবে।',
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white70, height: 1.35),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'বাতিল',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('বাতিল', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -156,9 +190,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     );
 
     if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
+      setState(() => _selectedTime = picked);
 
       if (_isReminderEnabled) {
         await _scheduleReminder();
@@ -167,41 +199,38 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   }
 
   Future<void> _toggleReminder(bool value) async {
-    setState(() {
-      _isReminderEnabled = value;
-    });
+    setState(() => _isReminderEnabled = value);
 
     if (value) {
       // Check permissions first
       final notificationGranted =
           _permissionStatuses[Permission.notification]?.isGranted ?? false;
-      final alarmGranted =
-          _permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ??
-              false;
 
       if (!notificationGranted) {
         await _requestPermission(Permission.notification);
         await _checkPermissions();
-        if (!(_permissionStatuses[Permission.notification]?.isGranted ??
-            false)) {
-          setState(() {
-            _isReminderEnabled = false;
-          });
+        final ok = _permissionStatuses[Permission.notification]?.isGranted ?? false;
+        if (!ok) {
+          if (mounted) setState(() => _isReminderEnabled = false);
           _showSnackBar('নোটিফিকেশন অনুমতি দিন');
           return;
         }
       }
 
-      if (!alarmGranted) {
-        await _requestPermission(Permission.scheduleExactAlarm);
-        await _checkPermissions();
-        if (!(_permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ??
-            false)) {
-          setState(() {
-            _isReminderEnabled = false;
-          });
-          _showSnackBar('সঠিক সময়ে অ্যালার্ম অনুমতি দিন');
-          return;
+      if (_isAndroid12Plus) {
+        final alarmGranted =
+            _permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ?? false;
+
+        if (!alarmGranted) {
+          await _requestPermission(Permission.scheduleExactAlarm);
+          await _checkPermissions();
+          final ok =
+              _permissionStatuses[Permission.scheduleExactAlarm]?.isGranted ?? false;
+          if (!ok) {
+            if (mounted) setState(() => _isReminderEnabled = false);
+            _showSnackBar('সঠিক সময়ে অ্যালার্ম অনুমতি দিন');
+            return;
+          }
         }
       }
 
@@ -228,15 +257,17 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   }
 
   void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: const Color(0xFF2A2A2A),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFFD4AF37),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(12),
+      ),
+    );
   }
 
   Future<void> _testNotification() async {
@@ -261,8 +292,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const Color(0xFF0A0A0A),
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
           onPressed: () => Navigator.pop(context),
@@ -271,174 +303,50 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           'রিমাইন্ডার সেটিংস',
           style: TextStyle(
             color: Color(0xFFD4AF37),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.2,
           ),
         ),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
-            )
-          : RefreshIndicator(
-              onRefresh: _checkPermissions,
-              color: const Color(0xFFD4AF37),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF0A0A0A),
+              Color(0xFF0F0F0F),
+              Color(0xFF0A0A0A),
+            ],
+          ),
+        ),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+              )
+            : RefreshIndicator(
+                onRefresh: _checkPermissions,
+                color: const Color(0xFFD4AF37),
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
                   children: [
-                    // Info Card
-                    _buildInfoCard(),
-
-                    const SizedBox(height: 20),
-
-                    // Permission Status Section
+                    // Permission Section
                     _buildPermissionSection(),
-
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // OEM Settings Card
                     _buildOemSettingsCard(),
-
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Test Notification Button
                     _buildTestButton(),
-
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 28),
                   ],
                 ),
               ),
-            ),
-    );
-  }
-
-  Widget _buildInfoCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'নোটিফিকেশন সঠিকভাবে কাজ করতে নিচের অনুমতিগুলো দিন',
-              style: TextStyle(
-                color: Color(0xFFD4AF37),
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReminderCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
-      ),
-      child: Column(
-        children: [
-          // Toggle Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_active,
-                      color: Color(0xFFD4AF37),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'রিমাইন্ডার সক্রিয়',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              Switch(
-                value: _isReminderEnabled,
-                onChanged: _toggleReminder,
-                activeColor: const Color(0xFFD4AF37),
-              ),
-            ],
-          ),
-
-          if (_isReminderEnabled) ...[
-            const Divider(color: Color(0xFF2A2A2A), height: 24),
-
-            // Time Selector
-            InkWell(
-              onTap: _selectTime,
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.access_time,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'রিমাইন্ডার সময়',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          _formatTime(_selectedTime),
-                          style: const TextStyle(
-                            color: Color(0xFFD4AF37),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.edit,
-                          color: Color(0xFFD4AF37),
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -448,61 +356,73 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 8),
+          padding: EdgeInsets.only(left: 2, bottom: 10),
           child: Text(
             'অনুমতি স্থিতি',
             style: TextStyle(
               color: Color(0xFFD4AF37),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.2,
             ),
           ),
         ),
         _buildPermissionTile(
-          Permission.notification,
-          'নোটিফিকেশন',
-          'রিমাইন্ডার দেখানোর জন্য প্রয়োজন',
-          Icons.notifications,
+          permission: Permission.notification,
+          title: 'নোটিফিকেশন',
+          description: 'রিমাইন্ডার দেখানোর জন্য প্রয়োজন',
+          icon: Icons.notifications,
         ),
-        const SizedBox(height: 8),
-        _buildPermissionTile(
-          Permission.scheduleExactAlarm,
-          'সঠিক সময়ে অ্যালার্ম',
-          'নির্দিষ্ট সময়ে রিমাইন্ডার পাঠাতে প্রয়োজন',
-          Icons.alarm,
-        ),
+        const SizedBox(height: 10),
+        if (_isAndroid12Plus)
+          _buildPermissionTile(
+            permission: Permission.scheduleExactAlarm,
+            title: 'সঠিক সময়ে অ্যালার্ম',
+            description: 'নির্দিষ্ট সময়ে রিমাইন্ডার পাঠাতে প্রয়োজন',
+            icon: Icons.alarm,
+          ),
+        if (!_isAndroid12Plus)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'ℹ️ আপনার ডিভাইসে (Android 12-এর কম) Exact Alarm অনুমতি দরকার নেই।',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.55),
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildPermissionTile(
-    Permission permission,
-    String title,
-    String description,
-    IconData icon,
-  ) {
+  Widget _buildPermissionTile({
+    required Permission permission,
+    required String title,
+    required String description,
+    required IconData icon,
+  }) {
     final status = _permissionStatuses[permission];
     final isGranted = status?.isGranted ?? false;
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A2A)),
-      ),
+    final badgeColor = isGranted ? const Color(0xFFD4AF37) : const Color(0xFFFF5A5A);
+
+    return _PremiumCard(
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: (isGranted ? const Color(0xFFD4AF37) : Colors.red),
-              borderRadius: BorderRadius.circular(8),
+              color: badgeColor.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: badgeColor.withOpacity(0.24)),
             ),
             child: Icon(
               icon,
-              color: Colors.black,
-              size: 24,
+              color: badgeColor,
+              size: 20,
             ),
           ),
           const SizedBox(width: 12),
@@ -510,51 +430,63 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.8,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: badgeColor.withOpacity(0.22)),
+                      ),
+                      child: Text(
+                        isGranted ? 'Granted' : 'Required',
+                        style: TextStyle(
+                          color: badgeColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.15,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 6),
                 Text(
                   description,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isGranted ? '✓ অনুমতি দেওয়া হয়েছে' : '✗ অনুমতি প্রয়োজন',
-                  style: TextStyle(
-                    color: isGranted ? const Color(0xFFD4AF37) : Colors.red,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.white.withOpacity(0.65),
+                    fontSize: 12.2,
+                    height: 1.25,
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 10),
           if (!isGranted)
             ElevatedButton(
-              onPressed: () {
-                _requestPermission(permission);
-              },
+              onPressed: () => _requestPermission(permission),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD4AF37),
                 foregroundColor: Colors.black,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
                 'দিন',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
               ),
             ),
         ],
@@ -563,76 +495,86 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   }
 
   Widget _buildOemSettingsCard() {
-    return Container(
+    return _PremiumCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      accent: const Color(0xFFFFB020),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.warning_amber, color: Colors.red),
-              SizedBox(width: 8),
-              Expanded(
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB020).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFFFB020).withOpacity(0.22),
+                  ),
+                ),
+                child: const Icon(Icons.tips_and_updates, color: Color(0xFFFFB020), size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
                 child: Text(
                   'নোটিফিকেশন কাজ না করলে',
                   style: TextStyle(
                     color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'উপরের পার্মিশন দেওয়ার পরেও নোটিফিকেশন কাজ না করলে আপনার ডিভাইস অনুযায়ী নিচের অপশনগুলো চেক করুন। অনেক ব্র্যান্ডের ফোনে বিশেষ সেটিংস থাকে যা ম্যানুয়ালি পরিবর্তন করতে হয়। গাইড অনুযায়ী আপনার ফোনে যে যে অপশন খুজে পান সেগুলো চেক করুন।',
+          const SizedBox(height: 10),
+          Text(
+            'কিছু ফোনে (বিশেষ করে Xiaomi / Samsung / Oppo ইত্যাদি) Battery/Auto-start সেটিংসের কারণে নোটিফিকেশন delay বা off থাকতে পারে। নিচের গাইড থেকে আপনার ডিভাইস অনুযায়ী অপশনগুলো চেক করুন।',
             style: TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
+              color: Colors.white.withOpacity(0.68),
+              fontSize: 12.6,
+              height: 1.35,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Auto-detect button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _showDeviceSpecificGuide,
-              icon: const Icon(Icons.phone_android),
-              label: const Text('আমার ফোনের জন্য গাইড দেখান'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.all(14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+          // Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _showDeviceSpecificGuide,
+                  icon: const Icon(Icons.phone_android),
+                  label: const Text('আমার ফোন'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD4AF37),
+                    foregroundColor: Colors.black,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // All brands button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: _showAllBrandsGuide,
-              icon: const Icon(Icons.list_alt),
-              label: const Text('সব ব্র্যান্ডের গাইড দেখান'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white70,
-                side: const BorderSide(color: Colors.white30),
-                padding: const EdgeInsets.all(14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _showAllBrandsGuide,
+                  icon: const Icon(Icons.list_alt),
+                  label: const Text('সব ব্র্যান্ড'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(color: Colors.white.withOpacity(0.18)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -650,6 +592,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       model = androidInfo.model;
     } catch (e) {
       brand = 'unknown';
+      debugPrint('Device info error: $e');
     }
 
     if (!mounted) return;
@@ -658,10 +601,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _DeviceGuideSheet(
-        brand: brand,
-        model: model,
-      ),
+      builder: (context) => _DeviceGuideSheet(brand: brand, model: model),
     );
   }
 
@@ -684,9 +624,10 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFD4AF37),
           foregroundColor: Colors.black,
+          elevation: 0,
           padding: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),
@@ -694,7 +635,89 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
   }
 }
 
+/// Premium reusable card (subtle 3D: light shadow + border + gradient feel)
+class _PremiumCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsets padding;
+  final Color? accent;
+
+  const _PremiumCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(14),
+    this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final a = accent ?? const Color(0xFFD4AF37);
+
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: const Color(0xFF141414),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.07)),
+        boxShadow: [
+          // very subtle shadow (as you requested)
+          BoxShadow(
+            color: Colors.black.withOpacity(0.28),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+          // tiny top highlight to feel "raised"
+          BoxShadow(
+            color: a.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF151515),
+            const Color(0xFF111111),
+            const Color(0xFF141414),
+          ],
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// Small glowing icon block (premium touch but not too much)
+class _GlowIcon extends StatelessWidget {
+  final IconData icon;
+  final double size;
+
+  const _GlowIcon({required this.icon, this.size = 44});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFD4AF37).withOpacity(0.10),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.22)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: const Icon(Icons.notifications_active, color: Color(0xFFD4AF37), size: 22),
+    );
+  }
+}
+
+// ================================
 // Device-specific guide sheet
+// ================================
 class _DeviceGuideSheet extends StatelessWidget {
   final String brand;
   final String model;
@@ -707,10 +730,10 @@ class _DeviceGuideSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
+      height: MediaQuery.of(context).size.height * 0.86,
       decoration: const BoxDecoration(
-        color: Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Color(0xFF121212),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Column(
         children: [
@@ -718,9 +741,11 @@ class _DeviceGuideSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.1),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
+              color: const Color(0xFFD4AF37).withOpacity(0.08),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+              border: Border(
+                bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
+              ),
             ),
             child: Column(
               children: [
@@ -732,7 +757,7 @@ class _DeviceGuideSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     const Icon(Icons.phone_android, color: Color(0xFFD4AF37)),
@@ -745,15 +770,15 @@ class _DeviceGuideSheet extends StatelessWidget {
                             _getBrandDisplayName(brand),
                             style: const TextStyle(
                               color: Color(0xFFD4AF37),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                           Text(
                             model,
                             style: const TextStyle(
                               color: Colors.white70,
-                              fontSize: 14,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -776,21 +801,13 @@ class _DeviceGuideSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Common settings first
-                  _buildSectionTitle(
-                      'সব Android ফোনের জন্য (আগে এগুলো চেক করুন)'),
+                  _buildSectionTitle('সব Android ফোনের জন্য (আগে এগুলো চেক করুন)'),
                   _buildCommonSettings(),
-
-                  const SizedBox(height: 24),
-
-                  // Brand specific
-                  _buildSectionTitle(
-                      '${_getBrandDisplayName(brand)} এর জন্য বিশেষ সেটিংস'),
+                  const SizedBox(height: 22),
+                  _buildSectionTitle('${_getBrandDisplayName(brand)} এর জন্য বিশেষ সেটিংস'),
                   _buildBrandSpecificSettings(brand),
+                  const SizedBox(height: 22),
 
-                  const SizedBox(height: 24),
-
-                  // Open settings button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -800,14 +817,15 @@ class _DeviceGuideSheet extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD4AF37),
                         foregroundColor: Colors.black,
+                        elevation: 0,
                         padding: const EdgeInsets.all(14),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 28),
                 ],
               ),
             ),
@@ -859,8 +877,8 @@ class _DeviceGuideSheet extends StatelessWidget {
         title,
         style: const TextStyle(
           color: Color(0xFFD4AF37),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+          fontSize: 14.5,
+          fontWeight: FontWeight.w900,
         ),
       ),
     );
@@ -1174,19 +1192,31 @@ class _DeviceGuideSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem(String title, String description,
-      {bool isImportant = false}) {
+  Widget _buildSettingItem(
+    String title,
+    String description, {
+    bool isImportant = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isImportant
-            ? const Color(0xFFD4AF37).withOpacity(0.15)
-            : const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(8),
-        border: isImportant
-            ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5))
-            : null,
+            ? const Color(0xFFD4AF37).withOpacity(0.12)
+            : const Color(0xFF1B1B1B),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isImportant
+              ? const Color(0xFFD4AF37).withOpacity(0.28)
+              : Colors.white.withOpacity(0.06),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1195,8 +1225,8 @@ class _DeviceGuideSheet extends StatelessWidget {
             title,
             style: TextStyle(
               color: isImportant ? const Color(0xFFD4AF37) : Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 6),
@@ -1204,8 +1234,8 @@ class _DeviceGuideSheet extends StatelessWidget {
             description,
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 13,
-              height: 1.4,
+              fontSize: 12.8,
+              height: 1.35,
             ),
           ),
         ],
@@ -1214,7 +1244,9 @@ class _DeviceGuideSheet extends StatelessWidget {
   }
 }
 
+// ================================
 // All brands guide sheet with tabs
+// ================================
 class _AllBrandsGuideSheet extends StatefulWidget {
   const _AllBrandsGuideSheet();
 
@@ -1253,19 +1285,21 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
+      height: MediaQuery.of(context).size.height * 0.86,
       decoration: const BoxDecoration(
-        color: Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Color(0xFF121212),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Column(
         children: [
-          // Header
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF0A0A0A),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A0A0A),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+              border: Border(
+                bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
+              ),
             ),
             child: Column(
               children: [
@@ -1277,7 +1311,7 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     const Icon(Icons.list_alt, color: Color(0xFFD4AF37)),
@@ -1287,8 +1321,8 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
                         'ব্র্যান্ড অনুযায়ী গাইড',
                         style: TextStyle(
                           color: Color(0xFFD4AF37),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
@@ -1302,7 +1336,6 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
             ),
           ),
 
-          // Tab Bar
           Container(
             color: const Color(0xFF0A0A0A),
             child: TabBar(
@@ -1312,15 +1345,10 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
               labelColor: const Color(0xFFD4AF37),
               unselectedLabelColor: Colors.white54,
               tabAlignment: TabAlignment.start,
-              tabs: _brands
-                  .map((brand) => Tab(
-                        text: brand['name'],
-                      ))
-                  .toList(),
+              tabs: _brands.map((b) => Tab(text: b['name'])).toList(),
             ),
           ),
 
-          // Tab Content
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -1343,326 +1371,331 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
   }
 
   Widget _buildCommonTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('সব Android ফোনে আগে এগুলো চেক করুন'),
-          const SizedBox(height: 16),
-          _buildStep(
-              'A) App Notifications',
-              'Settings → Apps → আমল ট্র্যাকার → Notifications\n'
-                  '• Allow notifications = ON\n'
-                  '• Lock screen / Pop-up / Banner / Sound = ON'),
-          _buildStep(
-              'B) Battery Optimization বন্ধ',
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-                  '• Unrestricted / Don\'t optimize সিলেক্ট করুন'),
-          _buildStep(
-              'C) Background Data',
-              'Settings → Apps → আমল ট্র্যাকার → Mobile data & Wi-Fi\n'
-                  '• Background data = ON\n'
-                  '• Unrestricted data usage = ON'),
-          _buildStep(
-              'D) Unused app বন্ধ',
-              'App info → আমল ট্র্যাকার\n'
-                  '• Pause app activity if unused = OFF\n'
-                  '• Remove permissions if unused = OFF'),
-          _buildStep('E) Do Not Disturb',
-              'Do Not Disturb / Focus mode OFF রাখুন অথবা exception এ যোগ করুন'),
-          _buildStep(
-              'F) Exact Alarm (Android 12+)',
-              'Settings → Special app access → Alarms & reminders\n'
-                  '• Allow'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'সব Android ফোনে আগে এগুলো চেক করুন',
+      steps: const [
+        _GuideStep(
+          title: 'A) App Notifications',
+          desc:
+              'Settings → Apps → আমল ট্র্যাকার → Notifications\n• Allow notifications = ON\n• Lock screen / Pop-up / Banner / Sound = ON',
+        ),
+        _GuideStep(
+          title: 'B) Battery Optimization বন্ধ',
+          desc:
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted / Don\'t optimize সিলেক্ট করুন',
+        ),
+        _GuideStep(
+          title: 'C) Background Data',
+          desc:
+              'Settings → Apps → আমল ট্র্যাকার → Mobile data & Wi-Fi\n• Background data = ON\n• Unrestricted data usage = ON',
+        ),
+        _GuideStep(
+          title: 'D) Unused app বন্ধ',
+          desc:
+              'App info → আমল ট্র্যাকার\n• Pause app activity if unused = OFF\n• Remove permissions if unused = OFF',
+        ),
+        _GuideStep(
+          title: 'E) Do Not Disturb',
+          desc: 'Do Not Disturb / Focus mode OFF রাখুন অথবা exception এ যোগ করুন',
+        ),
+        _GuideStep(
+          title: 'F) Exact Alarm (Android 12+)',
+          desc:
+              'Settings → Special app access → Alarms & reminders\n• Allow',
+        ),
+      ],
     );
   }
 
   Widget _buildXiaomiTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Xiaomi / Redmi / Poco (MIUI / HyperOS)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
-              'Settings → Apps → Permissions → Autostart / Background autostart\n'
-                  '• আমল ট্র্যাকার = ON ✅',
-              isImportant: true),
-          _buildStep(
-              'Battery Settings',
-              'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n'
-                  '• No restrictions / Unrestricted\n'
-                  '• Allow background activity = ON'),
-          _buildStep('Recents Lock',
-              'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস করুন → Lock icon এ ট্যাপ'),
-          _buildStep(
-              'Security App',
-              'Security app → Battery → App battery saver\n'
-                  '• No restrictions\n'
-                  '• "Clear cache/Boost speed" এ আমল ট্র্যাকার exclude করুন'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Xiaomi / Redmi / Poco (MIUI / HyperOS)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
+          desc:
+              'Settings → Apps → Permissions → Autostart / Background autostart\n• আমল ট্র্যাকার = ON ✅',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery Settings',
+          desc:
+              'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n• No restrictions / Unrestricted\n• Allow background activity = ON',
+        ),
+        _GuideStep(
+          title: 'Recents Lock',
+          desc:
+              'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস করুন → Lock icon এ ট্যাপ',
+        ),
+        _GuideStep(
+          title: 'Security App',
+          desc:
+              'Security app → Battery → App battery saver\n• No restrictions\n• "Clear cache/Boost speed" এ আমল ট্র্যাকার exclude করুন',
+        ),
+      ],
     );
   }
 
   Widget _buildSamsungTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Samsung (One UI)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Sleeping Apps বন্ধ',
-              'Settings → Battery → Background usage limits\n'
-                  '• Put unused apps to sleep = OFF\n'
-                  '• Sleeping apps / Deep sleeping apps এ থাকলে Remove করুন',
-              isImportant: true),
-          _buildStep(
-              'Battery',
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-                  '• Unrestricted'),
-          _buildStep(
-              'Notifications',
-              'Settings → Notifications → App notifications\n'
-                  '• আমল ট্র্যাকার = ON\n'
-                  '• Notification categories এ সব category ON করুন'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Samsung (One UI)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Sleeping Apps বন্ধ',
+          desc:
+              'Settings → Battery → Background usage limits\n• Put unused apps to sleep = OFF\n• Sleeping apps / Deep sleeping apps এ থাকলে Remove করুন',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery',
+          desc:
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted',
+        ),
+        _GuideStep(
+          title: 'Notifications',
+          desc:
+              'Settings → Notifications → App notifications\n• আমল ট্র্যাকার = ON\n• Notification categories এ সব category ON করুন',
+        ),
+      ],
     );
   }
 
   Widget _buildOnePlusTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('OnePlus (OxygenOS)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Auto-launch Enable',
-              'Settings → Apps → Special app access → Auto-launch\n'
-                  '• আমল ট্র্যাকার = Enable\n'
-                  '• Secondary launch / Background launch = Allow',
-              isImportant: true),
-          _buildStep(
-              '⭐ Deep Optimization বন্ধ',
-              'Settings → Battery → Deep optimization\n'
-                  '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
-              isImportant: true),
-          _buildStep(
-              'Battery Optimization',
-              'Settings → Battery → Battery optimization\n'
-                  '• আমল ট্র্যাকার → Don\'t optimize'),
-          _buildStep('Recents Lock', 'Recents → Lock (কিছু মডেলে আছে)'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'OnePlus (OxygenOS)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Auto-launch Enable',
+          desc:
+              'Settings → Apps → Special app access → Auto-launch\n• আমল ট্র্যাকার = Enable\n• Secondary launch / Background launch = Allow',
+          important: true,
+        ),
+        _GuideStep(
+          title: '⭐ Deep Optimization বন্ধ',
+          desc:
+              'Settings → Battery → Deep optimization\n• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery Optimization',
+          desc:
+              'Settings → Battery → Battery optimization\n• আমল ট্র্যাকার → Don\'t optimize',
+        ),
+        _GuideStep(title: 'Recents Lock', desc: 'Recents → Lock (কিছু মডেলে আছে)'),
+      ],
     );
   }
 
   Widget _buildOppoTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Oppo / Realme (ColorOS / Realme UI)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Auto-launch / Startup',
-              'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
-                  '• আমল ট্র্যাকার = Enable\n'
-                  '• Secondary launch / Background launch = Allow',
-              isImportant: true),
-          _buildStep(
-              'Battery Optimization',
-              'Settings → Battery → Battery optimization\n'
-                  '• আমল ট্র্যাকার → Don\'t optimize'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Oppo / Realme (ColorOS / Realme UI)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Auto-launch / Startup',
+          desc:
+              'Settings → Apps → Special app access → Auto-launch / Startup manager\n• আমল ট্র্যাকার = Enable\n• Secondary launch / Background launch = Allow',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery Optimization',
+          desc:
+              'Settings → Battery → Battery optimization\n• আমল ট্র্যাকার → Don\'t optimize',
+        ),
+      ],
     );
   }
 
   Widget _buildVivoTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Vivo / iQOO (Funtouch OS)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Auto-start',
-              'Settings → Battery → Background power consumption management / Autostart\n'
-                  '• আমল ট্র্যাকার = Allow',
-              isImportant: true),
-          _buildStep(
-              'High Background Power',
-              'Settings → Battery → High background power consumption\n'
-                  '• আমল ট্র্যাকার = Allow / Don\'t restrict'),
-          _buildStep(
-              'Battery Optimization',
-              'Apps → আমল ট্র্যাকার → Battery\n'
-                  '• No restrictions'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Vivo / iQOO (Funtouch OS)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Auto-start',
+          desc:
+              'Settings → Battery → Background power consumption management / Autostart\n• আমল ট্র্যাকার = Allow',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'High Background Power',
+          desc:
+              'Settings → Battery → High background power consumption\n• আমল ট্র্যাকার = Allow / Don\'t restrict',
+        ),
+        _GuideStep(
+          title: 'Battery Optimization',
+          desc: 'Apps → আমল ট্র্যাকার → Battery\n• No restrictions',
+        ),
+      ],
     );
   }
 
   Widget _buildHuaweiTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Huawei / Honor (EMUI / MagicOS)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ App Launch (Manual)',
-              'Settings → Apps → App launch → আমল ট্র্যাকার\n'
-                  '• Manage manually = ON\n'
-                  '• Auto-launch = ON\n'
-                  '• Secondary launch = ON\n'
-                  '• Run in background = ON',
-              isImportant: true),
-          _buildStep(
-              'Battery Optimization',
-              'Battery optimization\n'
-                  '• Don\'t allow optimize / Unrestricted'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Huawei / Honor (EMUI / MagicOS)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ App Launch (Manual)',
+          desc:
+              'Settings → Apps → App launch → আমল ট্র্যাকার\n• Manage manually = ON\n• Auto-launch = ON\n• Secondary launch = ON\n• Run in background = ON',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery Optimization',
+          desc: 'Battery optimization\n• Don\'t allow optimize / Unrestricted',
+        ),
+      ],
     );
   }
 
   Widget _buildPixelTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoCard('Google Pixel / Stock Android'),
-          const SizedBox(height: 16),
-          _buildStep(
-              'Battery Optimization',
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-                  '• Unrestricted'),
-          _buildStep(
-              'Battery Saver',
-              'Settings → Battery → Battery Saver\n'
-                  '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)'),
-          _buildStep(
-              'Exact Alarm',
-              'Settings → Apps → Special app access → Alarms & reminders\n'
-                  '• আমল ট্র্যাকার = Allow'),
-          const SizedBox(height: 40),
-        ],
-      ),
+    return _GuideTab(
+      title: 'Google Pixel / Stock Android',
+      steps: const [
+        _GuideStep(
+          title: 'Battery Optimization',
+          desc:
+              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted',
+        ),
+        _GuideStep(
+          title: 'Battery Saver',
+          desc: 'Settings → Battery → Battery Saver\n• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)',
+        ),
+        _GuideStep(
+          title: 'Exact Alarm',
+          desc:
+              'Settings → Apps → Special app access → Alarms & reminders\n• আমল ট্র্যাকার = Allow',
+        ),
+      ],
     );
   }
 
   Widget _buildTecnoTab() {
+    return _GuideTab(
+      title: 'Tecno / Infinix / Itel (HiOS / XOS)',
+      steps: const [
+        _GuideStep(
+          title: '⭐ Auto-start',
+          desc: 'Settings → Apps → Autostart manager\n• আমল ট্র্যাকার = Enable',
+          important: true,
+        ),
+        _GuideStep(
+          title: 'Battery / Power Manager',
+          desc: 'Battery lab / Power manager\n• Don\'t restrict',
+        ),
+        _GuideStep(
+          title: 'Background Activity',
+          desc: 'Allow background activity = ON',
+        ),
+        _GuideStep(
+          title: 'Recents Lock',
+          desc: 'Lock in recent apps (যদি থাকে)',
+        ),
+      ],
+    );
+  }
+}
+
+class _GuideTab extends StatelessWidget {
+  final String title;
+  final List<_GuideStep> steps;
+
+  const _GuideTab({required this.title, required this.steps});
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoCard('Tecno / Infinix / Itel (HiOS / XOS)'),
-          const SizedBox(height: 16),
-          _buildStep(
-              '⭐ Auto-start',
-              'Settings → Apps → Autostart manager\n'
-                  '• আমল ট্র্যাকার = Enable',
-              isImportant: true),
-          _buildStep(
-              'Battery / Power Manager',
-              'Battery lab / Power manager\n'
-                  '• Don\'t restrict'),
-          _buildStep('Background Activity', 'Allow background activity = ON'),
-          _buildStep('Recents Lock', 'Lock in recent apps (যদি থাকে)'),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(String text) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.info_outline, color: Color(0xFFD4AF37), size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Color(0xFFD4AF37),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD4AF37).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.22)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: Color(0xFFD4AF37), size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      color: Color(0xFFD4AF37),
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: 14),
+          ...steps.map((s) => _GuideStepTile(step: s)),
+          const SizedBox(height: 28),
         ],
       ),
     );
   }
+}
 
-  Widget _buildStep(String title, String description,
-      {bool isImportant = false}) {
+class _GuideStep {
+  final String title;
+  final String desc;
+  final bool important;
+
+  const _GuideStep({required this.title, required this.desc, this.important = false});
+}
+
+class _GuideStepTile extends StatelessWidget {
+  final _GuideStep step;
+
+  const _GuideStepTile({required this.step});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = step.important ? const Color(0xFFD4AF37) : Colors.white;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isImportant
-            ? const Color(0xFFD4AF37).withOpacity(0.15)
-            : const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: isImportant
-            ? [
-                BoxShadow(
-                  color: const Color(0xFFD4AF37).withOpacity(0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
+        color: step.important
+            ? const Color(0xFFD4AF37).withOpacity(0.10)
+            : const Color(0xFF1B1B1B),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: step.important
+              ? const Color(0xFFD4AF37).withOpacity(0.26)
+              : Colors.white.withOpacity(0.06),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            step.title,
             style: TextStyle(
-              color: isImportant ? const Color(0xFFD4AF37) : Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+              color: step.important ? const Color(0xFFD4AF37) : Colors.white,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            description,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
-              height: 1.4,
+            step.desc,
+            style: TextStyle(
+              color: c.withOpacity(0.72),
+              fontSize: 12.8,
+              height: 1.35,
             ),
           ),
         ],
