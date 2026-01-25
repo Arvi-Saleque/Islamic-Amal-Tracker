@@ -181,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildOptionCard(
             title: 'সংস্করণ',
-            subtitle: 'v1.0.4',
+            subtitle: 'v1.0.8',
             icon: Icons.info,
             onTap: () => _showVersionDialog(context),
           ),
@@ -279,12 +279,12 @@ class SettingsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'সংস্করণ: v1.0.4',
+              'সংস্করণ: v1.0.8',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             const SizedBox(height: 8),
             const Text(
-              'বিল্ড: 6',
+              'বিল্ড: 13',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -368,6 +368,10 @@ class ManualScreen extends StatelessWidget {
             _buildHeaderSection(),
             const SizedBox(height: 24),
             
+            // Reminder Section
+            _buildReminderSection(),
+            const SizedBox(height: 24),
+            
             // Prayer Section
             _buildPrayerSection(),
             const SizedBox(height: 24),
@@ -429,7 +433,7 @@ class ManualScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '🌟 আমল ট্র্যাকার অ্যাপে স্বাগতম',
+            '🌟 আমল ট্র্যাকার - ব্যবহারের নিয়ম',
             style: TextStyle(
               color: Color(0xFFD4AF37),
               fontSize: 18,
@@ -438,7 +442,7 @@ class ManualScreen extends StatelessWidget {
           ),
           SizedBox(height: 12),
           Text(
-            'এই অ্যাপটি আপনার দৈনন্দিন ইবাদত, আমল এবং ইসলামিক কাজকর্ম ট্র্যাক করতে সাহায্য করবে। নিচে প্রতিটি ফিচারের বিস্তারিত বর্ণনা দেওয়া হলো।',
+            'এই অ্যাপটি আপনার দৈনন্দিন ইবাদত ট্র্যাক করার জন্য তৈরি। নামাজের সময় আপনার লোকেশন অনুযায়ী সঠিক ক্যালকুলেশন, স্মার্ট রিমাইন্ডার সিস্টেম এবং বিস্তারিত আমল ট্র্যাকিং সুবিধা পাবেন।',
             style: TextStyle(
               color: Colors.grey,
               fontSize: 14,
@@ -450,56 +454,142 @@ class ManualScreen extends StatelessWidget {
     );
   }
 
+  static Widget _buildReminderSection() {
+    return _buildFeatureCard(
+      icon: '🔔',
+      title: 'স্মার্ট রিমাইন্ডার সিস্টেম',
+      color: Colors.green,
+      children: [
+        _buildSubSection(
+          title: '🎯 রিমাইন্ডার প্রকার:',
+          items: [
+            '🔥 ডিফল্ট রিমাইন্ডার: ৮টি সময়ে স্বয়ংক্রিয়ভাবে সক্রিয়',
+            '⚙️ ব্যক্তিগত রিমাইন্ডার: আপনার নিজস্ব সময় সেট করুন',
+            '🎨 কাস্টম রিমাইন্ডার: যেকোনো আমলের জন্য',
+            '📅 পুনরাবৃত্তি: প্রতিদিন, নির্দিষ্ট দিন বা একবার',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🕌 ডিফল্ট নামাজ রিমাইন্ডার (সবসময় সক্রিয়):',
+          items: [
+            '🌅 ফজরের ৩০ মিনিট পর - সকালের যিকিরের জন্য',
+            '☀️ যোহরের ৬০ মিনিট পর - দুপুরের আমলের জন্য',
+            '🌤️ আসরের ১৫ মিনিট পর - বিকেলের দোয়ার জন্য',
+            '🌅 মাগরিবের ১০ মিনিট পর - সন্ধ্যার যিকির',
+            '🌙 ইশার ৬০ মিনিট পর - রাতের ইবাদতের জন্য',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📿 ডিফল্ট যিকির ও আমল রিমাইন্ডার:',
+          items: [
+            '🌅 সকালের যিকির: ফজরের ৬০ মিনিট পর',
+            '🌆 সন্ধ্যার যিকির: মাগরিবের ৩০ মিনিট পর',
+            '⭐ দৈনিক আমল: প্রতিদিন রাত ১০:০০ টায়',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '⚙️ ব্যক্তিগত রিমাইন্ডার সেটিংস:',
+          items: [
+            'সেটিংস → রিমাইন্ডারস → ব্যক্তিগত ট্যাব',
+            'দৈনিক আমল, সকাল/সন্ধ্যা যিকির, নামাজের সময়',
+            'আপনার সুবিধামত সময় পরিবর্তন করুন',
+            'জামাত/স্থানীয় সময় অনুযায়ী adjustment',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🎨 কাস্টম রিমাইন্ডার তৈরি:',
+          items: [
+            'সেটিংস → রিমাইন্ডারস → কাস্টম ট্যাব',
+            'রিমাইন্ডারের নাম, সময় ও বিবরণ লিখুন',
+            'সপ্তাহের নির্দিষ্ট দিন সিলেক্ট করুন',
+            'নামাজের সময়ের সাথে offset করে সেট করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🔕 রিমাইন্ডার সমস্যা সমাধান:',
+          items: [
+            'ফোনের ব্যাটারি সেটিংসে "Background restriction" OFF করুন',
+            'Notification permission allow করুন',
+            'Do Not Disturb mode থেকে app কে exclude করুন',
+            'Auto-start permission enable করুন',
+            'Power saving mode এ whitelist করুন',
+          ],
+        ),
+      ],
+    );
+  }
+
   static Widget _buildPrayerSection() {
     return _buildFeatureCard(
       icon: '🕌',
-      title: 'নামাজ ট্র্যাকার',
+      title: 'নামাজের ওয়াক্ত ক্যালকুলেশন',
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '📍 কি করতে পারবেন:',
+          title: '🌍 ওয়াক্ত ক্যালকুলেশন পদ্ধতি:',
           items: [
-            'আপনার লোকেশন অনুযায়ী স্বয়ংক্রিয় নামাজের সময় দেখুন',
-            'পাঁচ ওয়াক্ত নামাজ ট্র্যাক করুন (ফজর, যোহর, আসর, মাগরিব, ইশা)',
-            'প্রতিটি নামাজের জন্য ফরজ + সুন্নত রাকাত আলাদা আলাদা কাউন্ট করুন',
-            'চলমান ওয়াক্ত এবং কতক্ষণ বাকি আছে তা দেখুন',
+            'Calculation Method: Muslim World League (MWL)',
+            'Fajr Angle: 18°, Isha Angle: 17°',
+            'Madhab: Hanafi (Asr calculation)',
+            'High Latitude Rule: Nearest Valid Time',
+            'Coordinates: আপনার GPS location অনুযায়ী',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '⏰ নামাজের সময়:',
+          title: '📍 লোকেশন ও সময় নির্ধারণ:',
           items: [
-            'ফজর: সুবহে সাদিক থেকে সূর্যোদয় পর্যন্ত',
-            'যোহর: সূর্য মধ্যাকাশ পার থেকে আসর পর্যন্ত',
-            'আসর: আসর সময় থেকে সূর্যাস্তের ১৫ মিনিট আগে পর্যন্ত',
-            'মাগরিব: সূর্যাস্ত থেকে ইশা পর্যন্ত',
-            'ইশা: ইশা থেকে পরের দিন ফজর পর্যন্ত',
+            'আপনার বর্তমান GPS coordinates ব্যবহার করে',
+            'Timezone: আপনার ডিভাইসের timezone অনুযায়ী',
+            'প্রতিদিন sunrise/sunset সময় হিসাব করে',
+            'Elevation: Sea level থেকে calculation',
+            'Location permission প্রয়োজন accurate time এর জন্য',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '🚫 নিষিদ্ধ সময় (মাকরূহ ওয়াক্ত):',
+          title: '⏰ প্রতিটি ওয়াক্তের হিসাব:',
           items: [
-            'সূর্যোদয়ের পর ১৫ মিনিট',
-            'যোহরের ১০ মিনিট আগে (যাওয়াল)',
-            'সূর্যাস্তের ১৫ মিনিট আগে',
+            '🌅 ফজর: সুবহে সাদিক (সূর্যের 18° নিচে) থেকে সূর্যোদয়',
+            '☀️ যোহর: সূর্য মধ্যাকাশ অতিক্রম করার পর',
+            '🌤️ আসর: ছায়া দ্বিগুণ হলে (Hanafi method)',
+            '🌅 মাগরিব: সূর্যাস্তের সাথে সাথে',
+            '🌙 ইশা: শাফাক (লাল আলো) অন্তর্ধান (17° angle)',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '✨ নফল সময়:',
+          title: '🚫 মাকরূহ ওয়াক্ত (নিষিদ্ধ সময়):',
           items: [
-            'সূর্যোদয়ের ১৫ মিনিট পর থেকে যোহরের ১০ মিনিট আগে পর্যন্ত',
-            'এই সময়ে শুধু নফল নামাজ পড়া যায়',
+            'সূর্যোদয়ের সময় ও তার পর 15 মিনিট',
+            'যোহরের 10 মিনিট আগে (যাওয়াল)',
+            'সূর্যাস্তের সময় ও তার 15 মিনিট আগে',
+            'এই সময়ে কোনো নফল নামাজ পড়া যায় না',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '📊 হিস্টোরি কোথায় পাবেন:',
+          title: '✨ বিশেষ সময়সূচী:',
           items: [
-            'হোম স্ক্রিনে "Prayer Tracker" কার্ডে ট্যাপ করুন',
-            'পরিসংখ্যান পেজে গিয়ে নামাজের গ্রাফ এবং ক্যালেন্ডার দেখুন',
-            'প্রতিদিনের কত নামাজ পড়েছেন তা দেখতে পারবেন',
+            '🌇 ইশরাক: সূর্যোদয়ের 15 মিনিট পর',
+            '🌅 চাশত: ইশরাক থেকে যাওয়াল পর্যন্ত',
+            '🌙 তাহাজ্জুদ: ইশার পর থেকে ফজর পর্যন্ত',
+            '⭐ নফল: মাকরূহ সময় ছাড়া যেকোনো সময়',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '📊 নামাজ ট্র্যাকিং:',
+          items: [
+            'পাঁচ ওয়াক্ত আলাদা আলাদা মার্ক করুন',
+            'ফরজ + সুন্নত রাকাত গণনা',
+            'জামাত/একাকী নামাজ ট্র্যাক করুন',
+            'চলমান ওয়াক্ত ও অবশিষ্ট সময় দেখুন',
           ],
         ),
       ],
@@ -509,28 +599,35 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildAmalSection() {
     return _buildFeatureCard(
       icon: '✨',
-      title: 'দৈনিক আমল',
+      title: 'দৈনিক আমল ট্র্যাকিং',
       color: const Color(0xFFD4AF37),
       children: [
-        const SizedBox(height: 12),
         _buildSubSection(
-          title: '✅ কিভাবে ব্যবহার করবেন:',
+          title: '📋 প্রিসেট আমল তালিকা:',
           items: [
-            'হোম স্ক্রিনে "Daily Amal" কার্ডে যান',
-            'যে আমল করেছেন সেটার চেকবক্সে টিক দিন',
-            'টিক দিলেই তা সেভ হয়ে যাবে',
-            'পরের দিন সব আমল আবার রিসেট হয়ে যাবে',
-            'নতুন কাস্টম আমল যোগ করুন',
+            'কুরআন তিলাওয়াত, তাহাজ্জুদ, ইস্তিগফার',
+            'সকাল-সন্ধ্যার যিকির, দুরূদ শরীফ',
+            'দান-সাদাকা, পিতামাতার সেবা',
+            'নেক আমলের বিস্তৃত তালিকা',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '📊 হিস্টোরি:',
+          title: '➕ কাস্টম আমল যোগ:',
           items: [
-            'পরিসংখ্যান পেজে "Amal" ট্যাবে যান',
-            'সাপ্তাহিক/মাসিক গ্রাফে আমলের হার দেখুন',
-            'ক্যালেন্ডারে প্রতিদিন কত আমল করেছেন তা দেখুন',
-            'প্রতিটি আমলের আলাদা হিস্টোরি দেখতে পারবেন',
+            'নিজের মতো করে আমল তৈরি করুন',
+            'আমলের নাম, বর্ণনা ও লক্ষ্য সেট করুন',
+            'দৈনিক/সাপ্তাহিক ভিত্তিতে ট্র্যাক করুন',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildSubSection(
+          title: '🎯 প্রগ্রেস ট্র্যাকিং:',
+          items: [
+            'দৈনিক সম্পূর্ণতার হার (%) দেখুন',
+            'সাপ্তাহিক/মাসিক গ্রাফে উন্নতি বুঝুন',
+            'স্ট্রিক (ধারাবাহিকতা) কাউন্টার',
+            'ক্যালেন্ডার ভিউতে হিস্টোরি দেখুন',
           ],
         ),
       ],
@@ -544,33 +641,12 @@ class ManualScreen extends StatelessWidget {
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '🎯 কি করতে পারবেন:',
+          title: '🎯 যিকির ট্র্যাকিং:',
           items: [
-            'ডিফল্ট ৬টি যিকির দিয়ে শুরু করুন',
-            'নতুন কাস্টম যিকির যোগ করুন',
-            'বাটন ক্লিক করে কাউন্ট বাড়ান',
-            'সরাসরি সংখ্যা টাইপ করে দিতে পারবেন',
-            'টার্গেট সেট করুন (যেমন: ১০০ বার)',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '➕ নতুন যিকির যোগ করুন:',
-          items: [
-            'যিকির পেজে + বাটনে ক্লিক করুন',
-            'যিকিরের নাম লিখুন (আরবি/বাংলা)',
-            'টার্গেট সংখ্যা সেট করুন',
-            'Save করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📊 হিস্টোরি:',
-          items: [
-            'পরিসংখ্যান পেজে "Dhikr" ট্যাবে যান',
-            'প্রতিদিন কত যিকির করেছেন গ্রাফে দেখুন',
-            'কোন যিকির কতবার করেছেন তা দেখুন',
-            'সেশন হিস্টোরি দেখতে পারবেন',
+            'ডিফল্ট ৬টি যিকির + কাস্টম যিকির যোগ করুন',
+            'ডিজিটাল তসবিহ - বাটন ক্লিক বা সরাসরি নাম্বার এন্ট্রি',
+            'টার্গেট সেট করুন ও প্রগ্রেস দেখুন',
+            'সেশন হিস্টোরি ও ডেইলি গোল ট্র্যাকিং',
           ],
         ),
       ],
@@ -584,51 +660,12 @@ class ManualScreen extends StatelessWidget {
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '📚 কি কি ট্র্যাক করতে পারবেন:',
+          title: '📚 তিন ধরনের পড়া ট্র্যাক:',
           items: [
-            'কুরআন তিলাওয়াত (পৃষ্ঠা/আয়াত সংখ্যা)',
-            'তাফসীর পড়া (পৃষ্ঠা সংখ্যা)',
-            'হাদীস পড়া (হাদীস সংখ্যা)',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '✍️ কিভাবে রেকর্ড করবেন:',
-          items: [
-            'Reading Tracker পেজে যান',
-            'কুরআন/তাফসীর/হাদীস ট্যাব সিলেক্ট করুন',
-            '+ Add Session বাটনে ক্লিক করুন',
-            'কত পৃষ্ঠা/আয়াত/হাদীস পড়েছেন লিখুন',
-            'ঐচ্ছিক: নোট যোগ করতে পারবেন',
-            'Save করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🎯 লক্ষ্য নির্ধারণ:',
-          items: [
-            'দৈনিক লক্ষ্য সেট করুন',
-            'সাপ্তাহিক/মাসিক লক্ষ্য দেখুন',
-            'কতটা সম্পন্ন হয়েছে প্রগ্রেস বারে দেখুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📖 কুরআন বিশেষ ফিচার:',
-          items: [
-            'সূরা নম্বর এবং আয়াত নম্বর দিয়ে ট্র্যাক করুন',
-            'কতটি সূরা সম্পূর্ণ পড়েছেন দেখুন',
-            'পারা অনুযায়ী প্রগ্রেস দেখতে পারবেন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📊 হিস্টোরি:',
-          items: [
-            'Reading Tracker পেজেই নিচে স্ক্রল করুন',
-            'সব সেশনের লিস্ট দেখুন (তারিখ সহ)',
-            'পরিসংখ্যান পেজে গ্রাফ দেখুন',
-            'মোট কত পড়েছেন তা দেখুন',
+            '📖 কুরআন তিলাওয়াত: পৃষ্ঠা/আয়াত/সূরা ভিত্তিক',
+            '📜 তাফসীর পড়া: পৃষ্ঠা সংখ্যা দিয়ে',
+            '📝 হাদীস পড়া: হাদীস সংখ্যা দিয়ে',
+            'প্রতিটির জন্য আলাদা লক্ষ্য ও প্রগ্রেস বার',
           ],
         ),
       ],
@@ -638,55 +675,16 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildSinTrackerSection() {
     return _buildFeatureCard(
       icon: '⚠️',
-      title: 'গুনাহ ট্র্যাকার',
+      title: 'গুনাহ ট্র্যাকার (ঐচ্ছিক)',
       color: Colors.red,
       children: [
         _buildSubSection(
-          title: '🎯 উদ্দেশ্য:',
+          title: '🎯 উদ্দেশ্য ও ব্যবহার:',
           items: [
-            'নিজের গুনাহ সম্পর্কে সচেতন হওয়া',
-            'গুনাহ থেকে ফিরে আসতে সাহায্য করা',
-            'তওবা এবং ইস্তিগফারের অভ্যাস তৈরি করা',
-            'কোন গুনাহ বেশি হচ্ছে তা চিহ্নিত করা',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📝 কিভাবে রেকর্ড করবেন:',
-          items: [
-            'Sin Tracker পেজে যান',
-            '+ বাটনে ক্লিক করুন',
-            'গুনাহের ক্যাটাগরি সিলেক্ট করুন (ছোট/বড়)',
-            'গুনাহের বর্ণনা লিখুন (ঐচ্ছিক)',
-            'তওবা করেছেন কিনা মার্ক করুন',
-            'Save করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🔒 গোপনীয়তা:',
-          items: [
-            'সব ডাটা শুধুমাত্র আপনার ফোনে সংরক্ষিত',
-            'কোনো তথ্য বাইরে শেয়ার হয় না',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '✅ তওবা ট্র্যাকিং:',
-          items: [
-            'প্রতিটি গুনাহের জন্য তওবা মার্ক করুন',
-            'কতবার তওবা করেছেন তা দেখুন',
-            'তওবার পর পুনরায় করেছেন কিনা ট্র্যাক করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📊 হিস্টোরি ও পরিসংখ্যান:',
-          items: [
-            'Sin Tracker পেজেই সব রেকর্ড দেখুন',
-            'পরিসংখ্যান পেজে গ্রাফ দেখুন',
-            'সপ্তাহ/মাস অনুযায়ী তুলনা করুন',
-            'কোন গুনাহ কমছে/বাড়ছে তা বুঝুন',
+            'নিজের দুর্বলতা চিহ্নিত করা ও তওবায় সাহায্য',
+            'গুনাহের ক্যাটাগরি (ছোট/বড়) ও তওবা ট্র্যাকিং',
+            'সম্পূর্ণ গোপনীয় - শুধু আপনার ডিভাইসে',
+            'পরিসংখ্যানে উন্নতি ও কমার ট্রেন্ড দেখুন',
           ],
         ),
       ],
@@ -700,42 +698,12 @@ class ManualScreen extends StatelessWidget {
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '📈 কি কি দেখতে পারবেন:',
+          title: '📈 ডেটা ভিজুয়ালাইজেশন:',
           items: [
-            'নামাজ, আমল, যিকির, পড়া - সব আলাদা ট্যাবে',
-            'সাপ্তাহিক বার চার্ট',
-            'মাসিক লাইন চার্ট',
-            'বর্তমান মাসের ক্যালেন্ডার ভিউ',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🗓️ ক্যালেন্ডার ফিচার:',
-          items: [
-            'প্রতিদিন কত আমল/নামাজ করেছেন দেখুন',
-            'তারিখে ক্লিক করে বিস্তারিত দেখুন',
-            'কোন দিন বেশি ভালো ছিল তা বুঝুন',
-            'মাস পরিবর্তন করে আগের ডাটা দেখুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📊 গ্রাফ বিশ্লেষণ:',
-          items: [
-            'সাপ্তাহিক: গত ৭ দিনের তুলনা',
-            'মাসিক: পুরো মাসের ট্রেন্ড',
-            'গড় হিসাব দেখুন',
-            'সর্বোচ্চ ও সর্বনিম্ন দিন চিহ্নিত করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🎯 প্রগ্রেস ট্র্যাকিং:',
-          items: [
-            'মোট স্কোর দেখুন',
-            'কমপ্লিশন রেট (%) দেখুন',
-            'স্ট্রিক (পরপর কতদিন) দেখুন',
-            'উন্নতির হার বুঝতে পারবেন',
+            'সাপ্তাহিক বার চার্ট ও মাসিক লাইন চার্ট',
+            'ইন্টারঅ্যাক্টিভ ক্যালেন্ডার ভিউ',
+            'প্রগ্রেস রেট, স্ট্রিক ও সামগ্রিক স্কোর',
+            'নামাজ, আমল, যিকির, পড়া - আলাদা আলাদা ট্যাব',
           ],
         ),
       ],
@@ -745,57 +713,17 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildCloudSyncSection() {
     return _buildFeatureCard(
       icon: '☁️',
-      title: 'ক্লাউড সিঙ্ক ও Backup',
+      title: 'ক্লাউড সিঙ্ক ও ব্যাকআপ',
       color: Colors.blue,
       children: [
         _buildSubSection(
-          title: '🔄 Auto Sync (স্বয়ংক্রিয়):',
+          title: '🔄 স্বয়ংক্রিয় ও ম্যানুয়াল সিঙ্ক:',
           items: [
-            'প্রতিটি ডেটা পরিবর্তন স্বয়ংক্রিয়ভাবে cloud এ sync হয়',
-            'নামাজ mark, আমল check, যিকির save - সব auto sync',
-            'Internet থাকলে সঙ্গে সঙ্গে, না থাকলে queue তে',
-            'কোনো বাটন চাপতে হয় না',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '💾 Manual Backup:',
-          items: [
-            'Profile screen এ যান',
-            'Backup Data বাটনে ট্যাপ করুন',
-            'সব ডেটা Firebase Firestore এ upload হবে',
-            'Success message দেখাবে',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📥 Manual Restore:',
-          items: [
-            'Profile screen এ যান',
-            'Restore Data বাটনে ট্যাপ করুন',
-            'Firestore থেকে সব ডেটা download হবে',
-            'Local Hive database update হবে',
-            'UI refresh হবে',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📱 Multi-Device ব্যবহার:',
-          items: [
-            'একই email/password দিয়ে অন্য device এ login করুন',
-            'স্বয়ংক্রিয়ভাবে সব ডেটা restore হবে',
-            'দুই device এই change করলে auto-sync হবে',
-            'Last-write-wins - সর্বশেষ পরিবর্তন টিকে থাকবে',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📶 Offline Mode:',
-          items: [
-            'Internet ছাড়াই সম্পূর্ণ কাজ করে',
-            'সব ডেটা local এ থাকে',
-            'Internet আসলে auto-sync হয়',
-            '"Syncing..." indicator sync এর সময় দেখাবে',
+            '🔥 অটো সিঙ্ক: প্রতিটি পরিবর্তন তুরন্ত ক্লাউডে',
+            '💾 ম্যানুয়াল ব্যাকআপ: Profile → Backup Data',
+            '📥 রিস্টোর: Profile → Restore Data',
+            '📱 মাল্টি-ডিভাইস: একই একাউন্টে সব ডিভাইসে একই ডেটা',
+            '📶 অফলাইন মোড: ইন্টারনেট ছাড়াই কাজ করে',
           ],
         ),
       ],
@@ -805,35 +733,16 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildSettingsSection() {
     return _buildFeatureCard(
       icon: '⚙️',
-      title: 'সেটিংস কাস্টমাইজ',
+      title: 'সেটিংস ও কাস্টমাইজেশন',
       color: const Color(0xFFD4AF37),
       children: [
         _buildSubSection(
-          title: '🕌 Prayer Time Adjustments:',
+          title: '🔧 প্রধান সেটিংস:',
           items: [
-            'যদি আপনার এলাকায় সময় একটু আলাদা হয়',
-            'সেটিংস → Prayer Time Adjustment',
-            'প্রতিটি নামাজের জন্য +/- minutes করতে পারবেন',
-            'উদাহরণ: ফজর +2 min, মাগরিব -1 min',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '🎨 Theme & Language:',
-          items: [
-            'Dark mode (default - পরিবর্তন করা যায় না এখন)',
-            'Gold accent color (#D4AF37)',
-            'বাংলা ভাষা (default)',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '👤 Profile Management:',
-          items: [
-            'Display Name পরিবর্তন করুন',
-            'Email verification status চেক করুন',
-            'Backup/Restore data manually',
-            'Logout option',
+            '🕌 Prayer Time Adjustment: স্থানীয় সময় অনুযায়ী +/- মিনিট',
+            '🔔 রিমাইন্ডার কাস্টমাইজেশন: ডিফল্ট/ব্যক্তিগত/কাস্টম',
+            '👤 প্রোফাইল ম্যানেজমেন্ট: নাম, ইমেইল ভেরিফিকেশন',
+            '🎨 থিম: ডার্ক মোড উইথ গোল্ড একসেন্ট (#D4AF37)',
           ],
         ),
       ],
@@ -843,56 +752,26 @@ class ManualScreen extends StatelessWidget {
   static Widget _buildTroubleshootingSection(BuildContext context) {
     return _buildFeatureCard(
       icon: '🔧',
-      title: 'সমস্যা সমাধান',
+      title: 'সমস্যা সমাধান (FAQ)',
       color: Colors.orange,
       children: [
         _buildSubSection(
-          title: '📍 Prayer times update হচ্ছে না:',
+          title: '🆘 সাধারণ সমস্যা ও সমাধান:',
           items: [
-            '1. Location permission allow করুন',
-            '2. GPS চালু করুন',
-            '3. Internet connection check করুন',
-            '4. Home screen এ pull down করে refresh করুন',
+            '📍 Prayer times update হচ্ছে না → GPS ও Internet চেক করুন',
+            '☁️ Cloud sync কাজ করছে না → Email verify ও re-login করুন',
+            '🔔 Notification আসছে না → Battery optimization disable করুন',
+            '📊 Statistics খালি → Activity complete করে refresh করুন',
+            '💥 App crash → Clear cache অথবা reinstall করুন',
           ],
         ),
         const SizedBox(height: 12),
         _buildSubSection(
-          title: '☁️ Cloud sync কাজ করছে না:',
+          title: '⚡ পারফরমেন্স টিপস:',
           items: [
-            '1. Internet connection check করুন',
-            '2. Email verified কিনা দেখুন (Profile screen)',
-            '3. Manual backup করে দেখুন',
-            '4. অ্যাপ restart করুন',
-            '5. Re-login করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📊 Statistics খালি দেখাচ্ছে:',
-          items: [
-            '1. অন্তত একটি activity complete করুন',
-            '2. কয়েক সেকেন্ড অপেক্ষা করুন',
-            '3. Weekly/Monthly toggle করুন',
-            '4. Pull down করে refresh করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '💥 App crash হচ্ছে:',
-          items: [
-            '1. সেটিংস → Apps → Clear Cache',
-            '2. App reinstall করুন',
-            '3. Android version check করুন (minimum: 5.0)',
-            '4. Developer কে bug report করুন',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _buildSubSection(
-          title: '📱 Performance Tips:',
-          items: [
-            '• GPS শুধু প্রথমবার চালু রাখুন',
-            '• নিয়মিত statistics check করুন',
-            '• 60%+ daily progress maintain করুন',
+            'Location permission শুধু প্রয়োজনে চালু রাখুন',
+            'Auto-backup এর জন্য stable internet connection নিশ্চিত করুন',
+            'নিয়মিত statistics চেক করে মোটিভেশন বজায় রাখুন',
           ],
         ),
       ],
@@ -971,6 +850,16 @@ class ManualScreen extends StatelessWidget {
               color: Colors.grey,
               fontSize: 12,
               fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            '📚 Technical Reference: নামাজের ওয়াক্ত ক্যালকুলেশন Muslim World League (MWL) standard অনুযায়ী করা হয়েছে, যা বিশ্বব্যাপী স্বীকৃত। GPS coordinates ব্যবহার করে astronomical calculation এর মাধ্যমে সঠিক সময় নির্ধারণ করা হয়।',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 11,
+              fontStyle: FontStyle.italic,
+              height: 1.4,
             ),
           ),
         ],
