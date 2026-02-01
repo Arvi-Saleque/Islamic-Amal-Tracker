@@ -330,67 +330,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         );
       }
     }
-
-    // Default Prayer Reminders (Always active)
-    if (_defaultFajrReminderTime != null) {
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: PrayerName.fajr,
-        hour: _defaultFajrReminderTime!.hour,
-        minute: _defaultFajrReminderTime!.minute,
-      );
-    }
-    if (_defaultZuhrReminderTime != null) {
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: PrayerName.dhuhr,
-        hour: _defaultZuhrReminderTime!.hour,
-        minute: _defaultZuhrReminderTime!.minute,
-      );
-    }
-    if (_defaultAsrReminderTime != null) {
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: PrayerName.asr,
-        hour: _defaultAsrReminderTime!.hour,
-        minute: _defaultAsrReminderTime!.minute,
-      );
-    }
-    if (_defaultMaghribReminderTime != null) {
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: PrayerName.maghrib,
-        hour: _defaultMaghribReminderTime!.hour,
-        minute: _defaultMaghribReminderTime!.minute,
-      );
-    }
-    if (_defaultIshaReminderTime != null) {
-      await DailyReminderService.schedulePrayerReminderAtTime(
-        prayer: PrayerName.isha,
-        hour: _defaultIshaReminderTime!.hour,
-        minute: _defaultIshaReminderTime!.minute,
-      );
-    }
-
-    // Default Dhikr Reminders (Always active)
-    if (_defaultMorningDhikrReminderTime != null) {
-      await DailyReminderService.scheduleMorningDhikrReminder(
-        hour: _defaultMorningDhikrReminderTime!.hour,
-        minute: _defaultMorningDhikrReminderTime!.minute,
-      );
-    }
-    if (_defaultEveningDhikrReminderTime != null) {
-      await DailyReminderService.scheduleEveningDhikrReminder(
-        hour: _defaultEveningDhikrReminderTime!.hour,
-        minute: _defaultEveningDhikrReminderTime!.minute,
-      );
-    }
-
-    // Default Daily Amal Reminder (Always active)
-    if (_defaultDailyAmalReminderTime != null) {
-      await DailyReminderService.scheduleDailyReminder(
-        hour: _defaultDailyAmalReminderTime!.hour,
-        minute: _defaultDailyAmalReminderTime!.minute,
-      );
-    }
-
-    // Custom reminders are scheduled individually when added/updated
   }
 
   Future<void> _selectTime(String type, TimeOfDay currentTime) async {

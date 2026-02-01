@@ -177,7 +177,7 @@ class DailyReminderService {
     await _notifications.zonedSchedule(
       _dailyReminderId,
       '📋 দৈনিক আমল রিমাইন্ডার',
-      'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।',
+      'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করে নিন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -520,7 +520,7 @@ class DailyReminderService {
     await _notifications.zonedSchedule(
       _getPrayerNotificationId(prayer),
       '$emoji $prayerName এর সালাত',
-      '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।',
+      '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
