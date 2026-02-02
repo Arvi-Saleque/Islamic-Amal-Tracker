@@ -1,3 +1,4 @@
+import 'package:amal_tracker/presentation/providers/prayer_times_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -20,6 +21,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _checkAuthAndNavigate();
+    Future.microtask(() {
+      // triggers prayer time loading on app start
+      ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
+    });
   }
 
   Future<void> _checkAuthAndNavigate() async {

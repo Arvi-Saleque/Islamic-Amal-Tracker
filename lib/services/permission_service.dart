@@ -142,10 +142,14 @@ class PermissionService {
       if (context.mounted) {
         _showPermissionDialog(context, notification, alarm);
       }
-    } else {
-      // Permissions are granted, reschedule reminder if needed
+    }  else {
+      // Permissions are granted -> schedule ALWAYS-ON defaults immediately
+      await DailyReminderService.scheduleDefaultDailyAmalReminder();
+
+      // Keep this if you want personal daily reminder to come back automatically if enabled
       await DailyReminderService.rescheduleReminderIfNeeded();
     }
+
   }
 
   static void _showPermissionDialog(
@@ -264,15 +268,23 @@ class PermissionService {
     PermissionStatus alarm,
   ) async {
     if (!notification.isGranted) {
-      await Permission.notification.request();
+      notification = await Permission.notification.request();
     }
     if (!alarm.isGranted) {
-      await Permission.scheduleExactAlarm.request();
+      alarm = await Permission.scheduleExactAlarm.request();
     }
-    
-    // Reschedule reminder if permissions were granted
-    await DailyReminderService.rescheduleReminderIfNeeded();
+
+    // ✅ Only schedule if both permissions are granted
+    if (notification.isGranted && alarm.isGranted) {
+      // Always-on defaults
+      await DailyReminderService.scheduleDefaultDailyAmalReminder();
+
+      // Personal reminders (if enabled in settings)
+      await DailyReminderService.rescheduleReminderIfNeeded();
+      await DailyReminderService.scheduleDefaultRollingWindowFromApi();
+    }
   }
+
 
   /// Check if all required permissions are granted
   static Future<bool> areAllPermissionsGranted() async {

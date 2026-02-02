@@ -131,23 +131,49 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       }
 
       _customReminders = customReminders;
-      
+
       // Set up default prayer reminders
       _defaultFajrReminderTime = _calculateDefaultFajrReminderTime(prayerTimes);
       _defaultZuhrReminderTime = _calculateDefaultZuhrReminderTime(prayerTimes);
       _defaultAsrReminderTime = _calculateDefaultAsrReminderTime(prayerTimes);
       _defaultMaghribReminderTime = _calculateDefaultMaghribReminderTime(prayerTimes);
-      _defaultIshaReminderTime = _calculateDefaultIshaReminderTime(prayerTimes);
-      
+      final isha = prayerTimes?['isha'];
+      final off = _getDefaultPrayerOffset(PrayerName.isha); // isha + 60
+      final ishaDefault = (isha == null)
+          ? const TimeOfDay(hour: 21, minute: 30)
+          : TimeOfDay(
+              hour: ((isha.hour * 60 + isha.minute + off) ~/ 60) % 24,
+              minute: (isha.hour * 60 + isha.minute + off) % 60,
+            );
+      _defaultIshaReminderTime = ishaDefault;
+
       // Set up default dhikr and amal reminders
-      _defaultMorningDhikrReminderTime = _calculateDefaultMorningDhikrReminderTime(prayerTimes);
-      _defaultEveningDhikrReminderTime = _calculateDefaultEveningDhikrReminderTime(prayerTimes);
-      _defaultDailyAmalReminderTime = const TimeOfDay(hour: 22, minute: 0); // Fixed at 10 PM
-      
+      _defaultMorningDhikrReminderTime =
+          _calculateDefaultMorningDhikrReminderTime(prayerTimes);
+      _defaultEveningDhikrReminderTime =
+          _calculateDefaultEveningDhikrReminderTime(prayerTimes);
+      _defaultDailyAmalReminderTime =
+          const TimeOfDay(hour: 22, minute: 0); // Fixed at 10 PM
+
       _isLoading = false;
+
+      _isDailyReminderEnabled = dailySettings['enabled'] ?? false;
+
+      _isMorningDhikrEnabled = dhikrSettings['morningEnabled'] ?? false;
+      _isEveningDhikrEnabled = dhikrSettings['eveningEnabled'] ?? false;
+
+      if (prayerSettings.containsKey('enabled')) {
+      _arePrayerRemindersEnabled = prayerSettings['enabled'] == true;
+    } else {
+      _arePrayerRemindersEnabled = PrayerName.values.any((p) {
+        return prayerSettings['${p.name}_enabled'] == true;
+      });
+    }
+
+
     });
 
-    // Schedule all reminders (always enabled)
+    // Apply schedules based on toggles
     await _scheduleAllReminders();
   }
 
@@ -163,7 +189,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       case PrayerName.maghrib:
         return 10;
       case PrayerName.isha:
-        return 30;
+        return 60;
     }
   }
 
@@ -189,7 +215,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
 
     final offsetMinutes = _getDefaultPrayerOffset(prayer);
 
-    final totalMinutes = prayerDateTime.hour * 60 + prayerDateTime.minute + offsetMinutes;
+    final totalMinutes =
+        prayerDateTime.hour * 60 + prayerDateTime.minute + offsetMinutes;
     final hour = (totalMinutes ~/ 60) % 24;
     final minute = totalMinutes % 60;
 
@@ -232,7 +259,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultFajrReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultFajrReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Fajr + 30 minutes (Always active reminder)
     if (prayerTimes == null || prayerTimes['fajr'] == null) {
       return const TimeOfDay(hour: 6, minute: 30); // Fallback time
@@ -242,7 +270,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultZuhrReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultZuhrReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Zuhr + 60 minutes (Always active reminder)
     if (prayerTimes == null || prayerTimes['dhuhr'] == null) {
       return const TimeOfDay(hour: 14, minute: 30); // Fallback time
@@ -252,7 +281,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultAsrReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultAsrReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Asr + 15 minutes (Always active reminder)
     if (prayerTimes == null || prayerTimes['asr'] == null) {
       return const TimeOfDay(hour: 16, minute: 30); // Fallback time
@@ -262,7 +292,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultMaghribReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultMaghribReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Maghrib + 10 minutes (Always active reminder)
     if (prayerTimes == null || prayerTimes['maghrib'] == null) {
       return const TimeOfDay(hour: 18, minute: 35); // Fallback time
@@ -272,17 +303,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultIshaReminderTime(Map<String, DateTime>? prayerTimes) {
-    // Default: Isha + 60 minutes (Always active reminder)
-    if (prayerTimes == null || prayerTimes['isha'] == null) {
-      return const TimeOfDay(hour: 21, minute: 30); // Fallback time
-    }
-    final isha = prayerTimes['isha']!;
-    final total = isha.hour * 60 + isha.minute + 60;
-    return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
-  }
-
-  TimeOfDay _calculateDefaultMorningDhikrReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultMorningDhikrReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Fajr + 60 minutes (Always active dhikr reminder)
     if (prayerTimes == null || prayerTimes['fajr'] == null) {
       return const TimeOfDay(hour: 7, minute: 0); // Fallback time
@@ -292,7 +314,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultEveningDhikrReminderTime(Map<String, DateTime>? prayerTimes) {
+  TimeOfDay _calculateDefaultEveningDhikrReminderTime(
+      Map<String, DateTime>? prayerTimes) {
     // Default: Maghrib + 30 minutes (Always active dhikr reminder)
     if (prayerTimes == null || prayerTimes['maghrib'] == null) {
       return const TimeOfDay(hour: 18, minute: 30); // Fallback time
@@ -303,33 +326,54 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Future<void> _scheduleAllReminders() async {
+    // DEFAULT (Always Active)
+    await DailyReminderService.scheduleDefaultDailyAmalReminder();
+
     // Daily reminder
-    await DailyReminderService.scheduleDailyReminder(
-      hour: _dailyReminderTime.hour,
-      minute: _dailyReminderTime.minute,
-    );
+    if (_isDailyReminderEnabled) {
+      await DailyReminderService.scheduleDailyReminder(
+        hour: _dailyReminderTime.hour,
+        minute: _dailyReminderTime.minute,
+      );
+    } else {
+      await DailyReminderService.cancelDailyReminder();
+    }
 
     // Dhikr reminders
-    await DailyReminderService.scheduleMorningDhikrReminder(
-      hour: _morningDhikrTime.hour,
-      minute: _morningDhikrTime.minute,
-    );
-    await DailyReminderService.scheduleEveningDhikrReminder(
-      hour: _eveningDhikrTime.hour,
-      minute: _eveningDhikrTime.minute,
-    );
+    if (_isMorningDhikrEnabled) {
+      await DailyReminderService.scheduleMorningDhikrReminder(
+        hour: _morningDhikrTime.hour,
+        minute: _morningDhikrTime.minute,
+      );
+    } else {
+      await DailyReminderService.cancelMorningDhikrReminder();
+    }
+
+    if (_isEveningDhikrEnabled) {
+      await DailyReminderService.scheduleEveningDhikrReminder(
+        hour: _eveningDhikrTime.hour,
+        minute: _eveningDhikrTime.minute,
+      );
+    } else {
+      await DailyReminderService.cancelEveningDhikrReminder();
+    }
 
     // Prayer reminders
-    for (final prayer in PrayerName.values) {
-      final time = _prayerReminderTimes[prayer];
-      if (time != null) {
-        await DailyReminderService.schedulePrayerReminderAtTime(
-          prayer: prayer,
-          hour: time.hour,
-          minute: time.minute,
-        );
+    if (_arePrayerRemindersEnabled) {
+      for (final prayer in PrayerName.values) {
+        final time = _prayerReminderTimes[prayer];
+        if (time != null) {
+          await DailyReminderService.schedulePrayerReminderAtTime(
+            prayer: prayer,
+            hour: time.hour,
+            minute: time.minute,
+          );
+        }
       }
+    } else {
+      await DailyReminderService.cancelAllPrayerReminders();
     }
+
   }
 
   Future<void> _selectTime(String type, TimeOfDay currentTime) async {
@@ -349,7 +393,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     }
   }
 
-  Future<void> _selectPrayerTime(PrayerName prayer, TimeOfDay currentTime) async {
+  Future<void> _selectPrayerTime(
+      PrayerName prayer, TimeOfDay currentTime) async {
     final selectedTime = await DigitalTimePicker.show(
       context: context,
       initialTime: currentTime,
@@ -466,10 +511,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   children: [
                     _buildInfoCard(),
                     const SizedBox(height: 20),
-
                     _buildTabSelector(),
                     const SizedBox(height: 20),
-
                     _buildTabContent(),
                     const SizedBox(height: 40),
                   ],
@@ -806,7 +849,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: _Premium.iconChipDecoration(radius: 10),
-                child: const Icon(Icons.add_alert, color: _Premium.gold, size: 24),
+                child:
+                    const Icon(Icons.add_alert, color: _Premium.gold, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -872,8 +916,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: _selectedTab == ReminderTab.defaults 
-                      ? _Premium.gold 
+                  color: _selectedTab == ReminderTab.defaults
+                      ? _Premium.gold
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -881,8 +925,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   child: Text(
                     'ডিফল্ট',
                     style: TextStyle(
-                      color: _selectedTab == ReminderTab.defaults 
-                          ? Colors.black 
+                      color: _selectedTab == ReminderTab.defaults
+                          ? Colors.black
                           : Colors.grey.shade300,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -902,8 +946,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: _selectedTab == ReminderTab.userSettings 
-                      ? _Premium.gold 
+                  color: _selectedTab == ReminderTab.userSettings
+                      ? _Premium.gold
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -911,8 +955,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   child: Text(
                     'ব্যক্তিগত',
                     style: TextStyle(
-                      color: _selectedTab == ReminderTab.userSettings 
-                          ? Colors.black 
+                      color: _selectedTab == ReminderTab.userSettings
+                          ? Colors.black
                           : Colors.grey.shade300,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -932,8 +976,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: _selectedTab == ReminderTab.custom 
-                      ? _Premium.gold 
+                  color: _selectedTab == ReminderTab.custom
+                      ? _Premium.gold
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -941,8 +985,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   child: Text(
                     'কাস্টম',
                     style: TextStyle(
-                      color: _selectedTab == ReminderTab.custom 
-                          ? Colors.black 
+                      color: _selectedTab == ReminderTab.custom
+                          ? Colors.black
                           : Colors.grey.shade300,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -983,53 +1027,47 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
             time: _defaultFajrReminderTime!,
             isDefault: true,
           ),
-        if (_defaultZuhrReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.wb_sunny,
-              title: 'যোহরের পর রিমাইন্ডার',
-              subtitle: 'যোহরের ৬০ মিনিট পর (সবসময় সক্রিয়)',
-              time: _defaultZuhrReminderTime!,
-              isDefault: true,
-            ),
-          ],
-        if (_defaultAsrReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.wb_sunny_outlined,
-              title: 'আসরের পর রিমাইন্ডার',
-              subtitle: 'আসরের ১৫ মিনিট পর (সবসময় সক্রিয়)',
-              time: _defaultAsrReminderTime!,
-              isDefault: true,
-            ),
-          ],
-        if (_defaultMaghribReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.nights_stay,
-              title: 'মাগরিবের পর রিমাইন্ডার',
-              subtitle: 'মাগরিবের ১০ মিনিট পর (সবসময় সক্রিয়)',
-              time: _defaultMaghribReminderTime!,
-              isDefault: true,
-            ),
-          ],
-        if (_defaultIshaReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.nights_stay_outlined,
-              title: 'ইশার পর রিমাইন্ডার',
-              subtitle: 'ইশার ৬০ মিনিট পর (সবসময় সক্রিয়)',
-              time: _defaultIshaReminderTime!,
-              isDefault: true,
-            ),
-          ],
-
+        if (_defaultZuhrReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.wb_sunny,
+            title: 'যোহরের পর রিমাইন্ডার',
+            subtitle: 'যোহরের ৬০ মিনিট পর (সবসময় সক্রিয়)',
+            time: _defaultZuhrReminderTime!,
+            isDefault: true,
+          ),
+        ],
+        if (_defaultAsrReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.wb_sunny_outlined,
+            title: 'আসরের পর রিমাইন্ডার',
+            subtitle: 'আসরের ১৫ মিনিট পর (সবসময় সক্রিয়)',
+            time: _defaultAsrReminderTime!,
+            isDefault: true,
+          ),
+        ],
+        if (_defaultMaghribReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.nights_stay,
+            title: 'মাগরিবের পর রিমাইন্ডার',
+            subtitle: 'মাগরিবের ১০ মিনিট পর (সবসময় সক্রিয়)',
+            time: _defaultMaghribReminderTime!,
+            isDefault: true,
+          ),
+        ],
+        if (_defaultIshaReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.nights_stay_outlined,
+            title: 'ইশার পর রিমাইন্ডার',
+            subtitle: 'ইশার ৬০ মিনিট পর (সবসময় সক্রিয়)',
+            time: _defaultIshaReminderTime!,
+            isDefault: true,
+          ),
+        ],
         const SizedBox(height: 24),
-
         _buildSectionHeader('যিকির ও আমল ডিফল্ট রিমাইন্ডার'),
         const SizedBox(height: 8),
         if (_defaultMorningDhikrReminderTime != null)
@@ -1040,28 +1078,26 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
             time: _defaultMorningDhikrReminderTime!,
             isDefault: true,
           ),
-        if (_defaultEveningDhikrReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.nights_stay_outlined,
-              title: 'সন্ধ্যার যিকির',
-              subtitle: 'মাগরিবের ৩০ মিনিট পর (সবসময় সক্রিয়)',
-              time: _defaultEveningDhikrReminderTime!,
-              isDefault: true,
-            ),
-          ],
-        if (_defaultDailyAmalReminderTime != null) ...
-          [
-            const SizedBox(height: 8),
-            _buildDefaultReminderTile(
-              icon: Icons.star,
-              title: 'দৈনিক আমল',
-              subtitle: 'প্রতিদিন রাত ১০ টায় (সবসময় সক্রিয়)',
-              time: _defaultDailyAmalReminderTime!,
-              isDefault: true,
-            ),
-          ],
+        if (_defaultEveningDhikrReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.nights_stay_outlined,
+            title: 'সন্ধ্যার যিকির',
+            subtitle: 'মাগরিবের ৩০ মিনিট পর (সবসময় সক্রিয়)',
+            time: _defaultEveningDhikrReminderTime!,
+            isDefault: true,
+          ),
+        ],
+        if (_defaultDailyAmalReminderTime != null) ...[
+          const SizedBox(height: 8),
+          _buildDefaultReminderTile(
+            icon: Icons.star,
+            title: 'দৈনিক আমল',
+            subtitle: 'প্রতিদিন রাত ১০ টায় (সবসময় সক্রিয়)',
+            time: _defaultDailyAmalReminderTime!,
+            isDefault: true,
+          ),
+        ],
       ],
     );
   }
@@ -1072,7 +1108,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       children: [
         _buildUserSettingsInfoCard(),
         const SizedBox(height: 24),
-        
         _buildSectionHeader('দৈনিক আমল রিমাইন্ডার'),
         const SizedBox(height: 8),
         _buildUserReminderTile(
@@ -1081,12 +1116,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           subtitle: 'রিমাইন্ডার সময়',
           time: _dailyReminderTime,
           isEnabled: _isDailyReminderEnabled,
-          onToggle: (value) => setState(() => _isDailyReminderEnabled = value),
+          onToggle: (value) async {
+            setState(() => _isDailyReminderEnabled = value);
+            await _scheduleAllReminders();
+          },
           onTimeTap: () => _selectTime('daily', _dailyReminderTime),
         ),
-
         const SizedBox(height: 24),
-
         _buildSectionHeader('যিকির রিমাইন্ডার'),
         const SizedBox(height: 8),
         _buildUserReminderTile(
@@ -1095,7 +1131,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           subtitle: 'রিমাইন্ডার সময়',
           time: _morningDhikrTime,
           isEnabled: _isMorningDhikrEnabled,
-          onToggle: (value) => setState(() => _isMorningDhikrEnabled = value),
+          onToggle: (value) async {
+            setState(() => _isMorningDhikrEnabled = value);
+            await _scheduleAllReminders();
+          },
           onTimeTap: () => _selectTime('morningDhikr', _morningDhikrTime),
         ),
         const SizedBox(height: 8),
@@ -1105,12 +1144,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           subtitle: 'রিমাইন্ডার সময়',
           time: _eveningDhikrTime,
           isEnabled: _isEveningDhikrEnabled,
-          onToggle: (value) => setState(() => _isEveningDhikrEnabled = value),
+          onToggle: (value) async {
+            setState(() => _isEveningDhikrEnabled = value);
+            await _scheduleAllReminders();
+          },
           onTimeTap: () => _selectTime('eveningDhikr', _eveningDhikrTime),
         ),
-
         const SizedBox(height: 24),
-
         _buildSectionHeader('নামাজের রিমাইন্ডার'),
         const SizedBox(height: 8),
         _buildPrayerRemindersToggleCard(),
@@ -1139,7 +1179,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.blue.withOpacity(0.14), Colors.blue.withOpacity(0.06)],
+          colors: [
+            Colors.blue.withOpacity(0.14),
+            Colors.blue.withOpacity(0.06)
+          ],
         ),
         border: Border.all(color: Colors.blue.withOpacity(0.22)),
         boxShadow: [
@@ -1320,7 +1363,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           const SizedBox(width: 12),
           Switch(
             value: _arePrayerRemindersEnabled,
-            onChanged: (value) => setState(() => _arePrayerRemindersEnabled = value),
+            onChanged: (value) async {
+              setState(() => _arePrayerRemindersEnabled = value);
+              await _scheduleAllReminders();
+            },
             activeColor: _Premium.gold,
             activeTrackColor: _Premium.gold.withOpacity(0.3),
             inactiveThumbColor: Colors.grey.shade600,
@@ -1473,7 +1519,6 @@ class TodaysRemindersDialog extends StatefulWidget {
 }
 
 class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
-
   String _formatDateTime(DateTime time) {
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
@@ -1740,7 +1785,8 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
           reminder.fixedMinute!,
         );
       } else if (reminder.prayer != null) {
-        final actualPrayerTime = widget.actualPrayerTimes[reminder.prayer!.name];
+        final actualPrayerTime =
+            widget.actualPrayerTimes[reminder.prayer!.name];
         if (actualPrayerTime != null) {
           reminderTime =
               actualPrayerTime.add(Duration(minutes: reminder.minutesOffset));
@@ -1761,7 +1807,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
       // Sort by time, but put default reminders first within same time
       final timeComparison = a.time.compareTo(b.time);
       if (timeComparison != 0) return timeComparison;
-      
+
       // If same time, put default first
       if (a.isDefault && !b.isDefault) return -1;
       if (!a.isDefault && b.isDefault) return 1;

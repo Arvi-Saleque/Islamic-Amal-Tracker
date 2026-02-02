@@ -5,6 +5,10 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/models/custom_reminder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:geolocator/geolocator.dart';
+import 'prayer_times_api_service.dart';
 
 class DailyReminderService {
   static final FlutterLocalNotificationsPlugin _notifications =
@@ -29,6 +33,11 @@ class DailyReminderService {
   // Custom reminders key
   static const String _customRemindersKey = 'custom_reminders';
 
+  static const String _kDefaultPrayerLastScheduledDay =
+      'default_prayer_last_scheduled_day';
+  static const String _kDefaultDhikrLastScheduledDay =
+      'default_dhikr_last_scheduled_day';
+
   // Notification IDs
   static const int _dailyReminderId = 1001;
   static const int _morningDhikrId = 1002;
@@ -39,6 +48,61 @@ class DailyReminderService {
   static const int _maghribReminderId = 2004;
   static const int _ishaReminderId = 2005;
   static const int _customReminderBaseId = 3000;
+  static const int _defaultDailyAmalId = 9001;
+  static const int _defaultPrayerBaseId =
+      9200; // unique block for default prayers
+  static const int _defaultMorningDhikrId = 9301;
+  static const int _defaultEveningDhikrId = 9302;
+
+  static const int _defaultScheduleDaysAhead = 30;
+  static const String _kDefaultWindowScheduledOn =
+      'default_window_scheduled_on';
+
+  // Large safe ID ranges for default rolling schedules
+  static const int _defaultPrayerIdBase = 200000;
+  static const int _defaultDhikrIdBase = 210000;
+
+  static const String _kDefaultWindowStartDay = 'default_window_start_day';
+  static const String _kDefaultWindowDaysAhead = 'default_window_days_ahead';
+
+
+  static int _getDefaultPrayerNotificationId(PrayerName prayer) {
+    return _defaultPrayerBaseId + prayer.index; // stable + unique
+  }
+
+  static String _displayPrayerName(PrayerName prayer) {
+    switch (prayer) {
+      case PrayerName.fajr:
+        return 'Fajr';
+      case PrayerName.dhuhr:
+        return 'Dhuhr';
+      case PrayerName.asr:
+        return 'Asr';
+      case PrayerName.maghrib:
+        return 'Maghrib';
+      case PrayerName.isha:
+        return 'Isha';
+    }
+  }
+
+  static String _todayKey() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  static String _dayKey(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  static int _defaultPrayerIdForDayIndex(int dayIndex, int prayerIndex) {
+    // reserve 10 IDs per day
+    return _defaultPrayerIdBase + dayIndex * 10 + prayerIndex;
+  }
+
+  static int _defaultDhikrIdForDayIndex(int dayIndex, bool morning) {
+    // reserve 10 IDs per day
+    return _defaultDhikrIdBase + dayIndex * 10 + (morning ? 1 : 2);
+  }
 
   static Future<void> initialize() async {
     tz.initializeTimeZones();
@@ -134,6 +198,117 @@ class DailyReminderService {
       'আজকের আমলগুলো করতে ভুলবেন না!',
       notificationDetails,
     );
+  }
+
+  static Future<void> scheduleDefaultDailyAmalReminder() async {
+    // Don’t touch personal daily reminder ID (1001)
+    await _notifications.cancel(_defaultDailyAmalId);
+
+    final now = tz.TZDateTime.now(tz.local);
+
+    // Default: 10:00 PM
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      20,
+      30,
+    );
+
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    const androidDetails = AndroidNotificationDetails(
+      'default_daily_amal_channel',
+      'Default Daily Amal',
+      channelDescription: 'Always active default daily amal reminder',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const notificationDetails = NotificationDetails(android: androidDetails);
+
+    await _notifications.zonedSchedule(
+      _defaultDailyAmalId,
+      '🕌 আমল রিমাইন্ডার',
+      'আজকের আমলগুলো করতে ভুলবেন না!',
+      scheduledDate,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents:
+          DateTimeComponents.time, // repeats daily at 10 PM
+    );
+  }
+
+  static Future<void> cancelDefaultDailyAmalReminder() async {
+    await _notifications.cancel(_defaultDailyAmalId);
+  }
+
+  static Future<void> scheduleDefaultPrayerReminders({
+    required Map<String, DateTime> prayerTimes,
+  }) async {
+    // Offsets in minutes (your rules)
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+
+    final last = prefs.getString(_kDefaultPrayerLastScheduledDay);
+    if (last == today) {
+      return; // already scheduled today
+    }
+
+    const offsets = {
+      'fajr': 30,
+      'dhuhr': 60,
+      'asr': 15,
+      'maghrib': 10,
+      'isha': 60,
+    };
+
+    for (final prayer in PrayerName.values) {
+      final key = prayer
+          .name; // assumes PrayerName names are fajr/dhuhr/asr/maghrib/isha
+      final base = prayerTimes[key];
+      final off = offsets[key];
+
+      if (base == null || off == null) continue;
+
+      final when = base.add(Duration(minutes: off));
+
+      // Cancel previous default schedule for this prayer to avoid duplicates
+      await _notifications.cancel(_getDefaultPrayerNotificationId(prayer));
+
+      final scheduledDate = tz.TZDateTime.from(when, tz.local);
+      final now = tz.TZDateTime.now(tz.local);
+
+      // If today's time already passed, schedule for next day (same clock time)
+      final target = scheduledDate.isBefore(now)
+          ? scheduledDate.add(const Duration(days: 1))
+          : scheduledDate;
+
+      const androidDetails = AndroidNotificationDetails(
+        'default_prayer_channel',
+        'Default Prayer Reminders',
+        channelDescription:
+            'Always active default prayer reminders based on prayer times',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      const details = NotificationDetails(android: androidDetails);
+
+      await _notifications.zonedSchedule(
+        _getDefaultPrayerNotificationId(prayer),
+        '🕌 ${_displayPrayerName(prayer)} নামাজ',
+        'নামাজ আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।',
+        target,
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        // IMPORTANT: don’t use DateTimeComponents.time here because prayer times shift daily.
+      );
+    }
+    await prefs.setString(_kDefaultPrayerLastScheduledDay, today);
   }
 
   /// Schedule daily notification at specified time
@@ -535,6 +710,12 @@ class DailyReminderService {
     print('${prayer.name} reminder scheduled for $hour:$minute');
   }
 
+  static Future<void> cancelAllPrayerReminders() async {
+    for (final prayer in PrayerName.values) {
+      await cancelPrayerReminder(prayer);
+    }
+  }
+
   /// Cancel prayer reminder
   static Future<void> cancelPrayerReminder(PrayerName prayer) async {
     await _notifications.cancel(_getPrayerNotificationId(prayer));
@@ -719,5 +900,227 @@ class DailyReminderService {
     for (final reminder in customReminders.where((r) => r.isEnabled)) {
       await _scheduleCustomReminderNotification(reminder);
     }
+  }
+
+  static Future<void> scheduleDefaultDhikrReminders({
+    required DateTime fajrTime,
+    required DateTime maghribTime,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+
+    final last = prefs.getString(_kDefaultDhikrLastScheduledDay);
+    if (last == today) return;
+
+    // Morning dhikr = fajr + 60
+    final morning = fajrTime.add(const Duration(minutes: 60));
+    await _notifications.cancel(_defaultMorningDhikrId);
+    await _notifications.zonedSchedule(
+      _defaultMorningDhikrId,
+      '🌅 Morning Dhikr',
+      'সময় হয়েছে — সকালের যিকির পড়ুন।',
+      tz.TZDateTime.from(morning, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'default_dhikr_channel',
+          'Default Dhikr Reminders',
+          channelDescription: 'Always active default dhikr reminders',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+
+    // Evening dhikr = maghrib + 30
+    final evening = maghribTime.add(const Duration(minutes: 30));
+    await _notifications.cancel(_defaultEveningDhikrId);
+    await _notifications.zonedSchedule(
+      _defaultEveningDhikrId,
+      '🌙 Evening Dhikr',
+      'সময় হয়েছে — সন্ধ্যার যিকির পড়ুন।',
+      tz.TZDateTime.from(evening, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'default_dhikr_channel',
+          'Default Dhikr Reminders',
+          channelDescription: 'Always active default dhikr reminders',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+
+    await prefs.setString(_kDefaultDhikrLastScheduledDay, today);
+  }
+
+  static Future<void> scheduleDefaultRollingWindowFromApi({
+    int daysAhead = _defaultScheduleDaysAhead,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _todayKey();
+
+    // Don’t rebuild the same 30-day window repeatedly on the same day
+    final startKey = prefs.getString(_kDefaultWindowStartDay);
+    final days = prefs.getInt(_kDefaultWindowDaysAhead) ?? daysAhead;
+
+    DateTime? startDate;
+    if (startKey != null) {
+      final parts = startKey.split('-');
+      if (parts.length == 3) {
+        startDate = DateTime(
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+          int.parse(parts[2]),
+        );
+      }
+    }
+
+    if (startDate != null) {
+      final todayDate = DateTime.now();
+      final todayMidnight = DateTime(todayDate.year, todayDate.month, todayDate.day);
+
+      final endDate = startDate.add(Duration(days: days));
+      final remaining = endDate.difference(todayMidnight).inDays;
+
+      // ✅ If still have at least 7 days scheduled, do nothing
+      if (remaining >= 7) {
+        return;
+      }
+    }
+
+
+    // Get location once
+    double lat = 23.8103; // fallback: Dhaka
+    double lon = 90.4125;
+
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low,
+      );
+      lat = pos.latitude;
+      lon = pos.longitude;
+    } catch (_) {
+      // keep fallback
+    }
+
+    // Clear previously scheduled IDs for our window (only within our ID ranges)
+    for (int i = 0; i < daysAhead; i++) {
+      // 5 prayers (we use PrayerName.values order: fajr,dhuhr,asr,maghrib,isha)
+      for (int p = 0; p < 5; p++) {
+        await _notifications.cancel(_defaultPrayerIdForDayIndex(i, p));
+      }
+      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, true));
+      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, false));
+    }
+
+    final nowDate = DateTime.now();
+    final todayMidnight =
+        DateTime(nowDate.year, nowDate.month, nowDate.day);
+
+    // Offsets (your default rules)
+    const offsets = <String, int>{
+      'fajr': 30,
+      'dhuhr': 60,
+      'asr': 15,
+      'maghrib': 10,
+      'isha': 60,
+    };
+
+    for (int i = 0; i < daysAhead; i++) {
+      final date = todayMidnight.add(Duration(days: i));
+
+      final pt = await PrayerTimesApiService.fetchPrayerTimesForDate(
+        date: date,
+        latitude: lat,
+        longitude: lon,
+        method: 1,
+      );
+
+      // ===== Default prayers =====
+      final keys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+      for (int p = 0; p < keys.length; p++) {
+        final key = keys[p];
+        final base = pt[key]!;
+        final when = base.add(Duration(minutes: offsets[key]!));
+
+        final target = tz.TZDateTime.from(when, tz.local);
+        if (target.isBefore(tz.TZDateTime.now(tz.local))) continue;
+
+        await _notifications.zonedSchedule(
+          _defaultPrayerIdForDayIndex(i, p),
+          '🕌 ${key.toUpperCase()}',
+          'Default reminder (${offsets[key]} min after waqt)',
+          target,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_prayer_channel',
+              'Default Prayer Reminders',
+              channelDescription:
+                  'Always active default prayer reminders (rolling window)',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
+      }
+
+      // ===== Default dhikr =====
+      final morning = tz.TZDateTime.from(
+          pt['fajr']!.add(const Duration(minutes: 60)), tz.local);
+      if (morning.isAfter(tz.TZDateTime.now(tz.local))) {
+        await _notifications.zonedSchedule(
+          _defaultDhikrIdForDayIndex(i, true),
+          '🌅 Morning Dhikr',
+          'Default reminder (Fajr + 60 min)',
+          morning,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_dhikr_channel',
+              'Default Dhikr Reminders',
+              channelDescription:
+                  'Always active default dhikr reminders (rolling window)',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
+      }
+
+      final evening = tz.TZDateTime.from(
+          pt['maghrib']!.add(const Duration(minutes: 30)), tz.local);
+      if (evening.isAfter(tz.TZDateTime.now(tz.local))) {
+        await _notifications.zonedSchedule(
+          _defaultDhikrIdForDayIndex(i, false),
+          '🌙 Evening Dhikr',
+          'Default reminder (Maghrib + 30 min)',
+          evening,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_dhikr_channel',
+              'Default Dhikr Reminders',
+              channelDescription:
+                  'Always active default dhikr reminders (rolling window)',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
+      }
+    }
+
+    await prefs.setString(_kDefaultWindowScheduledOn, today);
+
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+
+    await prefs.setString(_kDefaultWindowStartDay, _dayKey(start));
+    await prefs.setInt(_kDefaultWindowDaysAhead, daysAhead);
+
   }
 }

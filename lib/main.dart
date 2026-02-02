@@ -15,6 +15,8 @@ import 'data/services/firestore_sync_service.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'services/daily_reminder_service.dart';
 import 'services/permission_service.dart';
+import 'presentation/providers/prayer_times_provider.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,10 +47,18 @@ void main() async {
   if (!kIsWeb && Platform.isAndroid) {
     try {
       await DailyReminderService.initialize();
+
+      // ✅ NEW: Auto-schedule always-on default reminders at app startup
+      final granted = await PermissionService.areAllPermissionsGranted();
+      if (granted) {
+        await DailyReminderService.scheduleDefaultDailyAmalReminder(); 
+        await DailyReminderService.scheduleDefaultRollingWindowFromApi();
+      }
     } catch (e) {
       print('DailyReminderService initialization failed: $e');
     }
   }
+
   
   // Set preferred orientations (only for mobile platforms)
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
@@ -75,6 +85,32 @@ class AmalTrackerApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<PrayerTimesState>(prayerTimesProvider, (previous, next) async {
+      if (next.isLoading) return;
+      if (next.error != null) return;
+      if (next.prayerTimes.isEmpty) return;
+
+      // Only schedule defaults if permissions are granted
+      final granted = await PermissionService.areAllPermissionsGranted();
+      if (!granted) return;
+
+      // ✅ Schedule default prayer reminders using today's computed times
+      await DailyReminderService.scheduleDefaultPrayerReminders(
+        prayerTimes: next.prayerTimes,
+      );
+
+      final fajr = next.prayerTimes['fajr'];
+      final maghrib = next.prayerTimes['maghrib'];
+
+      if (fajr != null && maghrib != null) {
+        await DailyReminderService.scheduleDefaultDhikrReminders(
+          fajrTime: fajr,
+          maghribTime: maghrib,
+        );
+      }
+    });
+
+
     return MaterialApp(
       title: 'আমল ট্র্যাকার',
       debugShowCheckedModeBanner: false,
