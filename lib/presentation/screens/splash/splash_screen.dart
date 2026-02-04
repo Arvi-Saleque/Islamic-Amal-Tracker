@@ -1,13 +1,10 @@
-import 'package:amal_tracker/presentation/providers/prayer_times_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../data/services/firestore_sync_service.dart';
-import '../../../services/permission_service.dart';
 import '../home/home_screen.dart';
 import '../auth/auth_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../../../firebase_options.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -21,52 +18,44 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _checkAuthAndNavigate();
-    Future.microtask(() {
-      // triggers prayer time loading on app start
-      ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-    });
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 2));
-    
-    if (mounted) {
-      // Check if user is already signed in
-      User? user;
-      try {
-        user = FirebaseAuth.instance.currentUser;
-      } catch (e) {
-        // Firebase not initialized, go to auth screen
-        user = null;
-      }
-      
-      if (user != null) {
-        // User is signed in, restore data from cloud first
-        print('🔄 User logged in, syncing data from cloud...');
-        await firestoreSyncService.restoreAllData();
-        print('✅ Data sync complete, navigating to home...');
-        
-        // User is signed in, go to home
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-        
-        // Check permissions after navigation (Android only)
-        if (!kIsWeb && Platform.isAndroid) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              PermissionService.checkAndRequestPermissions(context);
-            }
-          });
-        }
-      } else {
-        // No user, show auth screen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthScreen()),
+    await Future.delayed(const Duration(milliseconds: 150));
+    if (!mounted) return;
+
+    try {
+      // Needed so FirebaseAuth.currentUser works
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
         );
       }
+    } catch (_) {
+      // If init fails, treat as not logged in (AuthScreen)
+    }
+
+    User? user;
+    try {
+      user = FirebaseAuth.instance.currentUser;
+    } catch (_) {
+      user = null;
+    }
+
+    if (!mounted) return;
+
+    if (user != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      );
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

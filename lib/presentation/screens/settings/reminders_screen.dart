@@ -438,6 +438,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         customReminders: _customReminders,
         onNavigateToCustomReminders: _navigateToCustomReminders,
         actualPrayerTimes: actualPrayerTimes,
+        isDailyReminderEnabled: _isDailyReminderEnabled,
+        isMorningDhikrEnabled: _isMorningDhikrEnabled,
+        isEveningDhikrEnabled: _isEveningDhikrEnabled,
+        arePrayerRemindersEnabled: _arePrayerRemindersEnabled,
         defaultFajrReminderTime: _defaultFajrReminderTime,
         defaultZuhrReminderTime: _defaultZuhrReminderTime,
         defaultAsrReminderTime: _defaultAsrReminderTime,
@@ -1495,6 +1499,12 @@ class TodaysRemindersDialog extends StatefulWidget {
   final TimeOfDay? defaultEveningDhikrReminderTime;
   final TimeOfDay? defaultDailyAmalReminderTime;
 
+  // User reminder enabled flags
+  final bool isDailyReminderEnabled;
+  final bool isMorningDhikrEnabled;
+  final bool isEveningDhikrEnabled;
+  final bool arePrayerRemindersEnabled;
+
   const TodaysRemindersDialog({
     super.key,
     required this.dailyReminderTime,
@@ -1504,6 +1514,10 @@ class TodaysRemindersDialog extends StatefulWidget {
     required this.customReminders,
     required this.onNavigateToCustomReminders,
     required this.actualPrayerTimes,
+    required this.isDailyReminderEnabled,
+    required this.isMorningDhikrEnabled,
+    required this.isEveningDhikrEnabled,
+    required this.arePrayerRemindersEnabled,
     this.defaultFajrReminderTime,
     this.defaultZuhrReminderTime,
     this.defaultAsrReminderTime,
@@ -1709,60 +1723,68 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
       ));
     }
 
-    final dailyReminderDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      widget.dailyReminderTime.hour,
-      widget.dailyReminderTime.minute,
-    );
-    todaysReminders.add(ReminderItem(
-      title: 'দৈনিক আমল রিমাইন্ডার',
-      time: dailyReminderDateTime,
-      isPassed: now.isAfter(dailyReminderDateTime),
-    ));
+    if (widget.isDailyReminderEnabled) {
+      final dailyReminderDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        widget.dailyReminderTime.hour,
+        widget.dailyReminderTime.minute,
+      );
+      todaysReminders.add(ReminderItem(
+        title: 'দৈনিক আমল রিমাইন্ডার',
+        time: dailyReminderDateTime,
+        isPassed: now.isAfter(dailyReminderDateTime),
+      ));
+    }
 
-    final morningDhikrDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      widget.morningDhikrTime.hour,
-      widget.morningDhikrTime.minute,
-    );
-    todaysReminders.add(ReminderItem(
-      title: 'সকালের যিকির',
-      time: morningDhikrDateTime,
-      isPassed: now.isAfter(morningDhikrDateTime),
-    ));
+    if (widget.isMorningDhikrEnabled) {
+      final morningDhikrDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        widget.morningDhikrTime.hour,
+        widget.morningDhikrTime.minute,
+      );
+      todaysReminders.add(ReminderItem(
+        title: 'সকালের যিকির',
+        time: morningDhikrDateTime,
+        isPassed: now.isAfter(morningDhikrDateTime),
+      ));
+    }
 
-    final eveningDhikrDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      widget.eveningDhikrTime.hour,
-      widget.eveningDhikrTime.minute,
-    );
-    todaysReminders.add(ReminderItem(
-      title: 'সন্ধ্যার যিকির',
-      time: eveningDhikrDateTime,
-      isPassed: now.isAfter(eveningDhikrDateTime),
-    ));
+    if (widget.isEveningDhikrEnabled) {
+      final eveningDhikrDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        widget.eveningDhikrTime.hour,
+        widget.eveningDhikrTime.minute,
+      );
+      todaysReminders.add(ReminderItem(
+        title: 'সন্ধ্যার যিকির',
+        time: eveningDhikrDateTime,
+        isPassed: now.isAfter(eveningDhikrDateTime),
+      ));
+    }
 
-    for (final prayer in PrayerName.values) {
-      final reminderTime = widget.prayerReminderTimes[prayer];
-      if (reminderTime != null) {
-        final prayerReminderDateTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          reminderTime.hour,
-          reminderTime.minute,
-        );
-        todaysReminders.add(ReminderItem(
-          title: '${CustomReminder.getPrayerBengaliName(prayer)} সালাত',
-          time: prayerReminderDateTime,
-          isPassed: now.isAfter(prayerReminderDateTime),
-        ));
+    if (widget.arePrayerRemindersEnabled) {
+      for (final prayer in PrayerName.values) {
+        final reminderTime = widget.prayerReminderTimes[prayer];
+        if (reminderTime != null) {
+          final prayerReminderDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            reminderTime.hour,
+            reminderTime.minute,
+          );
+          todaysReminders.add(ReminderItem(
+            title: '${CustomReminder.getPrayerBengaliName(prayer)} সালাত',
+            time: prayerReminderDateTime,
+            isPassed: now.isAfter(prayerReminderDateTime),
+          ));
+        }
       }
     }
 

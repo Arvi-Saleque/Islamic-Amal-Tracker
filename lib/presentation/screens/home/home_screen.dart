@@ -21,6 +21,17 @@ import '../reading/reading_tracker_screen.dart';
 import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
+import '../../../services/daily_reminder_service.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:hive_flutter/hive_flutter.dart';
+import '../../../data/local/hive_service.dart';
+import '../../../data/services/firestore_sync_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../../../firebase_options.dart';
+
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -33,23 +44,98 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLocationAndShowNotificationPopup();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // 🔥 Start heavy init in background (doesn't block UI)
+      unawaited(_bootstrapApp());
+
+      // Permissions + your existing init flow
+      PermissionService.checkAndRequestPermissions(context);
+      _afterAuthInit();
+    });
   }
 
-  Future<void> _checkLocationAndShowNotificationPopup() async {
-    // Wait for location permission to be checked/granted
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _bootstrapApp() async {
+    // Timezone
+    try {
+      tz.initializeTimeZones();
+    } catch (_) {}
 
-    if (!mounted) return;
+    // Hive
+    try {
+      await Hive.initFlutter();
+      await HiveService.init();
+    } catch (e) {
+      debugPrint('Hive init failed: $e');
+    }
 
-    // Check if location permission is granted
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
-      // Location granted, show notification popup
-      PermissionService.showNotificationPermissionPopup(context);
+    // Firebase + Firestore sync init (optional)
+    try {
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+      await firestoreSyncService.init();
+    } catch (e) {
+      debugPrint('Firebase init failed: $e');
+    }
+
+    // Cloud restore (DO NOT block navigation/splash)
+    try {
+      await firestoreSyncService.restoreAllData();
+    } catch (e) {
+      debugPrint('Cloud restore failed: $e');
+    }
+
+    // Reminder init (don’t schedule heavy rolling window here unless you want)
+    if (!kIsWeb && Platform.isAndroid) {
+      try {
+        await DailyReminderService.initialize();
+      } catch (e) {
+        debugPrint('DailyReminderService init failed: $e');
+      }
     }
   }
+
+
+
+  Future<void> _afterAuthInit() async {
+    // small delay so UI is ready (optional)
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+
+    // ✅ Ask for location permission here (Home, after auth)
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // If location service is OFF, just skip. Defaults will still work using fallback.
+      PermissionService.showNotificationPermissionPopup(context);
+      return;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    final hasLocation = permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+
+    // Show notification popup (your existing behavior)
+    PermissionService.showNotificationPermissionPopup(context);
+
+    // ✅ If location granted, upgrade prayer-times + rolling window defaults using real coords
+    if (hasLocation) {
+      // refresh prayer times provider (it will now use real location)
+      ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
+
+      // rebuild rolling window defaults with real location
+      await DailyReminderService.scheduleDefaultRollingWindowFromApi();
+    }
+  }
+
 
 // -------------------------------------------------
 // Premium UI Helpers (Golden + Dark)

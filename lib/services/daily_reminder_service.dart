@@ -644,7 +644,8 @@ class DailyReminderService {
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
+        await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
+await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
     await prefs.setInt(
         '${_prayerReminderPrefix}${prayer.name}_minutesBefore', minutesBefore);
 
@@ -704,7 +705,8 @@ class DailyReminderService {
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
+        await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
+await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
     await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_minute', minute);
 
     print('${prayer.name} reminder scheduled for $hour:$minute');
@@ -991,19 +993,23 @@ class DailyReminderService {
     }
 
 
-    // Get location once
-    double lat = 23.8103; // fallback: Dhaka
+    double lat = 23.8103;
     double lon = 90.4125;
 
-    try {
+    final perm = await Geolocator.checkPermission();
+    final canUseLocation =
+        perm == LocationPermission.always || perm == LocationPermission.whileInUse;
+
+    if (canUseLocation) {
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low,
       );
       lat = pos.latitude;
       lon = pos.longitude;
-    } catch (_) {
-      // keep fallback
     }
+// DO NOT request permission here
+
+
 
     // Clear previously scheduled IDs for our window (only within our ID ranges)
     for (int i = 0; i < daysAhead; i++) {
