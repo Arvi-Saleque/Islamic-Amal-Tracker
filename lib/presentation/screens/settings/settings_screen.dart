@@ -1,29 +1,84 @@
+import 'package:amal_tracker/core/theme/theme_mode_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../profile/profile_screen.dart';
 import 'reminders_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_storage.dart';
 
-class SettingsScreen extends StatelessWidget {
+final settingsLightModeProvider =
+    StateNotifierProvider<SettingsLightModeController, bool>(
+  (ref) => SettingsLightModeController()..load(),
+);
+
+class SettingsLightModeController extends StateNotifier<bool> {
+  SettingsLightModeController() : super(false);
+
+  void load() {
+    state = ThemeStorage.getSettingsIsLight();
+  }
+
+  Future<void> setMode(bool v) async {
+    state = v;
+    await ThemeStorage.setSettingsIsLight(v);
+  }
+}
+
+// false = dark (default), true = light
+
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(appThemeModeProvider);
+    final isLight = mode == ThemeMode.light;
+
+    // ✅ Dark: keep your old style (no Theme override)
+    if (!isLight) {
+      return _SettingsBody(isLight: false);
+    }
+
+    // ✅ Light: only settings page uses light theme
+    return Theme(
+      data: AppTheme.lightTheme,
+      child: const _SettingsBody(isLight: true),
+    );
+  }
+}
+
+class _SettingsBody extends ConsumerWidget {
+  final bool isLight;
+  const _SettingsBody({required this.isLight, super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Light theme colors from ThemeData
+    final cs = Theme.of(context).colorScheme;
+
+    // Dark mode: keep your existing colors
+    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+    final titleColor = AppColors.primary; // keep gold always
+    final iconColor = AppColors.primary;  // keep gold always
+
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: bg,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'সেটিংস',
           style: TextStyle(
-            color: AppColors.textGolden,
+            color: titleColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -34,224 +89,358 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Quick Access Section
-            const SizedBox(height: 30),
-            _buildSettingsCard(
-              children: [
-                _buildNavigationTile(
-                  context: context,
-                  icon: Icons.person_outline,
-                  title: 'প্রোফাইল',
-                  subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProfileScreen(),
-                      ),
-                    );
-                  },
+            const SizedBox(height: 22),
+
+            // Theme toggle card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _softCard(
+                context: context,
+                isLight: isLight,
+                child: SwitchListTile(
+                  value: isLight,
+                  onChanged: (v) => ref.read(appThemeModeProvider.notifier)
+                    .setMode(v ? ThemeMode.light : ThemeMode.dark),
+
+                  title: Text(
+                    'Light Theme',
+                    style: TextStyle(
+                      color: isLight ? AppColors.textLightMode.withOpacity(0.92) : Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'শুধু সেটিংস পেজে থিম পরিবর্তন হবে',
+                    style: TextStyle(
+                      color: isLight
+                          ? AppColors.textSecondaryLightMode.withOpacity(0.90)
+                          : Colors.white.withOpacity(0.65),
+                      fontSize: 12,
+                    ),
+
+                  ),
+                  secondary: Icon(
+                    isLight ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                    color: iconColor,
+                  ),
+                  activeColor: iconColor,
                 ),
-                const Divider(color: Color(0xFF2A2A2A), height: 1),
-                _buildNavigationTile(
-                  context: context,
-                  icon: Icons.notifications_active,
-                  title: 'রিমাইন্ডারস',
-                  subtitle: 'দৈনিক রিমাইন্ডার সেট করুন',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RemindersScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
 
-            // About Section
-            const SizedBox(height: 20),
-            buildAboutSection(context),
+            const SizedBox(height: 14),
 
-            const SizedBox(height: 40),
+            // Profile + Reminders card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _softCard(
+                context: context,
+                isLight: isLight,
+                child: Column(
+                  children: [
+                    _buildNavigationTile(
+                      context: context,
+                      isLight: isLight,
+                      icon: Icons.person_outline,
+                      title: 'প্রোফাইল',
+                      subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _softDivider(isLight: isLight),
+                    _buildNavigationTile(
+                      context: context,
+                      isLight: isLight,
+                      icon: Icons.notifications_active,
+                      title: 'রিমাইন্ডারস',
+                      subtitle: 'দৈনিক রিমাইন্ডার সেট করুন',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RemindersScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 22),
+
+            // About section
+            _buildAboutSection(context, isLight),
+
+            const SizedBox(height: 36),
           ],
         ),
       ),
     );
   }
 
-  static Widget _buildSettingsCard({required List<Widget> children}) {
+  // ---------- UI helpers (NO borders, small shadow) ----------
+
+  Widget _softCard({
+    required BuildContext context,
+    required bool isLight,
+    required Widget child,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    final cardColor = isLight ? AppColors.surfaceLightMode : const Color(0xFF1A1A1A);
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowDark,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: 16,
+            spreadRadius: 0,
+            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(isLight ? 0.06 : 0.22),
           ),
         ],
       ),
-      child: Column(children: children),
+      child: child,
+    );
+  }
+
+  Widget _softDivider({required bool isLight}) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: (isLight ? Colors.black : Colors.white).withOpacity(0.08),
     );
   }
 
   Widget _buildNavigationTile({
     required BuildContext context,
+    required bool isLight,
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final cs = Theme.of(context).colorScheme;
+
+    final titleColor = isLight
+        ? AppColors.textLightMode.withOpacity(0.92)
+        : Colors.white;
+
+    final subColor = isLight
+        ? AppColors.textSecondaryLightMode.withOpacity(0.90)
+        : Colors.white.withOpacity(0.60);
+
+
     return ListTile(
+      onTap: onTap,
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFFD4AF37).withOpacity(0.2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: const Color(0xFFD4AF37),
-          size: 24,
-        ),
+        color: isLight
+            ? AppColors.primary.withOpacity(0.12) // soft gold wash
+            : AppColors.primary.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(12),
+      ),
+        child: Icon(icon, color: AppColors.primary, size: 22),
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: titleColor,
           fontSize: 16,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
         subtitle,
         style: TextStyle(
-          color: Colors.white.withOpacity(0.6),
+          color: subColor,
           fontSize: 12,
         ),
       ),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right,
-        color: Color(0xFFD4AF37),
+        color: AppColors.primary,
       ),
-      onTap: onTap,
     );
   }
 
-  // About section with help and bug report
-  static Widget buildAboutSection(BuildContext context) {
+  // ---------- About section (now supports light + dark) ----------
+
+  Widget _buildAboutSection(BuildContext context, bool isLight) {
+    final cs = Theme.of(context).colorScheme;
+
+    final headerColor = AppColors.primary;
+    final titleColor = isLight ? cs.onSurface : AppColors.primary;
+    final subColor = isLight
+        ? cs.onSurface.withOpacity(0.60)
+        : Colors.grey;
+
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 16),
-          const Text(
+          Text(
             'অ্যাপ সম্পর্কে 📱',
             style: TextStyle(
-              color: Color(0xFFD4AF37),
+              color: headerColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 12),
-          _buildOptionCard(
+
+          _aboutTile(
+            context: context,
+            isLight: isLight,
+            icon: Icons.help,
             title: 'ব্যবহারের নিয়ম',
             subtitle: 'অ্যাপ কীভাবে ব্যবহার করতে হয় জানুন',
-            icon: Icons.help,
+            titleColor: titleColor,
+            subColor: subColor,
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ManualScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const ManualScreen()),
               );
             },
           ),
-          const SizedBox(height: 8),
-          _buildOptionCard(
+          const SizedBox(height: 10),
+
+          _aboutTile(
+            context: context,
+            isLight: isLight,
+            icon: Icons.bug_report,
             title: 'বাগ রিপোর্ট করুন',
             subtitle: 'সমস্যা পেলে আমাদের জানান',
-            icon: Icons.bug_report,
+            titleColor: titleColor,
+            subColor: subColor,
             onTap: () => _sendBugReport(context),
           ),
-          const SizedBox(height: 8),
-          _buildOptionCard(
+          const SizedBox(height: 10),
+
+          _aboutTile(
+            context: context,
+            isLight: isLight,
+            icon: Icons.info,
             title: 'সংস্করণ',
             subtitle: 'v1.0.8',
-            icon: Icons.info,
-            onTap: () => _showVersionDialog(context),
+            titleColor: titleColor,
+            subColor: subColor,
+            onTap: () => _showVersionDialog(context, isLight),
           ),
         ],
       ),
     );
   }
 
-  static Widget _buildOptionCard({
+  Widget _aboutTile({
+    required BuildContext context,
+    required bool isLight,
+    required IconData icon,
     required String title,
     required String subtitle,
-    required IconData icon,
     required VoidCallback onTap,
+    required Color titleColor,
+    required Color subColor,
   }) {
-    return GestureDetector(
+    final cs = Theme.of(context).colorScheme;
+
+    final tileBg = isLight ? AppColors.surfaceLightMode : const Color(0xFF1A1A1A);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: onTap,
-      child: Card(
-        color: const Color(0xFF1A1A1A),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Icon(icon, color: const Color(0xFFD4AF37), size: 24),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Color(0xFFD4AF37),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: tileBg,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 16,
+              spreadRadius: 0,
+              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(isLight ? 0.06 : 0.22),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: isLight
+                    ? AppColors.primary.withOpacity(0.12)
+                    : AppColors.primary.withOpacity(0.18),
+                shape: BoxShape.circle,
               ),
-              const Icon(Icons.arrow_forward, color: Colors.grey, size: 20),
-            ],
-          ),
+              child: Icon(icon, color: AppColors.primary, size: 18),
+            ),
+
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: subColor, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward,
+              color: isLight ? cs.onSurface.withOpacity(0.45) : Colors.grey,
+              size: 20,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  static Future<void> _sendBugReport(BuildContext context) async {
+  // ---------- Bug report + version dialog (unchanged logic) ----------
+
+  Future<void> _sendBugReport(BuildContext context) async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
       path: 'effttech@gmail.com',
-      query: encodeQueryParameters(<String, String>{
+      query: _encodeQueryParameters(<String, String>{
         'subject': 'আমাল ট্র্যাকার - বাগ রিপোর্ট',
         'body': 'দয়া করে এখানে বাগের বিবরণ লিখুন:\n\n',
       }),
     );
-    
+
     try {
       await launchUrl(emailUri, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('ইমেইল অ্যাপ খুলতে পারছে না। effttech@gmail.com এ ইমেইল করুন।'),
+            content: Text(
+              'ইমেইল অ্যাপ খুলতে পারছে না। effttech@gmail.com এ ইমেইল করুন।',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -259,13 +448,13 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  static void _showVersionDialog(BuildContext context) {
+  void _showVersionDialog(BuildContext context, bool isLight) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Row(
-          children: [
+        backgroundColor: isLight ? Colors.white : const Color(0xFF1A1A1A),
+        title: Row(
+          children: const [
             Icon(Icons.info, color: Color(0xFFD4AF37)),
             SizedBox(width: 8),
             Text(
@@ -278,32 +467,36 @@ class SettingsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'সংস্করণ: v1.0.8',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: isLight ? const Color(0xFF1F2937) : Colors.white,
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'বিল্ড: 13',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              style: TextStyle(
+                color: isLight ? const Color(0xFF6B7280) : Colors.grey,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'ডেভেলপার: Salek Bin Hossain, Effy Tech',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              style: TextStyle(
+                color: isLight ? const Color(0xFF6B7280) : Colors.grey,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () async {
-                final Uri emailUri = Uri(
-                  scheme: 'mailto',
-                  path: 'effttech@gmail.com',
-                );
+                final Uri emailUri = Uri(scheme: 'mailto', path: 'effttech@gmail.com');
                 try {
                   await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-                } catch (e) {
-                  // Ignore
-                }
+                } catch (_) {}
               },
               child: const Text(
                 'effttech@gmail.com',
@@ -315,11 +508,14 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Divider(color: Color(0xFF2A2A2A)),
+            Divider(color: (isLight ? Colors.black : Colors.white).withOpacity(0.10)),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               '© ২০২৬ সর্বস্বত্ব সংরক্ষিত',
-              style: TextStyle(color: Colors.grey, fontSize: 12),
+              style: TextStyle(
+                color: isLight ? const Color(0xFF6B7280) : Colors.grey,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
@@ -336,13 +532,18 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  static String? encodeQueryParameters(Map<String, String> params) {
+  String? _encodeQueryParameters(Map<String, String> params) {
     return params.entries
-        .map((MapEntry<String, String> e) =>
-        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
   }
 }
+
+// -------------------------
+// ✅ Keep your existing ManualScreen code below UNCHANGED
+// class ManualScreen extends StatelessWidget { ... }
+// -------------------------
+
 
 class ManualScreen extends StatelessWidget {
   const ManualScreen({Key? key}) : super(key: key);
@@ -355,7 +556,8 @@ class ManualScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
           'ব্যবহারের নিয়ম',
-          style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.bold),
         ),
         elevation: 0,
       ),
@@ -367,47 +569,47 @@ class ManualScreen extends StatelessWidget {
             // Header
             _buildHeaderSection(),
             const SizedBox(height: 24),
-            
+
             // Reminder Section
             _buildReminderSection(),
             const SizedBox(height: 24),
-            
+
             // Prayer Section
             _buildPrayerSection(),
             const SizedBox(height: 24),
-            
+
             // Amal Section
             _buildAmalSection(),
             const SizedBox(height: 24),
-            
+
             // Dhikr Section
             _buildDhikrSection(),
             const SizedBox(height: 24),
-            
+
             // Reading Section
             _buildReadingSection(),
             const SizedBox(height: 24),
-            
+
             // Sin Tracker Section
             _buildSinTrackerSection(),
             const SizedBox(height: 24),
-            
+
             // Statistics Section
             _buildStatisticsSection(),
             const SizedBox(height: 24),
-            
+
             // Cloud Sync Section
             _buildCloudSyncSection(),
             const SizedBox(height: 24),
-            
+
             // Settings Section
             _buildSettingsSection(),
             const SizedBox(height: 24),
-            
+
             // Troubleshooting Section
             _buildTroubleshootingSection(context),
             const SizedBox(height: 24),
-            
+
             // Contact Section
             _buildContactSection(context),
           ],
@@ -825,7 +1027,8 @@ class ManualScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFD4AF37).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                border:
+                    Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
               ),
               child: const Row(
                 children: [
@@ -923,27 +1126,27 @@ class ManualScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ...items.map((item) => Padding(
-          padding: const EdgeInsets.only(bottom: 6, left: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '• ',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-              Expanded(
-                child: Text(
-                  item,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                    height: 1.5,
+              padding: const EdgeInsets.only(bottom: 6, left: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '• ',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
-                ),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )),
+            )),
       ],
     );
   }
@@ -979,3 +1182,4 @@ class ManualScreen extends StatelessWidget {
     );
   }
 }
+

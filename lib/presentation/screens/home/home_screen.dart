@@ -143,7 +143,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 static const Color _gold = Color(0xFFD4AF37);
 
-Widget _buildHomeBackground() {
+Widget _buildHomeBackground(BuildContext context) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  final top = cs.surface;
+  final bottom = cs.background;
+
   return Stack(
     children: [
       Container(
@@ -151,30 +158,34 @@ Widget _buildHomeBackground() {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.backgroundDark,
-              const Color(0xFF0B0B0B),
-            ],
+            colors: [top, bottom],
           ),
         ),
       ),
+
       Positioned(
         top: -140,
         right: -120,
-        child: _glowBlob(size: 280, opacity: 0.14),
+        child: _glowBlob(size: 280, opacity: theme.brightness == Brightness.dark ? 0.14 : 0.07),
       ),
       Positioned(
         bottom: -160,
         left: -140,
-        child: _glowBlob(size: 320, opacity: 0.10),
+        child: _glowBlob(size: 320, opacity: theme.brightness == Brightness.dark ? 0.10 : 0.05),
       ),
+
       Positioned.fill(
         child: IgnorePointer(
           child: CustomPaint(
-            painter: _PremiumNoisePainter(color: _gold.withOpacity(0.08), intensity: 0.22, seed: 3),
+            painter: _PremiumNoisePainter(
+              color: (theme.brightness == Brightness.dark ? _gold : cs.primary).withOpacity(theme.brightness == Brightness.dark ? 0.08 : 0.04),
+              intensity: 0.22,
+              seed: 3,
+            ),
           ),
         ),
       ),
+
       Positioned.fill(
         child: IgnorePointer(
           child: DecoratedBox(
@@ -184,7 +195,7 @@ Widget _buildHomeBackground() {
                 radius: 1.2,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.35),
+                  Colors.black.withOpacity(theme.brightness == Brightness.dark ? 0.35 : 0.06),
                 ],
               ),
             ),
@@ -212,24 +223,33 @@ Widget _glowBlob({required double size, required double opacity}) {
 }
 
 Widget _premiumCard({
+  required BuildContext context,
   EdgeInsets margin = EdgeInsets.zero,
   EdgeInsets padding = const EdgeInsets.all(16),
   double radius = 18,
   required Widget child,
 }) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  final accent = isDark ? _gold : cs.primary;
+  final cardA = cs.surface;
+  final cardB = cs.surfaceContainerLow;
+
   return Container(
     margin: margin,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.45),
+          color: Colors.black.withOpacity(isDark ? 0.45 : 0.10),
           blurRadius: 18,
           offset: const Offset(0, 10),
           spreadRadius: -10,
         ),
         BoxShadow(
-          color: _gold.withOpacity(0.06),
+          color: accent.withOpacity(isDark ? 0.06 : 0.08),
           blurRadius: 16,
           offset: const Offset(0, 6),
           spreadRadius: -10,
@@ -243,16 +263,14 @@ Widget _premiumCard({
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF202020),
-                    Color(0xFF141414),
-                  ],
+                  colors: [cardA, cardB],
+
                 ),
                 border: Border.all(
-                  color: _gold.withOpacity(0.10),
+                  color: accent.withOpacity(isDark ? 0.10 : 0.18),
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(radius),
@@ -263,7 +281,7 @@ Widget _premiumCard({
             child: IgnorePointer(
               child: CustomPaint(
                 painter: _PremiumNoisePainter(
-                  color: Colors.white.withOpacity(0.04),
+                  color: cs.onSurface.withOpacity(isDark ? 0.04 : 0.02),
                 ),
               ),
             ),
@@ -276,7 +294,7 @@ Widget _premiumCard({
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withOpacity(0.06),
+                      cs.onSurface.withOpacity(isDark ? 0.06 : 0.03),
                       Colors.transparent,
                     ],
                   ),
@@ -295,25 +313,34 @@ Widget _premiumCard({
 }
 
 Widget _premiumInkCard({
+  required BuildContext context,
   required VoidCallback onTap,
   EdgeInsets margin = EdgeInsets.zero,
   EdgeInsets padding = const EdgeInsets.all(16),
   double radius = 18,
   required Widget child,
 }) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  final accent = isDark ? _gold : cs.primary;
+  final cardA = cs.surface;
+  final cardB = cs.surfaceContainerLow;
+
   return Container(
     margin: margin,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.45),
+          color: Colors.black.withOpacity(isDark ? 0.45 : 0.10),
           blurRadius: 18,
           offset: const Offset(0, 10),
           spreadRadius: -10,
         ),
         BoxShadow(
-          color: _gold.withOpacity(0.06),
+          color: accent.withOpacity(isDark ? 0.06 : 0.08),
           blurRadius: 16,
           offset: const Offset(0, 6),
           spreadRadius: -10,
@@ -329,16 +356,13 @@ Widget _premiumInkCard({
           borderRadius: BorderRadius.circular(radius),
           child: Ink(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF202020),
-                  Color(0xFF141414),
-                ],
+                colors: [cardA, cardB],
               ),
               border: Border.all(
-                color: _gold.withOpacity(0.10),
+                color: accent.withOpacity(isDark ? 0.10 : 0.18),
                 width: 1,
               ),
             ),
@@ -348,7 +372,7 @@ Widget _premiumInkCard({
                   child: IgnorePointer(
                     child: CustomPaint(
                       painter: _PremiumNoisePainter(
-                        color: Colors.white.withOpacity(0.04),
+                        color: cs.onSurface.withOpacity(isDark ? 0.04 : 0.02),
                       ),
                     ),
                   ),
@@ -361,7 +385,7 @@ Widget _premiumInkCard({
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.white.withOpacity(0.06),
+                            cs.onSurface.withOpacity(isDark ? 0.06 : 0.03),
                             Colors.transparent,
                           ],
                         ),
@@ -382,29 +406,54 @@ Widget _premiumInkCard({
   );
 }
 
-Widget _iconPill(IconData icon) {
+Widget _iconPill(BuildContext context, IconData icon) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  final accent = isDark ? _gold : cs.primary;
+
+  final pillBg = cs.surfaceContainerHighest;
+
+  final pillBorder = accent.withOpacity(isDark ? 0.18 : 0.22);
+
+  final iconColor = accent;
+
   return Container(
     padding: const EdgeInsets.all(13),
     decoration: BoxDecoration(
-      color: _gold.withOpacity(0.14),
+      color: pillBg,
       borderRadius: BorderRadius.circular(14),
       border: Border.all(
-        color: _gold.withOpacity(0.20),
+        color: pillBorder,
       ),
     ),
     child: Icon(
       icon,
-      color: _gold,
+      color: iconColor,
       size: 26,
     ),
   );
 }
 
 Widget _sunChip({
+  required BuildContext context,
   required String label,
   required String time,
   required IconData icon,
 }) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
+
+  final accent = isDark ? _gold : cs.primary;
+
+  final bg = cs.surfaceContainerHighest;
+
+  final border = accent.withOpacity(isDark ? 0.18 : 0.22);
+
+  final textColor = cs.onSurface.withOpacity(isDark ? 0.85 : 0.80);
+
   return Row(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -413,8 +462,8 @@ Widget _sunChip({
         children: [
           Text(
             time,
-            style: const TextStyle(
-              color: _gold,
+            style: TextStyle(
+              color: accent,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.2,
@@ -423,7 +472,7 @@ Widget _sunChip({
           Text(
             label,
             style: TextStyle(
-              color: Colors.grey[500],
+              color: textColor,
               fontSize: 10,
             ),
           ),
@@ -433,15 +482,15 @@ Widget _sunChip({
       Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: _gold.withOpacity(0.12),
+          color: bg,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: _gold.withOpacity(0.18),
+            color: border,
           ),
         ),
         child: Icon(
           icon,
-          color: _gold,
+          color: accent,
           size: 20,
         ),
       ),
@@ -453,9 +502,10 @@ Widget _sunChip({
   @override
   Widget build(BuildContext context) {
     final prayerTimesState = ref.watch(prayerTimesProvider);
-  
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -463,27 +513,36 @@ Widget _sunChip({
         title: Text(
           'আমল ট্র্যাকার',
           style: TextStyle(
-            color: AppColors.primary,
+            color: cs.primary,
             fontSize: 22,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.2,
           ),
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.backgroundDark,
-                AppColors.backgroundDark.withOpacity(0.0),
-              ],
+        flexibleSpace: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          final cs = theme.colorScheme;
+          final isDark = theme.brightness == Brightness.dark;
+
+          final top = cs.surface;
+          final bottom = cs.background;
+
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [top, bottom],
+              ),
             ),
-          ),
-        ),
+          );
+        },
+      ),
+
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+            icon: Icon(Icons.refresh_rounded, color: cs.primary),
             tooltip: 'রিফ্রেশ',
             onPressed: () async {
               ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
@@ -494,16 +553,16 @@ Widget _sunChip({
               ref.read(statisticsProvider.notifier).updateTodayStats();
   
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('ডেটা আপডেট হয়েছে'),
-                  duration: Duration(seconds: 1),
-                  backgroundColor: AppColors.primary,
+                SnackBar(
+                  content: const Text('ডেটা আপডেট হয়েছে'),
+                  duration: const Duration(seconds: 1),
+                  backgroundColor: cs.primary,
                 ),
               );
             },
           ),
           IconButton(
-            icon: const Icon(Icons.bar_chart_rounded, color: AppColors.primary),
+            icon: Icon(Icons.bar_chart_rounded, color: cs.primary),
             onPressed: () {
               Navigator.push(
                 context,
@@ -514,7 +573,7 @@ Widget _sunChip({
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
+            icon: Icon(Icons.settings_outlined, color: cs.primary),
             onPressed: () {
               Navigator.push(
                 context,
@@ -528,7 +587,7 @@ Widget _sunChip({
       ),
       body: Stack(
         children: [
-          Positioned.fill(child: _buildHomeBackground()),
+          Positioned.fill(child: _buildHomeBackground(context)),
           RefreshIndicator(
             onRefresh: () async {
               ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
@@ -539,8 +598,8 @@ Widget _sunChip({
               ref.read(statisticsProvider.notifier).updateTodayStats();
               await Future.delayed(const Duration(milliseconds: 500));
             },
-            color: AppColors.primary,
-            backgroundColor: AppColors.backgroundLight,
+            color: cs.primary,
+            backgroundColor: cs.surface,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -591,6 +650,8 @@ Widget _sunChip({
       }
   
       return _premiumCard(
+        context: context,
+        
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         radius: 22,
@@ -601,65 +662,86 @@ Widget _sunChip({
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '$hijriDay $hijriMonthBengali',
-                    style: const TextStyle(
-                      color: AppColors.textGolden,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$dayName, $dayNum $monthName',
-                    style: const TextStyle(
-                      color: AppColors.grey500,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    bengaliDate,
-                    style: const TextStyle(
-                      color: AppColors.grey600,
-                      fontSize: 12,
-                      height: 1.2,
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final theme = Theme.of(context);
+                      final cs = theme.colorScheme;
+                      final isDark = theme.brightness == Brightness.dark;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$hijriDay $hijriMonthBengali',
+                            style: TextStyle(
+                              color: isDark ? _gold : cs.primary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '$dayName, $dayNum $monthName',
+                            style: TextStyle(
+                              color: cs.onSurface.withOpacity(0.65),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            bengaliDate,
+                            style: TextStyle(
+                              color: cs.onSurface.withOpacity(0.55),
+                              fontSize: 12,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-            Container(
-              height: 76,
-              width: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    const Color(0xFFD4AF37).withOpacity(0.25),
-                    const Color(0xFFD4AF37).withOpacity(0.55),
-                    const Color(0xFFD4AF37).withOpacity(0.25),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+            Builder(
+              builder: (context) {
+                final theme = Theme.of(context);
+                final cs = theme.colorScheme;
+                final isDark = theme.brightness == Brightness.dark;
+                return Container(
+                  height: 76,
+                  width: 1,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        (isDark ? _gold : cs.primary).withOpacity(0.25),
+                        (isDark ? _gold : cs.primary).withOpacity(0.55),
+                        (isDark ? _gold : cs.primary).withOpacity(0.25),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _sunChip(
+                  context: context,
                   label: 'সূর্যোদয়',
                   time: sunriseTime ?? '--:--',
                   icon: Icons.wb_sunny_rounded,
                 ),
                 const SizedBox(height: 12),
                 _sunChip(
+                  context: context,
                   label: 'সূর্যাস্ত',
                   time: sunsetTime ?? '--:--',
                   icon: Icons.nights_stay_rounded,
@@ -790,7 +872,12 @@ Widget _sunChip({
 
     
   Widget _buildPrayerTimesCard(BuildContext context, PrayerTimesState state) {
+      final theme = Theme.of(context);
+      final cs = theme.colorScheme;
+      final isDark = theme.brightness == Brightness.dark;
+      
       return _premiumCard(
+        context: context,
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: EdgeInsets.zero,
         radius: 22,
@@ -808,9 +895,9 @@ Widget _sunChip({
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      const Color(0xFFD4AF37).withOpacity(0.25),
-                      const Color(0xFFD4AF37).withOpacity(0.55),
-                      const Color(0xFFD4AF37).withOpacity(0.25),
+                      (isDark ? _gold : cs.primary).withOpacity(0.25),
+                      (isDark ? _gold : cs.primary).withOpacity(0.55),
+                      (isDark ? _gold : cs.primary).withOpacity(0.25),
                       Colors.transparent,
                     ],
                   ),
@@ -823,11 +910,11 @@ Widget _sunChip({
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (state.isLoading)
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         child: CircularProgressIndicator(
-                          color: Color(0xFFD4AF37),
+                          color: isDark ? _gold : cs.primary,
                         ),
                       ),
                     )
@@ -894,6 +981,10 @@ Widget _sunChip({
     }
   
     Widget _buildCurrentPrayerSection(PrayerTimesState state) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     // Determine status and colors
     Color statusColor;
     String statusText;
@@ -908,12 +999,12 @@ Widget _sunChip({
           ? 'আর ${state.timeToCurrentPrayerEnd} বাকি'
           : null;
     } else if (state.isNaflTime) {
-      statusColor = const Color(0xFFD4AF37);
+      statusColor = isDark ? _gold : cs.primary;
       statusText = 'এখন চলছে';
       mainText = 'নফল';
       subtitleText = null;
     } else if (state.currentPrayer != null) {
-      statusColor = const Color(0xFFD4AF37);
+      statusColor = isDark ? _gold : cs.primary;
       statusText = 'এখন চলছে';
       mainText = _getPrayerDisplayName(state.currentPrayer!);
       subtitleText = 'পরবর্তী ওয়াক্তের বাকি';
@@ -1002,17 +1093,17 @@ Widget _sunChip({
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF242424),
-            Color(0xFF151515),
+            cs.surfaceContainerHighest,
+            cs.surfaceContainer,
           ],
         ),
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFFD4AF37).withOpacity(0.10),
+            color: cs.outlineVariant.withOpacity(0.5),
             width: 1,
           ),
         ),
@@ -1060,8 +1151,8 @@ Widget _sunChip({
           Text(
             mainText,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFFD4AF37),
+            style: TextStyle(
+              color: isDark ? _gold : cs.primary,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -1077,11 +1168,11 @@ Widget _sunChip({
                   ? state.timeToNextPrayer!
                   : state.timeToCurrentPrayerEnd!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFFD4AF37),
+              style: TextStyle(
+                color: isDark ? _gold : cs.primary,
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                fontFeatures: [FontFeature.tabularFigures()],
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
             const SizedBox(height: 4),
@@ -1091,7 +1182,7 @@ Widget _sunChip({
                   : (subtitleText ?? 'পরবর্তী ওয়াক্তের বাকি'),
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey[500],
+                color: cs.onSurface.withOpacity(0.5),
                 fontSize: 12,
               ),
             ),
@@ -1117,7 +1208,7 @@ Widget _sunChip({
                 Text(
                   currentPrayerTimeStr ?? '',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: cs.onSurface.withOpacity(0.5),
                     fontSize: 11,
                   ),
                 ),
@@ -1127,7 +1218,7 @@ Widget _sunChip({
                     height: 6,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      color: Colors.grey[800],
+                      color: cs.surfaceContainerHighest.withOpacity(0.5),
                     ),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -1140,7 +1231,7 @@ Widget _sunChip({
                               width: totalWidth,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: Colors.grey[800],
+                                color: cs.surfaceContainerHighest.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -1149,7 +1240,7 @@ Widget _sunChip({
                               width: goldenWidth,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD4AF37),
+                                color: isDark ? _gold : cs.primary,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -1163,7 +1254,7 @@ Widget _sunChip({
                 Text(
                   prayerEndTimeStr ?? '',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: cs.onSurface.withOpacity(0.5),
                     fontSize: 11,
                   ),
                 ),
@@ -1173,59 +1264,83 @@ Widget _sunChip({
             // Next prayer info
             if (nextPrayerName != null && nextPrayerTimeStr != null) ...[
               const SizedBox(height: 16),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.schedule,
-                      color: Colors.grey[500],
-                      size: 16,
+              Builder(
+                builder: (context) {
+                  final theme = Theme.of(context);
+                  final cs = theme.colorScheme;
+                  final isDark = theme.brightness == Brightness.dark;
+
+                  final bg = cs.surfaceContainerHighest;
+
+                  final textColor = cs.onSurface.withOpacity(isDark ? 0.85 : 0.80);
+
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: bg,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'পরবর্তী: $nextPrayerName - $nextPrayerTimeStr',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 13,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.schedule,
+                          color: textColor,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'পরবর্তী: $nextPrayerName - $nextPrayerTimeStr',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ] else if (nextPrayerName != null) ...[
               const SizedBox(height: 16),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.schedule,
-                      color: Colors.grey[500],
-                      size: 16,
+              Builder(
+                builder: (context) {
+                  final theme = Theme.of(context);
+                  final cs = theme.colorScheme;
+                  final isDark = theme.brightness == Brightness.dark;
+
+                  final bg = cs.surfaceContainerHighest;
+
+                  final textColor = cs.onSurface.withOpacity(isDark ? 0.85 : 0.80);
+
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: bg,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'পরবর্তী: $nextPrayerName (আগামীকাল)',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 13,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.schedule,
+                          color: textColor,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'পরবর্তী: $nextPrayerName (আগামীকাল)',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
           ],
@@ -1290,13 +1405,16 @@ Widget _sunChip({
     return '$hour:$minute $period';
   }
 
-  // Replace your existing _buildPrayerTimeRow with this one
+// Replace your existing _buildPrayerTimeRow with this one
 Widget _buildPrayerTimeRow(
   BuildContext context,
   String name,
   String time,
   bool isActive,
 ) {
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+  final isDark = theme.brightness == Brightness.dark;
   final radius = BorderRadius.circular(16);
 
   return AnimatedContainer(
@@ -1308,7 +1426,7 @@ Widget _buildPrayerTimeRow(
       boxShadow: [
         // soft depth (always)
         BoxShadow(
-          color: Colors.black.withOpacity(0.45),
+          color: Colors.black.withOpacity(isDark ? 0.45 : 0.10),
           blurRadius: 18,
           offset: const Offset(0, 10),
           spreadRadius: -10,
@@ -1316,7 +1434,7 @@ Widget _buildPrayerTimeRow(
         // golden glow only for active
         if (isActive)
           BoxShadow(
-            color: const Color(0xFFD4AF37).withOpacity(0.28),
+            color: (isDark ? _gold : cs.primary).withOpacity(0.28),
             blurRadius: 22,
             offset: const Offset(0, 10),
             spreadRadius: -12,
@@ -1343,26 +1461,44 @@ Widget _buildPrayerTimeRow(
             decoration: BoxDecoration(
               borderRadius: radius,
               gradient: isActive
-                  ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFE0C05A),
-                        Color(0xFFD4AF37),
-                      ],
-                    )
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFF1B1B1B).withOpacity(0.70),
-                        const Color(0xFF121212).withOpacity(0.55),
-                      ],
-                    ),
+                  ? (isDark
+                      ? const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFFE0C05A),
+                            Color(0xFFD4AF37),
+                          ],
+                        )
+                      : LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            cs.primaryContainer,
+                            cs.primary,
+                          ],
+                        ))
+                  : (isDark
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFF1B1B1B).withOpacity(0.70),
+                            const Color(0xFF121212).withOpacity(0.55),
+                          ],
+                        )
+                      : LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            cs.surface,
+                            cs.surfaceContainerLow,
+                          ],
+                        )),
               border: Border.all(
                 color: isActive
-                    ? const Color(0xFF0A0A0A).withOpacity(0.10)
-                    : const Color(0xFFD4AF37).withOpacity(0.16),
+                    ? (isDark ? const Color(0xFF0A0A0A) : cs.surface).withOpacity(0.10)
+                    : (isDark ? _gold : cs.primary).withOpacity(0.16),
                 width: 1,
               ),
             ),
@@ -1375,12 +1511,12 @@ Widget _buildPrayerTimeRow(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isActive
-                        ? const Color(0xFF0A0A0A)
-                        : const Color(0xFFD4AF37).withOpacity(0.35),
+                        ? (isDark ? const Color(0xFF0A0A0A) : cs.onPrimary)
+                        : (isDark ? _gold : cs.primary).withOpacity(0.35),
                     boxShadow: [
                       if (isActive)
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withOpacity(isDark ? 0.25 : 0.15),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -1395,8 +1531,8 @@ Widget _buildPrayerTimeRow(
                     name,
                     style: TextStyle(
                       color: isActive
-                          ? const Color(0xFF0A0A0A)
-                          : Colors.white.withOpacity(0.92),
+                          ? (isDark ? const Color(0xFF0A0A0A) : cs.onPrimary)
+                          : cs.onSurface.withOpacity(isDark ? 0.92 : 0.88),
                       fontSize: 16,
                       fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                       letterSpacing: 0.15,
@@ -1409,8 +1545,8 @@ Widget _buildPrayerTimeRow(
                   time,
                   style: TextStyle(
                     color: isActive
-                        ? const Color(0xFF0A0A0A)
-                        : Colors.white.withOpacity(0.92),
+                        ? (isDark ? const Color(0xFF0A0A0A) : cs.onPrimary)
+                        : cs.onSurface.withOpacity(isDark ? 0.92 : 0.88),
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.3,
@@ -1428,7 +1564,7 @@ Widget _buildPrayerTimeRow(
             top: 0,
             child: Container(
               height: 1,
-              color: Colors.white.withOpacity(isActive ? 0.18 : 0.08),
+              color: cs.onSurface.withOpacity(isActive ? (isDark ? 0.18 : 0.12) : (isDark ? 0.08 : 0.05)),
             ),
           ),
         ],
@@ -1440,6 +1576,10 @@ Widget _buildPrayerTimeRow(
 
     
   Widget _buildTodayProgress(BuildContext context, WidgetRef ref) {
+      final theme = Theme.of(context);
+      final cs = theme.colorScheme;
+      final isDark = theme.brightness == Brightness.dark;
+      
       final prayerTrackingState = ref.watch(prayerTrackingProvider);
       final dailyAmalState = ref.watch(dailyAmalProvider);
       final dhikrState = ref.watch(dhikrCounterProvider);
@@ -1466,6 +1606,7 @@ Widget _buildPrayerTimeRow(
       final overallPercentage = (overallProgress * 100).toInt();
   
       return _premiumCard(
+  context: context,
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(22),
         radius: 22,
@@ -1477,24 +1618,24 @@ Widget _buildPrayerTimeRow(
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.14),
+                    color: (isDark ? _gold : cs.primary).withOpacity(0.14),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFFD4AF37).withOpacity(0.18),
+                      color: (isDark ? _gold : cs.primary).withOpacity(0.18),
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.trending_up_rounded,
-                    color: Color(0xFFD4AF37),
+                    color: isDark ? _gold : cs.primary,
                     size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'আজকের অগ্রগতি',
                     style: TextStyle(
-                      color: Color(0xFFD4AF37),
+                      color: isDark ? _gold : cs.primary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.2,
@@ -1528,10 +1669,10 @@ Widget _buildPrayerTimeRow(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'সামগ্রিক অগ্রগতি',
                       style: TextStyle(
-                        color: Color(0xFFB0B0B0),
+                        color: cs.onSurface.withOpacity(0.6),
                         fontSize: 13,
                       ),
                     ),
@@ -1551,10 +1692,10 @@ Widget _buildPrayerTimeRow(
                     Container(
                       height: 12,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F0F0F),
+                        color: isDark ? const Color(0xFF0F0F0F) : cs.surface.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.05),
+                          color: cs.onSurface.withOpacity(isDark ? 0.05 : 0.08),
                         ),
                       ),
                     ),
@@ -1603,10 +1744,14 @@ Widget _buildPrayerTimeRow(
     }
   
     Color _getProgressColor(double progress) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     if (progress >= 0.8) {
       return const Color(0xFF4CAF50); // Green for excellent
     } else if (progress >= 0.5) {
-      return const Color(0xFFD4AF37); // Gold for good
+      return isDark ? _gold : cs.primary; // Gold for good
     } else if (progress >= 0.25) {
       return const Color(0xFFFF9800); // Orange for moderate
     } else {
@@ -1628,6 +1773,10 @@ Widget _buildPrayerTimeRow(
 
   Widget _buildProgressCircle(
       BuildContext context, int current, int total, String label) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     final percentage = current / total;
     return Column(
       children: [
@@ -1640,9 +1789,11 @@ Widget _buildPrayerTimeRow(
               child: CircularProgressIndicator(
                 value: percentage,
                 strokeWidth: 6,
-                backgroundColor: const Color(0xFF2A2A2A),
+                backgroundColor: isDark
+                    ? const Color(0xFF2A2A2A)
+                    : cs.surfaceContainerHighest.withOpacity(0.3),
                 valueColor:
-                    const AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+                    AlwaysStoppedAnimation<Color>(isDark ? const Color(0xFFD4AF37) : cs.primary),
               ),
             ),
             Column(
@@ -1650,16 +1801,16 @@ Widget _buildPrayerTimeRow(
               children: [
                 Text(
                   '$current',
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFD4AF37) : cs.primary,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   '/$total',
-                  style: const TextStyle(
-                    color: Color(0xFF888888),
+                  style: TextStyle(
+                    color: cs.onSurface.withOpacity(isDark ? 0.55 : 0.50),
                     fontSize: 12,
                   ),
                 ),
@@ -1670,8 +1821,8 @@ Widget _buildPrayerTimeRow(
         const SizedBox(height: 12),
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFFB0B0B0),
+          style: TextStyle(
+            color: cs.onSurface.withOpacity(isDark ? 0.70 : 0.65),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -1681,6 +1832,10 @@ Widget _buildPrayerTimeRow(
   }
 
   Widget _buildAmalCards(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     final prayerTrackingState = ref.watch(prayerTrackingProvider);
     final dailyAmalState = ref.watch(dailyAmalProvider);
     final dhikrState = ref.watch(dhikrCounterProvider);
@@ -1702,12 +1857,12 @@ Widget _buildPrayerTimeRow(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 4, bottom: 16),
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 16),
             child: Text(
               'আজকের আমল',
               style: TextStyle(
-                color: Color(0xFFD4AF37),
+                color: isDark ? _gold : cs.primary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -1807,22 +1962,27 @@ Widget _buildPrayerTimeRow(
       required int pendingKaffara,
       required VoidCallback onTap,
     }) {
+      final theme = Theme.of(context);
+      final cs = theme.colorScheme;
+      final isDark = theme.brightness == Brightness.dark;
+
       return _premiumInkCard(
+  context: context,
         onTap: onTap,
         radius: 18,
         padding: const EdgeInsets.all(18),
         child: Row(
           children: [
-            _iconPill(Icons.auto_fix_high_rounded),
+            _iconPill(context, Icons.auto_fix_high_rounded),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'প্রতিদিনের গুনাহ',
                     style: TextStyle(
-                      color: Color(0xFFEAEAEA),
+                      color: cs.onSurface.withOpacity(isDark ? 0.92 : 0.88),
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.15,
@@ -1836,7 +1996,7 @@ Widget _buildPrayerTimeRow(
                             ? 'আজ $totalSins টি গুনাহ • সব কাফফারা হয়েছে ✓'
                             : 'আজ $totalSins টি গুনাহ • $pendingKaffara বাকি',
                     style: TextStyle(
-                      color: Colors.grey.shade500,
+                      color: cs.onSurface.withOpacity(isDark ? 0.65 : 0.60),
                       fontSize: 12.8,
                       height: 1.25,
                     ),
@@ -1846,7 +2006,7 @@ Widget _buildPrayerTimeRow(
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: Colors.grey.shade600,
+              color: cs.onSurface.withOpacity(isDark ? 0.50 : 0.45),
               size: 16,
             ),
           ],
@@ -1864,10 +2024,21 @@ Widget _buildPrayerTimeRow(
       required int total,
       required VoidCallback onTap,
     }) {
+      final theme = Theme.of(context);
+      final cs = theme.colorScheme;
+      final isDark = theme.brightness == Brightness.dark;
+
+      final accent = isDark ? _gold : cs.primary;
+
+      final bg = cs.surfaceContainerHighest;
+
+      final border = accent.withOpacity(isDark ? 0.18 : 0.22);
+
       final safeTotal = total <= 0 ? 1 : total;
       final percentage = (current / safeTotal).clamp(0.0, 1.0);
   
       return _premiumInkCard(
+  context: context,
         onTap: onTap,
         radius: 18,
         padding: EdgeInsets.zero,
@@ -1877,7 +2048,7 @@ Widget _buildPrayerTimeRow(
               padding: const EdgeInsets.all(18),
               child: Row(
                 children: [
-                  _iconPill(icon),
+                  _iconPill(context, icon),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -1885,8 +2056,8 @@ Widget _buildPrayerTimeRow(
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            color: Color(0xFFEAEAEA),
+                          style: TextStyle(
+                            color: cs.onSurface.withOpacity(isDark ? 0.92 : 0.88),
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.15,
@@ -1895,8 +2066,8 @@ Widget _buildPrayerTimeRow(
                         const SizedBox(height: 6),
                         Text(
                           subtitle,
-                          style: const TextStyle(
-                            color: Color(0xFF8D8D8D),
+                          style: TextStyle(
+                            color: cs.onSurface.withOpacity(isDark ? 0.65 : 0.60),
                             fontSize: 12.8,
                             height: 1.25,
                           ),
@@ -1909,16 +2080,16 @@ Widget _buildPrayerTimeRow(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37).withOpacity(0.14),
+                      color: bg,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: const Color(0xFFD4AF37).withOpacity(0.20),
+                        color: border,
                       ),
                     ),
                     child: Text(
                       '$current/$total',
-                      style: const TextStyle(
-                        color: Color(0xFFD4AF37),
+                      style: TextStyle(
+                        color: accent,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.1,
@@ -1926,9 +2097,9 @@ Widget _buildPrayerTimeRow(
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_ios_rounded,
-                    color: Color(0xFF666666),
+                    color: cs.onSurface.withOpacity(isDark ? 0.50 : 0.45),
                     size: 16,
                   ),
                 ],
@@ -1942,9 +2113,11 @@ Widget _buildPrayerTimeRow(
                 child: LinearProgressIndicator(
                   value: percentage,
                   minHeight: 8,
-                  backgroundColor: const Color(0xFF0F0F0F),
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color(0xFFD4AF37),
+                  backgroundColor: isDark
+                      ? const Color(0xFF0F0F0F)
+                      : cs.surfaceContainerHighest.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? const Color(0xFFD4AF37) : cs.primary,
                   ),
                 ),
               ),

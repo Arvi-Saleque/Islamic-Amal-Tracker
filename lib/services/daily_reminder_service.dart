@@ -212,8 +212,8 @@ class DailyReminderService {
       now.year,
       now.month,
       now.day,
-      20,
-      30,
+      22,
+      00,
     );
 
     if (scheduledDate.isBefore(now)) {

@@ -9,17 +9,27 @@ class AppColors {
       Color(0xFF1A1A1A); // Light grey for cards/boxes
 
   // Light Theme Colors
-  static const Color backgroundLightMode =
-      Color(0xFFF3F4F6); // Light mode background
-  static const Color surfaceLightMode = Color(0xFFFFFFFF); // Light mode cards
+  // Light Theme Colors (Creamy Premium — NO WHITE)
+  static const Color backgroundLightMode = Color(
+      0xFFF1E7D3); // main background: warm almond cream (darker than surface)
+
+  static const Color surfaceLightMode =
+      Color(0xFFF7EEDC); // cards: soft butter cream (clearly not white)
   static const Color cardLightMode =
-      Color(0xFFF9FAFB); // Light mode card items (gray-50)
+      Color(0xFFFBF3E3); // inner items: lighter cream, still not white
+
   static const Color textLightMode =
-      Color(0xFF1F2937); // Light mode text (gray-800)
+      Color(0xFF2A2116); // warm dark brown (excellent contrast)
+
   static const Color textSecondaryLightMode =
-      Color(0xFF6B7280); // Light mode secondary text (gray-500)
+      Color(0xFF6E6254); // muted warm brown-gray
+
+// Keep for compatibility but DON'T use as actual border in UI
   static const Color borderLightMode =
-      Color(0xFFE5E7EB); // Light mode borders (gray-200)
+      Color(0xFFE3D6C1); // creamy divider tone (not a visible border)
+
+  static const Color iconBgLightMode =
+      Color(0xFFFFEBC2); // gold-cream bubble background (not white)
 
   // Primary Colors
   static const Color primary = Color(0xFFD4AF37); // Golden color
