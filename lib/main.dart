@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 
@@ -11,7 +12,13 @@ import 'presentation/screens/splash/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await Hive.initFlutter();
+  
+  // Hive initialization - different for web
+  if (kIsWeb) {
+    await Hive.initFlutter('amal_tracker_db');
+  } else {
+    await Hive.initFlutter();
+  }
   await HiveService.init();
 
   runApp(

@@ -63,13 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       tz.initializeTimeZones();
     } catch (_) {}
 
-    // Hive
-    try {
-      await Hive.initFlutter();
-      await HiveService.init();
-    } catch (e) {
-      debugPrint('Hive init failed: $e');
-    }
+    // Hive already initialized in main.dart, skip re-initialization
 
     // Firebase + Firestore sync init (optional)
     try {
@@ -1096,14 +1090,21 @@ Widget _sunChip({
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            cs.surfaceContainerHighest,
-            cs.surfaceContainer,
-          ],
+          colors: isDark
+              ? [
+                  cs.surfaceContainerHighest,
+                  cs.surfaceContainer,
+                ]
+              : [
+                  const Color(0xFFFAFAFA),
+                  const Color(0xFFF5F5F5),
+                ],
         ),
         border: Border(
           bottom: BorderSide(
-            color: cs.outlineVariant.withOpacity(0.5),
+            color: isDark
+                ? cs.outlineVariant.withOpacity(0.5)
+                : const Color(0xFFE0E0E0),
             width: 1,
           ),
         ),
@@ -1218,7 +1219,9 @@ Widget _sunChip({
                     height: 6,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      color: cs.surfaceContainerHighest.withOpacity(0.5),
+                      color: isDark
+                          ? cs.surfaceContainerHighest.withOpacity(0.5)
+                          : const Color(0xFFE0E0E0),
                     ),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -1231,7 +1234,9 @@ Widget _sunChip({
                               width: totalWidth,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: cs.surfaceContainerHighest.withOpacity(0.5),
+                                color: isDark
+                                    ? cs.surfaceContainerHighest.withOpacity(0.5)
+                                    : const Color(0xFFE0E0E0),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -1270,9 +1275,13 @@ Widget _sunChip({
                   final cs = theme.colorScheme;
                   final isDark = theme.brightness == Brightness.dark;
 
-                  final bg = cs.surfaceContainerHighest;
+                  final bg = isDark
+                      ? cs.surfaceContainerHighest
+                      : const Color.fromARGB(255, 176, 175, 175);
 
-                  final textColor = cs.onSurface.withOpacity(isDark ? 0.85 : 0.80);
+                  final textColor = isDark
+                      ? cs.onSurface.withOpacity(0.85)
+                      : const Color(0xFF757575);
 
                   return Container(
                     padding:
@@ -1310,9 +1319,13 @@ Widget _sunChip({
                   final cs = theme.colorScheme;
                   final isDark = theme.brightness == Brightness.dark;
 
-                  final bg = cs.surfaceContainerHighest;
+                  final bg = isDark
+                      ? cs.surfaceContainerHighest
+                      : const Color.fromARGB(255, 244, 243, 233);
 
-                  final textColor = cs.onSurface.withOpacity(isDark ? 0.85 : 0.80);
+                  final textColor = isDark
+                      ? cs.onSurface.withOpacity(0.85)
+                      : const Color(0xFF757575);
 
                   return Container(
                     padding:

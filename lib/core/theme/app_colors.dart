@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 
 /// Global color theme for the app
-/// Change these values to update colors throughout the entire app
 class AppColors {
   // Dark Theme Colors
   static const Color backgroundDark = Color(0xFF0A0A0A); // Main dark background
   static const Color backgroundLight =
       Color(0xFF1A1A1A); // Light grey for cards/boxes
 
-  // Light Theme Colors
-  // Light Theme Colors (Creamy Premium — NO WHITE)
-  static const Color backgroundLightMode = Color(
-      0xFFF1E7D3); // main background: warm almond cream (darker than surface)
+  // Light Theme Colors (Premium Soft Ivory — NO PURE WHITE)
+static const Color backgroundLightMode =
+    Color(0xFFF2F1EC); // calm ivory-greige background (less yellow)
 
-  static const Color surfaceLightMode =
-      Color(0xFFF7EEDC); // cards: soft butter cream (clearly not white)
-  static const Color cardLightMode =
-      Color(0xFFFBF3E3); // inner items: lighter cream, still not white
+static const Color surfaceLightMode =
+    Color(0xFFF7F6F1); // cards: soft neutral ivory (clean, not white)
 
-  static const Color textLightMode =
-      Color(0xFF2A2116); // warm dark brown (excellent contrast)
+static const Color cardLightMode =
+    Color(0xFFFBFAF5); // inner items: brighter ivory (still not pure white)
 
-  static const Color textSecondaryLightMode =
-      Color(0xFF6E6254); // muted warm brown-gray
+static const Color textLightMode =
+    Color(0xFF1F2937); // professional dark gray (cleaner than brown)
 
-// Keep for compatibility but DON'T use as actual border in UI
-  static const Color borderLightMode =
-      Color(0xFFE3D6C1); // creamy divider tone (not a visible border)
+static const Color textSecondaryLightMode =
+    Color(0xFF6B7280); // muted gray (professional)
 
-  static const Color iconBgLightMode =
-      Color(0xFFFFEBC2); // gold-cream bubble background (not white)
+static const Color borderLightMode =
+    Color(0xFFE6E3DA); // soft neutral divider tone (if needed)
+
+static const Color iconBgLightMode =
+    Color(0xFFF3EAD1); // subtle gold-ivory tint (premium, not yellow)
 
   // Primary Colors
   static const Color primary = Color(0xFFD4AF37); // Golden color

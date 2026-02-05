@@ -98,6 +98,7 @@ class AppTheme {
       primary: AppColors.primary,
       secondary: AppColors.primary,
       surface: AppColors.surfaceLightMode,
+      surfaceContainerHighest: AppColors.cardLightMode, // Light gray for containers
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: AppColors.textLightMode,

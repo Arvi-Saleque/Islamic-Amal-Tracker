@@ -98,7 +98,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final isExpanded = expanded[prayer] ?? false;
     final isDone = prayerState.todayData.prayerDone[prayer] ?? false;
 
-    final tileBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+    final tileBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
     final titleColor = isDone
         ? AppColors.primary
         : (isLight ? AppColors.textLightMode.withOpacity(0.92) : AppColors.textSecondary);
@@ -277,7 +277,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
     final rowBg = done
         ? AppColors.primaryOpacity06
-        : (isLight ? AppColors.surfaceLightMode : AppColors.backgroundDark);
+        : (isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark);
 
     final textColor = done
         ? AppColors.primary
@@ -343,7 +343,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
   // ---------------- Bottom sheet ----------------
 
   void _showInfoBottomSheet(BuildContext context, bool isLight) {
-    final sheetBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+    final sheetBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
     final dividerColor = isLight ? Colors.black12 : AppColors.grey800;
     final bodyTextColor = isLight ? AppColors.textSecondaryLightMode : AppColors.textSecondary;
 
@@ -430,8 +430,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     _SectionHeader(isLight: isLight, icon: Icons.mosque_outlined, title: 'জামাতে নামাজের ফযিলত'),
                     const SizedBox(height: 12),
 
-                    const _HadithCard(
-                      isLight: true,
+                    _HadithCard(
+                      isLight: isLight,
                       hadith: 'জামাতে নামাজ পড়া একাকী নামাজ পড়ার চেয়ে সাতাশ গুণ বেশি মর্যাদাসম্পন্ন।',
                       reference: 'সহীহ বুখারী: ৬৪৫, সহীহ মুসলিম: ৬৫০',
                     ),
@@ -523,7 +523,7 @@ class _ProgressPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: isLight ? AppColors.surfaceLightMode : AppColors.primaryOpacity15,
+        color: isLight ? AppColors.backgroundLightMode : AppColors.primaryOpacity15,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
@@ -539,7 +539,7 @@ class _ProgressPill extends StatelessWidget {
           const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 18),
           const SizedBox(width: 6),
           Text(
-            '$completed/৫',
+            '$completed/5',
             style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14.8,
@@ -564,7 +564,7 @@ class _TopSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -607,7 +607,7 @@ class _TopSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$completed / ৫ ফরয সম্পন্ন',
+                  '$completed / 5 ফরয সম্পন্ন',
                   style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 16,
@@ -693,7 +693,7 @@ class _PremiumCheckBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = value
         ? AppColors.primary
-        : (isLight ? AppColors.surfaceLightMode : AppColors.grey800);
+        : (isLight ? AppColors.backgroundLightMode : AppColors.grey800);
 
     final checkColor = value
         ? (isLight ? const Color(0xFF1F2937) : AppColors.backgroundDark)
@@ -876,7 +876,7 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = isLight ? AppColors.surfaceLightMode : const Color(0xFF1A1A1A);
+    final surface = isLight ? AppColors.backgroundLightMode : const Color(0xFF1A1A1A);
 
     final hadithTextColor = isLight
         ? AppColors.textLightMode.withOpacity(0.90)
