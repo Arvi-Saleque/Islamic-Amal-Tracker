@@ -344,8 +344,12 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
   void _showInfoBottomSheet(BuildContext context, bool isLight) {
     final sheetBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
-    final dividerColor = isLight ? Colors.black12 : AppColors.grey800;
-    final bodyTextColor = isLight ? AppColors.textSecondaryLightMode : AppColors.textSecondary;
+    final dividerColor = isLight
+        ? AppColors.borderLightMode.withOpacity(0.5)
+        : AppColors.grey600.withOpacity(0.25);
+    final bodyTextColor = isLight
+        ? AppColors.textLightMode.withOpacity(0.90)
+        : AppColors.textSecondary;
 
     showModalBottomSheet(
       context: context,
@@ -389,7 +393,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                         color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
+                      child: const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 24),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
@@ -425,7 +429,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 • ৫ ওয়াক্ত ফরয পড়লে দিনের নামাজ ১০০% complete''',
                       bodyTextColor: bodyTextColor,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     _SectionHeader(isLight: isLight, icon: Icons.mosque_outlined, title: 'জামাতে নামাজের ফযিলত'),
                     const SizedBox(height: 12),
@@ -496,6 +500,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                           'যে ব্যক্তি দিনে-রাতে ১২ রাকাত সুন্নাত নামাজ আদায় করবে, তার জন্য জান্নাতে একটি ঘর নির্মাণ করা হবে।',
                       reference: 'সহীহ মুসলিম: ৭২৮',
                     ),
+
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),

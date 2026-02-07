@@ -11,34 +11,29 @@ class SinTrackerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(sinTrackerProvider);
+    final isLight = Theme.of(context).brightness == Brightness.light;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark,
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'প্রতিদিনের গুনাহ',
           style: TextStyle(
-            color: AppColors.textGolden,
+            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
           overflow: TextOverflow.ellipsis,
         ),
         iconTheme: const IconThemeData(color: AppColors.primary),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: AppColors.primary),
-            onPressed: () => _showAddSinTypeDialog(context, ref),
-            tooltip: 'নতুন গুনাহ যোগ করুন',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.primary),
-            onPressed: () => _showResetConfirmation(context, ref),
-            tooltip: 'রিসেট',
-          ),
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddSinTypeDialog(context, ref),
+        backgroundColor: AppColors.primary,
+        tooltip: 'নতুন গুনাহ যোগ করুন',
+        child: Icon(Icons.add, color: isLight ? Colors.white : AppColors.backgroundDark),
       ),
       body: state.isLoading
           ? const Center(
@@ -50,12 +45,12 @@ class SinTrackerScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Summary Card
-                  _buildSummaryCard(state),
+                  _buildSummaryCard(state, isLight),
                   
                   const SizedBox(height: 20),
                   
                   // Motivation
-                  _buildMotivationCard(state),
+                  _buildMotivationCard(state, isLight),
                   
                   const SizedBox(height: 24),
                   
@@ -63,7 +58,7 @@ class SinTrackerScreen extends ConsumerWidget {
                   const Text(
                     'গুনাহ সমূহ',
                     style: TextStyle(
-                      color: Color(0xFFD4AF37),
+                      color: AppColors.primary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -73,7 +68,7 @@ class SinTrackerScreen extends ConsumerWidget {
                   
                   ...state.sinTypes.map((sinType) {
                     final record = state.todayRecord.getRecordForType(sinType.id);
-                    return _buildSinTypeCard(context, ref, sinType, record);
+                    return _buildSinTypeCard(context, ref, sinType, record, isLight);
                   }),
                   
                   const SizedBox(height: 20),
@@ -83,7 +78,7 @@ class SinTrackerScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(SinTrackerState state) {
+  Widget _buildSummaryCard(SinTrackerState state, bool isLight) {
     final totalSins = state.todayRecord.totalSinCount;
     final pendingKaffara = state.todayRecord.pendingKaffaraCount;
     final completedKaffara = state.todayRecord.completedKaffaraCount;
@@ -116,6 +111,7 @@ class SinTrackerScreen extends ConsumerWidget {
             'মোট গুনাহ',
             '$totalSins',
             totalSins > 0 ? const Color(0xFFE53935) : const Color(0xFF4CAF50),
+            isLight,
           ),
           Container(
             width: 1,
@@ -126,6 +122,7 @@ class SinTrackerScreen extends ConsumerWidget {
             'বাকি কাফফারা',
             '$pendingKaffara',
             pendingKaffara > 0 ? const Color(0xFFFF9800) : const Color(0xFF4CAF50),
+            isLight,
           ),
           Container(
             width: 1,
@@ -136,13 +133,14 @@ class SinTrackerScreen extends ConsumerWidget {
             'কাফফারা হয়েছে',
             '$completedKaffara',
             const Color(0xFF4CAF50),
+            isLight,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
+  Widget _buildStatItem(String label, String value, Color color, bool isLight) {
     return Column(
       children: [
         Text(
@@ -156,8 +154,8 @@ class SinTrackerScreen extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.grey,
+          style: TextStyle(
+            color: isLight ? AppColors.textSecondaryLightMode : AppColors.grey500,
             fontSize: 12,
           ),
         ),
@@ -165,7 +163,7 @@ class SinTrackerScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMotivationCard(SinTrackerState state) {
+  Widget _buildMotivationCard(SinTrackerState state, bool isLight) {
     final pendingKaffara = state.todayRecord.pendingKaffaraCount;
     
     String message;
@@ -180,21 +178,21 @@ class SinTrackerScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.1),
+        color: AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.3),
+          color: AppColors.primary.withOpacity(0.3),
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: Color(0xFFD4AF37)),
+          const Icon(Icons.info_outline, color: AppColors.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
               style: const TextStyle(
-                color: Color(0xFFD4AF37),
+                color: AppColors.primary,
                 fontSize: 14,
               ),
             ),
@@ -209,19 +207,21 @@ class SinTrackerScreen extends ConsumerWidget {
     WidgetRef ref,
     SinType sinType,
     SinRecord? record,
+    bool isLight,
   ) {
     final hasSinned = record?.hasSinned ?? false;
     final kaffaraDone = record?.kaffaraDone ?? false;
     final kaffaraType = record?.kaffaraType;
+    final cardBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
         border: hasSinned && !kaffaraDone
             ? Border.all(color: const Color(0xFFE53935).withOpacity(0.3))
-            : null,
+            : isLight ? Border.all(color: AppColors.borderLightMode) : null,
       ),
       child: Column(
         children: [
@@ -239,7 +239,7 @@ class SinTrackerScreen extends ConsumerWidget {
                         ? kaffaraDone
                             ? const Color(0xFF4CAF50).withOpacity(0.15)
                             : const Color(0xFFE53935).withOpacity(0.15)
-                        : const Color(0xFF2A2A2A),
+                        : isLight ? Colors.black.withOpacity(0.06) : const Color(0xFF2A2A2A),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -265,8 +265,8 @@ class SinTrackerScreen extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               sinType.name,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isLight ? AppColors.textLightMode : Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -308,7 +308,7 @@ class SinTrackerScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: hasSinned
                           ? const Color(0xFFE53935).withOpacity(0.2)
-                          : const Color(0xFF2A2A2A),
+                          : isLight ? Colors.black.withOpacity(0.05) : const Color(0xFF2A2A2A),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: hasSinned
@@ -347,13 +347,13 @@ class SinTrackerScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Row(
                 children: [
-                  _buildKaffaraChip(ref, sinType.id, KaffaraType.istighfar, 'যিকির'),
+                  _buildKaffaraChip(ref, sinType.id, KaffaraType.istighfar, 'যিকির', isLight),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(ref, sinType.id, KaffaraType.quran, 'কোরআন'),
+                  _buildKaffaraChip(ref, sinType.id, KaffaraType.quran, 'কোরআন', isLight),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(ref, sinType.id, KaffaraType.charity, 'দান'),
+                  _buildKaffaraChip(ref, sinType.id, KaffaraType.charity, 'দান', isLight),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(ref, sinType.id, KaffaraType.prayer, 'নামাজ'),
+                  _buildKaffaraChip(ref, sinType.id, KaffaraType.prayer, 'নামাজ', isLight),
                 ],
               ),
             ),
@@ -388,6 +388,7 @@ class SinTrackerScreen extends ConsumerWidget {
     String sinTypeId,
     String kaffaraType,
     String label,
+    bool isLight,
   ) {
     return Expanded(
       child: GestureDetector(
@@ -398,13 +399,13 @@ class SinTrackerScreen extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.15),
+            color: AppColors.primary.withOpacity(0.15),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             label,
             style: const TextStyle(
-              color: Color(0xFFD4AF37),
+              color: AppColors.primary,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -422,7 +423,7 @@ class SinTrackerScreen extends ConsumerWidget {
     IconData icon,
     String label,
   ) {
-    const color = Color(0xFFD4AF37);
+    const color = AppColors.primary;
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
@@ -474,31 +475,41 @@ class SinTrackerScreen extends ConsumerWidget {
     
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final inputTextColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final labelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+        final fillColor = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+        title: Text(
           'নতুন গুনাহ যোগ করুন',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: titleColor),
         ),
         content: TextField(
           controller: controller,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: inputTextColor),
           decoration: InputDecoration(
             hintText: 'গুনাহের নাম',
-            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF2A2A2A)),
+            hintStyle: TextStyle(color: labelColor.withOpacity(0.5)),
+            filled: true,
+            fillColor: fillColor,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: isLight ? AppColors.borderLightMode : const Color(0xFF2A2A2A)),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFD4AF37)),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('বাতিল', style: TextStyle(color: Colors.grey)),
+            child: Text('বাতিল', style: TextStyle(color: labelColor)),
           ),
           TextButton(
             onPressed: () {
@@ -507,30 +518,38 @@ class SinTrackerScreen extends ConsumerWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('যোগ করুন', style: TextStyle(color: Color(0xFFD4AF37))),
+            child: const Text('যোগ করুন', style: TextStyle(color: AppColors.primary)),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
   void _showDeleteSinTypeDialog(BuildContext context, WidgetRef ref, SinType sinType) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final contentColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+        final labelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+        title: Text(
           'গুনাহ মুছে ফেলুন?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: titleColor),
         ),
         content: Text(
           '"${sinType.name}" মুছে ফেলতে চান?',
-          style: const TextStyle(color: Colors.grey),
+          style: TextStyle(color: contentColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('না', style: TextStyle(color: Colors.grey)),
+            child: Text('না', style: TextStyle(color: labelColor)),
           ),
           TextButton(
             onPressed: () {
@@ -540,27 +559,35 @@ class SinTrackerScreen extends ConsumerWidget {
             child: const Text('হ্যাঁ', style: TextStyle(color: Color(0xFFE53935))),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
   void _showResetConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final contentColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+        final labelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+        title: Text(
           'আজকের ডেটা রিসেট?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: titleColor),
         ),
-        content: const Text(
+        content: Text(
           'আজকের সব গুনাহ ও কাফফারা মুছে যাবে।',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: contentColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('না', style: TextStyle(color: Colors.grey)),
+            child: Text('না', style: TextStyle(color: labelColor)),
           ),
           TextButton(
             onPressed: () {
@@ -570,7 +597,8 @@ class SinTrackerScreen extends ConsumerWidget {
             child: const Text('হ্যাঁ', style: TextStyle(color: Color(0xFFE53935))),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 }

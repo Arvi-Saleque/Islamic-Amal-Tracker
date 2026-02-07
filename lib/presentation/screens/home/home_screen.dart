@@ -1277,11 +1277,11 @@ Widget _sunChip({
 
                   final bg = isDark
                       ? cs.surfaceContainerHighest
-                      : const Color.fromARGB(255, 176, 175, 175);
+                      : const Color.fromARGB(255, 244, 240, 230);
 
                   final textColor = isDark
                       ? cs.onSurface.withOpacity(0.85)
-                      : const Color(0xFF757575);
+                      : const Color.fromARGB(255, 0, 0, 0);
 
                   return Container(
                     padding:
@@ -1321,7 +1321,7 @@ Widget _sunChip({
 
                   final bg = isDark
                       ? cs.surfaceContainerHighest
-                      : const Color.fromARGB(255, 244, 243, 233);
+                      : const Color.fromARGB(255, 244, 240, 230);
 
                   final textColor = isDark
                       ? cs.onSurface.withOpacity(0.85)
@@ -1705,11 +1705,8 @@ Widget _buildPrayerTimeRow(
                     Container(
                       height: 12,
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF0F0F0F) : cs.surface.withOpacity(0.5),
+                        color: isDark ? const Color(0xFF0F0F0F) : cs.onSurface.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: cs.onSurface.withOpacity(isDark ? 0.05 : 0.08),
-                        ),
                       ),
                     ),
                     AnimatedContainer(
@@ -1804,7 +1801,7 @@ Widget _buildPrayerTimeRow(
                 strokeWidth: 6,
                 backgroundColor: isDark
                     ? const Color(0xFF2A2A2A)
-                    : cs.surfaceContainerHighest.withOpacity(0.3),
+                    : cs.surfaceContainerHighest,
                 valueColor:
                     AlwaysStoppedAnimation<Color>(isDark ? const Color(0xFFD4AF37) : cs.primary),
               ),
@@ -2128,7 +2125,7 @@ Widget _buildPrayerTimeRow(
                   minHeight: 8,
                   backgroundColor: isDark
                       ? const Color(0xFF0F0F0F)
-                      : cs.surfaceContainerHighest.withOpacity(0.3),
+                      : cs.onSurface.withOpacity(0.05),
                   valueColor: AlwaysStoppedAnimation<Color>(
                     isDark ? const Color(0xFFD4AF37) : cs.primary,
                   ),

@@ -18,24 +18,27 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     final readingState = ref.watch(readingTrackerProvider);
     final readingNotifier = ref.read(readingTrackerProvider.notifier);
 
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+
     final quranProgress = readingState.todayData.quranProgress;
     final tafsirProgress = readingState.todayData.tafsirProgress;
     final hadithProgress = readingState.todayData.hadithProgress;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: bg,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'পড়াশোনা ট্র্যাকার',
           style: TextStyle(
-            color: AppColors.textGolden,
+            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -106,30 +109,31 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
   }
 
   Widget _buildOverallProgress(ReadingTrackerModel data) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final cardBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+    final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+    final subColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+    final ringBg = isLight ? Colors.black.withOpacity(0.08) : const Color(0xFF2A2A2A);
+
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A1A1A),
-            const Color(0xFF1A1A1A).withOpacity(0.8),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: isLight ? Border.all(color: Colors.black.withOpacity(0.06), width: 1) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(isLight ? 0.08 : 0.3),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          BoxShadow(
-            color: const Color(0xFFD4AF37).withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
+          if (data.overallProgress >= 1.0)
+            BoxShadow(
+              color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
         ],
       ),
       child: Column(
@@ -137,10 +141,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'আজকের মোট পড়া',
                 style: TextStyle(
-                  color: Color(0xFFE0E0E0),
+                  color: titleColor,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -149,13 +153,13 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.2),
+                  color: AppColors.primary.withOpacity(isLight ? 0.10 : 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '${data.totalSessions} সেশন',
                   style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                    color: AppColors.primary,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -173,7 +177,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     Text(
                       '${data.totalMinutes} মিনিট',
                       style: const TextStyle(
-                        color: Color(0xFFD4AF37),
+                        color: AppColors.primary,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         height: 1,
@@ -182,8 +186,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'লক্ষ্য: ${data.goal.totalMinutes} মিনিট',
-                      style: const TextStyle(
-                        color: Color(0xFF888888),
+                      style: TextStyle(
+                        color: subColor,
                         fontSize: 14,
                       ),
                     ),
@@ -202,16 +206,16 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       child: CircularProgressIndicator(
                         value: data.overallProgress,
                         strokeWidth: 8,
-                        backgroundColor: const Color(0xFF2A2A2A),
+                        backgroundColor: ringBg,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          Color(0xFFD4AF37),
+                          AppColors.primary,
                         ),
                       ),
                     ),
                     Text(
                       '${(data.overallProgress * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: Color(0xFFD4AF37),
+                      style: TextStyle(
+                        color: isLight ? AppColors.textLightMode : AppColors.primary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -237,24 +241,31 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     required List<ReadingSession> sessions,
     required ReadingTrackerNotifier readingNotifier,
   }) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final cardBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+    final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+    final subColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+    final trackBg = isLight ? Colors.black.withOpacity(0.08) : AppColors.backgroundDark;
+    final dividerColor = isLight ? AppColors.borderLightMode : const Color(0xFF2A2A2A).withOpacity(0.5);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(20),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: isLight ? Border.all(color: Colors.black.withOpacity(0.06), width: 1) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(isLight ? 0.06 : 0.3),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          BoxShadow(
-            color: progress >= 1.0
-                ? const Color(0xFFD4AF37).withOpacity(0.25)
-                : const Color(0xFFD4AF37).withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
+          if (progress >= 1.0)
+            BoxShadow(
+              color: AppColors.primary.withOpacity(isLight ? 0.10 : 0.25),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
         ],
       ),
       child: Column(
@@ -268,12 +279,12 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        color: AppColors.primary.withOpacity(isLight ? 0.10 : 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         icon,
-                        color: const Color(0xFFD4AF37),
+                        color: AppColors.primary,
                         size: 28,
                       ),
                     ),
@@ -284,8 +295,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                         children: [
                           Text(
                             title,
-                            style: const TextStyle(
-                              color: Color(0xFFE0E0E0),
+                            style: TextStyle(
+                              color: titleColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
@@ -293,8 +304,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           const SizedBox(height: 4),
                           Text(
                             '$currentMinutes / $goalMinutes মিনিট',
-                            style: const TextStyle(
-                              color: Color(0xFF888888),
+                            style: TextStyle(
+                              color: subColor,
                               fontSize: 14,
                             ),
                           ),
@@ -311,8 +322,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       icon: const Icon(Icons.add, size: 18),
                       label: const Text('যোগ করুন'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
-                        foregroundColor: const Color(0xFF0A0A0A),
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: isLight ? Colors.white : AppColors.backgroundDark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -330,9 +341,9 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 8,
-                    backgroundColor: const Color(0xFF0A0A0A),
+                    backgroundColor: trackBg,
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFFD4AF37),
+                      AppColors.primary,
                     ),
                   ),
                 ),
@@ -344,7 +355,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: const Color(0xFF2A2A2A).withOpacity(0.5),
+                    color: dividerColor,
                     width: 0.5,
                   ),
                 ),
@@ -364,12 +375,19 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     ReadingSession session,
     ReadingTrackerNotifier notifier,
   ) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+    final noteColor = isLight ? AppColors.textSecondaryLightMode.withOpacity(0.7) : AppColors.grey600;
+    final dividerColor = isLight ? AppColors.borderLightMode : const Color(0xFF2A2A2A).withOpacity(0.3);
+    final badgeBg = isLight ? AppColors.primary.withOpacity(0.08) : const Color(0xFF2A2A2A);
+    final deleteColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey600;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: const Color(0xFF2A2A2A).withOpacity(0.3),
+            color: dividerColor,
             width: 0.5,
           ),
         ),
@@ -379,12 +397,12 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.15),
+              color: AppColors.primary.withOpacity(isLight ? 0.10 : 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
               Icons.check_circle,
-              color: Color(0xFFD4AF37),
+              color: AppColors.primary,
               size: 20,
             ),
           ),
@@ -395,8 +413,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               children: [
                 Text(
                   session.title,
-                  style: const TextStyle(
-                    color: Color(0xFFE0E0E0),
+                  style: TextStyle(
+                    color: titleColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
@@ -405,8 +423,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   const SizedBox(height: 4),
                   Text(
                     session.notes!,
-                    style: const TextStyle(
-                      color: Color(0xFF666666),
+                    style: TextStyle(
+                      color: noteColor,
                       fontSize: 13,
                     ),
                     maxLines: 1,
@@ -420,22 +438,22 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
+              color: badgeBg,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               '${session.durationMinutes} মিনিট',
               style: const TextStyle(
-                color: Color(0xFFD4AF37),
+                color: AppColors.primary,
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.delete_outline,
-              color: Color(0xFF666666),
+              color: deleteColor,
               size: 20,
             ),
             onPressed: () => _confirmDeleteSession(context, session, notifier),
@@ -462,180 +480,184 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFFD4AF37),
-            width: 1,
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final inputTextColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final labelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+        final fillColor = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+        final cancelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-        ),
-        title: Text(
-          '$typeTitle সেশন যোগ করুন',
-          style: const TextStyle(
-            color: Color(0xFFD4AF37),
+          titleTextStyle: TextStyle(
+            color: titleColor,
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                style: const TextStyle(color: Color(0xFFE0E0E0)),
-                decoration: InputDecoration(
-                  labelText: type == ReadingType.quran
-                      ? 'সূরাহর নাম'
-                      : type == ReadingType.tafsir
-                          ? 'তাফসীরের নাম'
-                          : 'হাদিসের নাম',
-                  labelStyle: const TextStyle(color: Color(0xFF888888)),
-                  filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+          title: Text('$typeTitle সেশন যোগ করুন'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  style: TextStyle(color: inputTextColor),
+                  decoration: InputDecoration(
+                    labelText: type == ReadingType.quran
+                        ? 'সূরাহর নাম'
+                        : type == ReadingType.tafsir
+                            ? 'তাফসীরের নাম'
+                            : 'হাদিসের নাম',
+                    labelStyle: TextStyle(color: labelColor),
+                    filled: true,
+                    fillColor: fillColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
                   ),
                 ),
-              ),
-              if (type == ReadingType.quran) ...[
+                if (type == ReadingType.quran) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: fromAyahController,
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: inputTextColor),
+                          decoration: InputDecoration(
+                            labelText: 'আয়াত থেকে',
+                            labelStyle: TextStyle(color: labelColor),
+                            filled: true,
+                            fillColor: fillColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: AppColors.primary),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: toAyahController,
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: inputTextColor),
+                          decoration: InputDecoration(
+                            labelText: 'আয়াত পর্যন্ত',
+                            labelStyle: TextStyle(color: labelColor),
+                            filled: true,
+                            fillColor: fillColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: AppColors.primary),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: fromAyahController,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Color(0xFFE0E0E0)),
-                        decoration: InputDecoration(
-                          labelText: 'আয়াত থেকে',
-                          labelStyle: const TextStyle(color: Color(0xFF888888)),
-                          filled: true,
-                          fillColor: const Color(0xFF0A0A0A),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFD4AF37)),
-                          ),
-                        ),
-                      ),
+                TextField(
+                  controller: minutesController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: inputTextColor),
+                  decoration: InputDecoration(
+                    labelText: 'সময় (মিনিট)',
+                    labelStyle: TextStyle(color: labelColor),
+                    filled: true,
+                    fillColor: fillColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: toAyahController,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Color(0xFFE0E0E0)),
-                        decoration: InputDecoration(
-                          labelText: 'আয়াত পর্যন্ত',
-                          labelStyle: const TextStyle(color: Color(0xFF888888)),
-                          filled: true,
-                          fillColor: const Color(0xFF0A0A0A),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFD4AF37)),
-                          ),
-                        ),
-                      ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
                     ),
-                  ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: notesController,
+                  style: TextStyle(color: inputTextColor),
+                  maxLines: 2,
+                  decoration: InputDecoration(
+                    labelText: 'নোট (ঐচ্ছিক)',
+                    labelStyle: TextStyle(color: labelColor),
+                    filled: true,
+                    fillColor: fillColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                  ),
                 ),
               ],
-              const SizedBox(height: 16),
-              TextField(
-                controller: minutesController,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Color(0xFFE0E0E0)),
-                decoration: InputDecoration(
-                  labelText: 'সময় (মিনিট)',
-                  labelStyle: const TextStyle(color: Color(0xFF888888)),
-                  filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFD4AF37)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: notesController,
-                style: const TextStyle(color: Color(0xFFE0E0E0)),
-                maxLines: 2,
-                decoration: InputDecoration(
-                  labelText: 'নোট (ঐচ্ছিক)',
-                  labelStyle: const TextStyle(color: Color(0xFF888888)),
-                  filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFD4AF37)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'বাতিল',
-              style: TextStyle(color: Color(0xFF888888)),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                final minutes = int.tryParse(minutesController.text) ?? 15;
-                final fromAyah = int.tryParse(fromAyahController.text);
-                final toAyah = int.tryParse(toAyahController.text);
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'বাতিল',
+                style: TextStyle(color: cancelColor),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (titleController.text.isNotEmpty) {
+                  final minutes = int.tryParse(minutesController.text) ?? 15;
+                  final fromAyah = int.tryParse(fromAyahController.text);
+                  final toAyah = int.tryParse(toAyahController.text);
 
-                notifier.addSession(
-                  type: type,
-                  title: titleController.text,
-                  surahName:
-                      type == ReadingType.quran ? titleController.text : null,
-                  fromAyah: fromAyah,
-                  toAyah: toAyah,
-                  notes: notesController.text.isEmpty
-                      ? null
-                      : notesController.text,
-                  durationMinutes: minutes,
-                );
-                Navigator.pop(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
-              foregroundColor: const Color(0xFF0A0A0A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                  notifier.addSession(
+                    type: type,
+                    title: titleController.text,
+                    surahName:
+                        type == ReadingType.quran ? titleController.text : null,
+                    fromAyah: fromAyah,
+                    toAyah: toAyah,
+                    notes: notesController.text.isEmpty
+                        ? null
+                        : notesController.text,
+                    durationMinutes: minutes,
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: isLight ? Colors.white : AppColors.backgroundDark,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              child: const Text('যোগ করুন'),
             ),
-            child: const Text('যোগ করুন'),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
@@ -646,47 +668,52 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Text(
-          'মুছে ফেলবেন?',
-          style: TextStyle(
-            color: Color(0xFFD4AF37),
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final cancelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          titleTextStyle: TextStyle(
+            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
-        ),
-        content: Text(
-          '"${session.title}" সেশন মুছে ফেলতে চান?',
-          style: const TextStyle(color: Color(0xFFE0E0E0)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'না',
-              style: TextStyle(color: Color(0xFF888888)),
-            ),
+          contentTextStyle: TextStyle(
+            color: isLight ? AppColors.textSecondaryLightMode : AppColors.textSecondary,
+            fontSize: 14,
           ),
-          ElevatedButton(
-            onPressed: () {
-              notifier.deleteSession(session.id);
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+          title: const Text('মুছে ফেলবেন?'),
+          content: Text('"${session.title}" সেশন মুছে ফেলতে চান?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'না',
+                style: TextStyle(color: cancelColor),
               ),
             ),
-            child: const Text('হ্যাঁ, মুছুন'),
-          ),
-        ],
-      ),
+            ElevatedButton(
+              onPressed: () {
+                notifier.deleteSession(session.id);
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('হ্যাঁ, মুছুন'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -706,113 +733,129 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Text(
-          'দৈনিক লক্ষ্য নির্ধারণ করুন',
-          style: TextStyle(
-            color: Color(0xFFD4AF37),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      builder: (context) {
+        final isLight = Theme.of(context).brightness == Brightness.light;
+        final dialogBg = isLight ? AppColors.surfaceLightMode : AppColors.backgroundLight;
+        final inputTextColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+        final labelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+        final fillColor = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+        final cancelColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
+
+        return AlertDialog(
+          backgroundColor: dialogBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: quranController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Color(0xFFE0E0E0)),
-              decoration: InputDecoration(
-                labelText: 'কুরআন (মিনিট)',
-                labelStyle: const TextStyle(color: Color(0xFF888888)),
-                filled: true,
-                fillColor: const Color(0xFF0A0A0A),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+          titleTextStyle: TextStyle(
+            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+          title: const Text('দৈনিক লক্ষ্য নির্ধারণ করুন'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quranController,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: inputTextColor),
+                decoration: InputDecoration(
+                  labelText: 'কুরআন (মিনিট)',
+                  labelStyle: TextStyle(color: labelColor),
+                  filled: true,
+                  fillColor: fillColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: tafsirController,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: inputTextColor),
+                decoration: InputDecoration(
+                  labelText: 'তাফসীর (মিনিট)',
+                  labelStyle: TextStyle(color: labelColor),
+                  filled: true,
+                  fillColor: fillColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
                 ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: hadithController,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: inputTextColor),
+                decoration: InputDecoration(
+                  labelText: 'হাদিস (মিনিট)',
+                  labelStyle: TextStyle(color: labelColor),
+                  filled: true,
+                  fillColor: fillColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'বাতিল',
+                style: TextStyle(color: cancelColor),
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: tafsirController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Color(0xFFE0E0E0)),
-              decoration: InputDecoration(
-                labelText: 'তাফসীর (মিনিট)',
-                labelStyle: const TextStyle(color: Color(0xFF888888)),
-                filled: true,
-                fillColor: const Color(0xFF0A0A0A),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFD4AF37)),
+            ElevatedButton(
+              onPressed: () {
+                notifier.updateGoal(
+                  quranMinutes: int.tryParse(quranController.text) ?? 15,
+                  tafsirMinutes: int.tryParse(tafsirController.text) ?? 10,
+                  hadithMinutes: int.tryParse(hadithController.text) ?? 10,
+                );
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: isLight ? Colors.white : AppColors.backgroundDark,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: hadithController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Color(0xFFE0E0E0)),
-              decoration: InputDecoration(
-                labelText: 'হাদিস (মিনিট)',
-                labelStyle: const TextStyle(color: Color(0xFF888888)),
-                filled: true,
-                fillColor: const Color(0xFF0A0A0A),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFD4AF37)),
-                ),
-              ),
+              child: const Text('সংরক্ষণ করুন'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'বাতিল',
-              style: TextStyle(color: Color(0xFF888888)),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              notifier.updateGoal(
-                quranMinutes: int.tryParse(quranController.text) ?? 15,
-                tafsirMinutes: int.tryParse(tafsirController.text) ?? 10,
-                hadithMinutes: int.tryParse(hadithController.text) ?? 10,
-              );
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
-              foregroundColor: const Color(0xFF0A0A0A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('সংরক্ষণ করুন'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   // Show info bottom sheet
   void _showInfoBottomSheet(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final sheetBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
+    final dividerColor = isLight
+        ? AppColors.borderLightMode.withOpacity(0.5)
+        : AppColors.grey600.withOpacity(0.25);
+    final bodyTextColor = isLight
+        ? AppColors.textLightMode.withOpacity(0.90)
+        : AppColors.textSecondary;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -822,61 +865,73 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: sheetBg,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isLight ? 0.08 : 0.22),
+                blurRadius: 22,
+                offset: const Offset(0, -12),
+              ),
+            ],
           ),
           child: Column(
             children: [
               // Handle bar
               Container(
                 margin: const EdgeInsets.only(top: 12),
-                width: 40,
+                width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
+                  color: isLight ? Colors.black.withOpacity(0.18) : AppColors.grey600,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               // Title
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(
-                        Icons.info_outline,
-                        color: Color(0xFFD4AF37),
+                        Icons.info_outline_rounded,
+                        color: AppColors.primary,
                         size: 24,
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 12),
                     const Expanded(
                       child: Text(
                         'পড়াশোনা - তথ্য ও ফযিলত',
                         style: TextStyle(
-                          color: Color(0xFFD4AF37),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.1,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+              Container(height: 1, color: dividerColor),
               // Content
               Expanded(
                 child: ListView(
                   controller: scrollController,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 22),
                   children: [
                     // How it works
                     _buildInfoSection(
+                      isDark: !isLight,
+                      bodyTextColor: bodyTextColor,
                       icon: Icons.timer_outlined,
                       title: 'কিভাবে ব্যবহার করবেন?',
                       content: '''
@@ -889,15 +944,15 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 20),
 
                     // Quran section
-                    _buildInfoSection(
+                    _buildSectionHeader(
+                      isDark: !isLight,
                       icon: Icons.menu_book,
                       title: 'কুরআন তেলাওয়াতের ফযিলত',
-                      content: '',
-                      isHadithSection: true,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'কুরআনের প্রতিটি অক্ষর পাঠে একটি নেকী এবং প্রতিটি নেকী দশগুণে বৃদ্ধি পায়।',
                       reference: 'জামে তিরমিযী: ২৯১০',
@@ -905,6 +960,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি কুরআন পড়ে এবং তা মুখস্থ করে, সে সম্মানিত নেক ফেরেশতাদের সাথে থাকবে। আর যে কষ্ট করে পড়ে, তার জন্য দুই সওয়াব।',
                       reference: 'সহীহ বুখারী: ৪৯৩৭',
@@ -912,22 +968,23 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'তোমরা কুরআন পড়ো, কারণ এটি কিয়ামতের দিন তার পাঠকদের জন্য সুপারিশকারী হিসেবে আসবে।',
                       reference: 'সহীহ মুসলিম: ৭৩০',
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
 
                     // Tafsir section
-                    _buildInfoSection(
+                    _buildSectionHeader(
+                      isDark: !isLight,
                       icon: Icons.book,
                       title: 'কুরআন বোঝার গুরুত্ব',
-                      content: '',
-                      isHadithSection: true,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'তোমাদের মধ্যে সেই ব্যক্তি সর্বোত্তম যে কুরআন শেখে এবং অন্যকে শেখায়।',
                       reference: 'সহীহ বুখারী: ৫০২২',
@@ -935,44 +992,46 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, আল্লাহ তার জন্য জান্নাতের পথ সহজ করে দেন।',
                       reference: 'সহীহ মুসলিম: ২৬৭৬',
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
 
                     // Hadith section
-                    _buildInfoSection(
+                    _buildSectionHeader(
+                      isDark: !isLight,
                       icon: Icons.auto_stories,
                       title: 'হাদিস শিক্ষার গুরুত্ব',
-                      content: '',
-                      isHadithSection: true,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'আল্লাহ সেই ব্যক্তির চেহারা উজ্জ্বল (সজীব) করুন, যে আমার কথা শুনেছে, তা সংরক্ষণ (মুখস্থ) করেছে এবং তা অন্যের কাছে পৌঁছে দিয়েছে।',
                       reference: 'জামে তিরমিযী: ২৬৫৭',
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
 
                     // Knowledge seeking
-                    _buildInfoSection(
+                    _buildSectionHeader(
+                      isDark: !isLight,
                       icon: Icons.school,
                       title: 'ইলম অর্জনের ফযিলত',
-                      content: '',
-                      isHadithSection: true,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith: 'ইলম অর্জন করা প্রতিটি মুসলিম নর-নারীর জন্য ফরজ।',
                       reference: 'সুনানে ইবনে মাজাহ: ২২৬',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, সে ফিরে আসা পর্যন্ত সে আল্লাহর পথে থাকে।',
                       reference: 'জামে তিরমিযী: ২৬৫৪',
@@ -980,6 +1039,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
+                      isDark: !isLight,
                       hadith:
                           'আলেমরা নবীদের উত্তরাধিকারী। নবীগণ উত্তরাধিকারী রেখে যাননি দিনার-দিরহাম, বরং রেখে গেছেন ইলম।',
                       reference: 'সুনানে আবু দাউদ: ৩৬৪১',
@@ -997,142 +1057,185 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
   }
 
   Widget _buildInfoSection({
+    required bool isDark,
+    required Color bodyTextColor,
     required IconData icon,
     required String title,
     required String content,
-    bool isHadithSection = false,
   }) {
-    return Builder(
-      builder: (context) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isSmallScreen = screenWidth < 360;
+    final boxBg = isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
 
-        return Container(
-          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0A0A0A),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-              BoxShadow(
-                color: const Color(0xFFD4AF37).withOpacity(0.1),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: boxBg,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 10),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Icon(
-                    icon,
-                    color: const Color(0xFFD4AF37),
-                    size: isSmallScreen ? 18 : 22,
-                  ),
-                  SizedBox(width: isSmallScreen ? 8 : 10),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        color: const Color(0xFFD4AF37),
-                        fontSize: isSmallScreen ? 14 : 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: AppColors.primary, size: 18),
               ),
-              if (content.isNotEmpty) ...[
-                SizedBox(height: isSmallScreen ? 10 : 14),
-                Text(
-                  content,
-                  style: TextStyle(
-                    color: const Color(0xFFE0E0E0),
-                    fontSize: isSmallScreen ? 12 : 14,
-                    height: 1.7,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.1,
                   ),
                 ),
-              ],
+              ),
             ],
           ),
-        );
-      },
+          if (content.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              content,
+              style: TextStyle(
+                color: bodyTextColor,
+                fontSize: 14,
+                height: 1.7,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
   Widget _buildHadithCard({
+    required bool isDark,
     required String hadith,
     required String reference,
   }) {
-    return Builder(
-      builder: (context) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isSmallScreen = screenWidth < 360;
+    final surface = isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
+    final hadithTextColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.textLightMode.withOpacity(0.90);
 
-        return Container(
-          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFFD4AF37).withOpacity(0.08),
-                const Color(0xFFD4AF37).withOpacity(0.03),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.22 : 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 12),
           ),
-          child: Column(
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.format_quote,
-                    color: const Color(0xFFD4AF37),
-                    size: isSmallScreen ? 16 : 20,
-                  ),
-                  SizedBox(width: isSmallScreen ? 8 : 10),
-                  Expanded(
-                    child: Text(
-                      hadith,
-                      style: TextStyle(
-                        color: const Color(0xFFE0E0E0),
-                        fontSize: isSmallScreen ? 12 : 14,
-                        height: 1.6,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.format_quote_rounded, color: AppColors.primary, size: 18),
               ),
-              SizedBox(height: isSmallScreen ? 8 : 12),
-              Text(
-                '📚 $reference',
-                style: TextStyle(
-                  color: const Color(0xFFD4AF37),
-                  fontSize: isSmallScreen ? 11 : 12,
-                  fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  hadith,
+                  style: TextStyle(
+                    color: hadithTextColor,
+                    fontSize: 14,
+                    height: 1.65,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Text(
+            '📚 $reference',
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required bool isDark,
+    required IconData icon,
+    required String title,
+  }) {
+    final panelBg = isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: panelBg,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontSize: 16.5,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
