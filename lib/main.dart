@@ -39,16 +39,14 @@ class AmalTrackerApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(appThemeModeProvider);
+    final selectedTheme = ref.watch(appThemeModeProvider);
     return MaterialApp(
       title: 'আমল ট্র্যাকার',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: mode,
+      theme: AppTheme.getTheme(selectedTheme),
       home: const SplashScreen(),
     );
   }

@@ -406,19 +406,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
       'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
     ];
-    return '${_toBengaliNumber(date.day)} ${months[date.month - 1]}, ${_toBengaliNumber(date.year)}';
+    return '${date.day} ${months[date.month - 1]}, ${date.year}';
   }
 
   String _getWeekdayBengali(int weekday) {
     final days = ['সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার', 'রবিবার'];
     return days[weekday - 1];
-  }
-
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
   }
 }

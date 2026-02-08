@@ -1,12 +1,11 @@
-﻿import 'dart:math';
-import 'dart:ui';
+﻿import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/dhikr_counter_provider.dart';
 import '../../../data/models/dhikr_counter_model.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 
 class DhikrCounterScreen extends ConsumerStatefulWidget {
   const DhikrCounterScreen({super.key});
@@ -21,11 +20,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final dhikrState = ref.watch(dhikrCounterProvider);
     final dhikrNotifier = ref.read(dhikrCounterProvider.notifier);
 
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
-    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
-    final iconColor = AppColors.primary;
-    final titleColor = AppColors.primary;
+    final iconColor = Theme.of(context).colorScheme.primary;
+    final titleColor = Theme.of(context).colorScheme.primary;
 
     final totalCount = dhikrState.todayData.totalCount;
     final totalTarget = dhikrState.todayData.totalTarget;
@@ -33,9 +29,32 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final totalItems = dhikrState.todayData.items.length;
 
     return Scaffold(
-      backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: bg,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
@@ -58,11 +77,21 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             onPressed: () => _showInfoBottomSheet(context),
           ),
         ],
+        
       ),
-      body: Stack(
-        children: [
-          const _PremiumBackground(),
-          Column(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: Theme.of(context)
+                .extension<GradientColors>()!
+                .backgroundGradient,
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
             children: [
               // Overall Progress Card
               _buildOverallProgress(
@@ -71,7 +100,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               // Dhikr List
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 22),
                   itemCount: dhikrState.todayData.items.length,
                   itemBuilder: (context, index) {
                     return _buildDhikrCard(
@@ -83,22 +112,19 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               ),
             ],
           ),
-        ],
+        ),
       ),
-      floatingActionButton: Builder(
-        builder: (context) {
-          final isLight = Theme.of(context).brightness == Brightness.light;
-          return FloatingActionButton(
-            mini: true,
-            onPressed: () => _showAddDhikrDialog(context, dhikrNotifier),
-            backgroundColor: AppColors.primary,
-            child: Icon(
-              Icons.add,
-              color: isLight ? Colors.white : Colors.black,
-              size: 20,
-            ),
-          );
-        },
+      floatingActionButton: FloatingActionButton(
+        mini: true,
+        elevation: 10,
+        highlightElevation: 14,
+        onPressed: () => _showAddDhikrDialog(context, dhikrNotifier),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.onPrimary,
+          size: 20,
+        ),
       ),
     );
   }
@@ -107,174 +133,153 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
       int count, int target, int completed, int total) {
     final percentage = target > 0 ? (count / target).clamp(0.0, 1.0) : 0.0;
 
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
-    final labelColor =
-        isLight ? AppColors.textSecondaryLightMode : AppColors.textSecondary;
-
-    final mainTextColor =
-        isLight ? AppColors.textLightMode : AppColors.textSecondary;
-
-    final subTextColor =
-        isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
-
-    final ringBg =
-        isLight ? Colors.black.withOpacity(0.08) : AppColors.grey800.withOpacity(0.45);
-
-    final chipTextColor =
-        isLight ? AppColors.textLightMode : AppColors.textSecondary;
-
-    final chipShadowColor =
-        Colors.black.withOpacity(isLight ? 0.10 : 0.25);
-
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return _PremiumCard(
-      margin: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-      padding: const EdgeInsets.all(20),
-      glow: false,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'আজকের মোট',
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withOpacity(0.18),
-                      AppColors.primary.withOpacity(0.07),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  // No border (clean)
-                  border: null,
-                  // Softer shadow (premium but not odd)
-                  boxShadow: [
-                    BoxShadow(
-                      color: chipShadowColor,
-                      blurRadius: 5,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  '$completed/$total সম্পন্ন',
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+      child: buildPremiumCard(
+        context: context,
+        radius: 18,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'আজকের মোট',
                   style: TextStyle(
-                    color: chipTextColor,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    color: cs.onSurfaceVariant,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$count',
-                      style: TextStyle(
-                        color: mainTextColor,
-                        fontSize: 38,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                        letterSpacing: -0.5,
-                      ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: theme.extension<GradientColors>()!.innerCardGradient,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'লক্ষ্য: $target',
-                      style: TextStyle(
-                        color: subTextColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: cs.primary.withOpacity(0.25),
+                      width: 1,
                     ),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: 1,
-                      width: 120,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.primary.withOpacity(0.55),
-                            Colors.transparent,
-                          ],
-                        ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.shadowColor,
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
                       ),
+                    ],
+                  ),
+                  child: Text(
+                    '$completed/$total সম্পন্ন',
+                    style: TextStyle(
+                      color: cs.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              SizedBox(
-                width: 104,
-                height: 104,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Simple progress ring (clean)
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: percentage),
-                      duration: const Duration(milliseconds: 700),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, _) {
-                        return SizedBox(
-                          width: 104,
-                          height: 104,
-                          child: CircularProgressIndicator(
-                            value: value,
-                            strokeWidth: 8,
-                            backgroundColor: isLight
-                            ? AppColors.surfaceLightMode.withOpacity(0.3)
-                            :  cs.surfaceContainerHighest,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${(percentage * 100).toInt()}%',
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$count',
                         style: TextStyle(
-                          color: mainTextColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
+                          color: cs.primary,
+                          fontSize: 38,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(
+                        'লক্ষ্য: $target',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        height: 1,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              cs.primary.withOpacity(0.55),
+                              cs.surface.withOpacity(0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 14),
+                SizedBox(
+                  width: 104,
+                  height: 104,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Simple progress ring (clean)
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: percentage),
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, _) {
+                          return SizedBox(
+                            width: 104,
+                            height: 104,
+                            child: CircularProgressIndicator(
+                              value: value,
+                              strokeWidth: 8,
+                              backgroundColor: cs.surfaceContainerHighest,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                cs.primary,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        width: 72,
+                        height: 72,
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${(percentage * 100).toInt()}%',
+                          style: TextStyle(
+                            color: cs.primary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -283,28 +288,23 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final isCompleted = dhikr.isCompleted;
     final progress = dhikr.progress.clamp(0.0, 1.0);
 
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-    final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
-    final subtitleColor =
-        isLight ? AppColors.textSecondaryLightMode : AppColors.textSecondary;
+    final titleColor = cs.onSurface;
+    final subtitleColor = cs.onSurfaceVariant;
+    final trackColor = cs.surfaceContainerHighest;
+    final completedBg = cs.primary.withOpacity(0.1);
+    final completedBorder = cs.primary.withOpacity(0.3);
+    final completedText = cs.primary;
 
-    final trackColor =
-        isLight ? Colors.black.withOpacity(0.08) : Colors.white.withOpacity(0.10);
-
-    final completedBg =
-        isLight ? AppColors.primary.withOpacity(0.12) : AppColors.primary.withOpacity(0.22);
-
-    final completedBorder =
-        isLight ? AppColors.primary.withOpacity(0.22) : AppColors.primary.withOpacity(0.30);
-
-    final completedText =
-        isLight ? AppColors.textLightMode : AppColors.textSecondary;
-
-    return _PremiumCard(
-      margin: const EdgeInsets.only(bottom: 16),
-      glow: isCompleted,
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: buildPremiumCard(
+        context: context,
+        radius: 18,
+        padding: EdgeInsets.zero,
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
@@ -315,25 +315,22 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final isLight = Theme.of(context).brightness == Brightness.light;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (dhikr.arabic != null) ...[
-                                Text(
-                                  dhikr.arabic!,
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Arial',
-                                    height: 1.25,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                              ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (dhikr.arabic != null) ...[
+                            Text(
+                              dhikr.arabic!,
+                              style: TextStyle(
+                                color: cs.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Arial',
+                                height: 1.25,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
                           Text(
                             dhikr.title,
                             style: TextStyle(
@@ -346,8 +343,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             ),
                           ),
                         ],
-                      );
-                        },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -398,95 +393,85 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                       // Count Display (Tappable for manual input)
                       Flexible(
-                        child: Builder(
-                          builder: (context) {
-                            final isLight = Theme.of(context).brightness == Brightness.light;
-                            return InkWell(
-                              onTap: () => _showManualInputDialog(
-                                context,
-                                dhikr,
-                                notifier,
+                        child: InkWell(
+                          onTap: () => _showManualInputDialog(
+                            context,
+                            dhikr,
+                            notifier,
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            constraints: const BoxConstraints(minWidth: 120),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: theme.extension<GradientColors>()!.innerCardGradient,
                               ),
                               borderRadius: BorderRadius.circular(14),
-                              child: Container(
-                                constraints: const BoxConstraints(minWidth: 120),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
+                              border: Border.all(
+                                color: cs.primary.withOpacity(0.25),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.shadowColor.withOpacity(0.15),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 8),
                                 ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      AppColors.primary.withOpacity(0.22),
-                                            AppColors.primary.withOpacity(0.08),
-                                    ]
-                                  ),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: null,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(isLight ? 0.12 : 0.35),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      height: 42,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          '${dhikr.currentCount}',
-                                          maxLines: 1,
-                                          softWrap: false,
-                                          style: TextStyle(
-                                            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.w900,
-                                            height: 1,
-                                            letterSpacing: -0.6,
-                                          ),
-                                        ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  height: 42,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '${dhikr.currentCount}',
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: TextStyle(
+                                        color: cs.primary,
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1,
+                                        letterSpacing: -0.6,
                                       ),
                                     ),
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 Text(
                                   'লক্ষ্য: ${dhikr.targetCount}',
                                   style: TextStyle(
-                                    color: AppColors.grey600,
+                                    color: cs.onSurfaceVariant,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
-                                Builder(
-                                  builder: (context) {
-                                    final isLight = Theme.of(context).brightness == Brightness.light;
-                                    return Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.edit,
-                                        size: 12,
-                                        color: isLight ? Colors.black : Colors.black,
-                                      ),
-                                    );
-                                  },
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: cs.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.edit,
+                                    size: 12,
+                                    color: theme.extension<GradientColors>()!.onPrimaryText,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                          },
                         ),
                       ),
 
@@ -519,8 +504,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       children: [
                         Text(
                           '${(progress * 100).toInt()}% সম্পন্ন',
-                          style: const TextStyle(
-                            color: AppColors.grey500,
+                          style: TextStyle(
+                            color: cs.onSurfaceVariant,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -562,15 +547,15 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                               HapticFeedback.selectionClick();
                               notifier.resetDhikr(dhikr.id);
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.refresh,
                               size: 14,
-                              color: AppColors.grey600,
+                              color: cs.onSurfaceVariant,
                             ),
-                            label: const Text(
+                            label: Text(
                               'রিসেট',
                               style: TextStyle(
-                                color: AppColors.grey600,
+                                color: cs.onSurfaceVariant,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -599,8 +584,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             minHeight: 7,
                             backgroundColor:
                                 trackColor,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              cs.primary,
                             ),
                           );
                         },
@@ -613,6 +598,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -623,16 +609,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }) {
     return Builder(
       builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+        final gradients = theme.extension<GradientColors>()!;
         final enabled = onPressed != null;
-
-        final base = isPrimary
-            ? AppColors.primary
-            : (isLight ? AppColors.cardLightMode : const Color(0xFF1B1B1B).withOpacity(0.85));
-
-        final border = isPrimary
-            ? AppColors.primary
-            : (isLight ? Colors.black.withOpacity(0.08) : const Color(0xFF2A2A2A));
 
         return Opacity(
           opacity: enabled ? 1 : 0.55,
@@ -654,40 +634,31 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            AppColors.primary.withOpacity(0.85),
-                            AppColors.primary,
-                            AppColors.primary.withOpacity(0.90),
+                            cs.primary.withOpacity(0.85),
+                            cs.primary,
+                            cs.primary.withOpacity(0.90),
                           ],
                         )
                       : LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            base.withOpacity(0.95),
-                            base.withOpacity(0.70),
+                            cs.surfaceContainerHigh.withOpacity(0.95),
+                            cs.surfaceContainerHigh.withOpacity(0.70),
                           ],
                         ),
                   border: isPrimary
-                      ? Border.all(color: border.withOpacity(0.75), width: 1)
+                      ? Border.all(color: cs.primary.withOpacity(0.75), width: 1)
                       : null,
                   boxShadow: [
-                    // Lift
                     BoxShadow(
-                      color: Colors.black.withOpacity(isPrimary ? 0.60 : 0.75),
+                      color: theme.shadowColor.withOpacity(isPrimary ? 0.30 : 0.20),
                       blurRadius: isPrimary ? 6 : 2,
                       offset: const Offset(0, 3),
                     ),
-                    // Soft top highlight
-                    BoxShadow(
-                      color: Colors.white.withOpacity(isPrimary ? 0.14 : 0.06),
-                      blurRadius: 5,
-                      offset: const Offset(-2, -2),
-                    ),
-                    // Golden glow
                     if (isPrimary || enabled)
                       BoxShadow(
-                        color: AppColors.shadowGolden
-                            .withOpacity(isPrimary ? 0.75 : 0.30),
+                        color: cs.primary.withOpacity(isPrimary ? 0.25 : 0.10),
                         blurRadius: isPrimary ? 5 : 3,
                         offset: const Offset(0, 3),
                       ),
@@ -697,8 +668,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 child: Icon(
                   icon,
                   color: isPrimary
-                      ? (isLight ? Colors.white : Colors.black)
-                      : (isLight ? AppColors.textLightMode : AppColors.textSecondary),
+                      ? gradients.onPrimaryText
+                      : cs.onSurface,
                   size: 28,
                 ),
               ),
@@ -718,35 +689,22 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+        final gradients = theme.extension<GradientColors>()!;
 
-        final cancelText =
-            isLight ? AppColors.textLightMode : AppColors.textSecondary;
-        final primaryBg = AppColors.primary;
-        final primaryText = isLight ? Colors.white : Colors.black;
-
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-          ),
-          child: AlertDialog(
+        return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            backgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
+            backgroundColor: cs.surface,
             titleTextStyle: TextStyle(
-              color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+              color: cs.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
             contentTextStyle: TextStyle(
-              color: isLight
-                  ? AppColors.textSecondaryLightMode
-                  : AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               fontSize: 14,
             ),
             title: const Text('নতুন যিকির যোগ করুন'),
@@ -756,32 +714,25 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 TextField(
                   controller: titleController,
                   style: TextStyle(
-                    color: isLight ? AppColors.textLightMode : Colors.white,
+                    color: cs.onSurface,
                   ),
                   decoration: InputDecoration(
                     labelText: 'যিকিরের নাম',
                     filled: true,
-                    fillColor: isLight
-                        ? AppColors.cardLightMode
-                        : Colors.white.withOpacity(0.06),
+                    fillColor: cs.surfaceContainer,
                     labelStyle: TextStyle(
-                      color: isLight
-                          ? AppColors.textSecondaryLightMode
-                          : AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color: isLight
-                            ? Colors.black.withOpacity(0.10)
-                            : Colors.white.withOpacity(0.10),
+                        color: cs.outline.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color:
-                            AppColors.primary.withOpacity(isLight ? 0.55 : 0.75),
+                        color: cs.primary.withOpacity(0.6),
                         width: 1.4,
                       ),
                     ),
@@ -791,33 +742,26 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 TextField(
                   controller: arabicController,
                   style: TextStyle(
-                    color: isLight ? AppColors.textLightMode : Colors.white,
+                    color: cs.onSurface,
                     fontSize: 20,
                   ),
                   decoration: InputDecoration(
                     labelText: 'আরবি (ঐচ্ছিক)',
                     filled: true,
-                    fillColor: isLight
-                        ? AppColors.cardLightMode
-                        : Colors.white.withOpacity(0.06),
+                    fillColor: cs.surfaceContainer,
                     labelStyle: TextStyle(
-                      color: isLight
-                          ? AppColors.textSecondaryLightMode
-                          : AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color: isLight
-                            ? Colors.black.withOpacity(0.10)
-                            : Colors.white.withOpacity(0.10),
+                        color: cs.outline.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color:
-                            AppColors.primary.withOpacity(isLight ? 0.55 : 0.75),
+                        color: cs.primary.withOpacity(0.6),
                         width: 1.4,
                       ),
                     ),
@@ -827,33 +771,26 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 TextField(
                   controller: targetController,
                   style: TextStyle(
-                    color: isLight ? AppColors.textLightMode : Colors.white,
+                    color: cs.onSurface,
                   ),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: 'লক্ষ্য সংখ্যা',
                     filled: true,
-                    fillColor: isLight
-                        ? AppColors.cardLightMode
-                        : Colors.white.withOpacity(0.06),
+                    fillColor: cs.surfaceContainer,
                     labelStyle: TextStyle(
-                      color: isLight
-                          ? AppColors.textSecondaryLightMode
-                          : AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color: isLight
-                            ? Colors.black.withOpacity(0.10)
-                            : Colors.white.withOpacity(0.10),
+                        color: cs.outline.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color:
-                            AppColors.primary.withOpacity(isLight ? 0.55 : 0.75),
+                        color: cs.primary.withOpacity(0.6),
                         width: 1.4,
                       ),
                     ),
@@ -865,7 +802,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 style: TextButton.styleFrom(
-                  foregroundColor: cancelText,
+                  foregroundColor: cs.onSurface,
                 ),
                 child: const Text('বাতিল'),
               ),
@@ -884,10 +821,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBg,
-                  foregroundColor: primaryText,
-                  elevation: isLight ? 6 : 0,
-                  shadowColor: Colors.black.withOpacity(isLight ? 0.18 : 0.0),
+                  backgroundColor: cs.primary,
+                  foregroundColor: gradients.onPrimaryText,
+                  elevation: 2,
+                  shadowColor: theme.shadowColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -897,7 +834,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 child: const Text('যোগ করুন'),
               ),
             ],
-          ),
         );
       },
     );
@@ -914,67 +850,48 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+        final gradients = theme.extension<GradientColors>()!;
 
-        final cancelText =
-            isLight ? AppColors.textLightMode : AppColors.textSecondary;
-        final primaryBg = AppColors.primary;
-        final primaryText = isLight ? Colors.white : Colors.black;
-
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-          ),
-          child: AlertDialog(
+        return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            backgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
+            backgroundColor: cs.surface,
             titleTextStyle: TextStyle(
-              color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+              color: cs.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
             contentTextStyle: TextStyle(
-              color: isLight
-                  ? AppColors.textSecondaryLightMode
-                  : AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               fontSize: 14,
             ),
             title: const Text('লক্ষ্য সংখ্যা পরিবর্তন করুন'),
             content: TextField(
               controller: targetController,
               style: TextStyle(
-                color: isLight ? AppColors.textLightMode : Colors.white,
+                color: cs.onSurface,
               ),
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'নতুন লক্ষ্য',
                 filled: true,
-                fillColor: isLight
-                    ? AppColors.cardLightMode
-                    : Colors.white.withOpacity(0.06),
+                fillColor: cs.surfaceContainer,
                 labelStyle: TextStyle(
-                  color: isLight
-                      ? AppColors.textSecondaryLightMode
-                      : AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: isLight
-                        ? Colors.black.withOpacity(0.10)
-                        : Colors.white.withOpacity(0.10),
+                    color: cs.outline.withOpacity(0.2),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(
-                    color: AppColors.primary.withOpacity(isLight ? 0.55 : 0.75),
+                    color: cs.primary.withOpacity(0.6),
                     width: 1.4,
                   ),
                 ),
@@ -984,7 +901,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 style: TextButton.styleFrom(
-                  foregroundColor: cancelText,
+                  foregroundColor: cs.onSurface,
                 ),
                 child: const Text('বাতিল'),
               ),
@@ -997,10 +914,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBg,
-                  foregroundColor: primaryText,
-                  elevation: isLight ? 6 : 0,
-                  shadowColor: Colors.black.withOpacity(isLight ? 0.18 : 0.0),
+                  backgroundColor: cs.primary,
+                  foregroundColor: gradients.onPrimaryText,
+                  elevation: 2,
+                  shadowColor: theme.shadowColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -1010,7 +927,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 child: const Text('আপডেট করুন'),
               ),
             ],
-          ),
         );
       },
     );
@@ -1024,33 +940,21 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
 
-        final cancelText =
-            isLight ? AppColors.textLightMode : AppColors.textSecondary;
-
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-          ),
-          child: AlertDialog(
+        return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            backgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
+            backgroundColor: cs.surface,
             titleTextStyle: TextStyle(
-              color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+              color: cs.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
             contentTextStyle: TextStyle(
-              color: isLight
-                  ? AppColors.textSecondaryLightMode
-                  : AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               fontSize: 14,
             ),
             title: const Text('মুছে ফেলবেন?'),
@@ -1059,7 +963,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 style: TextButton.styleFrom(
-                  foregroundColor: cancelText,
+                  foregroundColor: cs.onSurface,
                 ),
                 child: const Text('না'),
               ),
@@ -1071,8 +975,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
-                  elevation: isLight ? 6 : 0,
-                  shadowColor: Colors.black.withOpacity(isLight ? 0.18 : 0.0),
+                  elevation: 2,
+                  shadowColor: theme.shadowColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -1082,7 +986,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 child: const Text('হ্যাঁ, মুছুন'),
               ),
             ],
-          ),
         );
       },
     );
@@ -1100,35 +1003,22 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+        final gradients = theme.extension<GradientColors>()!;
 
-        final cancelText =
-            isLight ? AppColors.textLightMode : AppColors.textSecondary;
-        final primaryBg = AppColors.primary;
-        final primaryText = isLight ? Colors.white : Colors.black;
-
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-          ),
-          child: AlertDialog(
+        return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            backgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
+            backgroundColor: cs.surface,
             titleTextStyle: TextStyle(
-              color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+              color: cs.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
             contentTextStyle: TextStyle(
-              color: isLight
-                  ? AppColors.textSecondaryLightMode
-                  : AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               fontSize: 14,
             ),
             title: Text(dhikr.title),
@@ -1141,34 +1031,27 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isLight ? AppColors.textLightMode : Colors.white,
+                    color: cs.onSurface,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                   decoration: InputDecoration(
                     labelText: 'কাউন্ট লিখুন',
                     filled: true,
-                    fillColor: isLight
-                        ? AppColors.cardLightMode
-                        : Colors.white.withOpacity(0.06),
+                    fillColor: cs.surfaceContainer,
                     labelStyle: TextStyle(
-                      color: isLight
-                          ? AppColors.textSecondaryLightMode
-                          : AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color: isLight
-                            ? Colors.black.withOpacity(0.10)
-                            : Colors.white.withOpacity(0.10),
+                        color: cs.outline.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
-                        color:
-                            AppColors.primary.withOpacity(isLight ? 0.55 : 0.75),
+                        color: cs.primary.withOpacity(0.6),
                         width: 1.4,
                       ),
                     ),
@@ -1182,7 +1065,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 style: TextButton.styleFrom(
-                  foregroundColor: cancelText,
+                  foregroundColor: cs.onSurface,
                 ),
                 child: const Text('বাতিল'),
               ),
@@ -1190,7 +1073,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 onPressed: () {
                   final newCount = int.tryParse(countController.text);
                   if (newCount != null && newCount >= 0) {
-                    // Calculate difference and apply increments/decrements
                     final diff = newCount - dhikr.currentCount;
                     if (diff > 0) {
                       for (int i = 0; i < diff; i++) {
@@ -1205,10 +1087,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBg,
-                  foregroundColor: primaryText,
-                  elevation: isLight ? 6 : 0,
-                  shadowColor: Colors.black.withOpacity(isLight ? 0.18 : 0.0),
+                  backgroundColor: cs.primary,
+                  foregroundColor: gradients.onPrimaryText,
+                  elevation: 2,
+                  shadowColor: theme.shadowColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -1218,7 +1100,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 child: const Text('সেট করুন'),
               ),
             ],
-          ),
         );
       },
     );
@@ -1229,29 +1110,24 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
   // Helper method for showing snackbars
   void _showSnack(BuildContext context, String message, {bool success = true}) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-    final bg = isLight
-        ? (success
-            ? AppColors.primary.withOpacity(0.18)
-            : Colors.red.withOpacity(0.12))
-        : (success
-            ? AppColors.primary.withOpacity(0.28)
-            : Colors.red.withOpacity(0.22));
-
-    final textColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+    final bg = success
+        ? cs.primary.withOpacity(0.2)
+        : Colors.red.withOpacity(0.15);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: bg,
-        elevation: isLight ? 10 : 0,
+        elevation: 2,
         margin: const EdgeInsets.all(14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         content: Text(
           message,
           style: TextStyle(
-            color: textColor,
+            color: cs.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1261,14 +1137,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
   // Show info bottom sheet
   void _showInfoBottomSheet(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
-    final sheetBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
-    final dividerColor = isLight
-        ? AppColors.borderLightMode.withOpacity(0.5)
-        : AppColors.grey600.withOpacity(0.25);
-    final bodyTextColor = isLight
-        ? AppColors.textLightMode.withOpacity(0.90)
-        : AppColors.textSecondary;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     showModalBottomSheet(
       context: context,
@@ -1280,11 +1150,11 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
           decoration: BoxDecoration(
-            color: sheetBg,
+            color: cs.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isLight ? 0.08 : 0.22),
+                color: theme.shadowColor.withOpacity(0.15),
                 blurRadius: 22,
                 offset: const Offset(0, -12),
               ),
@@ -1298,7 +1168,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isLight ? Colors.black.withOpacity(0.18) : AppColors.grey600,
+                  color: cs.onSurfaceVariant.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1311,17 +1181,17 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                        color: cs.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 24),
+                      child: Icon(Icons.info_outline_rounded, color: cs.primary, size: 24),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'যিকির - তথ্য ও ফযিলত',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: cs.primary,
                           fontSize: 19,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.1,
@@ -1331,7 +1201,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   ],
                 ),
               ),
-              Container(height: 1, color: dividerColor),
+              Container(height: 1, color: cs.outline.withOpacity(0.3)),
               // Content
               Expanded(
                 child: ListView(
@@ -1340,8 +1210,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   children: [
                     // How it works
                     _buildInfoSection(
-                      isDark: !isLight,
-                      bodyTextColor: bodyTextColor,
                       icon: Icons.touch_app,
                       title: 'কিভাবে ব্যবহার করবেন?',
                       content: '''
@@ -1356,14 +1224,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                     // Tasbih section
                     _buildSectionHeader(
-                      isDark: !isLight,
                       icon: Icons.favorite,
                       title: 'তাসবীহ ফাতেমীর ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'প্রতি নামাজের পর ৩৩ বার সুবহানাল্লাহ, ৩৩ বার আলহামদুলিল্লাহ, ৩৩ বার আল্লাহু আকবার বললে গুনাহ মাফ হয়, যদিও সমুদ্রের ফেনার মতো হয়।',
                       reference: 'সহীহ মুসলিম: ৬৯৭',
@@ -1371,7 +1237,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'দুটি কালেমা আছে যা জিহ্বায় হালকা কিন্তু মীযানে ভারী: সুবহানাল্লাহি ওয়া বিহামদিহি ও লা ইলাহা ইল্লাল্লাহু ওয়াল্লাহু আকবার।',
                       reference: 'সহীহ বুখারী: ৬৩৬০, সহীহ মুসলিম: ২৬৯২',
@@ -1380,14 +1245,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                     // SubhanAllah section
                     _buildSectionHeader(
-                      isDark: !isLight,
                       icon: Icons.star,
                       title: 'সুবহানাল্লাহির ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'সুবহানাল্লাহি ওয়াল হামদুলিল্লাহ - এটি মীযানকে ভরপুর করে দেয়, অথবা আসমান ও জমিনের মধ্যবর্তী স্থানের মতো।',
                       reference: 'সহীহ মুসলিম: ২৬৯৬',
@@ -1395,7 +1258,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি দিনে ১০০ বার সুবহানাল্লাহ বলবে, তার জন্য ১০০০ নেকী লেখা হবে এবং ১০০ গুনাহ মাফ হবে।',
                       reference: 'সহীহ মুসলিম: ২৬৯২',
@@ -1404,14 +1266,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                     // Istighfar section
                     _buildSectionHeader(
-                      isDark: !isLight,
                       icon: Icons.healing,
                       title: 'ইস্তিগফারের ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি নিয়মিত ইস্তিগফার করবে, আল্লাহ তার সব দুশ্চিন্তা দূর করে দেবেন, সব সংকট থেকে বের করে দেবেন এবং অপ্রত্যাশিত জায়গা থেকে রিযিিক দেবেন।',
                       reference: 'সুনানে আবু দাউদ: ১৫১৮',
@@ -1419,7 +1279,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'আমি দিনে ৭০ বারেরও বেশি আল্লাহর কাছে তাওবা করি এবং ইস্তিগফার করি।',
                       reference: 'সহীহ বুখারী: ৬৩০৭',
@@ -1428,14 +1287,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                     // La ilaha illallah section
                     _buildSectionHeader(
-                      isDark: !isLight,
                       icon: Icons.brightness_high,
                       title: 'লা ইলাহা ইল্লাল্লাহর ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'সর্বোত্তম যিকির হলো লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুয়া আলা কুল্লি শাইইন কাদীর।',
                       reference: 'জামে তিরমিযী: ৩৫৮৫',
@@ -1443,7 +1300,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি দিনে ১০০ বার লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু... বলবে, তা ১০টি গোলাম মুক্ত করার সমান, ১০০ নেকী লেখা হবে, ১০০ গুনাহ মাফ হবে এবং সন্ধ্যা পর্যন্ত শয়তান থেকে রক্ষা হবে।',
                       reference: 'সহীহ বুখারী: ৬৩০৩, সহীহ মুসলিম: ২৬৯১',
@@ -1452,14 +1308,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
                     // Durood section
                     _buildSectionHeader(
-                      isDark: !isLight,
                       icon: Icons.auto_awesome,
                       title: 'দরূদ শরীফের ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'যে ব্যক্তি আমার উপর একবার দরূদ পাঠাবে, আল্লাহ তার উপর দশবার রহমত বর্ষণ করেন।',
                       reference: 'সহীহ মুসলিম: ৪০২',
@@ -1467,7 +1321,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 12),
 
                     _buildHadithCard(
-                      isDark: !isLight,
                       hadith:
                           'কিয়ামতের দিন আমার নিকটতম হবে সেই ব্যক্তি যে আমার উপর সবচেয়ে বেশি দরূদ পাঠাবে।',
                       reference: 'জামে তিরমিযী: ৪৮৪',
@@ -1485,23 +1338,21 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 
   Widget _buildInfoSection({
-    required bool isDark,
-    required Color bodyTextColor,
     required IconData icon,
     required String title,
     required String content,
   }) {
-    final isLight = !isDark;
-    final boxBg = isLight ? AppColors.primary.withOpacity(0.05) : AppColors.backgroundDark;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: boxBg,
+        color: cs.surfaceContainer,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isLight ? 0.05 : 0.18),
+            color: theme.shadowColor.withOpacity(0.08),
             blurRadius: 16,
             offset: const Offset(0, 10),
           ),
@@ -1516,17 +1367,17 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                  color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 18),
+                child: Icon(icon, color: cs.primary, size: 18),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: cs.primary,
                     fontSize: 16.5,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.1,
@@ -1540,7 +1391,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             Text(
               content,
               style: TextStyle(
-                color: bodyTextColor,
+                color: cs.onSurface.withOpacity(0.9),
                 fontSize: 14,
                 height: 1.7,
                 fontWeight: FontWeight.w600,
@@ -1553,21 +1404,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 
   Widget _buildSectionHeader({
-    required bool isDark,
     required IconData icon,
     required String title,
   }) {
-    final isLight = !isDark;
-    final panelBg = isLight ? AppColors.primary.withOpacity(0.05) : AppColors.backgroundDark;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: panelBg,
+        color: cs.surfaceContainer,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isLight ? 0.05 : 0.18),
+            color: theme.shadowColor.withOpacity(0.08),
             blurRadius: 16,
             offset: const Offset(0, 10),
           ),
@@ -1579,17 +1429,17 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+              color: cs.primary.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 18),
+            child: Icon(icon, color: cs.primary, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: cs.primary,
                 fontSize: 16.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.1,
@@ -1602,24 +1452,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 
   Widget _buildHadithCard({
-    required bool isDark,
     required String hadith,
     required String reference,
   }) {
-    final isLight = !isDark;
-    final surface = isLight ? AppColors.backgroundLightMode : const Color(0xFF1A1A1A);
-    final hadithTextColor = isLight
-        ? AppColors.textLightMode.withOpacity(0.90)
-        : AppColors.textSecondary;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isLight ? 0.06 : 0.22),
+            color: theme.shadowColor.withOpacity(0.10),
             blurRadius: 18,
             offset: const Offset(0, 12),
           ),
@@ -1635,21 +1481,18 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withOpacity(isLight ? 0.12 : 0.18),
+                  color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.format_quote_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 14),
+                    color: cs.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   hadith,
                   style: TextStyle(
-                    color: hadithTextColor,
+                    color: cs.onSurface.withOpacity(0.9),
                     fontSize: 14,
                     height: 1.65,
                     fontStyle: FontStyle.italic,
@@ -1665,13 +1508,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               Icon(
                 Icons.book_outlined,
                 size: 18,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+                color: cs.primary.withOpacity(0.75),
               ),
               const SizedBox(width: 5),
               Text(
-                '$reference',
+                reference,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: cs.primary,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.1,
@@ -1681,182 +1524,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
           )
         ],
       ),
-    );
-  }
-}
-
-// =====================================================
-//                 PREMIUM UI HELPERS
-// =====================================================
-
-class _PremiumBackground extends StatelessWidget {
-  const _PremiumBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
-    final baseGradientColors = isLight
-        ? [
-            AppColors.backgroundLightMode,
-            AppColors.surfaceLightMode.withOpacity(0.98),
-            AppColors.cardLightMode.withOpacity(0.96),
-          ]
-        : [
-            AppColors.backgroundDark,
-            AppColors.backgroundDark.withOpacity(0.92),
-            const Color(0xFF0F0F12),
-          ];
-
-    return SizedBox.expand(
-      child: Stack(
-        children: [
-          // Base gradient
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: baseGradientColors,
-              ),
-            ),
-          ),
-
-          // Bottom glow
-          Positioned(
-            bottom: -180,
-            right: -140,
-            child: Container(
-              width: 380,
-              height: 380,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(isLight ? 0.10 : 0.16),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Subtle vignette (light mode should be MUCH softer)
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0, -0.6),
-                  radius: 1.2,
-                  colors: [
-                    Colors.transparent,
-                    (isLight ? Colors.black : Colors.black)
-                        .withOpacity(isLight ? 0.08 : 0.40),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Noise texture (keep it very light)
-          IgnorePointer(
-            child: CustomPaint(
-              painter: _NoisePainter(seed: 7),
-              size: Size.infinite,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PremiumCard extends StatelessWidget {
-  const _PremiumCard({
-    required this.child,
-    this.margin,
-    this.padding,
-    this.glow = false,
-  });
-
-  final Widget child;
-  final EdgeInsets? margin;
-  final EdgeInsets? padding;
-  final bool glow;
-
-  @override
-  Widget build(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
-    final gradientColors = isLight
-        ? [
-            AppColors.lightgradient1,
-            AppColors.lightgradient2
-          ]
-        : [
-            AppColors.backgroundLight.withOpacity(0.98),
-            const Color(0xFF151515).withOpacity(0.94),
-          ];
-
-    final shadows = isLight
-        ? <BoxShadow>[
-            // soft lift
-            BoxShadow(
-              color: Colors.black.withOpacity(0.10),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
-            ),
-            // subtle highlight
-            BoxShadow(
-              color: Colors.white.withOpacity(0.55),
-              blurRadius: 12,
-              offset: const Offset(-2, -2),
-            ),
-            if (glow)
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.14),
-                blurRadius: 18,
-                offset: const Offset(0, 10),
-              ),
-          ]
-        : <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withOpacity(0.55),
-              blurRadius: 14,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.035),
-              blurRadius: 8,
-              offset: const Offset(-2, -2),
-            ),
-            if (glow)
-              BoxShadow(
-                color: AppColors.shadowGolden.withOpacity(0.35),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-          ];
-
-    return Container(
-      margin: margin,
-      padding: padding ?? const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradientColors,
-        ),
-        border: isLight
-            ? Border.all(
-                color: Colors.black.withOpacity(0.06),
-                width: 1,
-              )
-            : null,
-        boxShadow: shadows,
-      ),
-      child: child,
     );
   }
 }
@@ -1874,7 +1541,8 @@ class _GlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
@@ -1887,25 +1555,13 @@ class _GlassPanel extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isLight
-                  ? [
-                      Colors.white.withOpacity(0.55),
-                      Colors.white.withOpacity(0.30),
-                      Colors.white.withOpacity(0.10),
-                    ]
-                  : [
-                      Colors.white.withOpacity(0.06),
-                      Colors.white.withOpacity(0.03),
-                      Colors.black.withOpacity(0.15),
-                    ],
+              colors: theme.extension<GradientColors>()!.innerCardGradient,
             ),
-            border: isLight
-                ? Border.all(color: Colors.black.withOpacity(0.06), width: 1)
-                : null,
+            border:Border.all(color: cs.outline.withOpacity(0.10), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isLight ? 0.10 : 0.40),
-                blurRadius: isLight ? 16 : 12,
+                color: theme.shadowColor.withOpacity(0.15),
+                blurRadius: 14,
                 offset: const Offset(0, 8),
               ),
             ],
@@ -1928,10 +1584,11 @@ class _IconPillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Material(
-      color: Colors.transparent,
+      color: cs.surface.withOpacity(0),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -1941,23 +1598,11 @@ class _IconPillButton extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isLight
-                  ? [
-                      Colors.white.withOpacity(0.70),
-                      Colors.white.withOpacity(0.45),
-                    ]
-                  : [
-                      Colors.white.withOpacity(0.08),
-                      Colors.black.withOpacity(0.22),
-                    ],
-            ),
-            border: isLight ? Border.all(color: Colors.black.withOpacity(0.06)) : null,
+            color: cs.surfaceContainerHigh,
+            border: Border.all(color: cs.outline.withOpacity(0.10)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isLight ? 0.10 : 0.35),
+                color: theme.shadowColor.withOpacity(0.15),
                 blurRadius: 10,
                 offset: const Offset(0, 6),
               ),
@@ -1965,45 +1610,11 @@ class _IconPillButton extends StatelessWidget {
           ),
           child: Icon(
             icon,
-            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+            color: cs.onSurfaceVariant,
             size: 20,
           ),
         ),
       ),
     );
   }
-}
-
-class _NoisePainter extends CustomPainter {
-  _NoisePainter({required this.seed});
-
-  final int seed;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return;
-
-    final rnd = Random(seed);
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Density scales with screen size (kept very light)
-    final n = (size.width * size.height / 4500).clamp(120.0, 520.0).toInt();
-
-    for (var i = 0; i < n; i++) {
-      final x = rnd.nextDouble() * size.width;
-      final y = rnd.nextDouble() * size.height;
-      final r = rnd.nextDouble() * 0.9 + 0.25;
-
-      // Mostly dark specks, few bright specks
-      final isBright = rnd.nextDouble() > 0.88;
-      paint.color = (isBright ? Colors.white : Colors.black)
-          .withOpacity(isBright ? 0.022 : 0.030);
-
-      canvas.drawCircle(Offset(x, y), r, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _NoisePainter oldDelegate) =>
-      oldDelegate.seed != seed;
 }

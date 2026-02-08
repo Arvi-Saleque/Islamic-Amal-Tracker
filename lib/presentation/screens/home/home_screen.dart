@@ -1221,6 +1221,8 @@ Widget _sunChip({
                   style: TextStyle(
                     color: cs.onSurface.withOpacity(0.5),
                     fontSize: 11,
+                    
+                    fontFamily: 'AlinurBanglaborno',
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1271,6 +1273,7 @@ Widget _sunChip({
                   style: TextStyle(
                     color: cs.onSurface.withOpacity(0.5),
                     fontSize: 11,
+                    fontFamily: 'AlinurBanglaborno',
                   ),
                 ),
               ],
@@ -1314,6 +1317,7 @@ Widget _sunChip({
                           style: TextStyle(
                             color: textColor,
                             fontSize: 13,
+                            fontFamily: 'AlinurBanglaborno',
                           ),
                         ),
                       ],

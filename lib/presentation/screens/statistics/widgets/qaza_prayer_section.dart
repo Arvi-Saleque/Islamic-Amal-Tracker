@@ -100,7 +100,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
               Flexible(
                 child: Text(
                   totalPending > 0
-                      ? 'বাকি কাজা নামাজ: ${_toBengaliNumber(totalPending)}'
+                      ? 'বাকি কাজা নামাজ: $totalPending'
                       : 'আলহামদুলিল্লাহ! কোনো কাজা নেই',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -116,7 +116,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           if (totalPending > 0) ...[
             const SizedBox(height: 16),
             Text(
-              'গত ৩০ দিনের মধ্যে',
+              'গত 30 দিনের মধ্যে',
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 14,
@@ -234,7 +234,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                           const SizedBox(height: 4),
                           Text(
                             hasPending
-                                ? 'বাকি: ${_toBengaliNumber(pendingCount)} ওয়াক্ত'
+                                ? 'বাকি: $pendingCount ওয়াক্ত'
                                 : 'সব কাজা আদায় হয়েছে',
                             style: TextStyle(
                               color: hasPending
@@ -258,7 +258,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          _toBengaliNumber(pendingCount),
+                          pendingCount.toString(),
                           style: const TextStyle(
                             color: AppColors.primaryGold,
                             fontSize: 14,
@@ -455,7 +455,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
       'নভেম্বর',
       'ডিসেম্বর'
     ];
-    return '${_toBengaliNumber(date.day)} ${months[date.month - 1]}';
+    return '${date.day} ${months[date.month - 1]}';
   }
 
   String _getWeekdayBengali(int weekday) {
@@ -479,14 +479,6 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
 
     if (difference == 1) return 'গতকাল';
     if (difference == 2) return 'পরশু';
-    return '${_toBengaliNumber(difference)} দিন আগে';
-  }
-
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
+    return '$difference দিন আগে';
   }
 }

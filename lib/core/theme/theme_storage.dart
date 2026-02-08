@@ -1,15 +1,26 @@
 import '../../data/local/hive_service.dart';
 
 class ThemeStorage {
-  // Only for Settings page preview toggle (for now)
-  static const String _settingsLightKey = 'settings_light_mode';
+  static const String _themeKey = 'selected_theme';
 
+  /// Get the currently selected theme name
+  /// Returns 'dark', 'light', or future themes like 'green'
+  static String getSelectedTheme() {
+    return HiveService.settingsBox.get(_themeKey, defaultValue: 'dark') as String;
+  }
+
+  /// Set the selected theme name
+  static Future<void> setSelectedTheme(String themeName) async {
+    await HiveService.settingsBox.put(_themeKey, themeName);
+  }
+
+  // Deprecated - kept for backward compatibility
   static bool getSettingsIsLight() {
-    // default: false (dark)
-    return HiveService.settingsBox.get(_settingsLightKey, defaultValue: false) as bool;
+    final theme = getSelectedTheme();
+    return theme == 'light';
   }
 
   static Future<void> setSettingsIsLight(bool value) async {
-    await HiveService.settingsBox.put(_settingsLightKey, value);
+    await setSelectedTheme(value ? 'light' : 'dark');
   }
 }

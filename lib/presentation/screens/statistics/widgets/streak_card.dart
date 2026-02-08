@@ -12,14 +12,6 @@ class StreakCard extends StatelessWidget {
     required this.bestStreak,
   });
 
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -69,7 +61,7 @@ class StreakCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      _toBengaliNumber(currentStreak),
+                      currentStreak.toString(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 36,
@@ -110,7 +102,7 @@ class StreakCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      _toBengaliNumber(bestStreak),
+                      bestStreak.toString(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 36,
@@ -147,7 +139,7 @@ class StreakCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    'স্ট্রিক কাউন্টের জন্য কমপক্ষে ৬০%+ প্রোগ্রেস পূরণ করতে হবে',
+                    'স্ট্রিক কাউন্টের জন্য কমপক্ষে 60%+ প্রোগ্রেস পূরণ করতে হবে',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,

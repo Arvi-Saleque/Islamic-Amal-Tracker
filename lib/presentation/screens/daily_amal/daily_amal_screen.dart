@@ -1,11 +1,9 @@
-import 'dart:math' as math;
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/daily_amal_provider.dart';
 import '../../../data/models/daily_amal_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme.dart';
 
 class DailyAmalScreen extends ConsumerStatefulWidget {
   const DailyAmalScreen({super.key});
@@ -18,9 +16,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   String _selectedCategory = 'all';
 
   // Polish constants
-  static const double _pagePad = 16;
-  static const double _cardRadius = 16;
-  static const double _sectionRadius = 22;
+  static const double _pagePad = 18;
+  static const double _cardRadius = 18;
+  static const double _sectionRadius = 18;
 
   final Map<String, String> _categoryNames = {
     'all': 'সবগুলো',
@@ -51,22 +49,37 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
     final completedCount = amalState.todayData.completedCount;
     final totalCount = amalState.todayData.totalCount;
-    final bool isAllDone = totalCount > 0 && completedCount == totalCount;
 
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    final isLight = Theme.of(context).brightness == Brightness.light;
-
-    final bg =
-        isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
-    final iconColor = AppColors.primary;
-    final titleColor = AppColors.primary;
+    final iconColor = Theme.of(context).colorScheme.primary;
+    final titleColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: bg,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
@@ -90,10 +103,17 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          const _AdaptiveBackground(),
-          Column(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: Theme.of(context).extension<GradientColors>()!.backgroundGradient,
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
             children: [
               // Category Filter
               _buildCategoryFilter(),
@@ -105,40 +125,29 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
-                      _pagePad, 0, _pagePad, _pagePad),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.backgroundLight.withOpacity(0.10)
-                          : AppColors.surfaceLightMode.withOpacity(0.55),
-                      borderRadius: BorderRadius.circular(_sectionRadius),
-                      border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withOpacity(0.06)
-                            : AppColors.borderLightMode.withOpacity(0.5),
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(_sectionRadius),
-                      child: items.isEmpty
-                          ? _buildEmptyState()
-                          : ListView.builder(
-                              padding: const EdgeInsets.all(14),
-                              itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                return _buildChecklistItem(
-                                  items[index],
-                                  amalNotifier,
-                                );
-                              },
-                            ),
-                    ),
+                      _pagePad, 0, _pagePad, 22),
+                  child: buildPremiumCard(
+                    context: context,
+                    radius: _sectionRadius,
+                    padding: const EdgeInsets.all(14),
+                    child: items.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              return _buildChecklistItem(
+                                items[index],
+                                amalNotifier,
+                              );
+                            },
+                          ),
                   ),
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         mini: true,
@@ -158,7 +167,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   Widget _buildCategoryFilter() {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       height: 60,
@@ -182,41 +190,33 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 gradient: isSelected
-                    ? const LinearGradient(
+                    ? LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFFE6C35C),
-                          Color(0xFFD4AF37),
-                          Color(0xFFB8891A),
+                          cs.primary.withOpacity(0.95),
+                          cs.primary,
+                          cs.primary.withOpacity(0.85),
                         ],
-                        stops: [0.0, 0.55, 1.0],
+                        stops: const [0.0, 0.55, 1.0],
                       )
                     : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: isDark
-                            ? const [
-                                Color(0xFF1C1C1C),
-                                Color(0xFF121212),
-                              ]
-                            : const [
-                                ui.Color.fromARGB(255, 216, 213, 199),
-                                Color(0xFFF2F1EC),
-                              ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: theme.extension<GradientColors>()!.cardGradient.take(2).toList(),
                       ),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected
-                      ? Colors.black.withOpacity(isDark ? 0.18 : 0.10)
-                      : cs.outline.withOpacity(isDark ? 0.18 : 0.24),
+                      ? theme.extension<GradientColors>()!.appBarBorder
+                      : cs.outline.withOpacity(0.20),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.65 : 0.05),
-                    blurRadius: isDark ? 16 : 10,
-                    offset: isDark ? const Offset(0, 10) : const Offset(0, 6),
+                    color: theme.shadowColor,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -225,7 +225,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Icon(
                     _categoryIcons[category],
                     color: isSelected
-                        ? (isDark ? const Color(0xFF0D0D0D) : Colors.white)
+                        ? theme.extension<GradientColors>()!.onPrimaryText
                         : cs.primary,
                     size: 20,
                   ),
@@ -234,7 +234,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     _categoryNames[category]!,
                     style: TextStyle(
                       color: isSelected
-                          ? (isDark ? const Color(0xFF0D0D0D) : Colors.white)
+                          ? theme.extension<GradientColors>()!.onPrimaryText
                           : cs.onSurfaceVariant,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -252,163 +252,119 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   Widget _buildProgressBar(int completed, int total) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final percentage = total > 0 ? completed / total : 0.0;
 
-    return Container(
-      margin:
-          const EdgeInsets.only(left: _pagePad, right: _pagePad, bottom: 12),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [
-                  Color(0xFF1E1E1E),
-                  Color(0xFF121212),
-                ]
-              : const [
-                  ui.Color.fromARGB(255, 231, 229, 219),
-                  ui.Color.fromARGB(255, 229, 228, 221),
-                ],
-        ),
-        borderRadius: BorderRadius.circular(_sectionRadius),
-        border: Border.all(
-          color: cs.outline.withOpacity(isDark ? 0.16 : 0.24),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.35 : 0.06),
-            blurRadius: isDark ? 12 : 10,
-            offset: isDark ? const Offset(0, 8) : const Offset(0, 6),
-          ),
-          BoxShadow(
-            color: cs.primary.withOpacity(isDark ? 0.18 : 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'আজকের মোট',
-                style: TextStyle(
-                  color: cs.onSurfaceVariant,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isDark
-                        ? const [
-                            Color(0xFF2A2413),
-                            Color(0xFF19150B),
-                          ]
-                        : [
-                            cs.primary.withOpacity(0.12),
-                            cs.primary.withOpacity(0.08),
-                          ],
-                  ),
-                  borderRadius: BorderRadius.circular(_sectionRadius),
-                  border: Border.all(
-                    color: cs.primary.withOpacity(isDark ? 0.30 : 0.20),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.30 : 0.08),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                    BoxShadow(
-                      color: cs.primary.withOpacity(isDark ? 0.15 : 0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  '$completed/$total সম্পন্ন',
+    return Padding(
+      padding:
+          const EdgeInsets.only(left: _pagePad, right: _pagePad, bottom: 14),
+      child: buildPremiumCard(
+        context: context,
+        radius: _sectionRadius,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'আজকের মোট',
                   style: TextStyle(
-                    color: cs.primary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    color: cs.onSurfaceVariant,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$completed',
-                      style: TextStyle(
-                        color: cs.primary,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        height: 1,
-                      ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: theme.extension<GradientColors>()!.innerCardGradient,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'লক্ষ্য: $total',
-                      style: TextStyle(
-                        color: cs.onSurfaceVariant,
-                        fontSize: 14,
-                      ),
+                    borderRadius: BorderRadius.circular(_sectionRadius),
+                    border: Border.all(
+                      color: cs.primary.withOpacity(0.25),
+                      width: 1,
                     ),
-                  ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.shadowColor,
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '$completed/$total সম্পন্ন',
+                    style: TextStyle(
+                      color: cs.primary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 100,
-                height: 100,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: CircularProgressIndicator(
-                        value: percentage,
-                        strokeWidth: 8,
-                        backgroundColor: isDark
-                            ? cs.surfaceContainerHighest
-                            : AppColors.surfaceLightMode.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$completed',
+                        style: TextStyle(
+                          color: cs.primary,
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${(percentage * 100).toInt()}%',
-                      style: TextStyle(
-                        color: cs.primary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 4),
+                      Text(
+                        'লক্ষ্য: $total',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: CircularProgressIndicator(
+                          value: percentage,
+                          strokeWidth: 8,
+                          backgroundColor: cs.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
+                        ),
+                      ),
+                      Text(
+                        '${(percentage * 100).toInt()}%',
+                        style: TextStyle(
+                          color: cs.primary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -417,154 +373,88 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     DailyAmalItem item,
     DailyAmalNotifier notifier,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-    // Define gradients based on theme
-    final completedGradient = isDark
-        ? const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2413), Color(0xFF17130A)],
-          )
-        : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.08),
-              Theme.of(context).colorScheme.primary.withOpacity(0.04),
-            ],
-          );
-
-    final normalGradient = isDark
-        ? const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1D1D1D), Color(0xFF121212)],
-          )
-        : const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              ui.Color.fromARGB(255, 238, 236, 226),
-              ui.Color.fromARGB(255, 220, 218, 206),
-            ],
-          );
-
-    final borderColor = item.isCompleted
-        ? Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.35 : 0.2)
-        : (isDark ? Colors.white.withOpacity(0.06) : AppColors.borderLightMode);
-
-    final shadowOpacity = isDark ? 0.78 : 0.06;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        gradient: item.isCompleted ? completedGradient : normalGradient,
-        borderRadius: BorderRadius.circular(_cardRadius),
-        border: Border.all(color: borderColor, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(shadowOpacity),
-            blurRadius: isDark ? 20 : 12,
-            offset: isDark ? const Offset(0, 14) : const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_cardRadius),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => notifier.toggleItem(item.id),
-              borderRadius: BorderRadius.circular(_cardRadius),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 26,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        color: item.isCompleted
-                            ? Theme.of(context).colorScheme.primary
-                            : (isDark
-                                ? const Color(0xFF2A2A2A)
-                                : AppColors.surfaceLightMode),
-                        border: item.isCompleted
-                            ? null
-                            : Border.all(
-                                color: isDark
-                                    ? const Color(0xFF3A3A3A)
-                                    : AppColors.borderLightMode,
-                                width: 2,
-                              ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: item.isCompleted
-                          ? Icon(
-                              Icons.check,
-                              color: isDark
-                                  ? const Color(0xFF0D0D0D)
-                                  : Colors.white,
-                              size: 16,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.title,
-                            style: TextStyle(
-                              color: item.isCompleted
-                                  ? Theme.of(context).colorScheme.primary
-                                  : (isDark
-                                      ? AppColors.textSecondary
-                                      : AppColors.textLightMode),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              decoration: item.isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                          if (item.completedAt != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              'সম্পন্ন: ${_formatTime(item.completedAt!)}',
-                              style: TextStyle(
-                                color: isDark
-                                    ? AppColors.textTertiary
-                                    : AppColors.textSecondaryLightMode,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    if (item.id.startsWith('custom_'))
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withOpacity(isDark ? 0.75 : 0.95),
-                          size: 20,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: buildPremiumInkCard(
+        context: context,
+        radius: _cardRadius,
+        onTap: () => notifier.toggleItem(item.id),
+        backgroundColor: item.isCompleted 
+            ? cs.primary.withOpacity(0.08)
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: item.isCompleted
+                      ? cs.primary
+                      : cs.surfaceContainerHighest,
+                  border: item.isCompleted
+                      ? null
+                      : Border.all(
+                          color: cs.outline.withOpacity(0.3),
+                          width: 2,
                         ),
-                        onPressed: () =>
-                            _confirmDelete(context, item, notifier),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: item.isCompleted
+                    ? Icon(
+                        Icons.check,
+                        color: theme.extension<GradientColors>()!.onPrimaryText,
+                        size: 16,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: TextStyle(
+                        color: item.isCompleted
+                            ? cs.primary
+                            : cs.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        decoration: item.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
+                    ),
+                    if (item.completedAt != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'সম্পন্ন: ${_formatTime(item.completedAt!)}',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-            ),
+              if (item.id.startsWith('custom_'))
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: cs.onSurfaceVariant.withOpacity(0.75),
+                    size: 20,
+                  ),
+                  onPressed: () =>
+                      _confirmDelete(context, item, notifier),
+                ),
+            ],
           ),
         ),
       ),
@@ -574,7 +464,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   Widget _buildEmptyState() {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Column(
@@ -582,14 +471,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         children: [
           Icon(
             _categoryIcons[_selectedCategory],
-            color: cs.onSurfaceVariant.withOpacity(isDark ? 0.55 : 0.80),
+            color: cs.onSurfaceVariant.withOpacity(0.70),
             size: 64,
           ),
           const SizedBox(height: 16),
           Text(
             'কোনো ${_categoryNames[_selectedCategory]} নেই',
             style: TextStyle(
-              color: cs.onSurfaceVariant.withOpacity(isDark ? 0.55 : 0.86),
+              color: cs.onSurfaceVariant.withOpacity(0.70),
               fontSize: 16,
             ),
           ),
@@ -614,10 +503,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
-        final isDark = theme.brightness == Brightness.dark;
 
         final fieldFill = cs.surface;
-        final borderCol = cs.outline.withOpacity(isDark ? 0.25 : 0.35);
+        final borderCol = cs.outline.withOpacity(0.30);
 
         InputDecoration deco({
           required String hint,
@@ -785,7 +673,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   void _showInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.85,
@@ -794,31 +682,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         builder: (context, scrollController) {
           final theme = Theme.of(context);
           final cs = theme.colorScheme;
-          final isDark = theme.brightness == Brightness.dark;
 
-          final sheetBg = isDark
-              ? AppColors.backgroundLight
-              : AppColors.backgroundLightMode;
-          final dividerColor = isDark
-              ? AppColors.grey600.withOpacity(0.25)
-              : AppColors.borderLightMode.withOpacity(0.5);
-          final bodyTextColor = isDark
-              ? AppColors.textSecondary
-              : AppColors.textLightMode.withOpacity(0.90);
-
-          return Container(
-            decoration: BoxDecoration(
-              color: sheetBg,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(26)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.22 : 0.08),
-                  blurRadius: 22,
-                  offset: const Offset(0, -12),
-                ),
-              ],
-            ),
+          return buildPremiumCard(
+            context: context,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(26)),
+            gradientBegin: Alignment.topCenter,
+            gradientEnd: Alignment.bottomCenter,
+            padding: EdgeInsets.zero,
             child: Column(
               children: [
                 // Handle bar
@@ -827,9 +698,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.grey600
-                        : Colors.black.withOpacity(0.18),
+                    color: cs.onSurfaceVariant.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -842,22 +711,21 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: AppColors.primary
-                              .withOpacity(isDark ? 0.18 : 0.12),
+                          color: cs.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.info_outline_rounded,
-                          color: AppColors.primary,
+                          color: cs.primary,
                           size: 24,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'প্রতিদিনের আমল - তথ্য ও ফযিলত',
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: cs.primary,
                             fontSize: 19,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.1,
@@ -867,7 +735,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     ],
                   ),
                 ),
-                Container(height: 1, color: dividerColor),
+                Container(height: 1, color: cs.outline.withOpacity(0.3)),
                 // Content
                 Expanded(
                   child: ListView(
@@ -876,8 +744,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     children: [
                       // How it works
                       _buildInfoSection(
-                        isDark: isDark,
-                        bodyTextColor: bodyTextColor,
                         icon: Icons.calculate_outlined,
                         title: 'হিসাব কিভাবে হয়?',
                         content: '''
@@ -895,14 +761,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
                       // Miswak section
                       _buildSectionHeader(
-                        isDark: isDark,
                         icon: Icons.brush,
                         title: 'মিসওয়াকের ফযিলত',
                       ),
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'মিসওয়াক মুখ পরিষ্কার করে এবং আল্লাহর সন্তুষ্টি অর্জন করে।',
                         reference: 'সুনানে নাসাঈ: ৫',
@@ -910,7 +774,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'যদি আমার উম্মতের উপর কষ্টকর না হতো, তাহলে আমি প্রতি নামাজের সময় মিসওয়াক করার আদেশ দিতাম।',
                         reference: 'সহীহ বুখারী: ৮৮৭, সহীহ মুসলিম: ২৫২',
@@ -919,14 +782,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
                       // Surah section
                       _buildSectionHeader(
-                        isDark: isDark,
                         icon: Icons.menu_book,
                         title: 'সূরাহ পাঠের ফযিলত',
                       ),
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'যে ব্যক্তি সূরা ইখলাস পড়বে, সে যেন কুরআনের এক তৃতীয়াংশ পড়ল।',
                         reference: 'সহীহ বুখারী: ৫০১৫',
@@ -934,7 +795,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'যে ব্যক্তি রাতে সূরা বাকারার শেষ দুই আয়াত পড়বে, তার জন্য তা যথেষ্ট হবে।',
                         reference: 'সহীহ বুখারী: ৫০০৯, সহীহ মুসলিম: ৮০৭',
@@ -942,7 +802,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'সূরা মুলক পাঠকারীর জন্য কবরের আযাব থেকে সুপারিশ করবে যতক্ষণ না তাকে ক্ষমা করা হয়।',
                         reference: 'জামে তিরমিযী: ২৮৯১',
@@ -951,21 +810,18 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
                       // Dua section
                       _buildSectionHeader(
-                        isDark: isDark,
                         icon: Icons.favorite,
                         title: 'দোয়ার ফযিলত',
                       ),
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith: 'দোয়াই হলো ইবাদত',
                         reference: 'জামে তিরমিযী: ২৯৬৯',
                       ),
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'যে ব্যক্তি সকাল-সন্ধ্যায় তিনবার করে সাইয়্যিদুল ইস্তিগফার পড়বে এবং সেদিন বা সে রাতে মারা গেলে জান্নাতে যাবে।',
                         reference: 'সহীহ বুখারী: ৬৩০৬',
@@ -973,7 +829,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'যে ব্যক্তি সকালে ও সন্ধ্যায় তিনবার বলে "বিসমিল্লাহিল্লাযী লা ইয়াদুররু মাআসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামায়ি ওয়া হুয়াস সামিউল আলীম" তাকে কোনো বিপদ স্পর্শ করবে না।',
                         reference: 'সুনানে আবু দাউদ: ৫০৮৮, জামে তিরমিযী: ৩৩৮৮',
@@ -982,14 +837,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
                       // Nafal prayer section
                       _buildSectionHeader(
-                        isDark: isDark,
                         icon: Icons.mosque,
                         title: 'নফল নামাজের ফযিলত',
                       ),
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'রাতের নামাজ (তাহাজ্জুদ) ফরয নামাজের পর সর্বোত্তম নামাজ।',
                         reference: 'সহীহ মুসলিম: ১১৬৩',
@@ -997,7 +850,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(height: 12),
 
                       _buildHadithCard(
-                        isDark: isDark,
                         hadith:
                             'চাশতের নামাজ (সালাতুদ-দুহা) দুই রাকাত পড়লে শরীরের ৩৬০টি জোড়ের সদকা আদায় হয়ে যায়।',
                         reference: 'সহীহ মুসলিম: ৭২০',
@@ -1016,28 +868,16 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   }
 
   Widget _buildInfoSection({
-    required bool isDark,
-    required Color bodyTextColor,
     required IconData icon,
     required String title,
     required String content,
   }) {
-    final boxBg =
-        isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: boxBg,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1047,17 +887,17 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                  color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 18),
+                child: Icon(icon, color: cs.primary, size: 18),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: cs.primary,
                     fontSize: 16.5,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.1,
@@ -1071,7 +911,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             Text(
               content,
               style: TextStyle(
-                color: bodyTextColor,
+                color: cs.onSurfaceVariant,
                 fontSize: 14,
                 height: 1.7,
                 fontWeight: FontWeight.w600,
@@ -1084,30 +924,15 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   }
 
   Widget _buildHadithCard({
-    required bool isDark,
     required String hadith,
     required String reference,
   }) {
-    final surface =
-        isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
-    final hadithTextColor = isDark
-        ? AppColors.textSecondary
-        : AppColors.textLightMode.withOpacity(0.90);
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.22 : 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1118,21 +943,18 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withOpacity(isLight ? 0.12 : 0.18),
+                  color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.format_quote_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 14),
+                    color: cs.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   hadith,
                   style: TextStyle(
-                    color: hadithTextColor,
+                    color: cs.onSurfaceVariant,
                     fontSize: 14,
                     height: 1.65,
                     fontStyle: FontStyle.italic,
@@ -1148,13 +970,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               Icon(
                 Icons.book_outlined,
                 size: 18,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+                color: cs.primary.withOpacity(0.75),
               ),
               const SizedBox(width: 5),
               Text(
                 reference,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: cs.primary,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.1,
@@ -1168,43 +990,33 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   }
 
   Widget _buildSectionHeader({
-    required bool isDark,
     required IconData icon,
     required String title,
   }) {
-    final panelBg =
-        isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: panelBg,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.18 : 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+              color: cs.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 18),
+            child: Icon(icon,
+                color: Theme.of(context).extension<GradientColors>()!.onPrimaryText, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: cs.primary,
                 fontSize: 16.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.1,
@@ -1219,45 +1031,33 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   // Expandable Morning-Evening Dua Section
   Widget _buildExpandableDuaSection() {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final containerBg =
-        isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
-    final titleColor =
-        isDark ? AppColors.textSecondary : AppColors.textLightMode;
+    final cs = theme.colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: containerBg,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.22 : 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
+      padding: EdgeInsets.zero,
       child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
+        data: theme.copyWith(dividerColor: cs.surface.withOpacity(0)),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+              color: cs.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.wb_twilight,
-              color: AppColors.primary,
+              color: cs.primary,
               size: 20,
             ),
           ),
-          title: const Text(
+          title: Text(
             'সকাল-সন্ধ্যার আযকার',
             style: TextStyle(
-              color: AppColors.primary,
+              color: cs.primary,
               fontSize: 17,
               fontWeight: FontWeight.bold,
             ),
@@ -1267,15 +1067,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             child: Text(
               'ট্যাপ করে দোয়াগুলো দেখুন',
               style: TextStyle(
-                color: isDark
-                    ? AppColors.textTertiary
-                    : AppColors.textSecondaryLightMode,
+                color: cs.onSurfaceVariant,
                 fontSize: 12,
               ),
             ),
           ),
-          iconColor: AppColors.primary,
-          collapsedIconColor: AppColors.primary,
+          iconColor: cs.primary,
+          collapsedIconColor: cs.primary,
           children: [
             const SizedBox(height: 8),
             // 27.2: Ayatul Kursi
@@ -1507,80 +1305,71 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     required String fazilat,
     required String count,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.backgroundDark : AppColors.cardLightMode;
-    final titleColor =
-        isDark ? AppColors.textSecondary : AppColors.textLightMode;
-    final innerBg =
-        isDark ? const Color(0xFF1A1A1A) : AppColors.surfaceLightMode;
-    final textColor = isDark
-        ? AppColors.textSecondary
-        : AppColors.textLightMode.withOpacity(0.90);
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: cardBg,
+        color: cs.surfaceContainer,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.22 : 0.06),
+            color: theme.shadowColor.withOpacity(0.12),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-          leading: const Icon(
+          leading: Icon(
             Icons.format_quote,
-            color: AppColors.primary,
+            color: cs.primary,
             size: 20,
           ),
           title: Text(
             title,
             style: TextStyle(
-              color: titleColor,
+              color: cs.onSurface,
               fontSize: 15,
               fontWeight: FontWeight.w600,
+              fontFamily: 'AlinurBanglaborno',
             ),
           ),
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.15),
+              color: cs.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               count,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: cs.primary,
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          iconColor: AppColors.primary,
-          collapsedIconColor: AppColors.primary,
+          iconColor: cs.primary,
+          collapsedIconColor: cs.primary,
           children: [
             // Arabic Text
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF0A0A0A).withOpacity(0.6)
-                    : AppColors.backgroundLightMode,
+                color: cs.surfaceContainerHighest.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: isDark
-                    ? null
-                    : Border.all(
-                        color: AppColors.borderLightMode.withOpacity(0.3)),
+                border: Border.all(
+                  color: cs.outline.withOpacity(0.15),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                    color: theme.shadowColor.withOpacity(0.08),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -1595,13 +1384,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: cs.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'আরবী',
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: cs.primary,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1615,9 +1404,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                     style: TextStyle(
-                      color: isDark
-                          ? const Color(0xFFF5F5F5)
-                          : const Color(0xFF1F2937),
+                      color: cs.onSurface,
                       fontSize: 20,
                       fontFamily: 'Amiri',
                       height: 2.2,
@@ -1633,12 +1420,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: innerBg,
+                color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: isDark
-                    ? null
-                    : Border.all(
-                        color: AppColors.borderLightMode.withOpacity(0.2)),
+                border: Border.all(
+                  color: cs.outline.withOpacity(0.10),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1647,14 +1433,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     children: [
                       Icon(
                         Icons.record_voice_over,
-                        color: isDark ? Colors.teal[400] : Colors.teal[700],
+                        color: cs.tertiary,
                         size: 14,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         'উচ্চারণ',
                         style: TextStyle(
-                          color: isDark ? Colors.teal[400] : Colors.teal[700],
+                          color: cs.tertiary,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1665,7 +1451,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Text(
                     pronunciation,
                     style: TextStyle(
-                      color: textColor,
+                      color: cs.onSurfaceVariant,
                       fontSize: 14,
                       height: 1.7,
                       fontStyle: FontStyle.italic,
@@ -1681,12 +1467,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: innerBg,
+                color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: isDark
-                    ? null
-                    : Border.all(
-                        color: AppColors.borderLightMode.withOpacity(0.2)),
+                border: Border.all(
+                  color: cs.outline.withOpacity(0.10),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1695,14 +1480,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     children: [
                       Icon(
                         Icons.translate,
-                        color: isDark ? Colors.blue[400] : Colors.blue[700],
+                        color: cs.secondary,
                         size: 14,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         'অর্থ',
                         style: TextStyle(
-                          color: isDark ? Colors.blue[400] : Colors.blue[700],
+                          color: cs.secondary,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1713,7 +1498,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Text(
                     meaning,
                     style: TextStyle(
-                      color: textColor,
+                      color: cs.onSurfaceVariant,
                       fontSize: 14,
                       height: 1.7,
                     ),
@@ -1728,14 +1513,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(isDark ? 0.08 : 0.05),
+                color: cs.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: isDark
-                    ? null
-                    : Border.all(color: AppColors.primary.withOpacity(0.15)),
+                border: Border.all(
+                  color: cs.primary.withOpacity(0.15),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.22 : 0.03),
+                    color: theme.shadowColor.withOpacity(0.08),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -1744,18 +1529,18 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(
                         Icons.star,
-                        color: AppColors.primary,
+                        color: cs.primary,
                         size: 14,
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
                         'ফযীলত',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: cs.primary,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1766,9 +1551,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Text(
                     fazilat,
                     style: TextStyle(
-                      color: isDark
-                          ? AppColors.primary.withOpacity(0.85)
-                          : AppColors.textLightMode.withOpacity(0.85),
+                      color: cs.onSurfaceVariant.withOpacity(0.90),
                       fontSize: 13,
                       height: 1.5,
                       fontWeight: FontWeight.w600,
@@ -1788,18 +1571,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Icon(
                     Icons.book_outlined,
                     size: 16,
-                    color: (isDark
-                            ? AppColors.grey400
-                            : AppColors.textSecondaryLightMode)
-                        .withOpacity(0.75),
+                    color: cs.onSurfaceVariant.withOpacity(0.75),
                   ),
                   const SizedBox(width: 5),
                   Text(
                     reference,
                     style: TextStyle(
-                      color: isDark
-                          ? AppColors.grey400
-                          : AppColors.textSecondaryLightMode,
+                      color: cs.onSurfaceVariant,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1811,159 +1589,5 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         ),
       ),
     );
-  }
-}
-
-// ------------------------------------------------------------
-// Premium background (gradient + soft glows + subtle noise)
-// ------------------------------------------------------------
-class _AdaptiveBackground extends StatelessWidget {
-  const _AdaptiveBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final top = isDark ? const Color(0xFF0D0D0D) : const Color(0xFFF2F1EC);
-    final bottom = isDark ? const Color(0xFF070707) : const Color(0xFFEAE9E4);
-
-    return IgnorePointer(
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [top, bottom],
-                ),
-              ),
-            ),
-          ),
-
-          // Soft golden glow (top-right)
-          Positioned(
-            top: -120,
-            right: -140,
-            child: _GlowBlob(
-              size: 340,
-              colors: [
-                const Color(0xFFD4AF37).withOpacity(isDark ? 0.22 : 0.10),
-                const Color(0xFFD4AF37).withOpacity(0.0),
-              ],
-            ),
-          ),
-
-          // Soft highlight (top-left)
-          Positioned(
-            top: -140,
-            left: -140,
-            child: _GlowBlob(
-              size: 300,
-              colors: [
-                (isDark ? Colors.white : Colors.black)
-                    .withOpacity(isDark ? 0.08 : 0.04),
-                (isDark ? Colors.white : Colors.black).withOpacity(0.0),
-              ],
-            ),
-          ),
-
-          // Subtle vignette (much lighter in light mode)
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.topCenter,
-                  radius: 1.2,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(isDark ? 0.65 : 0.08),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          Positioned.fill(child: _NoiseOverlay(isDark: isDark)),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlowBlob extends StatelessWidget {
-  final double size;
-  final List<Color> colors;
-  const _GlowBlob({required this.size, required this.colors});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(colors: colors),
-        ),
-      ),
-    );
-  }
-}
-
-class _NoiseOverlay extends StatelessWidget {
-  final bool isDark;
-  const _NoiseOverlay({required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: _NoisePainter(seed: 2026, density: 1400, isDark: isDark),
-      ),
-    );
-  }
-}
-
-class _NoisePainter extends CustomPainter {
-  final int seed;
-  final int density;
-  final bool isDark;
-
-  _NoisePainter({
-    required this.seed,
-    required this.density,
-    required this.isDark,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rnd = math.Random(seed);
-
-    final lightPaint = Paint()
-      ..color = isDark
-          ? Colors.white.withOpacity(0.035)
-          : Colors.black.withOpacity(0.03);
-
-    final darkPaint = Paint()
-      ..color = isDark
-          ? Colors.black.withOpacity(0.08)
-          : Colors.black.withOpacity(0.02);
-
-    for (int i = 0; i < density; i++) {
-      final x = rnd.nextDouble() * size.width;
-      final y = rnd.nextDouble() * size.height;
-      final r = rnd.nextDouble() * 1.2;
-
-      canvas.drawCircle(Offset(x, y), r, (i % 3 == 0) ? darkPaint : lightPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _NoisePainter oldDelegate) {
-    return oldDelegate.seed != seed ||
-        oldDelegate.density != density ||
-        oldDelegate.isDark != isDark;
   }
 }

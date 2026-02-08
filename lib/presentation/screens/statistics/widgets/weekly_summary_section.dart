@@ -108,14 +108,6 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
     }
   }
 
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
-  }
-
   @override
   Widget build(BuildContext context) {
     // Calculate totals based on view type
@@ -168,7 +160,6 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
           maxPrayers: maxPrayers,
           jamaatPrayers: jamaatPrayers,
           delayedPrayers: delayedPrayers,
-          toBengaliNumber: _toBengaliNumber,
         ),
         const SizedBox(height: 12),
 
@@ -180,8 +171,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
                 icon: Icons.check_circle_outline,
                 iconColor: AppColors.primaryGold,
                 title: 'মোট আমল',
-                value: _toBengaliNumber(totalAmal),
-                subtitle: '/${_toBengaliNumber(maxAmal)}',
+                value: totalAmal.toString(),
+                subtitle: '/${maxAmal.toString()}',
               ),
             ),
             const SizedBox(width: 12),
@@ -190,8 +181,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
                 icon: Icons.favorite,
                 iconColor: AppColors.primaryGold,
                 title: 'মোট\nযিকির',
-                value: _toBengaliNumber(totalDhikr),
-                subtitle: '/${_toBengaliNumber(maxDhikr)}',
+                value: totalDhikr.toString(),
+                subtitle: '/${maxDhikr.toString()}',
               ),
             ),
           ],
@@ -204,8 +195,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
                 icon: Icons.menu_book,
                 iconColor: AppColors.primaryGold,
                 title: 'পড়ার সময়',
-                value: _toBengaliNumber(totalReadingMinutes),
-                subtitle: '/${_toBengaliNumber(maxReadingMinutes)} মিনিট',
+                value: totalReadingMinutes.toString(),
+                subtitle: '/${maxReadingMinutes.toString()} মিনিট',
               ),
             ),
             const SizedBox(width: 12),
@@ -215,8 +206,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
                 icon: Icons.star,
                 iconColor: AppColors.primaryGold,
                 title: 'পূর্ণ দিন',
-                value: _toBengaliNumber(perfectDays),
-                subtitle: '/${_toBengaliNumber(totalDays)} দিন',
+                value: perfectDays.toString(),
+                subtitle: '/${totalDays.toString()} দিন',
               ),
             ),
           ],
@@ -227,7 +218,6 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
           const SizedBox(height: 12),
           _SinCountCard(
             sinCount: weeklySinCount,
-            toBengaliNumber: _toBengaliNumber,
           ),
         ],
       ],
@@ -319,12 +309,10 @@ class _SummaryCard extends StatelessWidget {
 class _PerfectDaysCard extends StatelessWidget {
   final int perfectDays;
   final int totalDays;
-  final String Function(int) toBengaliNumber;
 
   const _PerfectDaysCard({
     required this.perfectDays,
     required this.totalDays,
-    required this.toBengaliNumber,
   });
 
   @override
@@ -366,7 +354,7 @@ class _PerfectDaysCard extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: toBengaliNumber(perfectDays),
+                        text: perfectDays.toString(),
                         style: const TextStyle(
                           color: AppColors.primaryGold,
                           fontSize: 20,
@@ -374,7 +362,7 @@ class _PerfectDaysCard extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: '/${toBengaliNumber(totalDays)} দিন',
+                        text: '/${totalDays.toString()} দিন',
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -394,11 +382,9 @@ class _PerfectDaysCard extends StatelessWidget {
 
 class _SinCountCard extends StatelessWidget {
   final int sinCount;
-  final String Function(int) toBengaliNumber;
 
   const _SinCountCard({
     required this.sinCount,
-    required this.toBengaliNumber,
   });
 
   @override
@@ -439,7 +425,7 @@ class _SinCountCard extends StatelessWidget {
                 Text(
                   sinCount == 0
                       ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
-                      : '${toBengaliNumber(sinCount)} টি গুনাহ',
+                      : '$sinCount টি গুনাহ',
                   style: TextStyle(
                     color: sinCount == 0
                         ? const Color(0xFF4CAF50)
@@ -463,14 +449,12 @@ class _PrayerDetailCard extends StatelessWidget {
   final int maxPrayers;
   final int jamaatPrayers;
   final int delayedPrayers;
-  final String Function(int) toBengaliNumber;
 
   const _PrayerDetailCard({
     required this.totalPrayers,
     required this.maxPrayers,
     required this.jamaatPrayers,
     required this.delayedPrayers,
-    required this.toBengaliNumber,
   });
 
   @override
@@ -519,7 +503,7 @@ class _PrayerDetailCard extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: toBengaliNumber(totalPrayers),
+                            text: totalPrayers.toString(),
                             style: const TextStyle(
                               color: AppColors.primaryGold,
                               fontSize: 20,
@@ -527,7 +511,7 @@ class _PrayerDetailCard extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: '/${toBengaliNumber(maxPrayers)} ওয়াক্ত',
+                            text: '/${maxPrayers.toString()} ওয়াক্ত',
                             style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
@@ -582,7 +566,7 @@ class _PrayerDetailCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${toBengaliNumber(jamaatPrayers)} ওয়াক্ত',
+                                '$jamaatPrayers ওয়াক্ত',
                                 style: const TextStyle(
                                   color: Color(0xFF4CAF50),
                                   fontSize: 14,
@@ -619,7 +603,7 @@ class _PrayerDetailCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${toBengaliNumber(delayedPrayers)} ওয়াক্ত',
+                                '$delayedPrayers ওয়াক্ত',
                                 style: const TextStyle(
                                   color: Color(0xFFFF9800),
                                   fontSize: 14,

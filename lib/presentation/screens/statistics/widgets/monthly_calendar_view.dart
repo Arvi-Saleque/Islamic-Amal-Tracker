@@ -181,14 +181,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
-  }
-
   String _getMonthNameBengali(int month) {
     final months = [
       'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
@@ -199,11 +191,11 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
   Color _getDateColor(int score) {
     if (score == 0) {
-      return Colors.grey[850] ?? const Color(0xFF2A2A2A); // ধূসর (০%)
+      return Colors.grey[850] ?? const Color(0xFF2A2A2A); // ধূসর (0%)
     } else if (score < 80) {
-      return const Color(0xFF7A6528); // হালকা/ডিম গোল্ড (১-৭৯%)
+      return const Color(0xFF7A6528); // হালকা/ডিম গোল্ড (1-79%)
     }
-    return AppColors.primaryGold; // ফুল গোল্ড (৮০%+)
+    return AppColors.primaryGold; // ফুল গোল্ড (80%+)
   }
 
   @override
@@ -235,7 +227,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                 icon: const Icon(Icons.chevron_left, color: Colors.grey),
               ),
               Text(
-                '${_getMonthNameBengali(widget.selectedMonth.month)} ${_toBengaliNumber(widget.selectedMonth.year)}',
+                '${_getMonthNameBengali(widget.selectedMonth.month)} ${widget.selectedMonth.year}',
                 style: const TextStyle(
                   color: AppColors.primaryGold,
                   fontSize: 18,
@@ -338,11 +330,11 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _LegendItem(color: Colors.grey[850] ?? const Color(0xFF2A2A2A), label: '০%'),
+              _LegendItem(color: Colors.grey[850] ?? const Color(0xFF2A2A2A), label: '0%'),
               const SizedBox(width: 16),
-              const _LegendItem(color: Color(0xFF7A6528), label: '১-৭৯%'),
+              const _LegendItem(color: Color(0xFF7A6528), label: '1-79%'),
               const SizedBox(width: 16),
-              const _LegendItem(color: AppColors.primaryGold, label: '৮০%+'),
+              const _LegendItem(color: AppColors.primaryGold, label: '80%+'),
             ],
           ),
         ],

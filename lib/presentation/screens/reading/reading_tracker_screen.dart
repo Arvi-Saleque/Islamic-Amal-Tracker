@@ -140,10 +140,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           colors: [
             if (isLight)
               ...[
-                AppColors.lightgradient1,
-                AppColors.lightgradient2,
-                AppColors.lightgradient3,
-              ]
+            Colors.red,
+          ]
             else
               ...[
                 AppColors.backgroundLight,
@@ -288,10 +286,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           colors: [
             if (isLight)
               ...[
-                AppColors.lightgradient1,
-                AppColors.lightgradient2,
-                AppColors.lightgradient3,
-              ]
+            Colors.red,
+          ]
             else
               ...[
                 AppColors.backgroundLight,

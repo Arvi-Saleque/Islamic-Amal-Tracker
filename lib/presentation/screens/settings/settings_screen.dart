@@ -6,25 +6,6 @@ import '../profile/profile_screen.dart';
 import 'reminders_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/theme_storage.dart';
-
-final settingsLightModeProvider =
-    StateNotifierProvider<SettingsLightModeController, bool>(
-  (ref) => SettingsLightModeController()..load(),
-);
-
-class SettingsLightModeController extends StateNotifier<bool> {
-  SettingsLightModeController() : super(false);
-
-  void load() {
-    state = ThemeStorage.getSettingsIsLight();
-  }
-
-  Future<void> setMode(bool v) async {
-    state = v;
-    await ThemeStorage.setSettingsIsLight(v);
-  }
-}
 
 // false = dark (default), true = light
 
@@ -33,8 +14,8 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(appThemeModeProvider);
-    final isLight = mode == ThemeMode.light;
+    final selectedTheme = ref.watch(appThemeModeProvider);
+    final isLight = selectedTheme == 'light';
 
     // ✅ Dark: keep your old style (no Theme override)
     if (!isLight) {
@@ -100,7 +81,7 @@ class _SettingsBody extends ConsumerWidget {
                 child: SwitchListTile(
                   value: isLight,
                   onChanged: (v) => ref.read(appThemeModeProvider.notifier)
-                    .setMode(v ? ThemeMode.light : ThemeMode.dark),
+                    .setTheme(v ? 'light' : 'dark'),
 
                   title: Text(
                     'Light Theme',

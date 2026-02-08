@@ -75,14 +75,6 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  String _toBengaliNumber(int number) {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return number.toString().split('').map((digit) {
-      final index = int.tryParse(digit);
-      return index != null ? bengaliDigits[index] : digit;
-    }).join();
-  }
-
   String _formatDateBengali(DateTime date) {
     final months = [
       'জানুয়ারি',
@@ -98,7 +90,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
       'নভেম্বর',
       'ডিসেম্বর'
     ];
-    return '${_toBengaliNumber(date.day)} ${months[date.month - 1]}, ${_toBengaliNumber(date.year)}';
+    return '${date.day} ${months[date.month - 1]}, ${date.year}';
   }
 
   String _getWeekdayBengali(int weekday) {
@@ -291,7 +283,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     return _CategoryCard(
       icon: Icons.mosque,
       title: 'নামাজ',
-      subtitle: '${_toBengaliNumber(completedCount)} টি / ৫ টি সম্পন্ন',
+      subtitle: '$completedCount টি / 5 টি সম্পন্ন',
       progress: progress,
       child: prayer != null
           ? Wrap(
@@ -321,7 +313,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
       icon: Icons.check_circle_outline,
       title: 'প্রতিদিনের আমল',
       subtitle:
-          '${_toBengaliNumber(completedCount)} টি / ${_toBengaliNumber(totalCount)} টি সম্পন্ন',
+          '$completedCount টি / $totalCount টি সম্পন্ন',
       progress: progress,
       isExpandable: true,
       child: amal != null
@@ -351,7 +343,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
       icon: Icons.favorite,
       title: 'যিকির',
       subtitle:
-          '${_toBengaliNumber(totalCount)} বার / ${_toBengaliNumber(totalTarget)} বার সম্পন্ন',
+          '$totalCount বার / $totalTarget বার সম্পন্ন',
       progress: progress,
       isExpandable: true,
       child: dhikr != null
@@ -362,7 +354,6 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                   arabic: item.arabic,
                   currentCount: item.currentCount,
                   targetCount: item.targetCount,
-                  toBengaliNumber: _toBengaliNumber,
                 );
               }).toList(),
             )
@@ -385,7 +376,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
       icon: Icons.menu_book,
       title: 'পড়াশোনা',
       subtitle:
-          '${_toBengaliNumber(totalMinutes)} মিনিট / ${_toBengaliNumber(targetMinutes)} মিনিট সম্পন্ন',
+          '$totalMinutes মিনিট / $targetMinutes মিনিট সম্পন্ন',
       progress: progress,
       child: reading != null
           ? Column(
@@ -395,21 +386,18 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                   title: 'কুরআন তিলাওয়াত',
                   minutes: reading.quranMinutes,
                   target: reading.goal.quranMinutes,
-                  toBengaliNumber: _toBengaliNumber,
                 ),
                 _ReadingItem(
                   icon: Icons.book_outlined,
                   title: 'তাফসীর',
                   minutes: reading.tafsirMinutes,
                   target: reading.goal.tafsirMinutes,
-                  toBengaliNumber: _toBengaliNumber,
                 ),
                 _ReadingItem(
                   icon: Icons.auto_stories,
                   title: 'হাদিস',
                   minutes: reading.hadithMinutes,
                   target: reading.goal.hadithMinutes,
-                  toBengaliNumber: _toBengaliNumber,
                 ),
               ],
             )
@@ -487,7 +475,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                     Text(
                       totalSins == 0
                           ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
-                          : '${_toBengaliNumber(totalSins)} টি গুনাহ, ${_toBengaliNumber(kaffaraDone)} টি কাফফারা দেওয়া',
+                          : '$totalSins টি গুনাহ, $kaffaraDone টি কাফফারা দেওয়া',
                       style: TextStyle(
                         color: totalSins == 0
                             ? const Color(0xFF4CAF50)
@@ -795,14 +783,12 @@ class _DhikrItem extends StatelessWidget {
   final String? arabic;
   final int currentCount;
   final int targetCount;
-  final String Function(int) toBengaliNumber;
 
   const _DhikrItem({
     required this.title,
     this.arabic,
     required this.currentCount,
     required this.targetCount,
-    required this.toBengaliNumber,
   });
 
   @override
@@ -843,7 +829,7 @@ class _DhikrItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '${toBengaliNumber(currentCount)}/${toBengaliNumber(targetCount)}',
+              '$currentCount/$targetCount',
               style: TextStyle(
                 color: currentCount >= targetCount
                     ? AppColors.primaryGold
@@ -864,14 +850,12 @@ class _ReadingItem extends StatelessWidget {
   final String title;
   final int minutes;
   final int target;
-  final String Function(int) toBengaliNumber;
 
   const _ReadingItem({
     required this.icon,
     required this.title,
     required this.minutes,
     required this.target,
-    required this.toBengaliNumber,
   });
 
   @override
@@ -904,7 +888,7 @@ class _ReadingItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '${toBengaliNumber(minutes)}/${toBengaliNumber(target)} মি.',
+              '$minutes/$target মি.',
               style: TextStyle(
                 color: minutes >= target ? AppColors.primaryGold : Colors.grey,
                 fontSize: 13,
