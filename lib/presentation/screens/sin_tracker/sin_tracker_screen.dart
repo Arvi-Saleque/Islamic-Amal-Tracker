@@ -13,27 +13,37 @@ class SinTrackerScreen extends ConsumerWidget {
     final state = ref.watch(sinTrackerProvider);
     final isLight = Theme.of(context).brightness == Brightness.light;
 
+
+    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+    final iconColor =  AppColors.primary;
+    final titleColor = AppColors.primary;
+
     return Scaffold(
       backgroundColor: isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark,
       appBar: AppBar(
-        backgroundColor: isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark,
+        backgroundColor: bg,
+        elevation: 0,
         titleSpacing: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: iconColor),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
           'প্রতিদিনের গুনাহ',
           style: TextStyle(
-            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
-            fontSize: 18,
+            color: titleColor,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
-          overflow: TextOverflow.ellipsis,
         ),
-        iconTheme: const IconThemeData(color: AppColors.primary),
+        centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddSinTypeDialog(context, ref),
         backgroundColor: AppColors.primary,
         tooltip: 'নতুন গুনাহ যোগ করুন',
         child: Icon(Icons.add, color: isLight ? Colors.white : AppColors.backgroundDark),
+        mini: true,
       ),
       body: state.isLoading
           ? const Center(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class CategoryProgressSection extends StatelessWidget {
@@ -53,7 +53,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Namaz
           _CategoryProgressItem(
             icon: Icons.mosque,
-            iconColor: AppTheme.primaryGold,
+            iconColor: AppColors.primaryGold,
             title: 'নামাজ',
             progress: avgPrayer,
           ),
@@ -62,7 +62,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Daily Amal
           _CategoryProgressItem(
             icon: Icons.check_circle_outline,
-            iconColor: AppTheme.primaryGold,
+            iconColor: AppColors.primaryGold,
             title: 'প্রতিদিনের আমল',
             progress: avgAmal,
           ),
@@ -71,7 +71,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Dhikr
           _CategoryProgressItem(
             icon: Icons.favorite,
-            iconColor: AppTheme.primaryGold,
+            iconColor: AppColors.primaryGold,
             title: 'যিকির',
             progress: avgDhikr,
           ),
@@ -80,7 +80,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Reading
           _CategoryProgressItem(
             icon: Icons.menu_book,
-            iconColor: AppTheme.primaryGold,
+            iconColor: AppColors.primaryGold,
             title: 'পড়াশোনা',
             progress: avgReading,
           ),
@@ -140,7 +140,7 @@ class _CategoryProgressItem extends StatelessWidget {
                   Text(
                     '$percentage%',
                     style: const TextStyle(
-                      color: AppTheme.primaryGold,
+                      color: AppColors.primaryGold,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),

@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -202,7 +203,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     } else if (score < 80) {
       return const Color(0xFF7A6528); // হালকা/ডিম গোল্ড (১-৭৯%)
     }
-    return AppTheme.primaryGold; // ফুল গোল্ড (৮০%+)
+    return AppColors.primaryGold; // ফুল গোল্ড (৮০%+)
   }
 
   @override
@@ -236,7 +237,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
               Text(
                 '${_getMonthNameBengali(widget.selectedMonth.month)} ${_toBengaliNumber(widget.selectedMonth.year)}',
                 style: const TextStyle(
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -274,7 +275,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
             ? const SizedBox(
                 height: 200,
                 child: Center(
-                  child: CircularProgressIndicator(color: AppTheme.primaryGold),
+                  child: CircularProgressIndicator(color: AppColors.primaryGold),
                 ),
               )
             : GridView.builder(
@@ -312,9 +313,9 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                     color: _getDateColor(score),
                     borderRadius: BorderRadius.circular(8),
                     border: isSelected
-                        ? Border.all(color: AppTheme.primaryGold, width: 2)
+                        ? Border.all(color: AppColors.primaryGold, width: 2)
                         : isToday
-                            ? Border.all(color: AppTheme.primaryGold.withOpacity(0.5), width: 1)
+                            ? Border.all(color: AppColors.primaryGold.withOpacity(0.5), width: 1)
                             : null,
                   ),
                   child: Center(
@@ -341,7 +342,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
               const SizedBox(width: 16),
               const _LegendItem(color: Color(0xFF7A6528), label: '১-৭৯%'),
               const SizedBox(width: 16),
-              const _LegendItem(color: AppTheme.primaryGold, label: '৮০%+'),
+              const _LegendItem(color: AppColors.primaryGold, label: '৮০%+'),
             ],
           ),
         ],

@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -28,8 +29,8 @@ class StreakCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.primaryGold.withOpacity(0.3),
-            AppTheme.primaryGold.withOpacity(0.1),
+            AppColors.primaryGold.withOpacity(0.3),
+            AppColors.primaryGold.withOpacity(0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
@@ -40,7 +41,7 @@ class StreakCard extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: AppTheme.primaryGold.withOpacity(0.15),
+            color: AppColors.primaryGold.withOpacity(0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -57,12 +58,12 @@ class StreakCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGold.withOpacity(0.2),
+                        color: AppColors.primaryGold.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Icon(
                         Icons.local_fire_department,
-                        color: AppTheme.primaryGold,
+                        color: AppColors.primaryGold,
                         size: 32,
                       ),
                     ),
@@ -78,7 +79,7 @@ class StreakCard extends StatelessWidget {
                     const Text(
                       'বর্তমান স্ট্রিক',
                       style: TextStyle(
-                        color: AppTheme.primaryGold,
+                        color: AppColors.primaryGold,
                         fontSize: 14,
                       ),
                     ),
@@ -89,7 +90,7 @@ class StreakCard extends StatelessWidget {
               Container(
                 height: 100,
                 width: 1,
-                color: AppTheme.primaryGold.withOpacity(0.3),
+                color: AppColors.primaryGold.withOpacity(0.3),
               ),
               // Best Streak
               Expanded(
@@ -98,12 +99,12 @@ class StreakCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGold.withOpacity(0.2),
+                        color: AppColors.primaryGold.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Icon(
                         Icons.emoji_events,
-                        color: AppTheme.primaryGold,
+                        color: AppColors.primaryGold,
                         size: 32,
                       ),
                     ),
@@ -119,7 +120,7 @@ class StreakCard extends StatelessWidget {
                     const Text(
                       'সর্বোচ্চ স্ট্রিক',
                       style: TextStyle(
-                        color: AppTheme.primaryGold,
+                        color: AppColors.primaryGold,
                         fontSize: 14,
                       ),
                     ),
@@ -132,7 +133,7 @@ class StreakCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGold.withOpacity(0.1),
+              color: AppColors.primaryGold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -140,7 +141,7 @@ class StreakCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: AppTheme.primaryGold.withOpacity(0.8),
+                  color: AppColors.primaryGold.withOpacity(0.8),
                   size: 16,
                 ),
                 const SizedBox(width: 8),

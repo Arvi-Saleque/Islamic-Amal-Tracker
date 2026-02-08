@@ -579,10 +579,10 @@ Widget _sunChip({
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(child: _buildHomeBackground(context)),
-          RefreshIndicator(
+        body: Stack(
+          children: [
+            Positioned.fill(child: _buildHomeBackground(context)),
+            RefreshIndicator(
             onRefresh: () async {
               ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
               ref.read(prayerTrackingProvider.notifier).loadTodayData();
@@ -751,7 +751,7 @@ Widget _sunChip({
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
-    return '${_toBengaliNumber(hour)}:${_toBengaliNumber(int.parse(minute))}';
+    return '${_toBengaliNumber(hour)}:$minute'.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join();
   }
 
   String _toBengaliNumber(int number) {
@@ -761,6 +761,15 @@ Widget _sunChip({
         .split('')
         .map((d) => bengaliDigits[int.parse(d)])
         .join();
+  }
+
+  // Convert any string containing English digits to Bengali digits
+  String _toBengaliString(String str) {
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return str.split('').map((char) {
+      final digit = int.tryParse(char);
+      return digit != null ? bengaliDigits[digit] : char;
+    }).join();
   }
 
   String _getHijriMonthBengali(int month) {
@@ -876,7 +885,7 @@ Widget _sunChip({
         padding: EdgeInsets.zero,
         radius: 22,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!state.isLoading && state.error == null)
               _buildCurrentPrayerSection(state),
@@ -990,7 +999,7 @@ Widget _sunChip({
       statusText = 'নিষিদ্ধ সময়';
       mainText = 'নামাজ পড়া যাবে না';
       subtitleText = state.timeToCurrentPrayerEnd != null
-          ? 'আর ${state.timeToCurrentPrayerEnd} বাকি'
+          ? 'আর ${_toBengaliString(state.timeToCurrentPrayerEnd!)} বাকি'
           : null;
     } else if (state.isNaflTime) {
       statusColor = isDark ? _gold : cs.primary;
@@ -1085,6 +1094,7 @@ Widget _sunChip({
     }
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -1109,8 +1119,8 @@ Widget _sunChip({
           ),
         ),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(22),
+          topRight: Radius.circular(22),
         ),
       ),
       child: Column(
@@ -1165,9 +1175,9 @@ Widget _sunChip({
               (state.isNaflTime && state.timeToNextPrayer != null)) ...[
             const SizedBox(height: 8),
             Text(
-              state.isNaflTime
+              _toBengaliString(state.isNaflTime
                   ? state.timeToNextPrayer!
-                  : state.timeToCurrentPrayerEnd!,
+                  : state.timeToCurrentPrayerEnd!),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: isDark ? _gold : cs.primary,
@@ -1387,7 +1397,7 @@ Widget _sunChip({
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    return '$hour:$minute'.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join();
   }
 
   String _getPrayerNameInBangla(String prayerName) {
@@ -1412,10 +1422,11 @@ Widget _sunChip({
   }
 
   String _formatTime(DateTime time) {
-    final hour = time.hour > 12 ? time.hour - 12 : time.hour;
+    final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
-    return '$hour:$minute $period';
+    final timeStr = '$hour:$minute';
+    return '${timeStr.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join()} $period';
   }
 
 // Replace your existing _buildPrayerTimeRow with this one
@@ -1487,8 +1498,8 @@ Widget _buildPrayerTimeRow(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            cs.primaryContainer,
-                            cs.primary,
+                            Color(0xFFE0C05A),
+                            Color(0xFFD4AF37),
                           ],
                         ))
                   : (isDark

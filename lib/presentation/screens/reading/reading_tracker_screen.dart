@@ -25,6 +25,9 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     final tafsirProgress = readingState.todayData.tafsirProgress;
     final hadithProgress = readingState.todayData.hadithProgress;
 
+    final iconColor =  AppColors.primary;
+    final titleColor = AppColors.primary;
+
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
@@ -32,13 +35,13 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'পড়াশোনা ট্র্যাকার',
+          'পড়াশোনা',
           style: TextStyle(
-            color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
+            color: titleColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -47,12 +50,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         actions: [
           // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline, color: AppColors.primary),
+            icon: Icon(Icons.info_outline_rounded, color: titleColor),
             onPressed: () => _showInfoBottomSheet(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
-            onPressed: () => _showGoalSettingsDialog(context, readingNotifier),
           ),
         ],
       ),
@@ -105,6 +104,21 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           ],
         ),
       ),
+      floatingActionButton: Builder(
+        builder: (context) {
+          final isLight = Theme.of(context).brightness == Brightness.light;
+          return FloatingActionButton(
+            mini: true,
+            onPressed: () => _showGoalSettingsDialog(context, readingNotifier),
+            backgroundColor: AppColors.primary,
+            child: Icon(
+              Icons.settings,
+              color: isLight ? Colors.white : Colors.black,
+              size: 20,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -115,11 +129,28 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     final subColor = isLight ? AppColors.textSecondaryLightMode : AppColors.grey500;
     final ringBg = isLight ? Colors.black.withOpacity(0.08) : const Color(0xFF2A2A2A);
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: cardBg,
+        gradient: LinearGradient(
+          colors: [
+            if (isLight)
+              ...[
+                AppColors.lightgradient1,
+                AppColors.lightgradient2,
+                AppColors.lightgradient3,
+              ]
+            else
+              ...[
+                AppColors.backgroundLight,
+                AppColors.backgroundLight,
+              ],
+          ],
+        ),
         borderRadius: BorderRadius.circular(18),
         border: isLight ? Border.all(color: Colors.black.withOpacity(0.06), width: 1) : null,
         boxShadow: [
@@ -206,7 +237,9 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       child: CircularProgressIndicator(
                         value: data.overallProgress,
                         strokeWidth: 8,
-                        backgroundColor: ringBg,
+                        backgroundColor: isLight
+                            ? AppColors.surfaceLightMode.withOpacity(0.3)
+                            : cs.surfaceContainerHighest,
                         valueColor: const AlwaysStoppedAnimation<Color>(
                           AppColors.primary,
                         ),
@@ -251,7 +284,21 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: cardBg,
+        gradient: LinearGradient(
+          colors: [
+            if (isLight)
+              ...[
+                AppColors.lightgradient1,
+                AppColors.lightgradient2,
+                AppColors.lightgradient3,
+              ]
+            else
+              ...[
+                AppColors.backgroundLight,
+                AppColors.backgroundLight,
+              ],
+          ],
+        ),
         borderRadius: BorderRadius.circular(18),
         border: isLight ? Border.all(color: Colors.black.withOpacity(0.06), width: 1) : null,
         boxShadow: [
@@ -1133,6 +1180,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         ? AppColors.textSecondary
         : AppColors.textLightMode.withOpacity(0.90);
 
+    final isLight = !isDark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1153,13 +1202,17 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(isLight ? 0.12 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.format_quote_rounded, color: AppColors.primary, size: 18),
+                child: Icon(Icons.format_quote_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1177,15 +1230,25 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            '📚 $reference',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.1,
-            ),
-          ),
+          Row(
+            children: [
+              Icon(
+                Icons.book_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '$reference',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.1,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

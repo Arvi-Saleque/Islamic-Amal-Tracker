@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
@@ -142,7 +143,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryGold,
+              backgroundColor: AppColors.primaryGold,
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -188,11 +189,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: const Text(
           'প্রোফাইল',
           style: TextStyle(
-            color: AppTheme.primaryGold,
+            color: AppColors.primaryGold,
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: AppTheme.primaryGold),
+        iconTheme: const IconThemeData(color: AppColors.primaryGold),
       ),
       body: user == null
           ? _buildNotLoggedIn()
@@ -208,19 +209,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppTheme.primaryGold,
+                        color: AppColors.primaryGold,
                         width: 2,
                       ),
                     ),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: AppTheme.primaryGold.withOpacity(0.1),
+                      backgroundColor: AppColors.primaryGold.withOpacity(0.1),
                       child: Text(
                         _getInitials(user.displayName ?? user.email ?? 'U'),
                         style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                         ),
                       ),
                     ),
@@ -251,7 +252,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: const BorderSide(color: AppTheme.primaryGold),
+                                      borderSide: const BorderSide(color: AppColors.primaryGold),
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -269,7 +270,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: AppTheme.primaryGold,
+                                          color: AppColors.primaryGold,
                                         ),
                                       )
                                     : const Icon(Icons.check, color: Color(0xFF4CAF50)),
@@ -301,7 +302,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 onPressed: () => setState(() => _isEditing = true),
                                 icon: const Icon(
                                   Icons.edit,
-                                  color: AppTheme.primaryGold,
+                                  color: AppColors.primaryGold,
                                   size: 20,
                                 ),
                               ),
@@ -386,7 +387,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.cloud_sync, color: AppTheme.primaryGold, size: 20),
+                            const Icon(Icons.cloud_sync, color: AppColors.primaryGold, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               'ক্লাউড সিংক',
@@ -426,7 +427,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 icon: const Icon(Icons.cloud_upload, size: 18),
                                 label: const Text('ব্যাকআপ'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.primaryGold,
+                                  backgroundColor: AppColors.primaryGold,
                                   foregroundColor: Colors.black,
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
@@ -461,7 +462,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppTheme.primaryGold,
+                                  color: AppColors.primaryGold,
                                 ),
                               ),
                             ),
@@ -533,7 +534,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryGold,
+              backgroundColor: AppColors.primaryGold,
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -567,7 +568,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: AppTheme.primaryGold, size: 18),
+              Icon(icon, color: AppColors.primaryGold, size: 18),
               const SizedBox(width: 8),
               Text(
                 title,

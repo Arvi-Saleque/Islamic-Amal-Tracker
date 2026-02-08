@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
@@ -182,13 +183,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.auto_fix_high,
                   size: 60,
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                 ),
               ),
               const SizedBox(height: 24),
@@ -198,7 +199,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                 ),
               ),
               const SizedBox(height: 8),
@@ -324,7 +325,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           child: Text(
                             'পাসওয়ার্ড ভুলে গেছেন?',
                             style: TextStyle(
-                              color: AppTheme.primaryGold.withOpacity(0.8),
+                              color: AppColors.primaryGold.withOpacity(0.8),
                               fontSize: 13,
                             ),
                           ),
@@ -340,7 +341,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       child: ElevatedButton(
                         onPressed: authState.isLoading ? null : _handleSubmit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryGold,
+                          backgroundColor: AppColors.primaryGold,
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -411,7 +412,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             child: Text(
                               _isLogin ? 'রেজিস্টার করুন' : 'লগইন করুন',
                               style: const TextStyle(
-                                color: AppTheme.primaryGold,
+                                color: AppColors.primaryGold,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -533,7 +534,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppTheme.primaryGold),
+            borderSide: const BorderSide(color: AppColors.primaryGold),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -561,13 +562,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withOpacity(0.1),
+                  color: AppColors.primaryGold.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.mark_email_unread_outlined,
                   size: 80,
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                 ),
               ),
               const SizedBox(height: 32),
@@ -577,7 +578,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                 ),
               ),
               const SizedBox(height: 16),
@@ -624,7 +625,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: ElevatedButton(
                   onPressed: _goBackToLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryGold,
+                    backgroundColor: AppColors.primaryGold,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -650,14 +651,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                         ),
                       )
                     : const Icon(Icons.refresh, size: 18),
                 label: Text(
                   authState.isLoading ? 'পাঠানো হচ্ছে...' : 'আবার লিংক পাঠান',
                   style: TextStyle(
-                    color: AppTheme.primaryGold.withOpacity(0.8),
+                    color: AppColors.primaryGold.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),

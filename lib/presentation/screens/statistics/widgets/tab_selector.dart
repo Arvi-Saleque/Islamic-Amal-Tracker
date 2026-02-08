@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -31,7 +32,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.weekly 
-                      ? AppTheme.primaryGold 
+                      ? AppColors.primaryGold 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -58,7 +59,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.monthly 
-                      ? AppTheme.primaryGold 
+                      ? AppColors.primaryGold 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -85,7 +86,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.qaza 
-                      ? AppTheme.primaryGold 
+                      ? AppColors.primaryGold 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),

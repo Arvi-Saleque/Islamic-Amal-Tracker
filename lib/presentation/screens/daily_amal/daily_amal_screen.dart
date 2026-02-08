@@ -57,82 +57,36 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    final bg =
+        isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+    final iconColor = AppColors.primary;
+    final titleColor = AppColors.primary;
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: bg,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('প্রতিদিনের আমল'),
+        title: Text(
+          'প্রতিদিনের আমল',
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         actions: [
           // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline),
+            icon: Icon(Icons.info_outline_rounded, color: titleColor),
             onPressed: () => _showInfoBottomSheet(context),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: isAllDone
-                  ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFE6C35C),
-                        Color(0xFFD4AF37),
-                        Color(0xFFB8891A),
-                      ],
-                      stops: [0.0, 0.55, 1.0],
-                    )
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isDark
-                          ? const [Color(0xFF1C1C1C), Color(0xFF121212)]
-                          : const [Color(0xFFF7F6F1), Color(0xFFF2F1EC)],
-                    ),
-              borderRadius: BorderRadius.circular(_cardRadius),
-              border: Border.all(
-                color: isAllDone
-                    ? Colors.black.withOpacity(isDark ? 0.18 : 0.10)
-                    : cs.outline.withOpacity(isDark ? 0.18 : 0.24),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.65 : 0.10),
-                  blurRadius: 16,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: isAllDone
-                      ? (isDark ? const Color(0xFF0D0D0D) : Colors.white)
-                      : cs.primary,
-                  size: 18,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '$completedCount/$totalCount',
-                  style: TextStyle(
-                    color: isAllDone
-                        ? (isDark ? const Color(0xFF0D0D0D) : Colors.white)
-                        : cs.primary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -150,7 +104,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               // Checklist Items
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(_pagePad, 0, _pagePad, _pagePad),
+                  padding: const EdgeInsets.fromLTRB(
+                      _pagePad, 0, _pagePad, _pagePad),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).brightness == Brightness.dark
@@ -246,7 +201,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                                 Color(0xFF121212),
                               ]
                             : const [
-                                Color(0xFFF7F6F1),
+                                ui.Color.fromARGB(255, 216, 213, 199),
                                 Color(0xFFF2F1EC),
                               ],
                       ),
@@ -301,7 +256,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     final percentage = total > 0 ? completed / total : 0.0;
 
     return Container(
-      margin: const EdgeInsets.only(left: _pagePad, right: _pagePad, bottom: 12),
+      margin:
+          const EdgeInsets.only(left: _pagePad, right: _pagePad, bottom: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -313,8 +269,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Color(0xFF121212),
                 ]
               : const [
-                  Color(0xFFF7F6F1),
-                  Color(0xFFF2F1EC),
+                  ui.Color.fromARGB(255, 231, 229, 219),
+                  ui.Color.fromARGB(255, 229, 228, 221),
                 ],
         ),
         borderRadius: BorderRadius.circular(_sectionRadius),
@@ -433,9 +389,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       child: CircularProgressIndicator(
                         value: percentage,
                         strokeWidth: 8,
-                        backgroundColor: cs.surfaceContainerHighest,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            cs.primary),
+                        backgroundColor: isDark
+                            ? cs.surfaceContainerHighest
+                            : AppColors.surfaceLightMode.withOpacity(0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
                       ),
                     ),
                     Text(
@@ -487,7 +444,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         : const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFF7F6F1), Color(0xFFF2F1EC)],
+            colors: [
+              ui.Color.fromARGB(255, 238, 236, 226),
+              ui.Color.fromARGB(255, 220, 218, 206),
+            ],
           );
 
     final borderColor = item.isCompleted
@@ -592,7 +552,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       IconButton(
                         icon: Icon(
                           Icons.delete_outline,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
                               .withOpacity(isDark ? 0.75 : 0.95),
                           size: 20,
                         ),
@@ -665,9 +627,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             hintText: hint,
             filled: true,
             fillColor: fieldFill,
-            prefixIcon: icon == null ? null : Icon(icon, color: cs.onSurfaceVariant),
+            prefixIcon:
+                icon == null ? null : Icon(icon, color: cs.onSurfaceVariant),
             hintStyle: TextStyle(color: cs.onSurfaceVariant),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: borderCol),
@@ -685,7 +649,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
         return AlertDialog(
           backgroundColor: cs.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_cardRadius)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_cardRadius)),
           title: Text(
             'নতুন আমল যোগ করুন',
             style: TextStyle(
@@ -700,22 +665,25 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               TextField(
                 controller: titleController,
                 style: TextStyle(color: cs.onSurface),
-                decoration: deco(hint: 'আমলের নাম লিখুন', icon: Icons.edit_outlined),
+                decoration:
+                    deco(hint: 'আমলের নাম লিখুন', icon: Icons.edit_outlined),
               ),
               const SizedBox(height: 16),
-
               StatefulBuilder(
                 builder: (context, setState) => DropdownButtonFormField<String>(
                   value: selectedCategory,
                   dropdownColor: cs.surface,
                   style: TextStyle(color: cs.onSurface),
-                  decoration: deco(hint: 'ক্যাটাগরি নির্বাচন করুন', icon: Icons.category_outlined),
+                  decoration: deco(
+                      hint: 'ক্যাটাগরি নির্বাচন করুন',
+                      icon: Icons.category_outlined),
                   items: _categoryNames.entries
                       .where((e) => e.key != 'all')
                       .map(
                         (e) => DropdownMenuItem(
                           value: e.key,
-                          child: Text(e.value, style: TextStyle(color: cs.onSurface)),
+                          child: Text(e.value,
+                              style: TextStyle(color: cs.onSurface)),
                         ),
                       )
                       .toList(),
@@ -731,13 +699,15 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('বাতিল', style: TextStyle(color: cs.onSurfaceVariant)),
+              child:
+                  Text('বাতিল', style: TextStyle(color: cs.onSurfaceVariant)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: cs.primary,
                 foregroundColor: cs.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () {
                 final title = titleController.text.trim();
@@ -826,9 +796,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           final cs = theme.colorScheme;
           final isDark = theme.brightness == Brightness.dark;
 
-          final sheetBg = isDark ? AppColors.backgroundLight : AppColors.backgroundLightMode;
-          final dividerColor = isDark 
-              ? AppColors.grey600.withOpacity(0.25) 
+          final sheetBg = isDark
+              ? AppColors.backgroundLight
+              : AppColors.backgroundLightMode;
+          final dividerColor = isDark
+              ? AppColors.grey600.withOpacity(0.25)
               : AppColors.borderLightMode.withOpacity(0.5);
           final bodyTextColor = isDark
               ? AppColors.textSecondary
@@ -837,7 +809,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           return Container(
             decoration: BoxDecoration(
               color: sheetBg,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(26)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(isDark ? 0.22 : 0.08),
@@ -854,7 +827,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.grey600 : Colors.black.withOpacity(0.18),
+                    color: isDark
+                        ? AppColors.grey600
+                        : Colors.black.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -867,7 +842,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                          color: AppColors.primary
+                              .withOpacity(isDark ? 0.18 : 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Icon(
@@ -898,142 +874,142 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     controller: scrollController,
                     padding: const EdgeInsets.fromLTRB(18, 16, 18, 22),
                     children: [
-                    // How it works
-                    _buildInfoSection(
-                      isDark: isDark,
-                      bodyTextColor: bodyTextColor,
-                      icon: Icons.calculate_outlined,
-                      title: 'হিসাব কিভাবে হয়?',
-                      content: '''
+                      // How it works
+                      _buildInfoSection(
+                        isDark: isDark,
+                        bodyTextColor: bodyTextColor,
+                        icon: Icons.calculate_outlined,
+                        title: 'হিসাব কিভাবে হয়?',
+                        content: '''
 • প্রতিটি আমল সম্পন্ন করলে চেকমার্ক দিন
 • ক্যাটাগরি অনুযায়ী ফিল্টার করতে পারবেন
 • নিজের পছন্দমতো আমল যোগ করতে পারবেন
 • প্রতিদিন মধ্যরাতে স্বয়ংক্রিয়ভাবে রিসেট হয়
 • সব আমল সম্পন্ন করলে ১০০% complete''',
-                    ),
-                    const SizedBox(height: 20),
+                      ),
+                      const SizedBox(height: 20),
 
-                    // Morning-Evening Adhkar Section (Expandable)
-                    _buildExpandableDuaSection(),
-                    const SizedBox(height: 18),
+                      // Morning-Evening Adhkar Section (Expandable)
+                      _buildExpandableDuaSection(),
+                      const SizedBox(height: 18),
 
-                    // Miswak section
-                    _buildSectionHeader(
-                      isDark: isDark,
-                      icon: Icons.brush,
-                      title: 'মিসওয়াকের ফযিলত',
-                    ),
-                    const SizedBox(height: 12),
+                      // Miswak section
+                      _buildSectionHeader(
+                        isDark: isDark,
+                        icon: Icons.brush,
+                        title: 'মিসওয়াকের ফযিলত',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'মিসওয়াক মুখ পরিষ্কার করে এবং আল্লাহর সন্তুষ্টি অর্জন করে।',
-                      reference: 'সুনানে নাসাঈ: ৫',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'মিসওয়াক মুখ পরিষ্কার করে এবং আল্লাহর সন্তুষ্টি অর্জন করে।',
+                        reference: 'সুনানে নাসাঈ: ৫',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'যদি আমার উম্মতের উপর কষ্টকর না হতো, তাহলে আমি প্রতি নামাজের সময় মিসওয়াক করার আদেশ দিতাম।',
-                      reference: 'সহীহ বুখারী: ৮৮৭, সহীহ মুসলিম: ২৫২',
-                    ),
-                    const SizedBox(height: 18),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'যদি আমার উম্মতের উপর কষ্টকর না হতো, তাহলে আমি প্রতি নামাজের সময় মিসওয়াক করার আদেশ দিতাম।',
+                        reference: 'সহীহ বুখারী: ৮৮৭, সহীহ মুসলিম: ২৫২',
+                      ),
+                      const SizedBox(height: 18),
 
-                    // Surah section
-                    _buildSectionHeader(
-                      isDark: isDark,
-                      icon: Icons.menu_book,
-                      title: 'সূরাহ পাঠের ফযিলত',
-                    ),
-                    const SizedBox(height: 12),
+                      // Surah section
+                      _buildSectionHeader(
+                        isDark: isDark,
+                        icon: Icons.menu_book,
+                        title: 'সূরাহ পাঠের ফযিলত',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'যে ব্যক্তি সূরা ইখলাস পড়বে, সে যেন কুরআনের এক তৃতীয়াংশ পড়ল।',
-                      reference: 'সহীহ বুখারী: ৫০১৫',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'যে ব্যক্তি সূরা ইখলাস পড়বে, সে যেন কুরআনের এক তৃতীয়াংশ পড়ল।',
+                        reference: 'সহীহ বুখারী: ৫০১৫',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'যে ব্যক্তি রাতে সূরা বাকারার শেষ দুই আয়াত পড়বে, তার জন্য তা যথেষ্ট হবে।',
-                      reference: 'সহীহ বুখারী: ৫০০৯, সহীহ মুসলিম: ৮০৭',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'যে ব্যক্তি রাতে সূরা বাকারার শেষ দুই আয়াত পড়বে, তার জন্য তা যথেষ্ট হবে।',
+                        reference: 'সহীহ বুখারী: ৫০০৯, সহীহ মুসলিম: ৮০৭',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'সূরা মুলক পাঠকারীর জন্য কবরের আযাব থেকে সুপারিশ করবে যতক্ষণ না তাকে ক্ষমা করা হয়।',
-                      reference: 'জামে তিরমিযী: ২৮৯১',
-                    ),
-                    const SizedBox(height: 18),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'সূরা মুলক পাঠকারীর জন্য কবরের আযাব থেকে সুপারিশ করবে যতক্ষণ না তাকে ক্ষমা করা হয়।',
+                        reference: 'জামে তিরমিযী: ২৮৯১',
+                      ),
+                      const SizedBox(height: 18),
 
-                    // Dua section
-                    _buildSectionHeader(
-                      isDark: isDark,
-                      icon: Icons.favorite,
-                      title: 'দোয়ার ফযিলত',
-                    ),
-                    const SizedBox(height: 12),
+                      // Dua section
+                      _buildSectionHeader(
+                        isDark: isDark,
+                        icon: Icons.favorite,
+                        title: 'দোয়ার ফযিলত',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith: 'দোয়াই হলো ইবাদত',
-                      reference: 'জামে তিরমিযী: ২৯৬৯',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith: 'দোয়াই হলো ইবাদত',
+                        reference: 'জামে তিরমিযী: ২৯৬৯',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'যে ব্যক্তি সকাল-সন্ধ্যায় তিনবার করে সাইয়্যিদুল ইস্তিগফার পড়বে এবং সেদিন বা সে রাতে মারা গেলে জান্নাতে যাবে।',
-                      reference: 'সহীহ বুখারী: ৬৩০৬',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'যে ব্যক্তি সকাল-সন্ধ্যায় তিনবার করে সাইয়্যিদুল ইস্তিগফার পড়বে এবং সেদিন বা সে রাতে মারা গেলে জান্নাতে যাবে।',
+                        reference: 'সহীহ বুখারী: ৬৩০৬',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'যে ব্যক্তি সকালে ও সন্ধ্যায় তিনবার বলে "বিসমিল্লাহিল্লাযী লা ইয়াদুররু মাআসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামায়ি ওয়া হুয়াস সামিউল আলীম" তাকে কোনো বিপদ স্পর্শ করবে না।',
-                      reference: 'সুনানে আবু দাউদ: ৫০৮৮, জামে তিরমিযী: ৩৩৮৮',
-                    ),
-                    const SizedBox(height: 18),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'যে ব্যক্তি সকালে ও সন্ধ্যায় তিনবার বলে "বিসমিল্লাহিল্লাযী লা ইয়াদুররু মাআসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামায়ি ওয়া হুয়াস সামিউল আলীম" তাকে কোনো বিপদ স্পর্শ করবে না।',
+                        reference: 'সুনানে আবু দাউদ: ৫০৮৮, জামে তিরমিযী: ৩৩৮৮',
+                      ),
+                      const SizedBox(height: 18),
 
-                    // Nafal prayer section
-                    _buildSectionHeader(
-                      isDark: isDark,
-                      icon: Icons.mosque,
-                      title: 'নফল নামাজের ফযিলত',
-                    ),
-                    const SizedBox(height: 12),
+                      // Nafal prayer section
+                      _buildSectionHeader(
+                        isDark: isDark,
+                        icon: Icons.mosque,
+                        title: 'নফল নামাজের ফযিলত',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'রাতের নামাজ (তাহাজ্জুদ) ফরয নামাজের পর সর্বোত্তম নামাজ।',
-                      reference: 'সহীহ মুসলিম: ১১৬৩',
-                    ),
-                    const SizedBox(height: 12),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'রাতের নামাজ (তাহাজ্জুদ) ফরয নামাজের পর সর্বোত্তম নামাজ।',
+                        reference: 'সহীহ মুসলিম: ১১৬৩',
+                      ),
+                      const SizedBox(height: 12),
 
-                    _buildHadithCard(
-                      isDark: isDark,
-                      hadith:
-                          'চাশতের নামাজ (সালাতুদ-দুহা) দুই রাকাত পড়লে শরীরের ৩৬০টি জোড়ের সদকা আদায় হয়ে যায়।',
-                      reference: 'সহীহ মুসলিম: ৭২০',
-                    ),
+                      _buildHadithCard(
+                        isDark: isDark,
+                        hadith:
+                            'চাশতের নামাজ (সালাতুদ-দুহা) দুই রাকাত পড়লে শরীরের ৩৬০টি জোড়ের সদকা আদায় হয়ে যায়।',
+                        reference: 'সহীহ মুসলিম: ৭২০',
+                      ),
 
-                    const SizedBox(height: 30),
-                  ],
+                      const SizedBox(height: 30),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
         },
       ),
     );
@@ -1046,7 +1022,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     required String title,
     required String content,
   }) {
-    final boxBg = isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
+    final boxBg =
+        isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1111,10 +1088,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     required String hadith,
     required String reference,
   }) {
-    final surface = isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
+    final surface =
+        isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
     final hadithTextColor = isDark
         ? AppColors.textSecondary
         : AppColors.textLightMode.withOpacity(0.90);
+    final isLight = Theme.of(context).brightness == Brightness.light;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1136,13 +1115,17 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isDark ? 0.18 : 0.12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(isLight ? 0.12 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.format_quote_rounded, color: AppColors.primary, size: 18),
+                child: Icon(Icons.format_quote_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1160,14 +1143,24 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            '📚 $reference',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.1,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.book_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                reference,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.1,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1179,7 +1172,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     required IconData icon,
     required String title,
   }) {
-    final panelBg = isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
+    final panelBg =
+        isDark ? AppColors.backgroundDark : AppColors.primary.withOpacity(0.05);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1226,8 +1220,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   Widget _buildExpandableDuaSection() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final containerBg = isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
-    final titleColor = isDark ? AppColors.textSecondary : AppColors.textLightMode;
+    final containerBg =
+        isDark ? const Color(0xFF1A1A1A) : AppColors.backgroundLightMode;
+    final titleColor =
+        isDark ? AppColors.textSecondary : AppColors.textLightMode;
 
     return Container(
       decoration: BoxDecoration(
@@ -1271,7 +1267,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             child: Text(
               'ট্যাপ করে দোয়াগুলো দেখুন',
               style: TextStyle(
-                color: isDark ? AppColors.textTertiary : AppColors.textSecondaryLightMode,
+                color: isDark
+                    ? AppColors.textTertiary
+                    : AppColors.textSecondaryLightMode,
                 fontSize: 12,
               ),
             ),
@@ -1511,9 +1509,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.backgroundDark : AppColors.cardLightMode;
-    final titleColor = isDark ? AppColors.textSecondary : AppColors.textLightMode;
-    final innerBg = isDark ? const Color(0xFF1A1A1A) : AppColors.surfaceLightMode;
-    final textColor = isDark ? AppColors.textSecondary : AppColors.textLightMode.withOpacity(0.90);
+    final titleColor =
+        isDark ? AppColors.textSecondary : AppColors.textLightMode;
+    final innerBg =
+        isDark ? const Color(0xFF1A1A1A) : AppColors.surfaceLightMode;
+    final textColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.textLightMode.withOpacity(0.90);
 
     return Container(
       decoration: BoxDecoration(
@@ -1568,9 +1570,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0A0A0A).withOpacity(0.6) : AppColors.backgroundLightMode,
+                color: isDark
+                    ? const Color(0xFF0A0A0A).withOpacity(0.6)
+                    : AppColors.backgroundLightMode,
                 borderRadius: BorderRadius.circular(12),
-                border: isDark ? null : Border.all(color: AppColors.borderLightMode.withOpacity(0.3)),
+                border: isDark
+                    ? null
+                    : Border.all(
+                        color: AppColors.borderLightMode.withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
@@ -1585,7 +1592,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(6),
@@ -1607,7 +1615,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                     style: TextStyle(
-                      color: isDark ? const Color(0xFFF5F5F5) : const Color(0xFF1F2937),
+                      color: isDark
+                          ? const Color(0xFFF5F5F5)
+                          : const Color(0xFF1F2937),
                       fontSize: 20,
                       fontFamily: 'Amiri',
                       height: 2.2,
@@ -1625,7 +1635,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: innerBg,
                 borderRadius: BorderRadius.circular(10),
-                border: isDark ? null : Border.all(color: AppColors.borderLightMode.withOpacity(0.2)),
+                border: isDark
+                    ? null
+                    : Border.all(
+                        color: AppColors.borderLightMode.withOpacity(0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1670,7 +1683,10 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: innerBg,
                 borderRadius: BorderRadius.circular(10),
-                border: isDark ? null : Border.all(color: AppColors.borderLightMode.withOpacity(0.2)),
+                border: isDark
+                    ? null
+                    : Border.all(
+                        color: AppColors.borderLightMode.withOpacity(0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1714,7 +1730,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(isDark ? 0.08 : 0.05),
                 borderRadius: BorderRadius.circular(10),
-                border: isDark ? null : Border.all(color: AppColors.primary.withOpacity(0.15)),
+                border: isDark
+                    ? null
+                    : Border.all(color: AppColors.primary.withOpacity(0.15)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.22 : 0.03),
@@ -1748,7 +1766,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   Text(
                     fazilat,
                     style: TextStyle(
-                      color: isDark 
+                      color: isDark
                           ? AppColors.primary.withOpacity(0.85)
                           : AppColors.textLightMode.withOpacity(0.85),
                       fontSize: 13,
@@ -1764,13 +1782,29 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             // Reference
             Align(
               alignment: Alignment.centerRight,
-              child: Text(
-                '📚 $reference',
-                style: TextStyle(
-                  color: isDark ? AppColors.grey400 : AppColors.textSecondaryLightMode,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.book_outlined,
+                    size: 16,
+                    color: (isDark
+                            ? AppColors.grey400
+                            : AppColors.textSecondaryLightMode)
+                        .withOpacity(0.75),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    reference,
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.grey400
+                          : AppColors.textSecondaryLightMode,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -1828,7 +1862,8 @@ class _AdaptiveBackground extends StatelessWidget {
             child: _GlowBlob(
               size: 300,
               colors: [
-                (isDark ? Colors.white : Colors.black).withOpacity(isDark ? 0.08 : 0.04),
+                (isDark ? Colors.white : Colors.black)
+                    .withOpacity(isDark ? 0.08 : 0.04),
                 (isDark ? Colors.white : Colors.black).withOpacity(0.0),
               ],
             ),
@@ -1932,4 +1967,3 @@ class _NoisePainter extends CustomPainter {
         oldDelegate.isDark != isDark;
   }
 }
-

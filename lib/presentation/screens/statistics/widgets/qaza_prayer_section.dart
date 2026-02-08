@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +30,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     if (qazaState.isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          color: AppTheme.primaryGold,
+          color: AppColors.primaryGold,
         ),
       );
     }
@@ -76,8 +77,8 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           ),
           BoxShadow(
             color: totalPending > 0
-                ? AppTheme.primaryGold.withOpacity(0.1)
-                : AppTheme.primaryGold.withOpacity(0.15),
+                ? AppColors.primaryGold.withOpacity(0.1)
+                : AppColors.primaryGold.withOpacity(0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -92,7 +93,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                 totalPending > 0
                     ? Icons.warning_amber_rounded
                     : Icons.check_circle,
-                color: totalPending > 0 ? AppTheme.primaryGold : Colors.green,
+                color: totalPending > 0 ? AppColors.primaryGold : Colors.green,
                 size: 32,
               ),
               const SizedBox(width: 12),
@@ -104,7 +105,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color:
-                        totalPending > 0 ? AppTheme.primaryGold : Colors.green,
+                        totalPending > 0 ? AppColors.primaryGold : Colors.green,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -131,14 +132,14 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.primaryGold.withOpacity(0.1),
+        color: AppColors.primaryGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
-            color: AppTheme.primaryGold.withOpacity(0.8),
+            color: AppColors.primaryGold.withOpacity(0.8),
             size: 20,
           ),
           const SizedBox(width: 12),
@@ -180,7 +181,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
             ),
             BoxShadow(
               color: hasPending
-                  ? AppTheme.primaryGold.withOpacity(0.2)
+                  ? AppColors.primaryGold.withOpacity(0.2)
                   : Colors.green.withOpacity(0.15),
               blurRadius: 16,
               offset: const Offset(0, 6),
@@ -206,13 +207,13 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: hasPending
-                            ? AppTheme.primaryGold.withOpacity(0.15)
+                            ? AppColors.primaryGold.withOpacity(0.15)
                             : Colors.green.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
                         _getPrayerIcon(summary.prayerName),
-                        color: hasPending ? AppTheme.primaryGold : Colors.green,
+                        color: hasPending ? AppColors.primaryGold : Colors.green,
                         size: 22,
                       ),
                     ),
@@ -237,7 +238,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                                 : 'সব কাজা আদায় হয়েছে',
                             style: TextStyle(
                               color: hasPending
-                                  ? AppTheme.primaryGold.withOpacity(0.8)
+                                  ? AppColors.primaryGold.withOpacity(0.8)
                                   : Colors.green[300],
                               fontSize: 13,
                             ),
@@ -253,13 +254,13 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGold.withOpacity(0.2),
+                          color: AppColors.primaryGold.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           _toBengaliNumber(pendingCount),
                           style: const TextStyle(
-                            color: AppTheme.primaryGold,
+                            color: AppColors.primaryGold,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
@@ -272,7 +273,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                       duration: const Duration(milliseconds: 250),
                       child: Icon(
                         Icons.keyboard_arrow_down,
-                        color: hasPending ? AppTheme.primaryGold : Colors.green,
+                        color: hasPending ? AppColors.primaryGold : Colors.green,
                         size: 28,
                       ),
                     ),
@@ -367,7 +368,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                     BoxShadow(
                       color: qaza.isQazaDone
                           ? Colors.green.withOpacity(0.4)
-                          : AppTheme.primaryGold.withOpacity(0.3),
+                          : AppColors.primaryGold.withOpacity(0.3),
                       blurRadius: 4,
                       spreadRadius: 1,
                     ),

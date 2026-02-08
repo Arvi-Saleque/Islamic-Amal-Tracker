@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -177,7 +178,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.check_circle_outline,
-                iconColor: AppTheme.primaryGold,
+                iconColor: AppColors.primaryGold,
                 title: 'মোট আমল',
                 value: _toBengaliNumber(totalAmal),
                 subtitle: '/${_toBengaliNumber(maxAmal)}',
@@ -187,7 +188,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.favorite,
-                iconColor: AppTheme.primaryGold,
+                iconColor: AppColors.primaryGold,
                 title: 'মোট\nযিকির',
                 value: _toBengaliNumber(totalDhikr),
                 subtitle: '/${_toBengaliNumber(maxDhikr)}',
@@ -201,7 +202,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.menu_book,
-                iconColor: AppTheme.primaryGold,
+                iconColor: AppColors.primaryGold,
                 title: 'পড়ার সময়',
                 value: _toBengaliNumber(totalReadingMinutes),
                 subtitle: '/${_toBengaliNumber(maxReadingMinutes)} মিনিট',
@@ -212,7 +213,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.star,
-                iconColor: AppTheme.primaryGold,
+                iconColor: AppColors.primaryGold,
                 title: 'পূর্ণ দিন',
                 value: _toBengaliNumber(perfectDays),
                 subtitle: '/${_toBengaliNumber(totalDays)} দিন',
@@ -290,7 +291,7 @@ class _SummaryCard extends StatelessWidget {
                       TextSpan(
                         text: value,
                         style: const TextStyle(
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -339,12 +340,12 @@ class _PerfectDaysCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGold.withOpacity(0.2),
+              color: AppColors.primaryGold.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.star,
-              color: AppTheme.primaryGold,
+              color: AppColors.primaryGold,
               size: 24,
             ),
           ),
@@ -367,7 +368,7 @@ class _PerfectDaysCard extends StatelessWidget {
                       TextSpan(
                         text: toBengaliNumber(perfectDays),
                         style: const TextStyle(
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -413,12 +414,12 @@ class _SinCountCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGold.withOpacity(0.2),
+              color: AppColors.primaryGold.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.auto_fix_high,
-              color: AppTheme.primaryGold,
+              color: AppColors.primaryGold,
               size: 24,
             ),
           ),
@@ -442,7 +443,7 @@ class _SinCountCard extends StatelessWidget {
                   style: TextStyle(
                     color: sinCount == 0
                         ? const Color(0xFF4CAF50)
-                        : AppTheme.primaryGold,
+                        : AppColors.primaryGold,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -492,12 +493,12 @@ class _PrayerDetailCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withOpacity(0.2),
+                  color: AppColors.primaryGold.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.mosque,
-                  color: AppTheme.primaryGold,
+                  color: AppColors.primaryGold,
                   size: 24,
                 ),
               ),
@@ -520,7 +521,7 @@ class _PrayerDetailCard extends StatelessWidget {
                           TextSpan(
                             text: toBengaliNumber(totalPrayers),
                             style: const TextStyle(
-                              color: AppTheme.primaryGold,
+                              color: AppColors.primaryGold,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),

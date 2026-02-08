@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -165,11 +166,11 @@ class WeeklyProgressChart extends StatelessWidget {
 
   Color _getBarColor(double score) {
     if (score >= 80) {
-      return AppTheme.primaryGold;
+      return AppColors.primaryGold;
     } else if (score >= 50) {
-      return AppTheme.primaryGold.withOpacity(0.7);
+      return AppColors.primaryGold.withOpacity(0.7);
     } else if (score >= 1) {
-      return AppTheme.primaryGold.withOpacity(0.4);
+      return AppColors.primaryGold.withOpacity(0.4);
     }
     return Colors.grey[700]!;
   }

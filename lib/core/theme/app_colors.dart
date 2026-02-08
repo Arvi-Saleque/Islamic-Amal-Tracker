@@ -30,7 +30,7 @@ static const Color iconBgLightMode =
     Color(0xFFF3EAD1); // subtle gold-ivory tint (premium, not yellow)
 
   // Primary Colors
-  static const Color primary = Color(0xFFD4AF37); // Golden color
+  static const Color primary = Color.fromARGB(255, 206, 161, 15); // Golden color
   static const Color primaryLight = Color(0xFFE5C158); // Lighter golden
 
   // Text Colors (Dark Theme)
@@ -68,4 +68,22 @@ static const Color iconBgLightMode =
 
   // Transparent
   static const Color transparent = Colors.transparent;
+
+  // gradient colors for light 
+  static const lightgradient1 = Color.fromARGB(255, 231, 229, 219);
+  static const lightgradient2 = Color.fromARGB(255, 229, 228, 221);
+  static const lightgradient3 = Color.fromARGB(255, 241, 240, 236);
+
+  // gradient colors for dark 
+  static const darkgradient1 = Color.fromARGB(26, 26, 26, 1);
+  static const darkgradient2 = Color.fromARGB(26, 34, 34, 2);
+  static const darkgradient3 = Color.fromARGB(26, 40, 40, 4);
+
+
+  static const Color primaryGold = Color(0xFFD4AF37);
+  static const Color darkBackground = Color(0xFF1A1A1A);
+  static const Color darkSurface = Color(0xFF2A2A2A);
+  static const Color darkCard = Color(0xFF242424);
 }
+
+

@@ -103,3 +103,28 @@ flutter:
     - assets/translations/
     - assets/images/
     - assets/icons/
+  
+  fonts:
+    - family: HindSiliguri
+      fonts:
+        - asset: assets/fonts/HindSiliguri-Regular.ttf
+        - asset: assets/fonts/HindSiliguri-Light.ttf
+          weight: 300
+        - asset: assets/fonts/HindSiliguri-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/HindSiliguri-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/HindSiliguri-Bold.ttf
+          weight: 700
+    
+    - family: AlinurBanglaborno
+      fonts:
+        - asset: assets/fonts/Li Alinur Banglaborno Unicode.ttf
+        - asset: assets/fonts/Li Alinur Banglaborno Unicode Italic.ttf
+          style: italic
+    
+    - family: AlinurNakkhatra
+      fonts:
+        - asset: assets/fonts/Li Alinur Nakkhatra Unicode.ttf
+        - asset: assets/fonts/Li Alinur Nakkhatra Unicode Italic.ttf
+          style: italic

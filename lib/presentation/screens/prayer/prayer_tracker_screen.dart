@@ -3,14 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/prayer_tracking_provider.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/theme_mode_provider.dart';
 
 class PrayerTrackerScreen extends ConsumerStatefulWidget {
   const PrayerTrackerScreen({super.key});
 
   @override
-  ConsumerState<PrayerTrackerScreen> createState() => _PrayerTrackerScreenState();
+  ConsumerState<PrayerTrackerScreen> createState() =>
+      _PrayerTrackerScreenState();
 }
 
 class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
@@ -25,47 +24,42 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final mode = ref.watch(appThemeModeProvider);
-    final isLight = mode == ThemeMode.light;
-
     final prayerState = ref.watch(prayerTrackingProvider);
     final completedPrayers = prayerState.todayData.completedPrayersCount;
 
-    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    final bg = Theme.of(context).scaffoldBackgroundColor;
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
 
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: bg,
-        surfaceTintColor: Colors.transparent,
+        backgroundColor: colors.surface,
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'নামাজের হিসাব',
           style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.2,
+            color: titleColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
         actions: [
+          // Info button
           IconButton(
-            icon: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
+            icon: Icon(Icons.info_outline_rounded, color: titleColor),
             onPressed: () => _showInfoBottomSheet(context, isLight),
-            tooltip: 'Info',
           ),
-          _ProgressPill(
-            isLight: isLight,
-            completed: completedPrayers,
-          ),
-          const SizedBox(width: 12),
         ],
       ),
       body: SafeArea(
@@ -75,7 +69,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           children: [
             _TopSummaryCard(isLight: isLight, completed: completedPrayers),
             const SizedBox(height: 14),
-
             _buildPrayerTile('ফজর', isLight),
             const SizedBox(height: 12),
             _buildPrayerTile('যুহর', isLight),
@@ -98,18 +91,24 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final isExpanded = expanded[prayer] ?? false;
     final isDone = prayerState.todayData.prayerDone[prayer] ?? false;
 
-    final tileBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
+    final tileBg = isLight
+        ? Theme.of(context).scaffoldBackgroundColor
+        : Theme.of(context).colorScheme.surfaceVariant;
     final titleColor = isDone
-        ? AppColors.primary
-        : (isLight ? AppColors.textLightMode.withOpacity(0.92) : AppColors.textSecondary);
+        ? Theme.of(context).colorScheme.primary
+        : (isLight
+            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.92)
+            : Theme.of(context).colorScheme.onSurfaceVariant);
 
     final subColor = isLight
-        ? AppColors.textSecondaryLightMode.withOpacity(0.85)
-        : AppColors.textTertiary;
+        ? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.85)
+        : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.75);
 
     final arrowColor = isDone
-        ? AppColors.primary
-        : (isLight ? AppColors.textSecondaryLightMode.withOpacity(0.70) : AppColors.grey500);
+        ? Theme.of(context).colorScheme.primary
+        : (isLight
+            ? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.70)
+            : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.72));
 
     // count completed rakats for small badge
     final rakats = prayerState.todayData.rakatsDone[prayer]!;
@@ -130,7 +129,10 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           ),
           if (isDone)
             BoxShadow(
-              color: AppColors.shadowGolden,
+              color: Colors.black.withOpacity(
+                  Theme.of(context).brightness == Brightness.light
+                      ? 0.08
+                      : 0.25),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),
@@ -158,7 +160,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     },
                   ),
                   const SizedBox(width: 14),
-
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +188,12 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                         Text(
                           isDone ? 'Complete' : 'Tap to expand rakats',
                           style: TextStyle(
-                            color: isDone ? AppColors.primary.withOpacity(0.70) : subColor,
+                            color: isDone
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.70)
+                                : subColor,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
                           ),
@@ -195,19 +201,18 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       ],
                     ),
                   ),
-
                   const SizedBox(width: 8),
                   AnimatedRotation(
                     turns: isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOut,
-                    child: Icon(Icons.keyboard_arrow_down_rounded, color: arrowColor, size: 30),
+                    child: Icon(Icons.keyboard_arrow_down_rounded,
+                        color: arrowColor, size: 30),
                   ),
                 ],
               ),
             ),
           ),
-
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
             secondChild: Column(
@@ -219,7 +224,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     gradient: LinearGradient(
                       colors: [
                         Colors.transparent,
-                        AppColors.primary.withOpacity(0.14),
+                        Theme.of(context).colorScheme.primary.withOpacity(0.14),
                         Colors.transparent,
                       ],
                     ),
@@ -231,12 +236,16 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isLight
-                          ? AppColors.primary.withOpacity(0.05)
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.05)
                           : Colors.black.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(isLight ? 0.04 : 0.14),
+                          color:
+                              Colors.black.withOpacity(isLight ? 0.04 : 0.14),
                           blurRadius: 12,
                           offset: const Offset(0, 8),
                         ),
@@ -258,7 +267,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 ),
               ],
             ),
-            crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 220),
             sizeCurve: Curves.easeOut,
           ),
@@ -276,12 +287,16 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final notifier = ref.read(prayerTrackingProvider.notifier);
 
     final rowBg = done
-        ? AppColors.primaryOpacity06
-        : (isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark);
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.06)
+        : (isLight
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Theme.of(context).scaffoldBackgroundColor);
 
     final textColor = done
-        ? AppColors.primary
-        : (isLight ? AppColors.textSecondaryLightMode.withOpacity(0.90) : AppColors.textTertiary);
+        ? Theme.of(context).colorScheme.primary
+        : (isLight
+            ? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.90)
+            : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.75));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -328,10 +343,10 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 ),
               ),
               if (done)
-                const Icon(
+                Icon(
                   Icons.verified_rounded,
                   size: 18,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
             ],
           ),
@@ -343,13 +358,23 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
   // ---------------- Bottom sheet ----------------
 
   void _showInfoBottomSheet(BuildContext context, bool isLight) {
-    final sheetBg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
+    final sheetBg = isLight
+        ? Theme.of(context).scaffoldBackgroundColor
+        : Theme.of(context).colorScheme.surfaceVariant;
     final dividerColor = isLight
-        ? AppColors.borderLightMode.withOpacity(0.5)
-        : AppColors.grey600.withOpacity(0.25);
+        ? Theme.of(context)
+            .colorScheme
+            .outline
+            .withOpacity(0.18)
+            .withOpacity(0.5)
+        : Theme.of(context)
+            .colorScheme
+            .onSurfaceVariant
+            .withOpacity(0.82)
+            .withOpacity(0.25);
     final bodyTextColor = isLight
-        ? AppColors.textLightMode.withOpacity(0.90)
-        : AppColors.textSecondary;
+        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.90)
+        : Theme.of(context).colorScheme.onSurfaceVariant;
 
     showModalBottomSheet(
       context: context,
@@ -378,7 +403,12 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isLight ? Colors.black.withOpacity(0.18) : AppColors.grey600,
+                  color: isLight
+                      ? Colors.black.withOpacity(0.18)
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withOpacity(0.82),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -390,17 +420,22 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(isLight ? 0.12 : 0.18),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 24),
+                      child: Icon(Icons.info_outline_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 24),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'নামাজের তথ্য ও ফযিলত',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                           fontSize: 19,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.1,
@@ -430,17 +465,18 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       bodyTextColor: bodyTextColor,
                     ),
                     const SizedBox(height: 20),
-
-                    _SectionHeader(isLight: isLight, icon: Icons.mosque_outlined, title: 'জামাতে নামাজের ফযিলত'),
+                    _SectionHeader(
+                        isLight: isLight,
+                        icon: Icons.mosque_outlined,
+                        title: 'জামাতে নামাজের ফযিলত'),
                     const SizedBox(height: 12),
-
                     _HadithCard(
                       isLight: isLight,
-                      hadith: 'জামাতে নামাজ পড়া একাকী নামাজ পড়ার চেয়ে সাতাশ গুণ বেশি মর্যাদাসম্পন্ন।',
+                      hadith:
+                          'জামাতে নামাজ পড়া একাকী নামাজ পড়ার চেয়ে সাতাশ গুণ বেশি মর্যাদাসম্পন্ন।',
                       reference: 'সহীহ বুখারী: ৬৪৫, সহীহ মুসলিম: ৬৫০',
                     ),
                     const SizedBox(height: 12),
-
                     _HadithCard(
                       isLight: isLight,
                       hadith:
@@ -469,8 +505,10 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       reference: 'সহীহ বুখারী: ৬৫৭',
                     ),
                     const SizedBox(height: 18),
-
-                    _SectionHeader(isLight: isLight, icon: Icons.access_time_rounded, title: 'আউয়াল ওয়াক্তে নামাজের ফযিলত'),
+                    _SectionHeader(
+                        isLight: isLight,
+                        icon: Icons.access_time_rounded,
+                        title: 'আউয়াল ওয়াক্তে নামাজের ফযিলত'),
                     const SizedBox(height: 12),
                     _HadithCard(
                       isLight: isLight,
@@ -481,16 +519,20 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     const SizedBox(height: 12),
                     _HadithCard(
                       isLight: isLight,
-                      hadith: 'নামাজের প্রথম ওয়াক্ত আল্লাহর সন্তুষ্টি এবং শেষ ওয়াক্ত আল্লাহর ক্ষমা।',
+                      hadith:
+                          'নামাজের প্রথম ওয়াক্ত আল্লাহর সন্তুষ্টি এবং শেষ ওয়াক্ত আল্লাহর ক্ষমা।',
                       reference: 'জামে তিরমিযী: ১৭২',
                     ),
                     const SizedBox(height: 18),
-
-                    _SectionHeader(isLight: isLight, icon: Icons.auto_awesome_rounded, title: 'সুন্নাত নামাজের ফযিলত'),
+                    _SectionHeader(
+                        isLight: isLight,
+                        icon: Icons.auto_awesome_rounded,
+                        title: 'সুন্নাত নামাজের ফযিলত'),
                     const SizedBox(height: 12),
                     _HadithCard(
                       isLight: isLight,
-                      hadith: 'দুই রাকাত ফজরের সুন্নাত দুনিয়া ও তার মধ্যে যা আছে তার চেয়ে উত্তম।',
+                      hadith:
+                          'দুই রাকাত ফজরের সুন্নাত দুনিয়া ও তার মধ্যে যা আছে তার চেয়ে উত্তম।',
                       reference: 'সহীহ মুসলিম: ৭২৫',
                     ),
                     const SizedBox(height: 12),
@@ -500,7 +542,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                           'যে ব্যক্তি দিনে-রাতে ১২ রাকাত সুন্নাত নামাজ আদায় করবে, তার জন্য জান্নাতে একটি ঘর নির্মাণ করা হবে।',
                       reference: 'সহীহ মুসলিম: ৭২৮',
                     ),
-
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -529,7 +570,9 @@ class _ProgressPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: isLight ? AppColors.backgroundLightMode : AppColors.primaryOpacity15,
+        color: isLight
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Theme.of(context).colorScheme.primary.withOpacity(0.15),
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
@@ -542,12 +585,13 @@ class _ProgressPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 18),
+          Icon(Icons.check_circle_rounded,
+              color: Theme.of(context).colorScheme.primary, size: 18),
           const SizedBox(width: 6),
           Text(
             '$completed/5',
-            style: const TextStyle(
-              color: AppColors.primary,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontSize: 14.8,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.2,
@@ -570,7 +614,9 @@ class _TopSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundLight;
+    final bg = isLight
+        ? Theme.of(context).scaffoldBackgroundColor
+        : Theme.of(context).colorScheme.surfaceVariant;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -591,10 +637,14 @@ class _TopSummaryCard extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withOpacity(isLight ? 0.12 : 0.18),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.mosque_rounded, color: AppColors.primary, size: 24),
+            child: Icon(Icons.mosque_rounded,
+                color: Theme.of(context).colorScheme.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -605,8 +655,11 @@ class _TopSummaryCard extends StatelessWidget {
                   'আজকের অগ্রগতি',
                   style: TextStyle(
                     color: isLight
-                        ? AppColors.textLightMode.withOpacity(0.92)
-                        : AppColors.textSecondary,
+                        ? Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.92)
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                   ),
@@ -615,7 +668,7 @@ class _TopSummaryCard extends StatelessWidget {
                 Text(
                   '$completed / 5 ফরয সম্পন্ন',
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.2,
@@ -649,12 +702,17 @@ class _MiniBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = filled
-        ? AppColors.primary.withOpacity(isLight ? 0.14 : 0.20)
+        ? Theme.of(context)
+            .colorScheme
+            .primary
+            .withOpacity(isLight ? 0.14 : 0.20)
         : Colors.black.withOpacity(isLight ? 0.04 : 0.16);
 
     final fg = filled
-        ? AppColors.primary
-        : (isLight ? AppColors.textSecondaryLightMode.withOpacity(0.9) : AppColors.grey400);
+        ? Theme.of(context).colorScheme.primary
+        : (isLight
+            ? Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.9)
+            : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.60));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -698,11 +756,15 @@ class _PremiumCheckBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = value
-        ? AppColors.primary
-        : (isLight ? AppColors.backgroundLightMode : AppColors.grey800);
+        ? Theme.of(context).colorScheme.primary
+        : (isLight
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Theme.of(context).colorScheme.onSurface);
 
     final checkColor = value
-        ? (isLight ? const Color(0xFF1F2937) : AppColors.backgroundDark)
+        ? (isLight
+            ? const Color(0xFF1F2937)
+            : Theme.of(context).scaffoldBackgroundColor)
         : null;
 
     return GestureDetector(
@@ -749,7 +811,9 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final panelBg = isLight ? AppColors.primary.withOpacity(0.05) : AppColors.backgroundDark;
+    final panelBg = isLight
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+        : Theme.of(context).scaffoldBackgroundColor;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -770,17 +834,21 @@ class _SectionHeader extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withOpacity(isLight ? 0.12 : 0.18),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 18),
+            child: Icon(icon,
+                color: Theme.of(context).colorScheme.primary, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 16.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.1,
@@ -810,7 +878,9 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final boxBg = isLight ? AppColors.primary.withOpacity(0.05) : AppColors.backgroundDark;
+    final boxBg = isLight
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+        : Theme.of(context).scaffoldBackgroundColor;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -834,17 +904,21 @@ class _InfoCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(isLight ? 0.12 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 18),
+                child: Icon(icon,
+                    color: Theme.of(context).colorScheme.primary, size: 18),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 16.5,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.1,
@@ -882,11 +956,13 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = isLight ? AppColors.backgroundLightMode : const Color(0xFF1A1A1A);
+    final surface = isLight
+        ? Theme.of(context).scaffoldBackgroundColor
+        : const Color(0xFF1A1A1A);
 
     final hadithTextColor = isLight
-        ? AppColors.textLightMode.withOpacity(0.90)
-        : AppColors.textSecondary;
+        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.90)
+        : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -908,13 +984,17 @@ class _HadithCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(isLight ? 0.12 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.format_quote_rounded, color: AppColors.primary, size: 18),
+                child: Icon(Icons.format_quote_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -932,15 +1012,25 @@ class _HadithCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            '📚 $reference',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.1,
-            ),
-          ),
+          Row(
+            children: [
+              Icon(
+                Icons.book_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '$reference',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.1,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

@@ -24,8 +24,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final isLight = Theme.of(context).brightness == Brightness.light;
 
     final bg = isLight ? AppColors.backgroundLightMode : AppColors.backgroundDark;
-    final iconColor = isLight ? AppColors.textLightMode : AppColors.primary;
-    final titleColor = isLight ? AppColors.textLightMode : AppColors.textSecondary;
+    final iconColor = AppColors.primary;
+    final titleColor = AppColors.primary;
 
     final totalCount = dhikrState.todayData.totalCount;
     final totalTarget = dhikrState.todayData.totalTarget;
@@ -54,12 +54,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         actions: [
           // Info button
           IconButton(
-            icon: Icon(Icons.info_outline, color: iconColor),
+            icon: Icon(Icons.info_outline_rounded, color: titleColor),
             onPressed: () => _showInfoBottomSheet(context),
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh, color: iconColor),
-            onPressed: () => _showResetConfirmDialog(context, dhikrNotifier),
           ),
         ],
       ),
@@ -131,6 +127,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final chipShadowColor =
         Colors.black.withOpacity(isLight ? 0.10 : 0.25);
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return _PremiumCard(
       margin: const EdgeInsets.fromLTRB(20, 18, 20, 14),
       padding: const EdgeInsets.all(20),
@@ -168,8 +167,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: chipShadowColor,
-                      blurRadius: 8,
-                      offset: const Offset(0, 6),
+                      blurRadius: 5,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -246,8 +245,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           child: CircularProgressIndicator(
                             value: value,
                             strokeWidth: 8,
-                            backgroundColor:
-                                ringBg,
+                            backgroundColor: isLight
+                            ? AppColors.surfaceLightMode.withOpacity(0.3)
+                            :  cs.surfaceContainerHighest,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               AppColors.primary,
                             ),
@@ -418,15 +418,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                   gradient: LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: isLight
-                                        ? [
-                                            AppColors.primary.withOpacity(0.14),
-                                            AppColors.primary.withOpacity(0.06),
-                                          ]
-                                        : [
-                                            AppColors.primary.withOpacity(0.22),
+                                    colors: [
+                                      AppColors.primary.withOpacity(0.22),
                                             AppColors.primary.withOpacity(0.08),
-                                          ],
+                                    ]
                                   ),
                                   borderRadius: BorderRadius.circular(14),
                                   border: null,
@@ -463,9 +458,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                 Text(
                                   'লক্ষ্য: ${dhikr.targetCount}',
                                   style: TextStyle(
-                                    color: AppColors.grey400,
+                                    color: AppColors.grey600,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -473,42 +468,16 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                   builder: (context) {
                                     final isLight = Theme.of(context).brightness == Brightness.light;
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
+                                      width: 24,
+                                      height: 24,
                                       decoration: BoxDecoration(
-                                        color: isLight
-                                            ? Colors.black.withOpacity(0.06)
-                                            : AppColors.backgroundDark.withOpacity(0.35),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color:
-                                              AppColors.primary.withOpacity(0.20),
-                                          width: 1,
-                                        ),
+                                        color: AppColors.primary,
+                                        shape: BoxShape.circle,
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.edit,
-                                            size: 10,
-                                            color: AppColors.primary,
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Flexible(
-                                            child: Text(
-                                              'সংখ্যা লিখুন',
-                                              style: TextStyle(
-                                                color: AppColors.primary,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 12,
+                                        color: isLight ? Colors.black : Colors.black,
                                       ),
                                     );
                                   },
@@ -705,13 +674,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     // Lift
                     BoxShadow(
                       color: Colors.black.withOpacity(isPrimary ? 0.60 : 0.75),
-                      blurRadius: isPrimary ? 18 : 14,
-                      offset: const Offset(0, 10),
+                      blurRadius: isPrimary ? 6 : 2,
+                      offset: const Offset(0, 3),
                     ),
                     // Soft top highlight
                     BoxShadow(
                       color: Colors.white.withOpacity(isPrimary ? 0.14 : 0.06),
-                      blurRadius: 10,
+                      blurRadius: 5,
                       offset: const Offset(-2, -2),
                     ),
                     // Golden glow
@@ -719,8 +688,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       BoxShadow(
                         color: AppColors.shadowGolden
                             .withOpacity(isPrimary ? 0.75 : 0.30),
-                        blurRadius: isPrimary ? 10 : 6,
-                        offset: const Offset(0, 5),
+                        blurRadius: isPrimary ? 5 : 3,
+                        offset: const Offset(0, 3),
                       ),
                   ],
                 ),
@@ -1255,74 +1224,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-  void _showResetConfirmDialog(
-      BuildContext context, DhikrCounterNotifier notifier) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final isLight = Theme.of(context).brightness == Brightness.light;
-
-        final cancelText =
-            isLight ? AppColors.textLightMode : AppColors.textSecondary;
-
-        return Theme(
-          data: Theme.of(context).copyWith(
-            dialogBackgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-          ),
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            backgroundColor: isLight
-                ? AppColors.surfaceLightMode
-                : AppColors.backgroundDark,
-            titleTextStyle: TextStyle(
-              color: isLight ? AppColors.textLightMode : AppColors.textSecondary,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            contentTextStyle: TextStyle(
-              color: isLight
-                  ? AppColors.textSecondaryLightMode
-                  : AppColors.textSecondary,
-              fontSize: 14,
-            ),
-            title: const Text('সব রিসেট করবেন?'),
-            content: const Text('সমস্ত যিকির কাউন্টার ০-তে রিসেট হবে।'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: cancelText,
-                ),
-                child: const Text('না'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  notifier.resetAllDhikr();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  elevation: isLight ? 6 : 0,
-                  shadowColor: Colors.black.withOpacity(isLight ? 0.18 : 0.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                ),
-                child: const Text('হ্যাঁ, রিসেট করুন'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  
+      
 
   // Helper method for showing snackbars
   void _showSnack(BuildContext context, String message, {bool success = true}) {
@@ -1729,13 +1632,17 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(isLight ? 0.12 : 0.18),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(isLight ? 0.12 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.format_quote_rounded, color: AppColors.primary, size: 18),
+                child: Icon(Icons.format_quote_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1753,15 +1660,25 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            '📚 $reference',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.1,
-            ),
-          ),
+          Row(
+            children: [
+              Icon(
+                Icons.book_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '$reference',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.1,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -1873,8 +1790,8 @@ class _PremiumCard extends StatelessWidget {
 
     final gradientColors = isLight
         ? [
-            AppColors.surfaceLightMode.withOpacity(0.98),
-            AppColors.cardLightMode.withOpacity(0.96),
+            AppColors.lightgradient1,
+            AppColors.lightgradient2
           ]
         : [
             AppColors.backgroundLight.withOpacity(0.98),

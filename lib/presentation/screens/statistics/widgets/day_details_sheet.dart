@@ -1,3 +1,4 @@
+import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../providers/statistics_provider.dart';
@@ -176,7 +177,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 child: isLoading
                     ? const Center(
                         child: CircularProgressIndicator(
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                         ),
                       )
                     : ListView(
@@ -230,12 +231,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGold.withOpacity(0.2),
+              color: AppColors.primaryGold.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.calendar_today,
-              color: AppTheme.primaryGold.withOpacity(0.8),
+              color: AppColors.primaryGold.withOpacity(0.8),
               size: 28,
             ),
           ),
@@ -247,7 +248,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 Text(
                   _formatDateBengali(widget.date),
                   style: const TextStyle(
-                    color: AppTheme.primaryGold,
+                    color: AppColors.primaryGold,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -461,12 +462,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withOpacity(0.2),
+                  color: AppColors.primaryGold.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.auto_fix_high,
-                  color: AppTheme.primaryGold.withOpacity(0.8),
+                  color: AppColors.primaryGold.withOpacity(0.8),
                   size: 20,
                 ),
               ),
@@ -624,12 +625,12 @@ class _CategoryCardState extends State<_CategoryCard> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGold.withOpacity(0.2),
+                          color: AppColors.primaryGold.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           widget.icon,
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                           size: 24,
                         ),
                       ),
@@ -680,7 +681,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                       value: widget.progress.clamp(0.0, 1.0),
                       backgroundColor: Colors.grey[800],
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppTheme.primaryGold),
+                          AppColors.primaryGold),
                       minHeight: 6,
                     ),
                   ),
@@ -717,13 +718,13 @@ class _PrayerChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isCompleted
-            ? AppTheme.primaryGold.withOpacity(0.2)
+            ? AppColors.primaryGold.withOpacity(0.2)
             : Colors.grey[800],
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: isCompleted
-                ? AppTheme.primaryGold.withOpacity(0.3)
+                ? AppColors.primaryGold.withOpacity(0.3)
                 : Colors.black.withOpacity(0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -736,7 +737,7 @@ class _PrayerChip extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             size: 16,
-            color: isCompleted ? AppTheme.primaryGold : Colors.grey,
+            color: isCompleted ? AppColors.primaryGold : Colors.grey,
           ),
           const SizedBox(width: 6),
           Text(
@@ -770,7 +771,7 @@ class _AmalItem extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             size: 18,
-            color: isCompleted ? AppTheme.primaryGold : Colors.grey,
+            color: isCompleted ? AppColors.primaryGold : Colors.grey,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -837,7 +838,7 @@ class _DhikrItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: currentCount >= targetCount
-                  ? AppTheme.primaryGold.withOpacity(0.2)
+                  ? AppColors.primaryGold.withOpacity(0.2)
                   : Colors.grey[800],
               borderRadius: BorderRadius.circular(16),
             ),
@@ -845,7 +846,7 @@ class _DhikrItem extends StatelessWidget {
               '${toBengaliNumber(currentCount)}/${toBengaliNumber(targetCount)}',
               style: TextStyle(
                 color: currentCount >= targetCount
-                    ? AppTheme.primaryGold
+                    ? AppColors.primaryGold
                     : Colors.grey,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -898,14 +899,14 @@ class _ReadingItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: minutes >= target
-                  ? AppTheme.primaryGold.withOpacity(0.2)
+                  ? AppColors.primaryGold.withOpacity(0.2)
                   : Colors.grey[800],
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
               '${toBengaliNumber(minutes)}/${toBengaliNumber(target)} মি.',
               style: TextStyle(
-                color: minutes >= target ? AppTheme.primaryGold : Colors.grey,
+                color: minutes >= target ? AppColors.primaryGold : Colors.grey,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),

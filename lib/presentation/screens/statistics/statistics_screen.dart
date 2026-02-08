@@ -47,13 +47,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.primaryGold),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primaryGold),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'পরিসংখ্যান',
           style: TextStyle(
-            color: AppTheme.primaryGold,
+            color: AppColors.primaryGold,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -251,12 +251,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                             );
                           }).toList(),
                           isCurved: true,
-                          color: AppTheme.primaryGold,
+                          color: AppColors.primaryGold,
                           barWidth: 3,
                           dotData: const FlDotData(show: true),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: AppTheme.primaryGold.withOpacity(0.1),
+                            color: AppColors.primaryGold.withOpacity(0.1),
                           ),
                         ),
                       ],
@@ -333,12 +333,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withOpacity(0.2),
+                  color: AppColors.primaryGold.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.calendar_today,
-                  color: AppTheme.primaryGold.withOpacity(0.7),
+                  color: AppColors.primaryGold.withOpacity(0.7),
                   size: 24,
                 ),
               ),
@@ -349,7 +349,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   Text(
                     _formatDateBengali(date),
                     style: const TextStyle(
-                      color: AppTheme.primaryGold,
+                      color: AppColors.primaryGold,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
