@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/daily_amal_provider.dart';
 import '../../../data/models/daily_amal_model.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 
 class DailyAmalScreen extends ConsumerStatefulWidget {
@@ -559,7 +558,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               const SizedBox(height: 16),
               StatefulBuilder(
                 builder: (context, setState) => DropdownButtonFormField<String>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   dropdownColor: cs.surface,
                   style: TextStyle(color: cs.onSurface),
                   decoration: deco(
@@ -735,7 +734,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     ],
                   ),
                 ),
-                Container(height: 1, color: cs.outline.withOpacity(0.3)),
+                Container(height: 1, color: cs.primary.withOpacity(0.3)),
                 // Content
                 Expanded(
                   child: ListView(

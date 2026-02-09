@@ -1,6 +1,5 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
 
 class StreakCard extends StatelessWidget {
   final int currentStreak;
@@ -14,28 +13,30 @@ class StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primaryGold.withOpacity(0.3),
-            AppColors.primaryGold.withOpacity(0.1),
-          ],
+          colors: gradients.cardGradient,
         ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -50,28 +51,28 @@ class StreakCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGold.withOpacity(0.2),
+                        color: primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.local_fire_department,
-                        color: AppColors.primaryGold,
+                        color: primary,
                         size: 32,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       currentStreak.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: onSurface,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'বর্তমান স্ট্রিক',
                       style: TextStyle(
-                        color: AppColors.primaryGold,
+                        color: primary,
                         fontSize: 14,
                       ),
                     ),
@@ -82,7 +83,7 @@ class StreakCard extends StatelessWidget {
               Container(
                 height: 100,
                 width: 1,
-                color: AppColors.primaryGold.withOpacity(0.3),
+                color: shadowColor.withOpacity(0.2),
               ),
               // Best Streak
               Expanded(
@@ -91,28 +92,28 @@ class StreakCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGold.withOpacity(0.2),
+                        color: primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.emoji_events,
-                        color: AppColors.primaryGold,
+                        color: primary,
                         size: 32,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       bestStreak.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: onSurface,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'সর্বোচ্চ স্ট্রিক',
                       style: TextStyle(
-                        color: AppColors.primaryGold,
+                        color: primary,
                         fontSize: 14,
                       ),
                     ),
@@ -125,7 +126,7 @@ class StreakCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.1),
+              color: primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -133,16 +134,16 @@ class StreakCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: AppColors.primaryGold.withOpacity(0.8),
+                  color: primary.withOpacity(0.8),
                   size: 16,
                 ),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'স্ট্রিক কাউন্টের জন্য কমপক্ষে 60%+ প্রোগ্রেস পূরণ করতে হবে',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: bulletTextColor,
                       fontSize: 12,
                     ),
                   ),

@@ -1,11 +1,9 @@
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/statistics_provider.dart';
-import '../../providers/qaza_prayer_provider.dart';
 import '../../../data/models/statistics_model.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/app_colors.dart';
 import 'widgets/streak_card.dart';
 import 'widgets/tab_selector.dart';
 import 'widgets/weekly_progress_chart.dart';
@@ -40,24 +38,55 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   Widget build(BuildContext context) {
     final statsState = ref.watch(statisticsProvider);
 
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundDark,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
         titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryGold),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'পরিসংখ্যান',
           style: TextStyle(
-            color: AppColors.primaryGold,
+            color: titleColor,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
+        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -153,6 +182,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   }
 
   Widget _buildMonthlyProgressChart(StatisticsState statsState) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     final monthlyStats = statsState.data.getMonthlyStatsForMonth(
       selectedMonth.year,
       selectedMonth.month,
@@ -164,16 +199,31 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'মাসিক অগ্রগতি',
             style: TextStyle(
-              color: Colors.white,
+              color: onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -185,15 +235,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             child: Row(
               children: [
                 // Y-axis labels
-                const Column(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('100%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('75%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('50%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('25%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('0%', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                    Text('100%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('75%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('50%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('25%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('0%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(width: 8),
@@ -207,7 +257,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         drawVerticalLine: false,
                         horizontalInterval: 25,
                         getDrawingHorizontalLine: (value) => FlLine(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: shadowColor.withOpacity(0.2),
                           strokeWidth: 1,
                         ),
                       ),
@@ -221,8 +271,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                               if (value.toInt() < weekLabels.length) {
                                 return Text(
                                   weekLabels[value.toInt()],
-                                  style: const TextStyle(
-                                    color: Colors.grey,
+                                  style: TextStyle(
+                                    color: bulletTextColor,
                                     fontSize: 10,
                                   ),
                                 );
@@ -251,12 +301,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                             );
                           }).toList(),
                           isCurved: true,
-                          color: AppColors.primaryGold,
+                          color: primary,
                           barWidth: 3,
                           dotData: const FlDotData(show: true),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: AppColors.primaryGold.withOpacity(0.1),
+                            color: primary.withOpacity(0.1),
                           ),
                         ),
                       ],
@@ -316,14 +366,35 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   }
 
   Widget _buildSelectedDayDetails(DateTime date, StatisticsState statsState) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     final dateKey = _formatDate(date);
     final dayStats = statsState.data.dailyStats[dateKey];
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,12 +404,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGold.withOpacity(0.2),
+                  color: primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.calendar_today,
-                  color: AppColors.primaryGold.withOpacity(0.7),
+                  color: primary.withOpacity(0.7),
                   size: 24,
                 ),
               ),
@@ -348,16 +419,16 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 children: [
                   Text(
                     _formatDateBengali(date),
-                    style: const TextStyle(
-                      color: AppColors.primaryGold,
+                    style: TextStyle(
+                      color: primary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     _getWeekdayBengali(date.weekday),
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    style: TextStyle(
+                      color: bulletTextColor,
                       fontSize: 14,
                     ),
                   ),
@@ -367,13 +438,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: shadowColor.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '${dayStats?.overallScore ?? 0}%',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

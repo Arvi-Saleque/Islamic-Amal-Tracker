@@ -1,7 +1,6 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class WeeklyProgressChart extends StatelessWidget {
@@ -34,19 +33,40 @@ class WeeklyProgressChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'সাপ্তাহিক অগ্রগতি',
             style: TextStyle(
-              color: Colors.white,
+              color: onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -57,24 +77,24 @@ class WeeklyProgressChart extends StatelessWidget {
             child: Row(
               children: [
                 // Y-axis labels
-                const Column(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('100%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('75%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('50%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('25%', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                    Text('0%', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                    Text('100%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('75%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('50%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('25%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text('0%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: weeklyStats.days.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'এখনো কোনো ডেটা নেই',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: bulletTextColor),
                           ),
                         )
                       : BarChart(
@@ -84,11 +104,11 @@ class WeeklyProgressChart extends StatelessWidget {
                             barTouchData: BarTouchData(
                               enabled: true,
                               touchTooltipData: BarTouchTooltipData(
-                                getTooltipColor: (group) => Colors.grey[800]!,
+                                getTooltipColor: (group) => shadowColor.withOpacity(0.9),
                                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                   return BarTooltipItem(
                                     '${rod.toY.toInt()}%',
-                                    const TextStyle(color: Colors.white),
+                                    TextStyle(color: onSurface),
                                   );
                                 },
                               ),
@@ -106,8 +126,8 @@ class WeeklyProgressChart extends StatelessWidget {
                                         padding: const EdgeInsets.only(top: 8),
                                         child: Text(
                                           dayName,
-                                          style: const TextStyle(
-                                            color: Colors.grey,
+                                          style: TextStyle(
+                                            color: bulletTextColor,
                                             fontSize: 10,
                                           ),
                                         ),
@@ -133,7 +153,7 @@ class WeeklyProgressChart extends StatelessWidget {
                               drawVerticalLine: false,
                               horizontalInterval: 25,
                               getDrawingHorizontalLine: (value) => FlLine(
-                                color: Colors.grey.withOpacity(0.2),
+                                color: shadowColor.withOpacity(0.2),
                                 strokeWidth: 1,
                               ),
                             ),
@@ -144,7 +164,7 @@ class WeeklyProgressChart extends StatelessWidget {
                                 barRods: [
                                   BarChartRodData(
                                     toY: score,
-                                    color: _getBarColor(score),
+                                    color: _getBarColor(score, primary),
                                     width: 24,
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(6),
@@ -164,14 +184,14 @@ class WeeklyProgressChart extends StatelessWidget {
     );
   }
 
-  Color _getBarColor(double score) {
+  Color _getBarColor(double score, Color primary) {
     if (score >= 80) {
-      return AppColors.primaryGold;
+      return primary;
     } else if (score >= 50) {
-      return AppColors.primaryGold.withOpacity(0.7);
+      return primary.withOpacity(0.7);
     } else if (score >= 1) {
-      return AppColors.primaryGold.withOpacity(0.4);
+      return primary.withOpacity(0.4);
     }
-    return Colors.grey[700]!;
+    return primary.withOpacity(0.2);
   }
 }

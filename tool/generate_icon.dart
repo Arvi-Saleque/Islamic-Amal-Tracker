@@ -1,7 +1,3 @@
-import 'dart:io';
-import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 // This script generates app icon with mosque icon
 // Run: dart run tool/generate_icon.dart
@@ -10,7 +6,7 @@ void main() async {
   print('Generating app icon with mosque...');
   
   // Create SVG content for mosque icon
-  final svgContent = '''
+  const svgContent = '''
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <rect width="1024" height="1024" fill="#1A1A1A"/>
   <g transform="translate(112, 112) scale(0.78)">

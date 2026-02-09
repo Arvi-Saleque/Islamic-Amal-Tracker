@@ -361,13 +361,13 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       // adhan_dart returns UTC times, convert to local
       // Include sunrise for waqt end time calculation
       final times = {
-        'fajr': prayerTimes.fajr!.toLocal(),
+        'fajr': prayerTimes.fajr.toLocal(),
         'sunrise':
-            prayerTimes.sunrise!.toLocal(), // Important: Fajr ends at sunrise
-        'dhuhr': prayerTimes.dhuhr!.toLocal(),
-        'asr': prayerTimes.asr!.toLocal(),
-        'maghrib': prayerTimes.maghrib!.toLocal(),
-        'isha': prayerTimes.isha!.toLocal(),
+            prayerTimes.sunrise.toLocal(), // Important: Fajr ends at sunrise
+        'dhuhr': prayerTimes.dhuhr.toLocal(),
+        'asr': prayerTimes.asr.toLocal(),
+        'maghrib': prayerTimes.maghrib.toLocal(),
+        'isha': prayerTimes.isha.toLocal(),
       };
 
       // Calculate waqt end times for each prayer
@@ -423,9 +423,9 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     if (hours > 0) {
-      return '${hours}ঘ ${minutes}মি';
+      return '$hoursঘ $minutesমি';
     } else {
-      return '${minutes}মি';
+      return '$minutesমি';
     }
   }
 

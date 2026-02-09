@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 enum ReminderType {
   beforePrayer,  // নামাজের আগে
@@ -139,7 +138,7 @@ class CustomReminder {
     if (type == ReminderType.fixedTime && fixedHour != null && fixedMinute != null) {
       final hour = fixedHour! > 12 ? fixedHour! - 12 : (fixedHour == 0 ? 12 : fixedHour!);
       final period = fixedHour! >= 12 ? 'PM' : 'AM';
-      return '${hour}:${fixedMinute!.toString().padLeft(2, '0')} $period';
+      return '$hour:${fixedMinute!.toString().padLeft(2, '0')} $period';
     } else if (prayer != null) {
       final prayerName = getPrayerBengaliName(prayer!);
       if (minutesOffset == 0) {

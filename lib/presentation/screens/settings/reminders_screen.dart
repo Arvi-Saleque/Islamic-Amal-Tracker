@@ -1,12 +1,13 @@
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
 import '../../providers/prayer_times_provider.dart';
-import '../../widgets/digital_time_picker.dart';
+import '../statistics/widgets/digital_time_picker.dart';
 import 'custom_reminders_screen.dart';
-import 'daily_reminder_screen.dart';
+import 'reminder_setting_screen.dart';
 
 enum ReminderTab { defaults, userSettings, custom }
 
@@ -137,7 +138,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       _defaultZuhrReminderTime = _calculateDefaultZuhrReminderTime(prayerTimes);
       _defaultAsrReminderTime = _calculateDefaultAsrReminderTime(prayerTimes);
       _defaultMaghribReminderTime = _calculateDefaultMaghribReminderTime(prayerTimes);
-      final isha = prayerTimes?['isha'];
+      final isha = prayerTimes['isha'];
       final off = _getDefaultPrayerOffset(PrayerName.isha); // isha + 60
       final ishaDefault = (isha == null)
           ? const TimeOfDay(hour: 21, minute: 30)
@@ -456,24 +457,52 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
+
     return Scaffold(
-      backgroundColor: _Premium.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: _Premium.appBar,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
-        scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.transparent,
+        titleSpacing: 0,
         shape: Border(
           bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: _Premium.gold),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'রিমাইন্ডারস',
           style: TextStyle(
-            color: _Premium.gold,
+            color: Theme.of(context).colorScheme.primary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.2,
@@ -482,12 +511,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active, color: _Premium.gold),
+            icon: Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.primary),
             onPressed: _showTodaysRemindersPopup,
             tooltip: 'আজকের রিমাইন্ডারস',
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: _Premium.gold),
+            icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
             onPressed: () {
               Navigator.push(
                 context,
@@ -501,12 +530,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: _Premium.gold),
+          ? Center(
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
             )
           : RefreshIndicator(
               onRefresh: _loadAllSettings,
-              color: _Premium.gold,
+              color: Theme.of(context).colorScheme.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -527,18 +556,40 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildInfoCard() {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _Premium.infoCardDecoration(),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: _Premium.gold),
-          const SizedBox(width: 12),
-          const Expanded(
+          Icon(Icons.info_outline, color: primary),
+          SizedBox(width: 12),
+          Expanded(
             child: Text(
               'প্রতিদিন নির্দিষ্ট সময়ে আমল করার রিমাইন্ডার পাবেন',
               style: TextStyle(
-                color: _Premium.gold,
+                color: primary,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 height: 1.3,
@@ -557,94 +608,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       child: Text(
         title,
         style: TextStyle(
-          color: _Premium.gold.withOpacity(0.95),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.95),
           fontSize: 16,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.2,
         ),
-      ),
-    );
-  }
-
-  Widget _buildReminderTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required TimeOfDay time,
-    required VoidCallback onTimeTap,
-  }) {
-    // subtitle kept (no content added) – not displayed intentionally in old design,
-    // kept for compatibility.
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _Premium.cardDecoration(),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: _Premium.iconChipDecoration(),
-            child: Icon(icon, color: _Premium.gold, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                    letterSpacing: 0.1,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: onTimeTap,
-                    borderRadius: BorderRadius.circular(10),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 6,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: _Premium.gold.withOpacity(0.95),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            _formatTime(time),
-                            style: const TextStyle(
-                              color: _Premium.gold,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Icon(
-                            Icons.edit,
-                            size: 14,
-                            color: _Premium.gold.withOpacity(0.95),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.check_circle, color: Colors.green, size: 24),
-        ],
       ),
     );
   }
@@ -656,15 +624,40 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     required TimeOfDay time,
     required bool isDefault,
   }) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _Premium.cardDecoration(),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: _Premium.iconChipDecoration(),
-            child: Icon(icon, color: _Premium.gold, size: 24),
+            decoration: BoxDecoration(
+              color: primary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -673,8 +666,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
@@ -685,7 +678,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.68),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.68),
                     fontSize: 12,
                     height: 1.2,
                     letterSpacing: 0.1,
@@ -697,13 +690,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                     Icon(
                       Icons.access_time,
                       size: 14,
-                      color: _Premium.gold.withOpacity(0.95),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.95),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       _formatTime(time),
-                      style: const TextStyle(
-                        color: _Premium.gold,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.2,
@@ -757,19 +750,44 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       final reminderTime =
           _prayerReminderTimes[prayer] ?? _getStaticDefaultPrayerTime(prayer);
 
+      final gradients = Theme.of(context).extension<GradientColors>()!;
+      final primary = Theme.of(context).colorScheme.primary;
+      final shadowColor = Theme.of(context).shadowColor;
+      
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: _Premium.cardDecoration(),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradients.cardGradient,
+            ),
+            border: Border.all(
+              color: primary,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: _Premium.iconChipDecoration(radius: 10),
+                decoration: BoxDecoration(
+                  color: primary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Icon(
                   prayerIcons[prayer],
-                  color: _Premium.gold,
+                  color: primary,
                   size: 24,
                 ),
               ),
@@ -780,8 +798,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   children: [
                     Text(
                       prayerNames[prayer] ?? '',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
@@ -805,13 +823,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                               Icon(
                                 Icons.access_time,
                                 size: 14,
-                                color: _Premium.gold.withOpacity(0.95),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.95),
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 _formatTime(reminderTime),
-                                style: const TextStyle(
-                                  color: _Premium.gold,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.2,
@@ -821,7 +839,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                               Icon(
                                 Icons.edit,
                                 size: 14,
-                                color: _Premium.gold.withOpacity(0.95),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.95),
                               ),
                             ],
                           ),
@@ -840,6 +858,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildCustomReminderCard() {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -847,24 +869,44 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         borderRadius: BorderRadius.circular(14),
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: _Premium.cardDecoration(),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradients.cardGradient,
+            ),
+            border: Border.all(
+              color: primary,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: _Premium.iconChipDecoration(radius: 10),
-                child:
-                    const Icon(Icons.add_alert, color: _Premium.gold, size: 24),
+                decoration: BoxDecoration(
+                  color: primary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.add_alert, color: primary, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'কাস্টম রিমাইন্ডার',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
@@ -877,7 +919,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                           ? 'কোনো কাস্টম রিমাইন্ডার নেই'
                           : '${_customReminders.where((r) => r.isEnabled).length} টি সক্রিয় রিমাইন্ডার',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.68),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.68),
                         fontSize: 13,
                         height: 1.2,
                         letterSpacing: 0.1,
@@ -886,7 +928,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: _Premium.gold),
+              Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
             ],
           ),
         ),
@@ -898,12 +940,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Theme.of(context).shadowColor.withOpacity(0.1),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -921,7 +963,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == ReminderTab.defaults
-                      ? _Premium.gold
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -930,8 +972,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                     'ডিফল্ট',
                     style: TextStyle(
                       color: _selectedTab == ReminderTab.defaults
-                          ? Colors.black
-                          : Colors.grey.shade300,
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       letterSpacing: 0.2,
@@ -951,7 +993,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == ReminderTab.userSettings
-                      ? _Premium.gold
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -960,8 +1002,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                     'ব্যক্তিগত',
                     style: TextStyle(
                       color: _selectedTab == ReminderTab.userSettings
-                          ? Colors.black
-                          : Colors.grey.shade300,
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       letterSpacing: 0.2,
@@ -981,7 +1023,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == ReminderTab.custom
-                      ? _Premium.gold
+                      ? Theme.of(context).colorScheme.primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -990,8 +1032,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                     'কাস্টম',
                     style: TextStyle(
                       color: _selectedTab == ReminderTab.custom
-                          ? Colors.black
-                          : Colors.grey.shade300,
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       letterSpacing: 0.2,
@@ -1176,6 +1218,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildUserSettingsInfoCard() {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final textColor = gradients.bulletTextColor;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1183,34 +1227,29 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.withOpacity(0.14),
-            Colors.blue.withOpacity(0.06)
-          ],
+          colors: gradients.cardGradient,
         ),
-        border: Border.all(color: Colors.blue.withOpacity(0.22)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.22),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.04),
+            color: Theme.of(context).shadowColor.withOpacity(0.15),
             blurRadius: 8,
-            offset: const Offset(-2, -2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: Colors.blue.shade300, size: 24),
+          Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 24),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
               'ডিফল্ট ৮টা সময়ে রিমাইন্ডার দেওয়া হবে। কিন্তু প্রয়োজন হলে আপনার সময় অনুযায়ী (জামাত) এই রিমাইন্ডারগুলা সেট করে নিতে পারবেন অতিরিক্ত সতর্কতা হিসেবে।',
               style: TextStyle(
-                color: Colors.white,
+                color: textColor,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
@@ -1232,15 +1271,40 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     required Function(bool) onToggle,
     required VoidCallback onTimeTap,
   }) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _Premium.cardDecoration(),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: _Premium.iconChipDecoration(),
-            child: Icon(icon, color: _Premium.gold, size: 24),
+            decoration: BoxDecoration(
+              color: primary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1249,8 +1313,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
@@ -1275,13 +1339,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                             Icon(
                               Icons.access_time,
                               size: 14,
-                              color: _Premium.gold.withOpacity(0.95),
+                              color: primary.withOpacity(0.95),
                             ),
                             const SizedBox(width: 6),
                             Text(
                               _formatTime(time),
-                              style: const TextStyle(
-                                color: _Premium.gold,
+                              style: TextStyle(
+                                color: primary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.2,
@@ -1291,7 +1355,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                             Icon(
                               Icons.edit,
                               size: 14,
-                              color: _Premium.gold.withOpacity(0.95),
+                              color: primary.withOpacity(0.95),
                             ),
                           ],
                         ),
@@ -1302,7 +1366,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                   Text(
                     'বন্ধ করা আছে',
                     style: TextStyle(
-                      color: Colors.grey.shade500,
+                      color: Theme.of(context).extension<GradientColors>()!.bulletTextColor.withOpacity(0.6),
                       fontSize: 13,
                       height: 1.2,
                       letterSpacing: 0.1,
@@ -1315,10 +1379,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           Switch(
             value: isEnabled,
             onChanged: onToggle,
-            activeColor: _Premium.gold,
-            activeTrackColor: _Premium.gold.withOpacity(0.3),
-            inactiveThumbColor: Colors.grey.shade600,
-            inactiveTrackColor: Colors.grey.shade800,
+            activeThumbColor: primary,
+            activeTrackColor: primary.withOpacity(0.3),
+            inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
           ),
         ],
       ),
@@ -1326,36 +1390,61 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildPrayerRemindersToggleCard() {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _Premium.cardDecoration(),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
+        border: Border.all(
+          color: primary,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: _Premium.iconChipDecoration(),
-            child: const Icon(Icons.mosque, color: _Premium.gold, size: 24),
+            decoration: BoxDecoration(
+              color: primary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.mosque, color: primary, size: 24),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'নামাজের রিমাইন্ডার',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
                     letterSpacing: 0.1,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
                   '৫টি নামাজের জন্য আলাদা সময় সেট করুন',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                     fontSize: 13,
                     height: 1.2,
                     letterSpacing: 0.1,
@@ -1371,113 +1460,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
               setState(() => _arePrayerRemindersEnabled = value);
               await _scheduleAllReminders();
             },
-            activeColor: _Premium.gold,
-            activeTrackColor: _Premium.gold.withOpacity(0.3),
-            inactiveThumbColor: Colors.grey.shade600,
-            inactiveTrackColor: Colors.grey.shade800,
+            activeThumbColor: primary,
+            activeTrackColor: primary.withOpacity(0.3),
+            inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Premium {
-  static const Color bg = Color(0xFF0A0A0A);
-  static const Color appBar = Color(0xFF121212);
-  static const Color surface = Color(0xFF151515);
-  static const Color surfaceTop = Color(0xFF1C1C1C);
-  static const Color gold = Color(0xFFD4AF37);
-
-  static BoxDecoration cardDecoration({double radius = 14}) {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(radius),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [surfaceTop, surface],
-      ),
-      border: Border.all(color: Colors.white.withOpacity(0.06)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.28),
-          blurRadius: 16,
-          offset: const Offset(0, 10),
-        ),
-        BoxShadow(
-          color: Colors.white.withOpacity(0.045),
-          blurRadius: 8,
-          offset: const Offset(-2, -2),
-        ),
-      ],
-    );
-  }
-
-  static BoxDecoration iconChipDecoration({double radius = 12}) {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(radius),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [gold.withOpacity(0.26), gold.withOpacity(0.10)],
-      ),
-      border: Border.all(color: gold.withOpacity(0.22)),
-    );
-  }
-
-  static BoxDecoration infoCardDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(14),
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [gold.withOpacity(0.14), gold.withOpacity(0.06)],
-      ),
-      border: Border.all(color: gold.withOpacity(0.22)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.22),
-          blurRadius: 16,
-          offset: const Offset(0, 10),
-        ),
-        BoxShadow(
-          color: Colors.white.withOpacity(0.04),
-          blurRadius: 8,
-          offset: const Offset(-2, -2),
-        ),
-      ],
-    );
-  }
-
-  static BoxDecoration dialogContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFF1E1E1E), Color(0xFF151515)],
-      ),
-      border: Border.all(color: Colors.white.withOpacity(0.08)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.55),
-          blurRadius: 28,
-          offset: const Offset(0, 16),
-        ),
-        BoxShadow(
-          color: Colors.white.withOpacity(0.04),
-          blurRadius: 10,
-          offset: const Offset(-2, -2),
-        ),
-      ],
-    );
-  }
-
-  static BoxDecoration dialogSectionDecoration() {
-    return BoxDecoration(
-      color: const Color(0xFF202020),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: Colors.white.withOpacity(0.06)),
     );
   }
 }
@@ -1543,11 +1532,30 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
-        decoration: _Premium.dialogContainerDecoration(),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradients.cardGradient,
+          ),
+          border: Border.all(color: primary, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor.withOpacity(0.25),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Padding(
@@ -1558,17 +1566,17 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'রিমাইন্ডার সময়সূচী',
                       style: TextStyle(
-                        color: _Premium.gold,
+                        color: primary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.2,
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, color: Colors.grey.shade400),
+                      icon: Icon(Icons.close, color: primary),
                       onPressed: () => Navigator.pop(context),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -1840,10 +1848,10 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
     final passedReminders = todaysReminders.where((r) => r.isPassed).toList();
 
     if (todaysReminders.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'আজকের জন্য কোনো রিমাইন্ডার নেই',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
         ),
       );
     }
@@ -1856,7 +1864,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
             Text(
               'বাকি রিমাইন্ডার',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.80),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -1865,11 +1873,11 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
             ...pendingReminders.map((r) => _buildReminderRow(r, false)),
           ],
           if (passedReminders.isNotEmpty && pendingReminders.isNotEmpty)
-            Divider(color: Colors.white.withOpacity(0.08), height: 24),
+            Divider(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor.withOpacity(0.2), height: 24),
           if (passedReminders.isNotEmpty) ...[
             Text(
               'সম্পন্ন (${passedReminders.length})',
-              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor, fontSize: 12),
             ),
             const SizedBox(height: 8),
             ...passedReminders.map((r) => _buildReminderRow(r, true)),
@@ -1884,9 +1892,9 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C),
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -1895,7 +1903,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
             height: 8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isPassed ? Colors.grey : _Premium.gold,
+              color: isPassed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -1906,7 +1914,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
                   child: Text(
                     reminder.title,
                     style: TextStyle(
-                      color: isPassed ? Colors.grey.shade400 : Colors.white,
+                      color: isPassed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                       height: 1.2,
                       decoration: isPassed ? TextDecoration.lineThrough : null,
@@ -1921,14 +1929,14 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A2A),
+                      color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withOpacity(0.06)),
+                      border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                     ),
                     child: Text(
                       'কাস্টম',
                       style: TextStyle(
-                        color: Colors.grey.shade300,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.1,
@@ -1964,7 +1972,7 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
           Text(
             _formatDateTime(reminder.time),
             style: TextStyle(
-              color: isPassed ? Colors.grey.shade400 : _Premium.gold,
+              color: isPassed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               fontSize: 13,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.1,

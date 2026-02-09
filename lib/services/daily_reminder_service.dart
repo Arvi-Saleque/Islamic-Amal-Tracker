@@ -5,8 +5,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/models/custom_reminder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:geolocator/geolocator.dart';
 import 'prayer_times_api_service.dart';
 
@@ -644,10 +642,10 @@ class DailyReminderService {
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
-await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
+        await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
+await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
     await prefs.setInt(
-        '${_prayerReminderPrefix}${prayer.name}_minutesBefore', minutesBefore);
+        '$_prayerReminderPrefix${prayer.name}_minutesBefore', minutesBefore);
 
     print('${prayer.name} reminder scheduled for $scheduledDateTime');
   }
@@ -705,9 +703,9 @@ await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('${_prayerReminderPrefix}${prayer.name}_enabled', true);
-await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
-    await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_minute', minute);
+        await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
+await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
+    await prefs.setInt('$_prayerReminderPrefix${prayer.name}_minute', minute);
 
     print('${prayer.name} reminder scheduled for $hour:$minute');
   }
@@ -723,7 +721,7 @@ await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
     await _notifications.cancel(_getPrayerNotificationId(prayer));
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(
-        '${_prayerReminderPrefix}${prayer.name}_enabled', false);
+        '$_prayerReminderPrefix${prayer.name}_enabled', false);
     print('${prayer.name} reminder cancelled');
   }
 
@@ -734,15 +732,15 @@ await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
 
     for (final prayer in PrayerName.values) {
       settings['${prayer.name}_enabled'] =
-          prefs.getBool('${_prayerReminderPrefix}${prayer.name}_enabled') ??
+          prefs.getBool('$_prayerReminderPrefix${prayer.name}_enabled') ??
               false;
       settings['${prayer.name}_minutesBefore'] = prefs
-              .getInt('${_prayerReminderPrefix}${prayer.name}_minutesBefore') ??
+              .getInt('$_prayerReminderPrefix${prayer.name}_minutesBefore') ??
           10;
       settings['${prayer.name}_hour'] =
-          prefs.getInt('${_prayerReminderPrefix}${prayer.name}_hour');
+          prefs.getInt('$_prayerReminderPrefix${prayer.name}_hour');
       settings['${prayer.name}_minute'] =
-          prefs.getInt('${_prayerReminderPrefix}${prayer.name}_minute');
+          prefs.getInt('$_prayerReminderPrefix${prayer.name}_minute');
     }
 
     return settings;
@@ -849,8 +847,8 @@ await prefs.setInt('${_prayerReminderPrefix}${prayer.name}_hour', hour);
       icon: '@mipmap/ic_launcher',
     );
 
-    final notificationDetails =
-        const NotificationDetails(android: androidDetails);
+    const notificationDetails =
+        NotificationDetails(android: androidDetails);
 
     await _notifications.zonedSchedule(
       notificationId,

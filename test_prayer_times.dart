@@ -2,7 +2,7 @@ import 'package:adhan_dart/adhan_dart.dart';
 
 void main() {
   // Khulna coordinates (user mentioned Khulna)
-  final coordinates = Coordinates(22.8456, 89.5403);
+  const coordinates = Coordinates(22.8456, 89.5403);
   
   // Today: January 3, 2026
   final date = DateTime(2026, 1, 3);
@@ -19,12 +19,12 @@ void main() {
   );
   
   // Convert to local time (Bangladesh is UTC+6)
-  final fajr = prayerTimes.fajr!.toLocal();
-  final sunrise = prayerTimes.sunrise!.toLocal();
-  final dhuhr = prayerTimes.dhuhr!.toLocal();
-  final asr = prayerTimes.asr!.toLocal();
-  final maghrib = prayerTimes.maghrib!.toLocal();
-  final isha = prayerTimes.isha!.toLocal();
+  final fajr = prayerTimes.fajr.toLocal();
+  final sunrise = prayerTimes.sunrise.toLocal();
+  final dhuhr = prayerTimes.dhuhr.toLocal();
+  final asr = prayerTimes.asr.toLocal();
+  final maghrib = prayerTimes.maghrib.toLocal();
+  final isha = prayerTimes.isha.toLocal();
   
   // Calculate forbidden times
   final sunriseEnd = sunrise.add(const Duration(minutes: 15));
@@ -73,7 +73,7 @@ void main() {
     calculationParameters: params,
     precision: true,
   );
-  final tomorrowFajr = tomorrowPrayerTimes.fajr!.toLocal();
+  final tomorrowFajr = tomorrowPrayerTimes.fajr.toLocal();
   
   print('🌙 ইশা:');
   print('   শুরু: ${_formatTime(isha)}');

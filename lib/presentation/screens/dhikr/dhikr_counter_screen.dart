@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -389,7 +389,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                               }
                             : null,
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
 
                       // Count Display (Tappable for manual input)
                       Flexible(
@@ -1137,42 +1137,36 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
   // Show info bottom sheet
   void _showInfoBottomSheet(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final dividerColor = Theme.of(context).colorScheme.primary.withOpacity(0.3);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
+        initialChildSize: 0.86,
         minChildSize: 0.5,
         maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: cs.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-            boxShadow: [
-              BoxShadow(
-                color: theme.shadowColor.withOpacity(0.15),
-                blurRadius: 22,
-                offset: const Offset(0, -12),
-              ),
-            ],
-          ),
+        builder: (context, scrollController) => buildPremiumCard(
+          context: context,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+          gradientBegin: Alignment.topCenter,
+          gradientEnd: Alignment.bottomCenter,
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
-              // Handle bar
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: cs.onSurfaceVariant.withOpacity(0.4),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withOpacity(0.5),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Title
               Padding(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
                 child: Row(
@@ -1181,17 +1175,22 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: cs.primary.withOpacity(0.15),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.info_outline_rounded, color: cs.primary, size: 24),
+                      child: Icon(Icons.info_outline_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 24),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'যিকির - তথ্য ও ফযিলত',
                         style: TextStyle(
-                          color: cs.primary,
+                          color: Theme.of(context).colorScheme.primary,
                           fontSize: 19,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.1,
@@ -1201,7 +1200,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   ],
                 ),
               ),
-              Container(height: 1, color: cs.outline.withOpacity(0.3)),
+              Container(height: 1, color: dividerColor),
               // Content
               Expanded(
                 child: ListView(
@@ -1223,20 +1222,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 20),
 
                     // Tasbih section
-                    _buildSectionHeader(
+                    const _SectionHeader(
                       icon: Icons.favorite,
                       title: 'তাসবীহ ফাতেমীর ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'প্রতি নামাজের পর ৩৩ বার সুবহানাল্লাহ, ৩৩ বার আলহামদুলিল্লাহ, ৩৩ বার আল্লাহু আকবার বললে গুনাহ মাফ হয়, যদিও সমুদ্রের ফেনার মতো হয়।',
                       reference: 'সহীহ মুসলিম: ৬৯৭',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'দুটি কালেমা আছে যা জিহ্বায় হালকা কিন্তু মীযানে ভারী: সুবহানাল্লাহি ওয়া বিহামদিহি ও লা ইলাহা ইল্লাল্লাহু ওয়াল্লাহু আকবার।',
                       reference: 'সহীহ বুখারী: ৬৩৬০, সহীহ মুসলিম: ২৬৯২',
@@ -1244,20 +1243,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 18),
 
                     // SubhanAllah section
-                    _buildSectionHeader(
+                    const _SectionHeader(
                       icon: Icons.star,
                       title: 'সুবহানাল্লাহির ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'সুবহানাল্লাহি ওয়াল হামদুলিল্লাহ - এটি মীযানকে ভরপুর করে দেয়, অথবা আসমান ও জমিনের মধ্যবর্তী স্থানের মতো।',
                       reference: 'সহীহ মুসলিম: ২৬৯৬',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'যে ব্যক্তি দিনে ১০০ বার সুবহানাল্লাহ বলবে, তার জন্য ১০০০ নেকী লেখা হবে এবং ১০০ গুনাহ মাফ হবে।',
                       reference: 'সহীহ মুসলিম: ২৬৯২',
@@ -1265,20 +1264,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 18),
 
                     // Istighfar section
-                    _buildSectionHeader(
+                    const _SectionHeader(
                       icon: Icons.healing,
                       title: 'ইস্তিগফারের ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'যে ব্যক্তি নিয়মিত ইস্তিগফার করবে, আল্লাহ তার সব দুশ্চিন্তা দূর করে দেবেন, সব সংকট থেকে বের করে দেবেন এবং অপ্রত্যাশিত জায়গা থেকে রিযিিক দেবেন।',
                       reference: 'সুনানে আবু দাউদ: ১৫১৮',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'আমি দিনে ৭০ বারেরও বেশি আল্লাহর কাছে তাওবা করি এবং ইস্তিগফার করি।',
                       reference: 'সহীহ বুখারী: ৬৩০৭',
@@ -1286,20 +1285,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 18),
 
                     // La ilaha illallah section
-                    _buildSectionHeader(
+                    const _SectionHeader(
                       icon: Icons.brightness_high,
                       title: 'লা ইলাহা ইল্লাল্লাহর ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'সর্বোত্তম যিকির হলো লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুয়া আলা কুল্লি শাইইন কাদীর।',
                       reference: 'জামে তিরমিযী: ৩৫৮৫',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'যে ব্যক্তি দিনে ১০০ বার লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু... বলবে, তা ১০টি গোলাম মুক্ত করার সমান, ১০০ নেকী লেখা হবে, ১০০ গুনাহ মাফ হবে এবং সন্ধ্যা পর্যন্ত শয়তান থেকে রক্ষা হবে।',
                       reference: 'সহীহ বুখারী: ৬৩০৩, সহীহ মুসলিম: ২৬৯১',
@@ -1307,20 +1306,20 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(height: 18),
 
                     // Durood section
-                    _buildSectionHeader(
+                    const _SectionHeader(
                       icon: Icons.auto_awesome,
                       title: 'দরূদ শরীফের ফযিলত',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'যে ব্যক্তি আমার উপর একবার দরূদ পাঠাবে, আল্লাহ তার উপর দশবার রহমত বর্ষণ করেন।',
                       reference: 'সহীহ মুসলিম: ৪০২',
                     ),
                     const SizedBox(height: 12),
 
-                    _buildHadithCard(
+                    const _HadithCard(
                       hadith:
                           'কিয়ামতের দিন আমার নিকটতম হবে সেই ব্যক্তি যে আমার উপর সবচেয়ে বেশি দরূদ পাঠাবে।',
                       reference: 'জামে তিরমিযী: ৪৮৪',
@@ -1342,22 +1341,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     required String title,
     required String content,
   }) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainer,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1391,7 +1380,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             Text(
               content,
               style: TextStyle(
-                color: cs.onSurface.withOpacity(0.9),
+                color: cs.onSurfaceVariant,
                 fontSize: 14,
                 height: 1.7,
                 fontWeight: FontWeight.w600,
@@ -1402,44 +1391,41 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
       ),
     );
   }
+}
 
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-  }) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
 
-    return Container(
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainer,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: cs.primary.withOpacity(0.15),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: cs.primary, size: 18),
+            child: Icon(icon,
+                color: Theme.of(context).extension<GradientColors>()!.onPrimaryText, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
               style: TextStyle(
-                color: cs.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 16.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.1,
@@ -1450,27 +1436,25 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
       ),
     );
   }
+}
 
-  Widget _buildHadithCard({
-    required String hadith,
-    required String reference,
-  }) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+class _HadithCard extends StatelessWidget {
+  final String hadith;
+  final String reference;
 
-    return Container(
+  const _HadithCard({
+    required this.hadith,
+    required this.reference,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hadithTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withOpacity(0.10),
-            blurRadius: 18,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1481,18 +1465,19 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: cs.primary.withOpacity(0.15),
+                  color:
+                      Theme.of(context).colorScheme.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.format_quote_rounded,
-                    color: cs.primary, size: 14),
+                    color: Theme.of(context).colorScheme.primary, size: 14),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   hadith,
                   style: TextStyle(
-                    color: cs.onSurface.withOpacity(0.9),
+                    color: hadithTextColor,
                     fontSize: 14,
                     height: 1.65,
                     fontStyle: FontStyle.italic,
@@ -1508,13 +1493,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               Icon(
                 Icons.book_outlined,
                 size: 18,
-                color: cs.primary.withOpacity(0.75),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.75),
               ),
               const SizedBox(width: 5),
               Text(
                 reference,
                 style: TextStyle(
-                  color: cs.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.1,

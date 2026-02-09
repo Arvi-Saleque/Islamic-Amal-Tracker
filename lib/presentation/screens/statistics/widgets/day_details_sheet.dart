@@ -1,6 +1,5 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../providers/statistics_provider.dart';
 import '../../../../data/models/sin_tracker_model.dart';
 import 'package:hive/hive.dart';
@@ -141,15 +140,29 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradients.backgroundGradient,
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -159,7 +172,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -167,9 +180,9 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               // Content
               Expanded(
                 child: isLoading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
-                          color: AppColors.primaryGold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       )
                     : ListView(
@@ -211,24 +224,42 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
   Widget _buildDateHeader() {
     final overallScore = _calculateOverallScore();
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF242424),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.2),
+              color: primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.calendar_today,
-              color: AppColors.primaryGold.withOpacity(0.8),
+              color: primary.withOpacity(0.8),
               size: 28,
             ),
           ),
@@ -239,16 +270,16 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               children: [
                 Text(
                   _formatDateBengali(widget.date),
-                  style: const TextStyle(
-                    color: AppColors.primaryGold,
+                  style: TextStyle(
+                    color: primary,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   _getWeekdayBengali(widget.date.weekday),
-                  style: const TextStyle(
-                    color: Colors.grey,
+                  style: TextStyle(
+                    color: gradients.bulletTextColor,
                     fontSize: 14,
                   ),
                 ),
@@ -258,13 +289,17 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: primary.withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Text(
               '$overallScore%',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: primary,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -296,9 +331,9 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 );
               }).toList(),
             )
-          : const Text(
+            : Text(
               'কোনো ডেটা নেই',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
             ),
     );
   }
@@ -325,9 +360,9 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 );
               }).toList(),
             )
-          : const Text(
+          : Text(
               'কোনো ডেটা নেই',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
             ),
     );
   }
@@ -357,9 +392,9 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 );
               }).toList(),
             )
-          : const Text(
+          : Text(
               'কোনো ডেটা নেই',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
             ),
     );
   }
@@ -401,14 +436,18 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 ),
               ],
             )
-          : const Text(
+          : Text(
               'কোনো ডেটা নেই',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
             ),
     );
   }
 
   Widget _buildSinSection() {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     final sins = sinRecord?.records ?? [];
     final committedSins = sins.where((s) => s.hasSinned).toList();
     final totalSins = committedSins.length;
@@ -438,8 +477,23 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF242424),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,12 +504,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGold.withOpacity(0.2),
+                  color: primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.auto_fix_high,
-                  color: AppColors.primaryGold.withOpacity(0.8),
+                  color: primary.withOpacity(0.8),
                   size: 20,
                 ),
               ),
@@ -464,10 +518,10 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'গুনাহ ট্র্যাকার',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -479,7 +533,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                       style: TextStyle(
                         color: totalSins == 0
                             ? const Color(0xFF4CAF50)
-                            : Colors.grey,
+                            : gradients.bulletTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -491,7 +545,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
           if (committedSins.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Divider(color: Colors.grey, height: 1),
+            Divider(color: shadowColor.withOpacity(0.2), height: 1),
             const SizedBox(height: 12),
 
             // Sin list
@@ -508,15 +562,15 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                       sin.kaffaraDone ? Icons.check_circle : Icons.cancel,
                       color: sin.kaffaraDone
                           ? const Color(0xFF4CAF50)
-                          : Colors.red.shade300,
+                          : Theme.of(context).colorScheme.error,
                       size: 18,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         sinName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                         ),
                       ),
@@ -542,13 +596,13 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade300.withOpacity(0.2),
+                          color: Theme.of(context).colorScheme.error.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'কাফফারা বাকি',
                           style: TextStyle(
-                            color: Colors.red.shade300,
+                            color: Theme.of(context).colorScheme.error,
                             fontSize: 11,
                           ),
                         ),
@@ -590,12 +644,30 @@ class _CategoryCardState extends State<_CategoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
     final percentage = (widget.progress * 100).toInt();
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF242424),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -613,12 +685,12 @@ class _CategoryCardState extends State<_CategoryCard> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGold.withOpacity(0.2),
+                          color: primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           widget.icon,
-                          color: AppColors.primaryGold,
+                          color: primary,
                           size: 24,
                         ),
                       ),
@@ -629,16 +701,16 @@ class _CategoryCardState extends State<_CategoryCard> {
                           children: [
                             Text(
                               widget.title,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               widget.subtitle,
-                              style: const TextStyle(
-                                color: Colors.grey,
+                              style: TextStyle(
+                                color: gradients.bulletTextColor,
                                 fontSize: 12,
                               ),
                             ),
@@ -647,8 +719,8 @@ class _CategoryCardState extends State<_CategoryCard> {
                       ),
                       Text(
                         '$percentage%',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: primary,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -657,7 +729,7 @@ class _CategoryCardState extends State<_CategoryCard> {
                         const SizedBox(width: 8),
                         Icon(
                           isExpanded ? Icons.expand_less : Icons.expand_more,
-                          color: Colors.grey,
+                          color: gradients.bulletTextColor,
                         ),
                       ],
                     ],
@@ -667,9 +739,8 @@ class _CategoryCardState extends State<_CategoryCard> {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: widget.progress.clamp(0.0, 1.0),
-                      backgroundColor: Colors.grey[800],
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.primaryGold),
+                      backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                      valueColor: AlwaysStoppedAnimation<Color>(primary),
                       minHeight: 6,
                     ),
                   ),
@@ -679,7 +750,7 @@ class _CategoryCardState extends State<_CategoryCard> {
           ),
           // Content
           if (isExpanded || !widget.isExpandable) ...[
-            const Divider(color: Color(0xFF3A3A3A), height: 1),
+            Divider(color: Theme.of(context).shadowColor.withOpacity(0.2), height: 1),
             Padding(
               padding: const EdgeInsets.all(16),
               child: widget.child,
@@ -702,18 +773,23 @@ class _PrayerChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isCompleted
-            ? AppColors.primaryGold.withOpacity(0.2)
-            : Colors.grey[800],
+            ? primary.withOpacity(0.2)
+            : shadowColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isCompleted ? primary.withOpacity(0.3) : shadowColor.withOpacity(0.2),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: isCompleted
-                ? AppColors.primaryGold.withOpacity(0.3)
-                : Colors.black.withOpacity(0.2),
+            color: shadowColor.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -725,13 +801,13 @@ class _PrayerChip extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             size: 16,
-            color: isCompleted ? AppColors.primaryGold : Colors.grey,
+            color: isCompleted ? primary : Theme.of(context).extension<GradientColors>()!.bulletTextColor,
           ),
           const SizedBox(width: 6),
           Text(
             name,
             style: TextStyle(
-              color: isCompleted ? Colors.white : Colors.grey,
+              color: isCompleted ? Theme.of(context).colorScheme.onSurface : Theme.of(context).extension<GradientColors>()!.bulletTextColor,
               fontSize: 13,
             ),
           ),
@@ -752,6 +828,10 @@ class _AmalItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final bulletColor = Theme.of(context).extension<GradientColors>()!.bulletTextColor;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -759,14 +839,14 @@ class _AmalItem extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             size: 18,
-            color: isCompleted ? AppColors.primaryGold : Colors.grey,
+            color: isCompleted ? primary : bulletColor,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               title,
               style: TextStyle(
-                color: isCompleted ? Colors.white : Colors.grey,
+                color: isCompleted ? onSurface : bulletColor,
                 fontSize: 14,
                 decoration: isCompleted ? TextDecoration.lineThrough : null,
               ),
@@ -793,6 +873,11 @@ class _DhikrItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final bulletColor = Theme.of(context).extension<GradientColors>()!.bulletTextColor;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -803,8 +888,8 @@ class _DhikrItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -812,8 +897,8 @@ class _DhikrItem extends StatelessWidget {
                 if (arabic != null)
                   Text(
                     arabic!,
-                    style: const TextStyle(
-                      color: Colors.grey,
+                    style: TextStyle(
+                      color: bulletColor,
                       fontSize: 12,
                     ),
                   ),
@@ -824,16 +909,22 @@ class _DhikrItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: currentCount >= targetCount
-                  ? AppColors.primaryGold.withOpacity(0.2)
-                  : Colors.grey[800],
+                  ? primary.withOpacity(0.2)
+                  : shadowColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: currentCount >= targetCount
+                    ? primary.withOpacity(0.3)
+                    : shadowColor.withOpacity(0.2),
+                width: 1,
+              ),
             ),
             child: Text(
               '$currentCount/$targetCount',
               style: TextStyle(
                 color: currentCount >= targetCount
-                    ? AppColors.primaryGold
-                    : Colors.grey,
+                    ? primary
+                    : bulletColor,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
@@ -860,21 +951,26 @@ class _ReadingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final bulletColor = Theme.of(context).extension<GradientColors>()!.bulletTextColor;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(
             icon,
-            color: Colors.grey,
+            color: bulletColor,
             size: 20,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: onSurface,
                 fontSize: 14,
               ),
             ),
@@ -883,14 +979,20 @@ class _ReadingItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: minutes >= target
-                  ? AppColors.primaryGold.withOpacity(0.2)
-                  : Colors.grey[800],
+                  ? primary.withOpacity(0.2)
+                  : shadowColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: minutes >= target
+                    ? primary.withOpacity(0.3)
+                    : shadowColor.withOpacity(0.2),
+                width: 1,
+              ),
             ),
             child: Text(
               '$minutes/$target মি.',
               style: TextStyle(
-                color: minutes >= target ? AppColors.primaryGold : Colors.grey,
+                color: minutes >= target ? primary : bulletColor,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),

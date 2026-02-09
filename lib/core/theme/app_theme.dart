@@ -20,6 +20,9 @@ class GradientColors extends ThemeExtension<GradientColors> {
   
   // Text on primary color (badges, icons on primary background)
   final Color onPrimaryText;
+  
+  // Bullet text color (for usage rules, lists, etc.)
+  final Color bulletTextColor;
 
   const GradientColors({
     required this.appBarGradient,
@@ -28,6 +31,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
     required this.cardGradient,
     required this.innerCardGradient,
     required this.onPrimaryText,
+    required this.bulletTextColor,
   });
 
   @override
@@ -38,6 +42,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
     List<Color>? cardGradient,
     List<Color>? innerCardGradient,
     Color? onPrimaryText,
+    Color? bulletTextColor,
   }) {
     return GradientColors(
       appBarGradient: appBarGradient ?? this.appBarGradient,
@@ -46,6 +51,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
       cardGradient: cardGradient ?? this.cardGradient,
       innerCardGradient: innerCardGradient ?? this.innerCardGradient,
       onPrimaryText: onPrimaryText ?? this.onPrimaryText,
+      bulletTextColor: bulletTextColor ?? this.bulletTextColor,
     );
   }
 
@@ -63,6 +69,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
       innerCardGradient: innerCardGradient.asMap().entries.map((e) => 
         Color.lerp(e.value, other.innerCardGradient[e.key], t)!).toList(),
       onPrimaryText: Color.lerp(onPrimaryText, other.onPrimaryText, t)!,
+      bulletTextColor: Color.lerp(bulletTextColor, other.bulletTextColor, t)!,
     );
   }
 
@@ -88,6 +95,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
       AppColors.lightInnerCardGradient2,
     ],
     onPrimaryText: AppColors.onPrimaryTextLight,
+    bulletTextColor: AppColors.textSecondaryLightMode,
   );
 
   // Dark theme gradients
@@ -112,6 +120,7 @@ class GradientColors extends ThemeExtension<GradientColors> {
       AppColors.darkInnerCardGradient2,
     ],
     onPrimaryText: AppColors.onPrimaryText,
+    bulletTextColor: AppColors.textSecondaryDarkMode,
   );
 }
 
@@ -249,11 +258,11 @@ class PremiumCardStyle extends ThemeExtension<PremiumCardStyle> {
       topOverlayGradient: topOverlayGradient.asMap().entries.map((e) => 
         Color.lerp(e.value, other.topOverlayGradient[e.key], t)!).toList(),
       noiseColor: Color.lerp(noiseColor, other.noiseColor, t)!,
-      shadowDarkBlur: lerpDouble(shadowDarkBlur, other.shadowDarkBlur, t)!,
-      shadowDarkOpacity: lerpDouble(shadowDarkOpacity, other.shadowDarkOpacity, t)!,
-      shadowGlowBlur: lerpDouble(shadowGlowBlur, other.shadowGlowBlur, t)!,
-      shadowGlowOpacity: lerpDouble(shadowGlowOpacity, other.shadowGlowOpacity, t)!,
-      borderWidth: lerpDouble(borderWidth, other.borderWidth, t)!,
+      shadowDarkBlur: lerpDouble(shadowDarkBlur, other.shadowDarkBlur, t),
+      shadowDarkOpacity: lerpDouble(shadowDarkOpacity, other.shadowDarkOpacity, t),
+      shadowGlowBlur: lerpDouble(shadowGlowBlur, other.shadowGlowBlur, t),
+      shadowGlowOpacity: lerpDouble(shadowGlowOpacity, other.shadowGlowOpacity, t),
+      borderWidth: lerpDouble(borderWidth, other.borderWidth, t),
     );
   }
   

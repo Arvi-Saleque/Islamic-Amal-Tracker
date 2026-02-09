@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,12 +12,12 @@ Future<void> generateIcon() async {
   const size = 1024.0;
   
   final recorder = ui.PictureRecorder();
-  final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, size, size));
+  final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, size, size));
   
   // Background with rounded corners
   final bgPaint = Paint()..color = const Color(0xFF1A1A1A);
   final rrect = RRect.fromRectAndRadius(
-    Rect.fromLTWH(0, 0, size, size),
+    const Rect.fromLTWH(0, 0, size, size),
     const Radius.circular(200),
   );
   canvas.drawRRect(rrect, bgPaint);

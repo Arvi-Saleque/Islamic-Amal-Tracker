@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class CategoryProgressSection extends StatelessWidget {
@@ -16,6 +16,10 @@ class CategoryProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     // Calculate averages based on view type
     final stats = isMonthly && monthlyStats != null ? monthlyStats! : weeklyStats.days;
     
@@ -34,16 +38,31 @@ class CategoryProgressSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'বিভাগ অনুযায়ী অগ্রগতি',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -53,7 +72,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Namaz
           _CategoryProgressItem(
             icon: Icons.mosque,
-            iconColor: AppColors.primaryGold,
+            iconColor: primary,
             title: 'নামাজ',
             progress: avgPrayer,
           ),
@@ -62,7 +81,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Daily Amal
           _CategoryProgressItem(
             icon: Icons.check_circle_outline,
-            iconColor: AppColors.primaryGold,
+            iconColor: primary,
             title: 'প্রতিদিনের আমল',
             progress: avgAmal,
           ),
@@ -71,7 +90,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Dhikr
           _CategoryProgressItem(
             icon: Icons.favorite,
-            iconColor: AppColors.primaryGold,
+            iconColor: primary,
             title: 'যিকির',
             progress: avgDhikr,
           ),
@@ -80,7 +99,7 @@ class CategoryProgressSection extends StatelessWidget {
           // Reading
           _CategoryProgressItem(
             icon: Icons.menu_book,
-            iconColor: AppColors.primaryGold,
+            iconColor: primary,
             title: 'পড়াশোনা',
             progress: avgReading,
           ),
@@ -131,16 +150,16 @@ class _CategoryProgressItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     '$percentage%',
-                    style: const TextStyle(
-                      color: AppColors.primaryGold,
+                    style: TextStyle(
+                      color: iconColor,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -152,7 +171,7 @@ class _CategoryProgressItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
-                  backgroundColor: Colors.grey[800],
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                   valueColor: AlwaysStoppedAnimation<Color>(iconColor),
                   minHeight: 6,
                 ),

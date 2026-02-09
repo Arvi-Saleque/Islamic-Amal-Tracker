@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'prayer_record.dart';
 
 class AmalItem {

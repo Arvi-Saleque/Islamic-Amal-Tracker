@@ -1,7 +1,6 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class MonthlyCalendarView extends StatefulWidget {
@@ -189,17 +188,22 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     return months[month - 1];
   }
 
-  Color _getDateColor(int score) {
+  Color _getDateColor(BuildContext context, int score) {
     if (score == 0) {
-      return Colors.grey[850] ?? const Color(0xFF2A2A2A); // ধূসর (0%)
+      return Theme.of(context).shadowColor.withOpacity(0.2); // ধূসর (0%)
     } else if (score < 80) {
-      return const Color(0xFF7A6528); // হালকা/ডিম গোল্ড (1-79%)
+      return Theme.of(context).colorScheme.primary.withOpacity(0.4); // হালকা/ডিম গোল্ড (1-79%)
     }
-    return AppColors.primaryGold; // ফুল গোল্ড (80%+)
+    return Theme.of(context).colorScheme.primary; // ফুল গোল্ড (80%+)
   }
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletColor = gradients.bulletTextColor;
+    
     final daysInMonth = DateTime(widget.selectedMonth.year, widget.selectedMonth.month + 1, 0).day;
     final firstDayOfMonth = DateTime(widget.selectedMonth.year, widget.selectedMonth.month, 1);
     int startingWeekday = firstDayOfMonth.weekday;
@@ -208,8 +212,23 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -224,12 +243,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                     widget.selectedMonth.month - 1,
                   ));
                 },
-                icon: const Icon(Icons.chevron_left, color: Colors.grey),
+                icon: Icon(Icons.chevron_left, color: bulletColor),
               ),
               Text(
                 '${_getMonthNameBengali(widget.selectedMonth.month)} ${widget.selectedMonth.year}',
-                style: const TextStyle(
-                  color: AppColors.primaryGold,
+                style: TextStyle(
+                  color: primary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -241,7 +260,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                     widget.selectedMonth.month + 1,
                   ));
                 },
-                icon: const Icon(Icons.chevron_right, color: Colors.grey),
+                icon: Icon(Icons.chevron_right, color: bulletColor),
               ),
             ],
           ),
@@ -250,24 +269,24 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           // Weekday Headers (Starting from Saturday)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              _WeekdayHeader('শনি'),
-              _WeekdayHeader('রবি'),
-              _WeekdayHeader('সোম'),
-              _WeekdayHeader('মঙ্গল'),
-              _WeekdayHeader('বুধ'),
-              _WeekdayHeader('বৃহ'),
-              _WeekdayHeader('শুক্র'),
+            children: [
+              _WeekdayHeader('শনি', bulletColor),
+              _WeekdayHeader('রবি', bulletColor),
+              _WeekdayHeader('সোম', bulletColor),
+              _WeekdayHeader('মঙ্গল', bulletColor),
+              _WeekdayHeader('বুধ', bulletColor),
+              _WeekdayHeader('বৃহ', bulletColor),
+              _WeekdayHeader('শুক্র', bulletColor),
             ],
           ),
           const SizedBox(height: 12),
 
           // Calendar Grid
           _isLoading 
-            ? const SizedBox(
+            ? SizedBox(
                 height: 200,
                 child: Center(
-                  child: CircularProgressIndicator(color: AppColors.primaryGold),
+                  child: CircularProgressIndicator(color: primary),
                 ),
               )
             : GridView.builder(
@@ -302,19 +321,19 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                 onTap: () => widget.onDateSelected(date),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: _getDateColor(score),
+                    color: _getDateColor(context, score),
                     borderRadius: BorderRadius.circular(8),
                     border: isSelected
-                        ? Border.all(color: AppColors.primaryGold, width: 2)
+                        ? Border.all(color: primary, width: 2)
                         : isToday
-                            ? Border.all(color: AppColors.primaryGold.withOpacity(0.5), width: 1)
+                            ? Border.all(color: primary.withOpacity(0.5), width: 1)
                             : null,
                   ),
                   child: Center(
                     child: Text(
                       '$dayNumber',
                       style: TextStyle(
-                        color: score > 0 ? Colors.white : Colors.grey[400],
+                        color: score > 0 ? Theme.of(context).colorScheme.onSurface : bulletColor,
                         fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
                         fontSize: 13,
                       ),
@@ -330,11 +349,11 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _LegendItem(color: Colors.grey[850] ?? const Color(0xFF2A2A2A), label: '0%'),
+              _LegendItem(color: shadowColor.withOpacity(0.2), label: '0%', textColor: bulletColor),
               const SizedBox(width: 16),
-              const _LegendItem(color: Color(0xFF7A6528), label: '1-79%'),
+              _LegendItem(color: primary.withOpacity(0.4), label: '1-79%', textColor: bulletColor),
               const SizedBox(width: 16),
-              const _LegendItem(color: AppColors.primaryGold, label: '80%+'),
+              _LegendItem(color: primary, label: '80%+', textColor: bulletColor),
             ],
           ),
         ],
@@ -345,8 +364,9 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
 class _WeekdayHeader extends StatelessWidget {
   final String day;
+  final Color color;
 
-  const _WeekdayHeader(this.day);
+  const _WeekdayHeader(this.day, this.color);
 
   @override
   Widget build(BuildContext context) {
@@ -355,8 +375,8 @@ class _WeekdayHeader extends StatelessWidget {
       child: Text(
         day,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.grey,
+        style: TextStyle(
+          color: color,
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -368,10 +388,12 @@ class _WeekdayHeader extends StatelessWidget {
 class _LegendItem extends StatelessWidget {
   final Color color;
   final String label;
+  final Color textColor;
 
   const _LegendItem({
     required this.color,
     required this.label,
+    required this.textColor,
   });
 
   @override
@@ -390,8 +412,8 @@ class _LegendItem extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.grey,
+          style: TextStyle(
+            color: textColor,
             fontSize: 10,
           ),
         ),

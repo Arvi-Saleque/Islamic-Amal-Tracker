@@ -1,6 +1,5 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
 
 enum StatisticsTab { weekly, monthly, qaza }
 
@@ -16,10 +15,16 @@ class TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: shadowColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -32,7 +37,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.weekly 
-                      ? AppColors.primaryGold 
+                      ? primary 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -41,8 +46,8 @@ class TabSelector extends StatelessWidget {
                     'সাপ্তাহিক',
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.weekly 
-                          ? Colors.black 
-                          : Colors.grey,
+                          ? onPrimary 
+                          : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -59,7 +64,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.monthly 
-                      ? AppColors.primaryGold 
+                      ? primary 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -68,8 +73,8 @@ class TabSelector extends StatelessWidget {
                     'মাসিক',
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.monthly 
-                          ? Colors.black 
-                          : Colors.grey,
+                          ? onPrimary 
+                          : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -86,7 +91,7 @@ class TabSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: selectedTab == StatisticsTab.qaza 
-                      ? AppColors.primaryGold 
+                      ? primary 
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -95,8 +100,8 @@ class TabSelector extends StatelessWidget {
                     'কাজা',
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.qaza 
-                          ? Colors.black 
-                          : Colors.grey,
+                          ? onPrimary 
+                          : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),

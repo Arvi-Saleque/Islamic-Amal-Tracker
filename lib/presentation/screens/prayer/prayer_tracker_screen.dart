@@ -27,14 +27,11 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final prayerState = ref.watch(prayerTrackingProvider);
     final completedPrayers = prayerState.todayData.completedPrayersCount;
 
-    final bg = Theme.of(context).scaffoldBackgroundColor;
     final colors = Theme.of(context).colorScheme;
 
     final iconColor = colors.primary;
     final titleColor = colors.primary;
 
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -450,7 +447,8 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     const SizedBox(height: 20),
                     const _SectionHeader(
                         icon: Icons.mosque_outlined,
-                        title: 'জামাতে নামাজের ফযিলত'),
+                        title: 'জামাতে নামাজের ফযিলত'
+                    ),
                     const SizedBox(height: 12),
                     const _HadithCard(
                       hadith:
@@ -482,7 +480,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       reference: 'সহীহ বুখারী: ৬৫৭',
                     ),
                     const SizedBox(height: 18),
-                    _SectionHeader(
+                    const _SectionHeader(
                         icon: Icons.access_time_rounded,
                         title: 'আউয়াল ওয়াক্তে নামাজের ফযিলত'),
                     const SizedBox(height: 12),
@@ -527,48 +525,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
 // ---------------- Premium components ----------------
 
-class _ProgressPill extends StatelessWidget {
-  final int completed;
-
-  const _ProgressPill({
-    required this.completed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor,
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.check_circle_rounded,
-              color: Theme.of(context).colorScheme.primary, size: 18),
-          const SizedBox(width: 6),
-          Text(
-            '$completed/5',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 14.8,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _TopSummaryCard extends StatelessWidget {
   final int completed;
@@ -644,7 +600,7 @@ class _MiniBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = filled
         ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.surfaceVariant;
+        : Theme.of(context).colorScheme.surfaceContainerHighest;
 
     final fg = filled
         ? Theme.of(context).extension<GradientColors>()!.onPrimaryText
@@ -691,7 +647,7 @@ class _PremiumCheckBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = value
         ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.surfaceVariant;
+        : Theme.of(context).colorScheme.surfaceContainerHighest;
 
     final checkColor = value ? Theme.of(context).colorScheme.onPrimary : null;
 
@@ -891,7 +847,7 @@ class _HadithCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                '$reference',
+                reference,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 12,

@@ -1,8 +1,7 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/statistics_model.dart';
 import '../../../providers/sin_tracker_provider.dart';
 
@@ -110,6 +109,12 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     // Calculate totals based on view type
     final stats = widget.isMonthly && widget.monthlyStats != null
         ? widget.monthlyStats!
@@ -146,8 +151,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: onSurface,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -169,7 +174,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.check_circle_outline,
-                iconColor: AppColors.primaryGold,
+                iconColor: primary,
                 title: 'মোট আমল',
                 value: totalAmal.toString(),
                 subtitle: '/${maxAmal.toString()}',
@@ -179,7 +184,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.favorite,
-                iconColor: AppColors.primaryGold,
+                iconColor: primary,
                 title: 'মোট\nযিকির',
                 value: totalDhikr.toString(),
                 subtitle: '/${maxDhikr.toString()}',
@@ -193,7 +198,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.menu_book,
-                iconColor: AppColors.primaryGold,
+                iconColor: primary,
                 title: 'পড়ার সময়',
                 value: totalReadingMinutes.toString(),
                 subtitle: '/${maxReadingMinutes.toString()} মিনিট',
@@ -204,7 +209,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
             Expanded(
               child: _SummaryCard(
                 icon: Icons.star,
-                iconColor: AppColors.primaryGold,
+                iconColor: primary,
                 title: 'পূর্ণ দিন',
                 value: perfectDays.toString(),
                 subtitle: '/${totalDays.toString()} দিন',
@@ -242,11 +247,31 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -269,8 +294,8 @@ class _SummaryCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.grey,
+                  style: TextStyle(
+                    color: bulletTextColor,
                     fontSize: 12,
                   ),
                 ),
@@ -280,18 +305,19 @@ class _SummaryCard extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: value,
-                        style: const TextStyle(
-                          color: AppColors.primaryGold,
-                          fontSize: 20,
+                        style: TextStyle(
+                          color: primary,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       if (subtitle != null)
                         TextSpan(
                           text: subtitle,
-                          style: const TextStyle(
-                            color: Colors.grey,
+                          style: TextStyle(
+                            color: bulletTextColor,
                             fontSize: 14,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                     ],
@@ -306,79 +332,6 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-class _PerfectDaysCard extends StatelessWidget {
-  final int perfectDays;
-  final int totalDays;
-
-  const _PerfectDaysCard({
-    required this.perfectDays,
-    required this.totalDays,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.star,
-              color: AppColors.primaryGold,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'পূর্ণ দিন',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: perfectDays.toString(),
-                        style: const TextStyle(
-                          color: AppColors.primaryGold,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '/${totalDays.toString()} দিন',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _SinCountCard extends StatelessWidget {
   final int sinCount;
@@ -389,23 +342,43 @@ class _SinCountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.2),
+              color: primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.auto_fix_high,
-              color: AppColors.primaryGold,
+              color: primary,
               size: 24,
             ),
           ),
@@ -414,10 +387,10 @@ class _SinCountCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'মোট গুনাহ',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: bulletTextColor,
                     fontSize: 12,
                   ),
                 ),
@@ -429,7 +402,7 @@ class _SinCountCard extends StatelessWidget {
                   style: TextStyle(
                     color: sinCount == 0
                         ? const Color(0xFF4CAF50)
-                        : AppColors.primaryGold,
+                        : primary,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -459,14 +432,34 @@ class _PrayerDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    final bulletTextColor = gradients.bulletTextColor;
+    
     // Check if we have detailed data
     final hasDetailedData = jamaatPrayers > 0 || delayedPrayers > 0;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,12 +470,12 @@ class _PrayerDetailCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGold.withOpacity(0.2),
+                  color: primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.mosque,
-                  color: AppColors.primaryGold,
+                  color: primary,
                   size: 24,
                 ),
               ),
@@ -491,10 +484,10 @@ class _PrayerDetailCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'মোট নামাজ',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: bulletTextColor,
                         fontSize: 12,
                       ),
                     ),
@@ -504,16 +497,16 @@ class _PrayerDetailCard extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: totalPrayers.toString(),
-                            style: const TextStyle(
-                              color: AppColors.primaryGold,
+                            style: TextStyle(
+                              color: primary,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           TextSpan(
                             text: '/${maxPrayers.toString()} ওয়াক্ত',
-                            style: const TextStyle(
-                              color: Colors.grey,
+                            style: TextStyle(
+                              color: bulletTextColor,
                               fontSize: 14,
                             ),
                           ),
@@ -532,7 +525,7 @@ class _PrayerDetailCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF0A0A0A),
+                color: shadowColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -544,12 +537,12 @@ class _PrayerDetailCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50).withOpacity(0.2),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.groups,
-                            color: Color(0xFF4CAF50),
+                            color: Theme.of(context).colorScheme.primary,
                             size: 16,
                           ),
                         ),
@@ -558,17 +551,17 @@ class _PrayerDetailCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'জামাতে/সময়মত',
+                              Text(
+                                'জামাতে/সময়মত',
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: bulletTextColor,
                                   fontSize: 10,
                                 ),
                               ),
                               Text(
                                 '$jamaatPrayers ওয়াক্ত',
-                                style: const TextStyle(
-                                  color: Color(0xFF4CAF50),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -583,7 +576,7 @@ class _PrayerDetailCard extends StatelessWidget {
                   Container(
                     width: 1,
                     height: 40,
-                    color: Colors.grey.withOpacity(0.3),
+                    color: shadowColor.withOpacity(0.3),
                   ),
 
                   // Delayed
@@ -595,17 +588,17 @@ class _PrayerDetailCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Text(
+                              Text(
                                 'দেরীতে',
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: bulletTextColor,
                                   fontSize: 10,
                                 ),
                               ),
                               Text(
                                 '$delayedPrayers ওয়াক্ত',
-                                style: const TextStyle(
-                                  color: Color(0xFFFF9800),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -617,12 +610,12 @@ class _PrayerDetailCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF9800).withOpacity(0.2),
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.schedule,
-                            color: Color(0xFFFF9800),
+                            color: Theme.of(context).colorScheme.primary,
                             size: 16,
                           ),
                         ),

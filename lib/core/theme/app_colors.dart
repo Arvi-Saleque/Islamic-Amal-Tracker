@@ -21,7 +21,7 @@ static const Color textLightMode =
     Color(0xFF1F2937); // professional dark gray (cleaner than brown)
 
 static const Color textSecondaryLightMode =
-    Color(0xFF6B7280); // muted gray (professional)
+    Color.fromARGB(255, 37, 36, 31); // muted gray (professional)
 
 static const Color borderLightMode =
     Color(0xFFE6E3DA); // soft neutral divider tone (if needed)
@@ -30,7 +30,7 @@ static const Color iconBgLightMode =
     Color(0xFFF3EAD1); // subtle gold-ivory tint (premium, not yellow)
 
   // Primary Colors
-  static const Color primary = Color.fromARGB(255, 206, 161, 15); // Golden color
+  static const Color primary = Color.fromARGB(255, 228, 176, 7); // Golden color
   static const Color primaryLight = Color(0xFFE5C158); // Lighter golden
 
   // Text Colors (Dark Theme)
@@ -43,6 +43,7 @@ static const Color iconBgLightMode =
   static const Color onSecondaryDark = Color(0xFF000000); // Black text on secondary (dark theme)
   static const Color onSurface = Color(0xFFFFFFFF); // White text on surface
   static const Color onSurfaceVariant = Color(0xFFB0B0B0); // Grey text on surface variant
+  static const Color textSecondaryDarkMode = Color.fromARGB(255, 163, 160, 149); // muted gray (professional)
 
   // Text Colors (Light Theme)
   static const Color onPrimaryTextLight = Colors.white; // Text on primary color (light theme)
@@ -140,6 +141,8 @@ static const lightInnerCardGradient2 = Color(0xFFFAF7F0);
   static const Color darkBackground = Color(0xFF1A1A1A);
   static const Color darkSurface = Color(0xFF2A2A2A);
   static const Color darkCard = Color(0xFF242424);
+
+  static Color? get white => null;
 }
 
 

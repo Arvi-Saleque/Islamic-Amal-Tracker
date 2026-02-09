@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'daily_reminder_service.dart';
-import '../presentation/screens/settings/daily_reminder_screen.dart';
+import '../presentation/screens/settings/reminder_setting_screen.dart';
 
 class PermissionService {
   static const String _notificationPopupShownKey = 'notification_popup_shown';

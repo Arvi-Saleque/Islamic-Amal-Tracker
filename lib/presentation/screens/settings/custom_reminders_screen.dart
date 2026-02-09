@@ -1,7 +1,8 @@
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
-import '../../widgets/digital_time_picker.dart';
+import '../statistics/widgets/digital_time_picker.dart';
 
 class CustomRemindersScreen extends StatefulWidget {
   final VoidCallback? onRemindersChanged;
@@ -45,23 +46,23 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
+        title: Text(
           'রিমাইন্ডার মুছুন?',
-          style: TextStyle(color: Color(0xFFD4AF37)),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         content: Text(
           '"${reminder.title}" মুছে ফেলতে চান?',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('বাতিল', style: TextStyle(color: Colors.grey)),
+            child: Text('বাতিল', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('মুছুন', style: TextStyle(color: Colors.red)),
+            child: Text('মুছুন', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -73,9 +74,9 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
       widget.onRemindersChanged?.call();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('রিমাইন্ডার মুছে ফেলা হয়েছে'),
-            backgroundColor: Color(0xFF2A2A2A),
+          SnackBar(
+            content: const Text('রিমাইন্ডার মুছে ফেলা হয়েছে'),
+            backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
           ),
         );
       }
@@ -99,19 +100,49 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'কাস্টম রিমাইন্ডার',
           style: TextStyle(
-            color: Color(0xFFD4AF37),
+            color: titleColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -119,16 +150,16 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+          ? Center(
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
             )
           : _reminders.isEmpty
               ? _buildEmptyState()
               : _buildRemindersList(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openAddReminderScreen(),
-        backgroundColor: const Color(0xFFD4AF37),
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         icon: const Icon(Icons.add),
         label: const Text('নতুন রিমাইন্ডার'),
       ),
@@ -178,23 +209,29 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
   }
 
   Widget _buildReminderCard(CustomReminder reminder) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
-          if (reminder.isEnabled)
-            BoxShadow(
-              color: const Color(0xFFD4AF37).withOpacity(0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
         ],
       ),
       child: Material(
@@ -210,14 +247,14 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: reminder.isEnabled
-                        ? const Color(0xFFD4AF37).withOpacity(0.2)
+                        ? primary.withOpacity(0.2)
                         : Colors.grey.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     _getReminderIcon(reminder),
                     color: reminder.isEnabled
-                        ? const Color(0xFFD4AF37)
+                        ? primary
                         : Colors.grey,
                     size: 24,
                   ),
@@ -230,8 +267,9 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                       Text(
                         reminder.title,
                         style: TextStyle(
-                          color:
-                              reminder.isEnabled ? Colors.white : Colors.grey,
+                          color: reminder.isEnabled 
+                              ? Theme.of(context).colorScheme.onSurface 
+                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
@@ -241,7 +279,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                         reminder.getTimeDisplayString(),
                         style: TextStyle(
                           color: reminder.isEnabled
-                              ? const Color(0xFFD4AF37)
+                              ? primary
                               : Colors.grey.withOpacity(0.7),
                           fontSize: 13,
                         ),
@@ -252,7 +290,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                         Text(
                           reminder.description!,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                             fontSize: 12,
                           ),
                           maxLines: 1,
@@ -267,14 +305,14 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                     Switch(
                       value: reminder.isEnabled,
                       onChanged: (_) => _toggleReminder(reminder),
-                      activeColor: const Color(0xFFD4AF37),
+                      activeThumbColor: primary,
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit_outlined,
-                              color: Color(0xFFD4AF37), size: 20),
+                          icon: Icon(Icons.edit_outlined,
+                              color: primary, size: 20),
                           onPressed: () => _openAddReminderScreen(reminder),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -379,9 +417,9 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
   Future<void> _saveReminder() async {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('রিমাইন্ডারের নাম দিন'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text('রিমাইন্ডারের নাম দিন'),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -389,9 +427,9 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
 
     if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('অন্তত একটি দিন নির্বাচন করুন'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text('অন্তত একটি দিন নির্বাচন করুন'),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
@@ -425,7 +463,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
         SnackBar(
           content: Text(
               _isEditing ? 'রিমাইন্ডার আপডেট হয়েছে' : 'রিমাইন্ডার যোগ হয়েছে'),
-          backgroundColor: const Color(0xFF2A2A2A),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
     }
@@ -440,24 +478,54 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
+        titleSpacing: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _isEditing ? 'রিমাইন্ডার সম্পাদনা' : 'নতুন রিমাইন্ডার',
-          style: const TextStyle(
-            color: Color(0xFFD4AF37),
+          style: TextStyle(
+            color: titleColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
+        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -471,12 +539,12 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
               child: TextField(
                 controller: _titleController,
                 maxLength: 50,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'যেমন: কোরআন তেলাওয়াত, দোয়া পড়া...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                   border: InputBorder.none,
-                  counterStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  counterStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                 ),
               ),
             ),
@@ -492,23 +560,23 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'সময় নির্বাচন করুন',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     ),
                     Row(
                       children: [
                         Text(
                           _formatTime(_reminderTime),
-                          style: const TextStyle(
-                            color: Color(0xFFD4AF37),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.edit,
-                            color: Color(0xFFD4AF37), size: 18),
+                        Icon(Icons.edit,
+                            color: Theme.of(context).colorScheme.primary, size: 18),
                       ],
                     ),
                   ],
@@ -532,7 +600,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                       child: Text(
                         'অন্তত একটি দিন নির্বাচন করুন',
                         style: TextStyle(
-                          color: Colors.red.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.error,
                           fontSize: 12,
                         ),
                       ),
@@ -553,8 +621,8 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                     ? 'রিমাইন্ডার সেভ করুন'
                     : 'রিমাইন্ডার সংরক্ষণ করুন'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
-                  foregroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -575,23 +643,42 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     required String title,
     required Widget child,
   }) {
+    final gradients = Theme.of(context).extension<GradientColors>()!;
+    final primary = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).shadowColor;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: shadowColor.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFFD4AF37), size: 20),
+              Icon(icon, color: primary, size: 20),
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Color(0xFFD4AF37),
+                style: TextStyle(
+                  color: primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -627,12 +714,16 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                width: 1,
+              ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: const Color(0xFFD4AF37).withOpacity(0.4),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
@@ -642,7 +733,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             child: Text(
               dayNames[index],
               style: TextStyle(
-                color: isSelected ? Colors.black : Colors.white,
+                color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14,
               ),

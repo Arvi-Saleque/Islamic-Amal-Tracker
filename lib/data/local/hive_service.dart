@@ -1,10 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/prayer_record.dart';
-import '../models/dhikr_session.dart';
 import '../models/amal_category.dart';
-import '../models/reading_progress.dart';
-import '../models/daily_stats.dart';
 import '../models/app_settings.dart';
 
 class HiveService {

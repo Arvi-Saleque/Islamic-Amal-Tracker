@@ -102,6 +102,8 @@ class SinType {
     isDefault: json['isDefault'] as bool? ?? false,
     icon: json['icon'] as String? ?? 'warning',
   );
+
+  String? get iconName => null;
 }
 
 /// দৈনিক গুনাহের রেকর্ড
