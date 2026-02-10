@@ -55,10 +55,14 @@ class DailyReminderService {
   static const int _defaultScheduleDaysAhead = 30;
   static const String _kDefaultWindowScheduledOn =
       'default_window_scheduled_on';
+  
+  // Nafl reminder offset in minutes (Sunrise + this offset)
+  static const int _naflReminderOffsetMinutes = 104;
 
   // Large safe ID ranges for default rolling schedules
   static const int _defaultPrayerIdBase = 200000;
   static const int _defaultDhikrIdBase = 210000;
+  static const int _defaultNaflIdBase = 220000;
 
   static const String _kDefaultWindowStartDay = 'default_window_start_day';
   static const String _kDefaultWindowDaysAhead = 'default_window_days_ahead';
@@ -100,6 +104,11 @@ class DailyReminderService {
   static int _defaultDhikrIdForDayIndex(int dayIndex, bool morning) {
     // reserve 10 IDs per day
     return _defaultDhikrIdBase + dayIndex * 10 + (morning ? 1 : 2);
+  }
+
+  static int _defaultNaflIdForDayIndex(int dayIndex) {
+    // reserve 10 IDs per day
+    return _defaultNaflIdBase + dayIndex * 10 + 1;
   }
 
   static Future<void> initialize() async {
@@ -154,6 +163,27 @@ class DailyReminderService {
       enableVibration: true,
     );
 
+    const AndroidNotificationChannel defaultPrayerChannel =
+        AndroidNotificationChannel(
+      'default_prayer_channel',
+      'Default Prayer Reminders',
+      description: 'Always active default prayer reminders (rolling window)',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+
+    const AndroidNotificationChannel defaultDhikrChannel =
+        AndroidNotificationChannel(
+      'default_dhikr_channel',
+      'Default Dhikr Reminders',
+      description: 'Always active default dhikr reminders (rolling window)',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+
+
     const AndroidNotificationChannel customChannel = AndroidNotificationChannel(
       'custom_reminder_channel',
       'কাস্টম রিমাইন্ডার',
@@ -170,6 +200,9 @@ class DailyReminderService {
     await androidPlugin?.createNotificationChannel(dhikrChannel);
     await androidPlugin?.createNotificationChannel(prayerChannel);
     await androidPlugin?.createNotificationChannel(customChannel);
+    await androidPlugin?.createNotificationChannel(defaultPrayerChannel);
+    await androidPlugin?.createNotificationChannel(defaultDhikrChannel);
+
   }
 
   static void _onNotificationResponse(NotificationResponse response) {
@@ -985,9 +1018,24 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       final remaining = endDate.difference(todayMidnight).inDays;
 
       // ✅ If still have at least 7 days scheduled, do nothing
-      if (remaining >= 7) {
+            // ✅ Only skip rebuilding if we still have alarms actually scheduled.
+      final pending = await _notifications.pendingNotificationRequests();
+
+      final maxPrayerId = _defaultPrayerIdBase + days * 10;
+      final maxDhikrId = _defaultDhikrIdBase + days * 10;
+      final maxNaflId = _defaultNaflIdBase + days * 10;
+
+      final hasAnyDefaultScheduled = pending.any((r) =>
+          (r.id >= _defaultPrayerIdBase && r.id < maxPrayerId) ||
+          (r.id >= _defaultDhikrIdBase && r.id < maxDhikrId) ||
+          (r.id >= _defaultNaflIdBase && r.id < maxNaflId));
+
+      if (remaining >= 2 && hasAnyDefaultScheduled) {
+        print('[DefaultRolling] Skipping: $remaining days remaining, has pending alarms');
         return;
       }
+      print('[DefaultRolling] Rebuilding: remaining=$remaining, hasAlarms=$hasAnyDefaultScheduled');
+
     }
 
 
@@ -1009,15 +1057,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
 
 
-    // Clear previously scheduled IDs for our window (only within our ID ranges)
-    for (int i = 0; i < daysAhead; i++) {
-      // 5 prayers (we use PrayerName.values order: fajr,dhuhr,asr,maghrib,isha)
-      for (int p = 0; p < 5; p++) {
-        await _notifications.cancel(_defaultPrayerIdForDayIndex(i, p));
-      }
-      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, true));
-      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, false));
-    }
+    int scheduledCount = 0;
 
     final nowDate = DateTime.now();
     final todayMidnight =
@@ -1033,14 +1073,30 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     };
 
     for (int i = 0; i < daysAhead; i++) {
+
+      for (int p = 0; p < 5; p++) {
+        await _notifications.cancel(_defaultPrayerIdForDayIndex(i, p));
+      }
+      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, true));
+      await _notifications.cancel(_defaultDhikrIdForDayIndex(i, false));
+      await _notifications.cancel(_defaultNaflIdForDayIndex(i));
+
+
       final date = todayMidnight.add(Duration(days: i));
 
-      final pt = await PrayerTimesApiService.fetchPrayerTimesForDate(
-        date: date,
-        latitude: lat,
-        longitude: lon,
-        method: 1,
-      );
+      Map<String, DateTime> pt;
+      try {
+        pt = await PrayerTimesApiService.fetchPrayerTimesForDate(
+          date: date,
+          latitude: lat,
+          longitude: lon,
+          method: 1,
+        );
+      } catch (e) {
+        // If API fails for a day, skip it (don't break whole scheduling)
+        continue;
+      }
+
 
       // ===== Default prayers =====
       final keys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
@@ -1070,6 +1126,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
+        scheduledCount++;
+
       }
 
       // ===== Default dhikr =====
@@ -1093,6 +1151,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
+        scheduledCount++;
+
       }
 
       final evening = tz.TZDateTime.from(
@@ -1115,16 +1175,50 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
+        scheduledCount++;
+
+      }
+
+      // ===== Default Nafl reminder =====
+      // Sunrise + offset minutes
+      final naflReminder = tz.TZDateTime.from(
+          pt['sunrise']!.add(Duration(minutes: _naflReminderOffsetMinutes)), tz.local);
+      if (naflReminder.isAfter(tz.TZDateTime.now(tz.local))) {
+        await _notifications.zonedSchedule(
+          _defaultNaflIdForDayIndex(i),
+          '✨ Nafl Prayer Time',
+          'Default reminder (1 hour after Nafl wakt starts)',
+          naflReminder,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_prayer_channel',
+              'Default Prayer Reminders',
+              channelDescription:
+                  'Always active default prayer reminders (rolling window)',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
+        scheduledCount++;
+
       }
     }
 
-    await prefs.setString(_kDefaultWindowScheduledOn, today);
+    if (scheduledCount > 0) {
+      await prefs.setString(_kDefaultWindowScheduledOn, today);
 
-    final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day);
+      final now = DateTime.now();
+      final start = DateTime(now.year, now.month, now.day);
 
-    await prefs.setString(_kDefaultWindowStartDay, _dayKey(start));
-    await prefs.setInt(_kDefaultWindowDaysAhead, daysAhead);
+      await prefs.setString(_kDefaultWindowStartDay, _dayKey(start));
+      await prefs.setInt(_kDefaultWindowDaysAhead, daysAhead);
+      print('[DefaultRolling] Scheduled $scheduledCount notifications for $daysAhead days');
+    } else {
+      print('[DefaultRolling] WARNING: 0 notifications scheduled!');
+    }
+
 
   }
 }

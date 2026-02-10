@@ -49,6 +49,7 @@ class PrayerTimesApiService {
 
       return {
         'fajr': toDateTime(cleanTime('${timings['Fajr']}')),
+        'sunrise': toDateTime(cleanTime('${timings['Sunrise']}')),
         'dhuhr': toDateTime(cleanTime('${timings['Dhuhr']}')),
         'asr': toDateTime(cleanTime('${timings['Asr']}')),
         'maghrib': toDateTime(cleanTime('${timings['Maghrib']}')),

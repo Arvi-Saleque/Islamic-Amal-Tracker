@@ -100,8 +100,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // ✅ Ask for location permission here (Home, after auth)
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // If location service is OFF, just skip. Defaults will still work using fallback.
+      // If location service is OFF, still schedule defaults with fallback coords.
       PermissionService.showNotificationPermissionPopup(context);
+      await DailyReminderService.scheduleDefaultRollingWindowFromApi();
       return;
     }
 
@@ -120,10 +121,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (hasLocation) {
       // refresh prayer times provider (it will now use real location)
       ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-
-      // rebuild rolling window defaults with real location
-      await DailyReminderService.scheduleDefaultRollingWindowFromApi();
     }
+
+    // ✅ Always schedule default rolling window (uses fallback coords if no location)
+    await DailyReminderService.scheduleDefaultRollingWindowFromApi();
   }
 
 

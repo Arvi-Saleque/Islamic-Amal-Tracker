@@ -52,12 +52,16 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   TimeOfDay? _defaultMorningDhikrReminderTime;
   TimeOfDay? _defaultEveningDhikrReminderTime;
   TimeOfDay? _defaultDailyAmalReminderTime;
+  TimeOfDay? _defaultNaflReminderTime;
 
   // User Settings Reminders Enable/Disable States
   bool _isDailyReminderEnabled = false;
   bool _isMorningDhikrEnabled = false;
   bool _isEveningDhikrEnabled = false;
   bool _arePrayerRemindersEnabled = false;
+  
+  // Nafl reminder offset in minutes (Sunrise + this offset)
+  static const int _naflReminderOffsetMinutes = 104;
 
   @override
   void initState() {
@@ -155,6 +159,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           _calculateDefaultEveningDhikrReminderTime(prayerTimes);
       _defaultDailyAmalReminderTime =
           const TimeOfDay(hour: 22, minute: 0); // Fixed at 10 PM
+      _defaultNaflReminderTime =
+          _calculateDefaultNaflReminderTime(prayerTimes);
 
       _isLoading = false;
 
@@ -192,16 +198,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       case PrayerName.isha:
         return 60;
     }
-  }
-
-  /// Convert prayer time string (HH:mm) to TimeOfDay
-  TimeOfDay _parsePrayerTimeString(String timeStr) {
-    final parts = timeStr.split(':');
-    if (parts.length != 2) return const TimeOfDay(hour: 0, minute: 0);
-    return TimeOfDay(
-      hour: int.tryParse(parts[0]) ?? 0,
-      minute: int.tryParse(parts[1]) ?? 0,
-    );
   }
 
   /// Calculate default prayer reminder time: prayer time + offset
@@ -323,6 +319,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     }
     final maghrib = prayerTimes['maghrib']!;
     final total = maghrib.hour * 60 + maghrib.minute + 30;
+    return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
+  }
+
+  TimeOfDay _calculateDefaultNaflReminderTime(
+      Map<String, DateTime>? prayerTimes) {
+    // Default: Sunrise + offset minutes
+    if (prayerTimes == null || prayerTimes['sunrise'] == null) {
+      return const TimeOfDay(hour: 8, minute: 0); // Fallback time
+    }
+    final sunrise = prayerTimes['sunrise']!;
+    final total = sunrise.hour * 60 + sunrise.minute + _naflReminderOffsetMinutes;
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
@@ -451,6 +458,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         defaultMorningDhikrReminderTime: _defaultMorningDhikrReminderTime,
         defaultEveningDhikrReminderTime: _defaultEveningDhikrReminderTime,
         defaultDailyAmalReminderTime: _defaultDailyAmalReminderTime,
+        defaultNaflReminderTime: _defaultNaflReminderTime,
       ),
     );
   }
@@ -496,13 +504,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           bottom: BorderSide(color: Colors.white.withOpacity(0.06)),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'রিমাইন্ডারস',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
+            color: titleColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.2,
@@ -511,12 +519,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(Icons.notifications_active, color: iconColor),
             onPressed: _showTodaysRemindersPopup,
             tooltip: 'আজকের রিমাইন্ডারস',
           ),
           IconButton(
-            icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(Icons.settings, color: iconColor),
             onPressed: () {
               Navigator.push(
                 context,
@@ -531,11 +539,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       ),
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+              child: CircularProgressIndicator(color: colors.primary),
             )
           : RefreshIndicator(
               onRefresh: _loadAllSettings,
-              color: Theme.of(context).colorScheme.primary,
+              color: colors.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -1487,6 +1495,7 @@ class TodaysRemindersDialog extends StatefulWidget {
   final TimeOfDay? defaultMorningDhikrReminderTime;
   final TimeOfDay? defaultEveningDhikrReminderTime;
   final TimeOfDay? defaultDailyAmalReminderTime;
+  final TimeOfDay? defaultNaflReminderTime;
 
   // User reminder enabled flags
   final bool isDailyReminderEnabled;
@@ -1515,6 +1524,7 @@ class TodaysRemindersDialog extends StatefulWidget {
     this.defaultMorningDhikrReminderTime,
     this.defaultEveningDhikrReminderTime,
     this.defaultDailyAmalReminderTime,
+    this.defaultNaflReminderTime,
   });
 
   @override
@@ -1727,6 +1737,22 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
         title: 'দৈনিক আমল (ডিফল্ট)',
         time: defaultDailyAmalDateTime,
         isPassed: now.isAfter(defaultDailyAmalDateTime),
+        isDefault: true,
+      ));
+    }
+
+    if (widget.defaultNaflReminderTime != null) {
+      final defaultNaflDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        widget.defaultNaflReminderTime!.hour,
+        widget.defaultNaflReminderTime!.minute,
+      );
+      todaysReminders.add(ReminderItem(
+        title: 'নফল নামাজ (ডিফল্ট)',
+        time: defaultNaflDateTime,
+        isPassed: now.isAfter(defaultNaflDateTime),
         isDefault: true,
       ));
     }
