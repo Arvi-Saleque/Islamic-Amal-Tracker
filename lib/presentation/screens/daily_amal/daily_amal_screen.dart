@@ -499,11 +499,12 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
 
-        final fieldFill = cs.surface;
+        final fieldFill = cs.surfaceContainerHighest;
         final borderCol = cs.outline.withOpacity(0.30);
 
         InputDecoration deco({
@@ -534,81 +535,129 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           );
         }
 
-        return AlertDialog(
-          backgroundColor: cs.surface,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_cardRadius)),
-          title: Text(
-            'নতুন আমল যোগ করুন',
-            style: TextStyle(
-              color: cs.onSurface,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                style: TextStyle(color: cs.onSurface),
-                decoration:
-                    deco(hint: 'আমলের নাম লিখুন', icon: Icons.edit_outlined),
-              ),
-              const SizedBox(height: 16),
-              StatefulBuilder(
-                builder: (context, setState) => DropdownButtonFormField<String>(
-                  initialValue: selectedCategory,
-                  dropdownColor: cs.surface,
-                  style: TextStyle(color: cs.onSurface),
-                  decoration: deco(
-                      hint: 'ক্যাটাগরি নির্বাচন করুন',
-                      icon: Icons.category_outlined),
-                  items: _categoryNames.entries
-                      .where((e) => e.key != 'all')
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.key,
-                          child: Text(e.value,
-                              style: TextStyle(color: cs.onSurface)),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: _cardRadius,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title with icon
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: cs.primary.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.add_circle_outline,
+                        color: cs.primary,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'নতুন আমল যোগ করুন',
+                        style: TextStyle(
+                          color: cs.primary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCategory = value!;
-                    });
-                  },
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:
-                  Text('বাতিল', style: TextStyle(color: cs.onSurfaceVariant)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: cs.onPrimary,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                final title = titleController.text.trim();
-                if (title.isEmpty) return;
+                const SizedBox(height: 20),
+                // Text field
+                TextField(
+                  controller: titleController,
+                  style: TextStyle(color: cs.onSurface),
+                  decoration:
+                      deco(hint: 'আমলের নাম লিখুন', icon: Icons.edit_outlined),
+                ),
+                const SizedBox(height: 16),
+                // Dropdown
+                StatefulBuilder(
+                  builder: (context, setState) => DropdownButtonFormField<String>(
+                    initialValue: selectedCategory,
+                    dropdownColor: cs.surfaceContainerHighest,
+                    style: TextStyle(color: cs.onSurface),
+                    decoration: deco(
+                        hint: 'ক্যাটাগরি নির্বাচন করুন',
+                        icon: Icons.category_outlined),
+                    items: _categoryNames.entries
+                        .where((e) => e.key != 'all')
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e.key,
+                            child: Text(e.value,
+                                style: TextStyle(color: cs.onSurface)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCategory = value!;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Action buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'বাতিল',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: theme.extension<GradientColors>()!.onPrimaryText,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                      onPressed: () {
+                        final title = titleController.text.trim();
+                        if (title.isEmpty) return;
 
-                notifier.addCustomItem(
-                  title,
-                  selectedCategory,
-                );
-                Navigator.pop(context);
-              },
-              child: const Text('যোগ করুন'),
+                        notifier.addCustomItem(
+                          title,
+                          selectedCategory,
+                        );
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'যোগ করুন',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -624,46 +673,98 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cs.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_cardRadius),
-        ),
-        title: Text(
-          'মুছে ফেলবেন?',
-          style: TextStyle(
-            color: cs.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          '"${item.title}" মুছে ফেলতে চান?',
-          style: TextStyle(color: cs.onSurfaceVariant),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'না',
-              style: TextStyle(color: cs.onSurfaceVariant),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              notifier.deleteItem(item.id);
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: cs.error,
-              foregroundColor: cs.onError,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: buildPremiumCard(
+          context: context,
+          radius: _cardRadius,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title with icon
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: cs.error.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: cs.error,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'মুছে ফেলবেন?',
+                      style: TextStyle(
+                        color: cs.primary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: const Text('হ্যাঁ, মুছুন'),
+              const SizedBox(height: 16),
+              // Content
+              Text(
+                '"${item.title}" মুছে ফেলতে চান?',
+                style: TextStyle(
+                  color: cs.onSurfaceVariant,
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Action buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'না',
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      notifier.deleteItem(item.id);
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: cs.error,
+                      foregroundColor: cs.onError,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      'হ্যাঁ, মুছুন',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

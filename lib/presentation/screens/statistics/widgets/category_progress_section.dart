@@ -16,9 +16,7 @@ class CategoryProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
     // Calculate averages based on view type
     final stats = isMonthly && monthlyStats != null ? monthlyStats! : weeklyStats.days;
@@ -35,27 +33,10 @@ class CategoryProgressSection extends StatelessWidget {
       avgReading = stats.map((d) => d.readingProgress).reduce((a, b) => a + b) / stats.length;
     }
 
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

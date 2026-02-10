@@ -483,27 +483,34 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
         final gradients = theme.extension<GradientColors>()!;
 
-        return AlertDialog(
-          backgroundColor: cs.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          titleTextStyle: TextStyle(
-            color: cs.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-          title: Text('$typeTitle সেশন যোগ করুন'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: SingleChildScrollView(
+            child: buildPremiumCard(
+              context: context,
+              radius: 18,
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$typeTitle সেশন যোগ করুন',
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
                   controller: titleController,
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
@@ -615,50 +622,56 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'বাতিল',
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (titleController.text.isNotEmpty) {
+                          final minutes = int.tryParse(minutesController.text) ?? 15;
+                          final fromAyah = int.tryParse(fromAyahController.text);
+                          final toAyah = int.tryParse(toAyahController.text);
+
+                          notifier.addSession(
+                            type: type,
+                            title: titleController.text,
+                            surahName:
+                                type == ReadingType.quran ? titleController.text : null,
+                            fromAyah: fromAyah,
+                            toAyah: toAyah,
+                            notes: notesController.text.isEmpty
+                                ? null
+                                : notesController.text,
+                            durationMinutes: minutes,
+                          );
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: gradients.onPrimaryText,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('যোগ করুন'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'বাতিল',
-                style: TextStyle(color: cs.onSurfaceVariant),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.isNotEmpty) {
-                  final minutes = int.tryParse(minutesController.text) ?? 15;
-                  final fromAyah = int.tryParse(fromAyahController.text);
-                  final toAyah = int.tryParse(toAyahController.text);
-
-                  notifier.addSession(
-                    type: type,
-                    title: titleController.text,
-                    surahName:
-                        type == ReadingType.quran ? titleController.text : null,
-                    fromAyah: fromAyah,
-                    toAyah: toAyah,
-                    notes: notesController.text.isEmpty
-                        ? null
-                        : notesController.text,
-                    durationMinutes: minutes,
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: gradients.onPrimaryText,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('যোগ করুন'),
-            ),
-          ],
-        );
+        ),
+      );
       },
     );
   }
@@ -670,48 +683,68 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
   ) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final cs = Theme.of(context).colorScheme;
 
-        return AlertDialog(
-          backgroundColor: cs.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          titleTextStyle: TextStyle(
-            color: cs.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-          contentTextStyle: TextStyle(
-            color: cs.onSurfaceVariant,
-            fontSize: 14,
-          ),
-          title: const Text('মুছে ফেলবেন?'),
-          content: Text('"${session.title}" সেশন মুছে ফেলতে চান?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'না',
-                style: TextStyle(color: cs.onSurfaceVariant),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                notifier.deleteSession(session.id);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'মুছে ফেলবেন?',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              child: const Text('হ্যাঁ, মুছুন'),
+                const SizedBox(height: 12),
+                Text(
+                  '"${session.title}" সেশন মুছে ফেলতে চান?',
+                  style: TextStyle(
+                    color: cs.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'না',
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        notifier.deleteSession(session.id);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('হ্যাঁ, মুছুন'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -733,113 +766,126 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
         final gradients = theme.extension<GradientColors>()!;
 
-        return AlertDialog(
-          backgroundColor: cs.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          titleTextStyle: TextStyle(
-            color: cs.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-          title: const Text('দৈনিক লক্ষ্য নির্ধারণ করুন'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: quranController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(color: cs.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'কুরআন (মিনিট)',
-                  labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.outline),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.primary),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'দৈনিক লক্ষ্য নির্ধারণ করুন',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: tafsirController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(color: cs.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'তাফসীর (মিনিট)',
-                  labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.outline),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.primary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: hadithController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(color: cs.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'হাদিস (মিনিট)',
-                  labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                  filled: true,
-                  fillColor: cs.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.outline),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: cs.primary),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: quranController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: cs.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'কুরআন (মিনিট)',
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                    filled: true,
+                    fillColor: cs.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.primary),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'বাতিল',
-                style: TextStyle(color: cs.onSurfaceVariant),
-              ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: tafsirController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: cs.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'তাফসীর (মিনিট)',
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                    filled: true,
+                    fillColor: cs.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: hadithController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: cs.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'হাদিস (মিনিট)',
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                    filled: true,
+                    fillColor: cs.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'বাতিল',
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        notifier.updateGoal(
+                          quranMinutes: int.tryParse(quranController.text) ?? 15,
+                          tafsirMinutes: int.tryParse(tafsirController.text) ?? 10,
+                          hadithMinutes: int.tryParse(hadithController.text) ?? 10,
+                        );
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: gradients.onPrimaryText,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('সংরক্ষণ করুন'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                notifier.updateGoal(
-                  quranMinutes: int.tryParse(quranController.text) ?? 15,
-                  tafsirMinutes: int.tryParse(tafsirController.text) ?? 10,
-                  hadithMinutes: int.tryParse(hadithController.text) ?? 10,
-                );
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: gradients.onPrimaryText,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('সংরক্ষণ করুন'),
-            ),
-          ],
+          ),
         );
       },
     );

@@ -13,33 +13,16 @@ class StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
+    final gradients = Theme.of(context).extension<GradientColors>()!;
     final bulletTextColor = gradients.bulletTextColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         children: [
           Row(

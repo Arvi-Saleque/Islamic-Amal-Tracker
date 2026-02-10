@@ -23,6 +23,7 @@ class DigitalTimePicker extends StatefulWidget {
   }) async {
     return showDialog<TimeOfDay>(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) => _DigitalTimePickerDialog(
         initialTime: initialTime,
         use24HourFormat: use24HourFormat,
@@ -151,32 +152,15 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
     final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
-      height: 180,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
+      child: SizedBox(
+        height: 180,
+        child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Hour wheel
@@ -292,6 +276,7 @@ class _DigitalTimePickerState extends State<DigitalTimePicker> {
           ],
         ],
       ),
+    ),
     );
   }
 
@@ -357,36 +342,17 @@ class _DigitalTimePickerDialogState extends State<_DigitalTimePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
     return Dialog(
       backgroundColor: Colors.transparent,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradients.cardGradient,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: shadowColor.withOpacity(0.1),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
+      child: buildPremiumCard(
+        context: context,
+        radius: 18,
+        padding: const EdgeInsets.all(24),
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header
@@ -443,7 +409,6 @@ class _DigitalTimePickerDialogState extends State<_DigitalTimePickerDialog> {
             ],
           ),
         ),
-      ),
     );
   }
 }

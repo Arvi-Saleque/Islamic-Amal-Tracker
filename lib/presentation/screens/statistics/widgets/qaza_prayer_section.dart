@@ -57,29 +57,11 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   Widget _buildSummaryCard(int totalPending, QazaPrayerState state) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         children: [
           Row(
@@ -125,32 +107,13 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   }
 
   Widget _buildInfoCard() {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 18,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Icon(
@@ -186,28 +149,9 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradients.cardGradient,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: shadowColor.withOpacity(0.1),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor.withOpacity(0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+      child: buildPremiumCard(
+        context: context,
+        radius: 18,
         child: Column(
           children: [
             // Header

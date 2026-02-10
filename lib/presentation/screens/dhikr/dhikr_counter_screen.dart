@@ -688,29 +688,33 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
         final gradients = theme.extension<GradientColors>()!;
+        final fieldFill = cs.surfaceContainerHighest;
 
-        return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            backgroundColor: cs.surface,
-            titleTextStyle: TextStyle(
-              color: cs.onSurface,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            contentTextStyle: TextStyle(
-              color: cs.onSurfaceVariant,
-              fontSize: 14,
-            ),
-            title: const Text('নতুন যিকির যোগ করুন'),
-            content: Column(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'নতুন যিকির যোগ করুন',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: titleController,
                   style: TextStyle(
@@ -719,7 +723,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   decoration: InputDecoration(
                     labelText: 'যিকিরের নাম',
                     filled: true,
-                    fillColor: cs.surfaceContainer,
+                    fillColor: fieldFill,
                     labelStyle: TextStyle(
                       color: cs.onSurfaceVariant,
                     ),
@@ -748,7 +752,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   decoration: InputDecoration(
                     labelText: 'আরবি (ঐচ্ছিক)',
                     filled: true,
-                    fillColor: cs.surfaceContainer,
+                    fillColor: fieldFill,
                     labelStyle: TextStyle(
                       color: cs.onSurfaceVariant,
                     ),
@@ -777,7 +781,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   decoration: InputDecoration(
                     labelText: 'লক্ষ্য সংখ্যা',
                     filled: true,
-                    fillColor: cs.surfaceContainer,
+                    fillColor: fieldFill,
                     labelStyle: TextStyle(
                       color: cs.onSurfaceVariant,
                     ),
@@ -796,44 +800,50 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: cs.onSurface,
+                      ),
+                      child: const Text('বাতিল'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (titleController.text.isNotEmpty) {
+                          final target = int.tryParse(targetController.text) ?? 100;
+                          notifier.addCustomDhikr(
+                            titleController.text,
+                            arabicController.text.isEmpty
+                                ? null
+                                : arabicController.text,
+                            target,
+                          );
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: gradients.onPrimaryText,
+                        elevation: 2,
+                        shadowColor: theme.shadowColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      ),
+                      child: const Text('যোগ করুন'),
+                    ),
+                  ],
+                ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                ),
-                child: const Text('বাতিল'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (titleController.text.isNotEmpty) {
-                    final target = int.tryParse(targetController.text) ?? 100;
-                    notifier.addCustomDhikr(
-                      titleController.text,
-                      arabicController.text.isEmpty
-                          ? null
-                          : arabicController.text,
-                      target,
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: cs.primary,
-                  foregroundColor: gradients.onPrimaryText,
-                  elevation: 2,
-                  shadowColor: theme.shadowColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                ),
-                child: const Text('যোগ করুন'),
-              ),
-            ],
+          ),
         );
       },
     );
@@ -849,36 +859,43 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
         final gradients = theme.extension<GradientColors>()!;
+        final fieldFill = cs.surfaceContainerHighest;
 
-        return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            backgroundColor: cs.surface,
-            titleTextStyle: TextStyle(
-              color: cs.onSurface,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            contentTextStyle: TextStyle(
-              color: cs.onSurfaceVariant,
-              fontSize: 14,
-            ),
-            title: const Text('লক্ষ্য সংখ্যা পরিবর্তন করুন'),
-            content: TextField(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'লক্ষ্য সংখ্যা পরিবর্তন করুন',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
               controller: targetController,
               style: TextStyle(
                 color: cs.onSurface,
               ),
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'নতুন লক্ষ্য',
-                filled: true,
-                fillColor: cs.surfaceContainer,
+                  decoration: InputDecoration(
+                    labelText: 'নতুন লক্ষ্য',
+                    filled: true,
+                    fillColor: fieldFill,
                 labelStyle: TextStyle(
                   color: cs.onSurfaceVariant,
                 ),
@@ -895,38 +912,46 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     width: 1.4,
                   ),
                 ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                ),
-                child: const Text('বাতিল'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final newTarget = int.tryParse(targetController.text);
-                  if (newTarget != null && newTarget > 0) {
-                    notifier.updateTarget(dhikr.id, newTarget);
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: cs.primary,
-                  foregroundColor: gradients.onPrimaryText,
-                  elevation: 2,
-                  shadowColor: theme.shadowColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 ),
-                child: const Text('আপডেট করুন'),
-              ),
-            ],
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: cs.onSurface,
+                      ),
+                      child: const Text('বাতিল'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        final newTarget = int.tryParse(targetController.text);
+                        if (newTarget != null && newTarget > 0) {
+                          notifier.updateTarget(dhikr.id, newTarget);
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: gradients.onPrimaryText,
+                        elevation: 2,
+                        shadowColor: theme.shadowColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      ),
+                      child: const Text('আপডেট করুন'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -939,53 +964,73 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   ) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
 
-        return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            backgroundColor: cs.surface,
-            titleTextStyle: TextStyle(
-              color: cs.onSurface,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            contentTextStyle: TextStyle(
-              color: cs.onSurfaceVariant,
-              fontSize: 14,
-            ),
-            title: const Text('মুছে ফেলবেন?'),
-            content: Text('"${dhikr.title}" মুছে ফেলতে চান?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                ),
-                child: const Text('না'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  notifier.deleteDhikr(dhikr.id);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  elevation: 2,
-                  shadowColor: theme.shadowColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'মুছে ফেলবেন?',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 ),
-                child: const Text('হ্যাঁ, মুছুন'),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  '"${dhikr.title}" মুছে ফেলতে চান?',
+                  style: TextStyle(
+                    color: cs.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: cs.onSurface,
+                      ),
+                      child: const Text('না'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        notifier.deleteDhikr(dhikr.id);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shadowColor: theme.shadowColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      ),
+                      child: const Text('হ্যাঁ, মুছুন'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -1002,29 +1047,33 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         final theme = Theme.of(context);
         final cs = theme.colorScheme;
         final gradients = theme.extension<GradientColors>()!;
+        final fieldFill = cs.surfaceContainerHighest;
 
-        return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            backgroundColor: cs.surface,
-            titleTextStyle: TextStyle(
-              color: cs.onSurface,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            contentTextStyle: TextStyle(
-              color: cs.onSurfaceVariant,
-              fontSize: 14,
-            ),
-            title: Text(dhikr.title),
-            content: Column(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: buildPremiumCard(
+            context: context,
+            radius: 18,
+            padding: const EdgeInsets.all(24),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  dhikr.title,
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: countController,
                   autofocus: true,
@@ -1038,7 +1087,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   decoration: InputDecoration(
                     labelText: 'কাউন্ট লিখুন',
                     filled: true,
-                    fillColor: cs.surfaceContainer,
+                    fillColor: fieldFill,
                     labelStyle: TextStyle(
                       color: cs.onSurfaceVariant,
                     ),
@@ -1058,48 +1107,60 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('লক্ষ্য: ${dhikr.targetCount}'),
+                Text(
+                  'লক্ষ্য: ${dhikr.targetCount}',
+                  style: TextStyle(
+                    color: cs.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: cs.onSurface,
+                      ),
+                      child: const Text('বাতিল'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        final newCount = int.tryParse(countController.text);
+                        if (newCount != null && newCount >= 0) {
+                          final diff = newCount - dhikr.currentCount;
+                          if (diff > 0) {
+                            for (int i = 0; i < diff; i++) {
+                              notifier.incrementDhikr(dhikr.id);
+                            }
+                          } else if (diff < 0) {
+                            for (int i = 0; i < -diff; i++) {
+                              notifier.decrementDhikr(dhikr.id);
+                            }
+                          }
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: gradients.onPrimaryText,
+                        elevation: 2,
+                        shadowColor: theme.shadowColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      ),
+                      child: const Text('সেট করুন'),
+                    ),
+                  ],
+                ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                ),
-                child: const Text('বাতিল'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final newCount = int.tryParse(countController.text);
-                  if (newCount != null && newCount >= 0) {
-                    final diff = newCount - dhikr.currentCount;
-                    if (diff > 0) {
-                      for (int i = 0; i < diff; i++) {
-                        notifier.incrementDhikr(dhikr.id);
-                      }
-                    } else if (diff < 0) {
-                      for (int i = 0; i < -diff; i++) {
-                        notifier.decrementDhikr(dhikr.id);
-                      }
-                    }
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: cs.primary,
-                  foregroundColor: gradients.onPrimaryText,
-                  elevation: 2,
-                  shadowColor: theme.shadowColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                ),
-                child: const Text('সেট করুন'),
-              ),
-            ],
+          ),
         );
       },
     );
