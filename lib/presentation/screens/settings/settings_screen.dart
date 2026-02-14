@@ -86,7 +86,7 @@ class SettingsScreen extends ConsumerWidget {
                         .setTheme(v ? 'light' : 'dark'),
 
                       title: Text(
-                        'Light Theme',
+                        'থিম পরিবর্তন',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w600,

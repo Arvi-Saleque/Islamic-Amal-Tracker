@@ -23,6 +23,7 @@ dependencies:
   # Prayer Times
   adhan_dart: ^1.2.0
   geolocator: ^13.0.2
+  geocoding: ^3.0.0
   timezone: ^0.10.0
   flutter_timezone: ^3.0.1
 

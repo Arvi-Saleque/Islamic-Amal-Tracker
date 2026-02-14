@@ -157,6 +157,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  /// Refresh — location off thakle dialog dekhabe, on thakle real location fetch korbe
+  Future<void> _refreshAll() async {
+    final cs = Theme.of(context).colorScheme;
+
+    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      final shouldOpenSettings = await _showLocationServiceDialog();
+      if (shouldOpenSettings == true) {
+        await Geolocator.openLocationSettings();
+        await Future.delayed(const Duration(seconds: 2));
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      }
+    }
+
+    if (serviceEnabled) {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    }
+
+    ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
+    ref.read(prayerTrackingProvider.notifier).loadTodayData();
+    ref.read(dailyAmalProvider.notifier).loadTodayData();
+    ref.read(dhikrCounterProvider.notifier).loadTodayData();
+    ref.read(readingTrackerProvider.notifier).loadTodayData();
+    ref.read(statisticsProvider.notifier).updateTodayStats();
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
+
+    final locationOn = await Geolocator.isLocationServiceEnabled();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          locationOn
+              ? 'ডেটা আপডেট হয়েছে'
+              : 'লোকেশন বন্ধ — ঢাকার সময় দেখাচ্ছে',
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: cs.primary,
+      ),
+    );
+  }
+
 
 // -------------------------------------------------
 // Premium UI Helpers (Golden + Dark)
@@ -445,10 +490,6 @@ Widget _sunChip({
         ),
         elevation: 0,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: iconColor),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
           'আমল ট্র্যাকার',
           style: TextStyle(
@@ -462,22 +503,7 @@ Widget _sunChip({
           IconButton(
             icon: Icon(Icons.refresh_rounded, color: cs.primary),
             tooltip: 'রিফ্রেশ',
-            onPressed: () async {
-              ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-              ref.read(prayerTrackingProvider.notifier).loadTodayData();
-              ref.read(dailyAmalProvider.notifier).loadTodayData();
-              ref.read(dhikrCounterProvider.notifier).loadTodayData();
-              ref.read(readingTrackerProvider.notifier).loadTodayData();
-              ref.read(statisticsProvider.notifier).updateTodayStats();
-  
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('ডেটা আপডেট হয়েছে'),
-                  duration: const Duration(seconds: 1),
-                  backgroundColor: cs.primary,
-                ),
-              );
-            },
+            onPressed: () => _refreshAll(),
           ),
           IconButton(
             icon: Icon(Icons.bar_chart_rounded, color: cs.primary),
@@ -507,15 +533,7 @@ Widget _sunChip({
           children: [
             Positioned.fill(child: _buildHomeBackground(context)),
             RefreshIndicator(
-            onRefresh: () async {
-              ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-              ref.read(prayerTrackingProvider.notifier).loadTodayData();
-              ref.read(dailyAmalProvider.notifier).loadTodayData();
-              ref.read(dhikrCounterProvider.notifier).loadTodayData();
-              ref.read(readingTrackerProvider.notifier).loadTodayData();
-              ref.read(statisticsProvider.notifier).updateTodayStats();
-              await Future.delayed(const Duration(milliseconds: 500));
-            },
+            onRefresh: () => _refreshAll(),
             color: cs.primary,
             backgroundColor: cs.surface,
             child: SingleChildScrollView(
@@ -570,97 +588,142 @@ Widget _sunChip({
       return buildPremiumCard(
         context: context,
         margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.zero,
         radius: 22,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final cs = Theme.of(context).colorScheme;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$hijriDay $hijriMonthBengali',
+                                  style: TextStyle(
+                                    color: cs.primary,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '$dayName, $dayNum $monthName',
+                                  style: TextStyle(
+                                    color: cs.onSurface.withOpacity(0.65),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.1,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  bengaliDate,
+                                  style: TextStyle(
+                                    color: cs.onSurface.withOpacity(0.55),
+                                    fontSize: 12,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   Builder(
                     builder: (context) {
                       final cs = Theme.of(context).colorScheme;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$hijriDay $hijriMonthBengali',
-                            style: TextStyle(
-                              color: cs.primary,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.2,
-                            ),
+                      return Container(
+                        height: 76,
+                        width: 1,
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              cs.primary.withOpacity(0.25),
+                              cs.primary.withOpacity(0.55),
+                              cs.primary.withOpacity(0.25),
+                              Colors.transparent,
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '$dayName, $dayNum $monthName',
-                            style: TextStyle(
-                              color: cs.onSurface.withOpacity(0.65),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.1,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            bengaliDate,
-                            style: TextStyle(
-                              color: cs.onSurface.withOpacity(0.55),
-                              fontSize: 12,
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
+                        ),
                       );
                     },
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _sunChip(
+                        context: context,
+                        label: 'সূর্যোদয়',
+                        time: sunriseTime ?? '--:--',
+                        icon: Icons.wb_sunny_rounded,
+                      ),
+                      const SizedBox(height: 12),
+                      _sunChip(
+                        context: context,
+                        label: 'সূর্যাস্ত',
+                        time: sunsetTime ?? '--:--',
+                        icon: Icons.nights_stay_rounded,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            Builder(
-              builder: (context) {
-                final cs = Theme.of(context).colorScheme;
-                return Container(
-                  height: 76,
-                  width: 1,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        cs.primary.withOpacity(0.25),
-                        cs.primary.withOpacity(0.55),
-                        cs.primary.withOpacity(0.25),
-                        Colors.transparent,
-                      ],
-                    ),
+            if (state.locationName != null) ...[
+              Container(
+                height: 1,
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      Colors.transparent,
+                    ],
                   ),
-                );
-              },
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _sunChip(
-                  context: context,
-                  label: 'সূর্যোদয়',
-                  time: sunriseTime ?? '--:--',
-                  icon: Icons.wb_sunny_rounded,
                 ),
-                const SizedBox(height: 12),
-                _sunChip(
-                  context: context,
-                  label: 'সূর্যাস্ত',
-                  time: sunsetTime ?? '--:--',
-                  icon: Icons.nights_stay_rounded,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      state.locationName!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ],
         ),
       );

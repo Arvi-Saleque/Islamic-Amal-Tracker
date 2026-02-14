@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class PrayerTimesState {
   final Map<String, DateTime> prayerTimes;
@@ -15,6 +16,7 @@ class PrayerTimesState {
   final bool isNaflTime; // True during voluntary prayer time
   final bool isLoading;
   final String? error;
+  final String? locationName;
 
   PrayerTimesState({
     required this.prayerTimes,
@@ -27,6 +29,7 @@ class PrayerTimesState {
     this.isNaflTime = false,
     this.isLoading = false,
     this.error,
+    this.locationName,
   });
 
   PrayerTimesState copyWith({
@@ -40,6 +43,7 @@ class PrayerTimesState {
     bool? isNaflTime,
     bool? isLoading,
     String? error,
+    String? locationName,
   }) {
     return PrayerTimesState(
       prayerTimes: prayerTimes ?? this.prayerTimes,
@@ -53,6 +57,7 @@ class PrayerTimesState {
       isNaflTime: isNaflTime ?? this.isNaflTime,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      locationName: locationName ?? this.locationName,
     );
   }
 }
@@ -330,6 +335,29 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       // Debug: Print location
       print('Location: Lat ${position.latitude}, Lon ${position.longitude}');
 
+      // Reverse geocode to get location name
+      String cityName = 'ঢাকা';
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+          cityName = place.locality ??
+              place.subAdministrativeArea ??
+              place.administrativeArea ??
+              'ঢাকা';
+        }
+      } catch (e) {
+        const fallbackLat = 23.8103;
+        const fallbackLon = 90.4125;
+        final isNearDhaka =
+            (position.latitude - fallbackLat).abs() < 0.01 &&
+            (position.longitude - fallbackLon).abs() < 0.01;
+        cityName = isNearDhaka ? 'ঢাকা' : 'বাংলাদেশ';
+      }
+
       // Calculate prayer times using adhan_dart
       final coordinates = Coordinates(position.latitude, position.longitude);
 
@@ -410,6 +438,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         isForbiddenTime: result['isForbiddenTime'] ?? false,
         isNaflTime: result['isNaflTime'] ?? false,
         isLoading: false,
+        locationName: cityName,
       );
     } catch (e) {
       state = state.copyWith(

@@ -619,7 +619,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 Text(
                   title,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
@@ -630,7 +630,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.68),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.68),
                     fontSize: 12,
                     height: 1.2,
                     letterSpacing: 0.1,
