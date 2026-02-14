@@ -106,12 +106,13 @@ class CustomReminder {
   }
 
   // Get Bengali name for prayer
-  static String getPrayerBengaliName(PrayerName prayer) {
+  static String getPrayerBengaliName(PrayerName prayer, {DateTime? date}) {
     switch (prayer) {
       case PrayerName.fajr:
         return 'ফজর';
       case PrayerName.dhuhr:
-        return 'যোহর';
+        final d = date ?? DateTime.now();
+        return d.weekday == DateTime.friday ? 'জুম\'আ' : 'যোহর';
       case PrayerName.asr:
         return 'আসর';
       case PrayerName.maghrib:

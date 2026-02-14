@@ -55,14 +55,10 @@ class DailyReminderService {
   static const int _defaultScheduleDaysAhead = 30;
   static const String _kDefaultWindowScheduledOn =
       'default_window_scheduled_on';
-  
-  // Nafl reminder offset in minutes (Sunrise + this offset)
-  static const int _naflReminderOffsetMinutes = 104;
 
   // Large safe ID ranges for default rolling schedules
   static const int _defaultPrayerIdBase = 200000;
   static const int _defaultDhikrIdBase = 210000;
-  static const int _defaultNaflIdBase = 220000;
 
   static const String _kDefaultWindowStartDay = 'default_window_start_day';
   static const String _kDefaultWindowDaysAhead = 'default_window_days_ahead';
@@ -72,18 +68,19 @@ class DailyReminderService {
     return _defaultPrayerBaseId + prayer.index; // stable + unique
   }
 
-  static String _displayPrayerName(PrayerName prayer) {
+  static String _displayPrayerName(PrayerName prayer, {DateTime? date}) {
     switch (prayer) {
       case PrayerName.fajr:
-        return 'Fajr';
+        return 'ফজর';
       case PrayerName.dhuhr:
-        return 'Dhuhr';
+        final d = date ?? DateTime.now();
+        return d.weekday == DateTime.friday ? 'জুম\'আ' : 'যোহর';
       case PrayerName.asr:
-        return 'Asr';
+        return 'আসর';
       case PrayerName.maghrib:
-        return 'Maghrib';
+        return 'মাগরিব';
       case PrayerName.isha:
-        return 'Isha';
+        return 'এশা';
     }
   }
 
@@ -104,11 +101,6 @@ class DailyReminderService {
   static int _defaultDhikrIdForDayIndex(int dayIndex, bool morning) {
     // reserve 10 IDs per day
     return _defaultDhikrIdBase + dayIndex * 10 + (morning ? 1 : 2);
-  }
-
-  static int _defaultNaflIdForDayIndex(int dayIndex) {
-    // reserve 10 IDs per day
-    return _defaultNaflIdBase + dayIndex * 10 + 1;
   }
 
   static Future<void> initialize() async {
@@ -193,6 +185,16 @@ class DailyReminderService {
       enableVibration: true,
     );
 
+    const AndroidNotificationChannel defaultDailyAmalChannel =
+        AndroidNotificationChannel(
+      'default_daily_amal_channel',
+      'Default Daily Amal',
+      description: 'Always active default daily amal reminder',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+
     final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
 
@@ -202,6 +204,7 @@ class DailyReminderService {
     await androidPlugin?.createNotificationChannel(customChannel);
     await androidPlugin?.createNotificationChannel(defaultPrayerChannel);
     await androidPlugin?.createNotificationChannel(defaultDhikrChannel);
+    await androidPlugin?.createNotificationChannel(defaultDailyAmalChannel);
 
   }
 
@@ -225,7 +228,7 @@ class DailyReminderService {
 
     await _notifications.show(
       0,
-      '🕌 আমল রিমাইন্ডার',
+      'আমল রিমাইন্ডার',
       'আজকের আমলগুলো করতে ভুলবেন না!',
       notificationDetails,
     );
@@ -263,8 +266,8 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _defaultDailyAmalId,
-      '🕌 আমল রিমাইন্ডার',
-      'আজকের আমলগুলো করতে ভুলবেন না!',
+      'আমল রিমাইন্ডার',
+      'যে সকল আমল(যিকির/পড়াশোনা) বাকি আছে সেগুলো সম্পন্ন করে নিন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -331,7 +334,7 @@ class DailyReminderService {
 
       await _notifications.zonedSchedule(
         _getDefaultPrayerNotificationId(prayer),
-        '🕌 ${_displayPrayerName(prayer)} নামাজ',
+        '${_displayPrayerName(prayer)} নামাজ',
         'নামাজ আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।',
         target,
         details,
@@ -374,7 +377,7 @@ class DailyReminderService {
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
         'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।',
-        contentTitle: '📋 দৈনিক আমল রিমাইন্ডার',
+        contentTitle: 'দৈনিক আমল রিমাইন্ডার',
       ),
     );
 
@@ -382,8 +385,8 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _dailyReminderId,
-      '📋 দৈনিক আমল রিমাইন্ডার',
-      'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করে নিন।',
+      'দৈনিক আমল রিমাইন্ডার',
+      'যে সকল আমল(যিকির/পড়াশোনা) বাকি আছে সেগুলো সম্পন্ন করে নিন।',
       scheduledDate,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -487,7 +490,7 @@ class DailyReminderService {
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
         'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
-        contentTitle: '☀️ সকালের যিকির',
+        contentTitle: 'সকালের যিকির',
       ),
     );
 
@@ -495,7 +498,7 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _morningDhikrId,
-      '☀️ সকালের যিকির',
+      'সকালের যিকির',
       'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
       scheduledDate,
       notificationDetails,
@@ -549,7 +552,7 @@ class DailyReminderService {
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
         'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
-        contentTitle: '🌆 সন্ধ্যার যিকির',
+        contentTitle: 'সন্ধ্যার যিকির',
       ),
     );
 
@@ -557,7 +560,7 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _eveningDhikrId,
-      '🌆 সন্ধ্যার যিকির',
+      'সন্ধ্যার যিকির',
       'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
       scheduledDate,
       notificationDetails,
@@ -611,21 +614,6 @@ class DailyReminderService {
     }
   }
 
-  static String _getPrayerEmoji(PrayerName prayer) {
-    switch (prayer) {
-      case PrayerName.fajr:
-        return '🌅';
-      case PrayerName.dhuhr:
-        return '☀️';
-      case PrayerName.asr:
-        return '🌤️';
-      case PrayerName.maghrib:
-        return '🌆';
-      case PrayerName.isha:
-        return '🌙';
-    }
-  }
-
   /// Schedule prayer reminder
   static Future<void> schedulePrayerReminder({
     required PrayerName prayer,
@@ -645,8 +633,7 @@ class DailyReminderService {
 
     final scheduledDate = tz.TZDateTime.from(scheduledDateTime, tz.local);
 
-    final prayerName = CustomReminder.getPrayerBengaliName(prayer);
-    final emoji = _getPrayerEmoji(prayer);
+    final prayerName = CustomReminder.getPrayerBengaliName(prayer, date: scheduledDateTime);
 
     final androidDetails = AndroidNotificationDetails(
       'prayer_reminder_channel',
@@ -657,7 +644,7 @@ class DailyReminderService {
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
         '$prayerName এর সময় হতে $minutesBefore মিনিট বাকি আছে। নামাজের প্রস্তুতি নিন।',
-        contentTitle: '$emoji $prayerName এর সময়',
+        contentTitle: '$prayerName এর সময়',
       ),
     );
 
@@ -665,7 +652,7 @@ class DailyReminderService {
 
     await _notifications.zonedSchedule(
       _getPrayerNotificationId(prayer),
-      '$emoji $prayerName এর সময়',
+      '$prayerName এর সময়',
       '$prayerName এর সময় হতে $minutesBefore মিনিট বাকি',
       scheduledDate,
       notificationDetails,
@@ -706,8 +693,7 @@ await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    final prayerName = CustomReminder.getPrayerBengaliName(prayer);
-    final emoji = _getPrayerEmoji(prayer);
+    final prayerName = CustomReminder.getPrayerBengaliName(prayer, date: scheduledDate);
 
     final androidDetails = AndroidNotificationDetails(
       'prayer_reminder_channel',
@@ -718,7 +704,7 @@ await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
         '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
-        contentTitle: '$emoji $prayerName এর সালাত',
+        contentTitle: '$prayerName এর সালাত',
       ),
     );
 
@@ -726,7 +712,7 @@ await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
 
     await _notifications.zonedSchedule(
       _getPrayerNotificationId(prayer),
-      '$emoji $prayerName এর সালাত',
+      '$prayerName এর সালাত',
       '$prayerName এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
       scheduledDate,
       notificationDetails,
@@ -885,7 +871,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
     await _notifications.zonedSchedule(
       notificationId,
-      '🔔 ${reminder.title}',
+      '${reminder.title}',
       reminder.description ?? 'আপনার কাস্টম রিমাইন্ডার',
       scheduledDate,
       notificationDetails,
@@ -950,8 +936,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     await _notifications.cancel(_defaultMorningDhikrId);
     await _notifications.zonedSchedule(
       _defaultMorningDhikrId,
-      '🌅 Morning Dhikr',
-      'সময় হয়েছে — সকালের যিকির পড়ুন।',
+      'সকালের যিকির',
+      'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
       tz.TZDateTime.from(morning, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -970,8 +956,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     await _notifications.cancel(_defaultEveningDhikrId);
     await _notifications.zonedSchedule(
       _defaultEveningDhikrId,
-      '🌙 Evening Dhikr',
-      'সময় হয়েছে — সন্ধ্যার যিকির পড়ুন।',
+      'সন্ধ্যার যিকির',
+      'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
       tz.TZDateTime.from(evening, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -1023,12 +1009,10 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
       final maxPrayerId = _defaultPrayerIdBase + days * 10;
       final maxDhikrId = _defaultDhikrIdBase + days * 10;
-      final maxNaflId = _defaultNaflIdBase + days * 10;
 
       final hasAnyDefaultScheduled = pending.any((r) =>
           (r.id >= _defaultPrayerIdBase && r.id < maxPrayerId) ||
-          (r.id >= _defaultDhikrIdBase && r.id < maxDhikrId) ||
-          (r.id >= _defaultNaflIdBase && r.id < maxNaflId));
+          (r.id >= _defaultDhikrIdBase && r.id < maxDhikrId));
 
       if (remaining >= 2 && hasAnyDefaultScheduled) {
         print('[DefaultRolling] Skipping: $remaining days remaining, has pending alarms');
@@ -1048,10 +1032,11 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
     if (canUseLocation) {
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low,
+        desiredAccuracy: LocationAccuracy.high,
       );
-      lat = pos.latitude;
-      lon = pos.longitude;
+      // Round to 2 decimal places (~1.1km) so same-area devices get identical prayer times
+      lat = (pos.latitude * 100).round() / 100;
+      lon = (pos.longitude * 100).round() / 100;
     }
 // DO NOT request permission here
 
@@ -1079,7 +1064,6 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       }
       await _notifications.cancel(_defaultDhikrIdForDayIndex(i, true));
       await _notifications.cancel(_defaultDhikrIdForDayIndex(i, false));
-      await _notifications.cancel(_defaultNaflIdForDayIndex(i));
 
 
       final date = todayMidnight.add(Duration(days: i));
@@ -1109,10 +1093,13 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
         final target = tz.TZDateTime.from(when, tz.local);
         if (target.isBefore(tz.TZDateTime.now(tz.local))) continue;
 
+        // Show জুম'আ instead of যোহর on Fridays
+        final prayerLabel = _displayPrayerName(PrayerName.values[p], date: date);
+
         await _notifications.zonedSchedule(
           _defaultPrayerIdForDayIndex(i, p),
-          '🕌 ${key.toUpperCase()}',
-          'Default reminder (${offsets[key]} min after waqt)',
+          '$prayerLabel নামাজ',
+          'নামাজ আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।',
           target,
           const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -1136,8 +1123,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       if (morning.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, true),
-          '🌅 Morning Dhikr',
-          'Default reminder (Fajr + 60 min)',
+          'Morning Dhikr',
+          'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
           morning,
           const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -1160,8 +1147,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       if (evening.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, false),
-          '🌙 Evening Dhikr',
-          'Default reminder (Maghrib + 30 min)',
+          'Evening Dhikr',
+          'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
           evening,
           const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -1169,32 +1156,6 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
               'Default Dhikr Reminders',
               channelDescription:
                   'Always active default dhikr reminders (rolling window)',
-              importance: Importance.high,
-              priority: Priority.high,
-            ),
-          ),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
-        scheduledCount++;
-
-      }
-
-      // ===== Default Nafl reminder =====
-      // Sunrise + offset minutes
-      final naflReminder = tz.TZDateTime.from(
-          pt['sunrise']!.add(Duration(minutes: _naflReminderOffsetMinutes)), tz.local);
-      if (naflReminder.isAfter(tz.TZDateTime.now(tz.local))) {
-        await _notifications.zonedSchedule(
-          _defaultNaflIdForDayIndex(i),
-          '✨ Nafl Prayer Time',
-          'Default reminder (1 hour after Nafl wakt starts)',
-          naflReminder,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'default_prayer_channel',
-              'Default Prayer Reminders',
-              channelDescription:
-                  'Always active default prayer reminders (rolling window)',
               importance: Importance.high,
               priority: Priority.high,
             ),
@@ -1221,4 +1182,5 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
 
   }
+
 }

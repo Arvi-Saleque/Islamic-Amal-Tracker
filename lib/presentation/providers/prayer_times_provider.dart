@@ -328,7 +328,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       Position position = await _getCurrentLocation();
 
       // Debug: Print location
-      print('📍 Location: Lat ${position.latitude}, Lon ${position.longitude}');
+      print('Location: Lat ${position.latitude}, Lon ${position.longitude}');
 
       // Calculate prayer times using adhan_dart
       final coordinates = Coordinates(position.latitude, position.longitude);
@@ -351,7 +351,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       );
 
       // Debug: Print prayer times
-      print('🕌 Prayer Times (raw from adhan_dart):');
+      print('Prayer Times (raw from adhan_dart):');
       print('  Fajr: ${prayerTimes.fajr}');
       print('  Dhuhr: ${prayerTimes.dhuhr}');
       print('  Asr: ${prayerTimes.asr}');
@@ -381,14 +381,14 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
             .add(const Duration(days: 1)), // Isha ends at next day Fajr
       };
 
-      print('🕌 Local Prayer Times:');
+      print('Local Prayer Times:');
       print('  Fajr: ${times['fajr']}');
       print('  Sunrise: ${times['sunrise']}');
       print('  Dhuhr: ${times['dhuhr']}');
       print('  Asr: ${times['asr']}');
       print('  Maghrib: ${times['maghrib']}');
       print('  Isha: ${times['isha']}');
-      print('📍 Waqt End Times:');
+      print('Waqt End Times:');
       print('  Fajr ends: ${waqtEndTimes['fajr']}');
       print('  Dhuhr ends: ${waqtEndTimes['dhuhr']}');
       print('  Asr ends: ${waqtEndTimes['asr']}');
@@ -474,7 +474,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
 
       // Permission already granted -> safe to read location
       return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low,
+        desiredAccuracy: LocationAccuracy.high,
       );
     } catch (_) {
       return Position(

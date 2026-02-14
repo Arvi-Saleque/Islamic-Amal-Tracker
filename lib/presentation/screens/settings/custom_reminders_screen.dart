@@ -45,26 +45,45 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
   Future<void> _deleteReminder(CustomReminder reminder) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).dialogBackgroundColor,
-        title: Text(
-          'রিমাইন্ডার মুছুন?',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
-        ),
-        content: Text(
-          '"${reminder.title}" মুছে ফেলতে চান?',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('বাতিল', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: buildPremiumCard(
+          context: context,
+          radius: 16,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'রিমাইন্ডার মুছুন?',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '"${reminder.title}" মুছে ফেলতে চান?',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text('বাতিল', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text('মুছুন', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('মুছুন', style: TextStyle(color: Theme.of(context).colorScheme.error)),
-          ),
-        ],
+        ),
       ),
     );
 
@@ -209,41 +228,24 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
   }
 
   Widget _buildReminderCard(CustomReminder reminder) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _openAddReminderScreen(reminder),
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
+      child: buildPremiumCard(
+        context: context,
+        radius: 12,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _openAddReminderScreen(reminder),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: reminder.isEnabled
@@ -335,6 +337,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -643,31 +646,12 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     required String title,
     required Widget child,
   }) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 12,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: shadowColor.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

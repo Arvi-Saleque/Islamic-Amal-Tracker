@@ -158,7 +158,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         }
         
         // Debug log
-        debugPrint('📅 $dateKey: Prayer=$prayersCompleted/5, Amal=$amalCompleted/$totalAmal, Dhikr=$dhikrCount/$dhikrTarget, Read=${readingMinutes}min, Active=$activeCategories → Score=$score%');
+        debugPrint('$dateKey: Prayer=$prayersCompleted/5, Amal=$amalCompleted/$totalAmal, Dhikr=$dhikrCount/$dhikrTarget, Read=${readingMinutes}min, Active=$activeCategories -> Score=$score%');
         
         if (score > 0) {
           scores[dateKey] = score;

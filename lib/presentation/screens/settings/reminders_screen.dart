@@ -52,16 +52,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   TimeOfDay? _defaultMorningDhikrReminderTime;
   TimeOfDay? _defaultEveningDhikrReminderTime;
   TimeOfDay? _defaultDailyAmalReminderTime;
-  TimeOfDay? _defaultNaflReminderTime;
 
   // User Settings Reminders Enable/Disable States
   bool _isDailyReminderEnabled = false;
   bool _isMorningDhikrEnabled = false;
   bool _isEveningDhikrEnabled = false;
   bool _arePrayerRemindersEnabled = false;
-  
-  // Nafl reminder offset in minutes (Sunrise + this offset)
-  static const int _naflReminderOffsetMinutes = 104;
 
   @override
   void initState() {
@@ -159,8 +155,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           _calculateDefaultEveningDhikrReminderTime(prayerTimes);
       _defaultDailyAmalReminderTime =
           const TimeOfDay(hour: 22, minute: 0); // Fixed at 10 PM
-      _defaultNaflReminderTime =
-          _calculateDefaultNaflReminderTime(prayerTimes);
 
       _isLoading = false;
 
@@ -322,17 +316,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
   }
 
-  TimeOfDay _calculateDefaultNaflReminderTime(
-      Map<String, DateTime>? prayerTimes) {
-    // Default: Sunrise + offset minutes
-    if (prayerTimes == null || prayerTimes['sunrise'] == null) {
-      return const TimeOfDay(hour: 8, minute: 0); // Fallback time
-    }
-    final sunrise = prayerTimes['sunrise']!;
-    final total = sunrise.hour * 60 + sunrise.minute + _naflReminderOffsetMinutes;
-    return TimeOfDay(hour: (total ~/ 60) % 24, minute: total % 60);
-  }
-
   Future<void> _scheduleAllReminders() async {
     // DEFAULT (Always Active)
     await DailyReminderService.scheduleDefaultDailyAmalReminder();
@@ -458,7 +441,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         defaultMorningDhikrReminderTime: _defaultMorningDhikrReminderTime,
         defaultEveningDhikrReminderTime: _defaultEveningDhikrReminderTime,
         defaultDailyAmalReminderTime: _defaultDailyAmalReminderTime,
-        defaultNaflReminderTime: _defaultNaflReminderTime,
       ),
     );
   }
@@ -564,31 +546,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildInfoCard() {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 14,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        border: Border.all(
-          color: primary,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Icon(Icons.info_outline, color: primary),
@@ -632,31 +595,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     required TimeOfDay time,
     required bool isDefault,
   }) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 14,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        border: Border.all(
-          color: primary,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
@@ -746,9 +690,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       PrayerName.isha: Icons.nights_stay_outlined,
     };
 
+    final isFriday = DateTime.now().weekday == DateTime.friday;
     final prayerNames = {
       PrayerName.fajr: 'ফজরের নামাজ',
-      PrayerName.dhuhr: 'যোহরের নামাজ',
+      PrayerName.dhuhr: isFriday ? 'জুম\'আর নামাজ' : 'যোহরের নামাজ',
       PrayerName.asr: 'আসরের নামাজ',
       PrayerName.maghrib: 'মাগরিবের নামাজ',
       PrayerName.isha: 'এশার নামাজ',
@@ -758,33 +703,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       final reminderTime =
           _prayerReminderTimes[prayer] ?? _getStaticDefaultPrayerTime(prayer);
 
-      final gradients = Theme.of(context).extension<GradientColors>()!;
       final primary = Theme.of(context).colorScheme.primary;
-      final shadowColor = Theme.of(context).shadowColor;
       
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: Container(
+        child: buildPremiumCard(
+          context: context,
+          radius: 14,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: gradients.cardGradient,
-            ),
-            border: Border.all(
-              color: primary,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
           child: Row(
             children: [
               Container(
@@ -866,36 +792,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildCustomReminderCard() {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: _navigateToCustomReminders,
         borderRadius: BorderRadius.circular(14),
-        child: Container(
+        child: buildPremiumCard(
+          context: context,
+          radius: 14,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: gradients.cardGradient,
-            ),
-            border: Border.all(
-              color: primary,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
           child: Row(
             children: [
               Container(
@@ -1085,8 +992,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
           const SizedBox(height: 8),
           _buildDefaultReminderTile(
             icon: Icons.wb_sunny,
-            title: 'যোহরের পর রিমাইন্ডার',
-            subtitle: 'যোহরের ৬০ মিনিট পর (সবসময় সক্রিয়)',
+            title: DateTime.now().weekday == DateTime.friday
+                ? 'জুম\'আর পর রিমাইন্ডার'
+                : 'যোহরের পর রিমাইন্ডার',
+            subtitle: DateTime.now().weekday == DateTime.friday
+                ? 'জুম\'আর ৬০ মিনিট পর (সবসময় সক্রিয়)'
+                : 'যোহরের ৬০ মিনিট পর (সবসময় সক্রিয়)',
             time: _defaultZuhrReminderTime!,
             isDefault: true,
           ),
@@ -1228,27 +1139,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   Widget _buildUserSettingsInfoCard() {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final textColor = gradients.bulletTextColor;
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 14,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 24),
@@ -1279,31 +1173,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     required Function(bool) onToggle,
     required VoidCallback onTimeTap,
   }) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 14,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        border: Border.all(
-          color: primary,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
@@ -1398,31 +1273,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
   }
 
   Widget _buildPrayerRemindersToggleCard() {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 14,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradients.cardGradient,
-        ),
-        border: Border.all(
-          color: primary,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(
@@ -1495,7 +1351,6 @@ class TodaysRemindersDialog extends StatefulWidget {
   final TimeOfDay? defaultMorningDhikrReminderTime;
   final TimeOfDay? defaultEveningDhikrReminderTime;
   final TimeOfDay? defaultDailyAmalReminderTime;
-  final TimeOfDay? defaultNaflReminderTime;
 
   // User reminder enabled flags
   final bool isDailyReminderEnabled;
@@ -1524,7 +1379,6 @@ class TodaysRemindersDialog extends StatefulWidget {
     this.defaultMorningDhikrReminderTime,
     this.defaultEveningDhikrReminderTime,
     this.defaultDailyAmalReminderTime,
-    this.defaultNaflReminderTime,
   });
 
   @override
@@ -1542,65 +1396,47 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     
     return Dialog(
       backgroundColor: Colors.transparent,
+      elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradients.cardGradient,
-          ),
-          border: Border.all(color: primary, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor.withOpacity(0.25),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'রিমাইন্ডার সময়সূচী',
-                      style: TextStyle(
-                        color: primary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.2,
-                      ),
+      child: buildPremiumCard(
+        context: context,
+        radius: 16,
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'রিমাইন্ডার সময়সূচী',
+                    style: TextStyle(
+                      color: primary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: primary),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      splashRadius: 18,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.50,
-                  child: _buildTodaysRemindersTab(),
-                ),
-              ],
-            ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close, color: primary),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    splashRadius: 18,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.50,
+                child: _buildTodaysRemindersTab(),
+              ),
+            ],
           ),
         ),
       ),
@@ -1637,7 +1473,9 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
         widget.defaultZuhrReminderTime!.minute,
       );
       todaysReminders.add(ReminderItem(
-        title: 'যোহরের পর ডিফল্ট রিমাইন্ডার',
+        title: DateTime.now().weekday == DateTime.friday
+            ? 'জুম\'আর পর ডিফল্ট রিমাইন্ডার'
+            : 'যোহরের পর ডিফল্ট রিমাইন্ডার',
         time: defaultZuhrDateTime,
         isPassed: now.isAfter(defaultZuhrDateTime),
         isDefault: true,
@@ -1737,22 +1575,6 @@ class _TodaysRemindersDialogState extends State<TodaysRemindersDialog> {
         title: 'দৈনিক আমল (ডিফল্ট)',
         time: defaultDailyAmalDateTime,
         isPassed: now.isAfter(defaultDailyAmalDateTime),
-        isDefault: true,
-      ));
-    }
-
-    if (widget.defaultNaflReminderTime != null) {
-      final defaultNaflDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        widget.defaultNaflReminderTime!.hour,
-        widget.defaultNaflReminderTime!.minute,
-      );
-      todaysReminders.add(ReminderItem(
-        title: 'নফল নামাজ (ডিফল্ট)',
-        time: defaultNaflDateTime,
-        isPassed: now.isAfter(defaultNaflDateTime),
         isDefault: true,
       ));
     }

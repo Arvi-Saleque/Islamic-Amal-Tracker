@@ -61,7 +61,7 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
   static const String _boxName = 'prayer_tracking';
   Box? _box;
 
-  final List<String> prayerNames = ['ফজর', 'যুহর', 'আসর', 'মাগরিব', 'এশা'];
+  final List<String> prayerNames = ['ফজর', 'যোহর', 'আসর', 'মাগরিব', 'এশা'];
 
   QazaPrayerNotifier()
       : super(QazaPrayerState(
@@ -107,6 +107,14 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
             final qazaDone = data['qazaDone'] != null 
                 ? Map<String, bool>.from(data['qazaDone'] as Map)
                 : <String, bool>{};
+
+            // Migrate old 'যুহর' key to 'যোহর'
+            if (prayerDone.containsKey('যুহর') && !prayerDone.containsKey('যোহর')) {
+              prayerDone['যোহর'] = prayerDone.remove('যুহর')!;
+            }
+            if (qazaDone.containsKey('যুহর') && !qazaDone.containsKey('যোহর')) {
+              qazaDone['যোহর'] = qazaDone.remove('যুহর')!;
+            }
 
             // Check each prayer
             for (final prayer in prayerNames) {
@@ -164,7 +172,7 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
             ? Map<String, bool>.from(data['qazaDone'] as Map)
             : <String, bool>{
                 'ফজর': false,
-                'যুহর': false,
+                'যোহর': false,
                 'আসর': false,
                 'মাগরিব': false,
                 'এশা': false,

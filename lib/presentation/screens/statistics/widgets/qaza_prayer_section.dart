@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../providers/qaza_prayer_provider.dart';
@@ -14,7 +15,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   // Track expanded state for each prayer
   final Map<String, bool> _expandedStates = {
     'ফজর': false,
-    'যুহর': false,
+    'যোহর': false,
     'আসর': false,
     'মাগরিব': false,
     'এশা': false,
@@ -188,7 +189,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            summary.prayerName,
+                            fridayAwareDisplay(summary.prayerName),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 17,
@@ -401,7 +402,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     switch (prayerName) {
       case 'ফজর':
         return Icons.wb_twilight;
-      case 'যুহর':
+      case 'যোহর':
         return Icons.wb_sunny;
       case 'আসর':
         return Icons.sunny_snowing;

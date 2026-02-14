@@ -44,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      // 🔥 Start heavy init in background (doesn't block UI)
+      // Start heavy init in background (doesn't block UI)
       unawaited(_bootstrapApp());
 
       // Permissions + your existing init flow
@@ -97,34 +97,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await Future.delayed(const Duration(milliseconds: 800));
     if (!mounted) return;
 
-    // ✅ Ask for location permission here (Home, after auth)
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    // Check if location service is ON
+    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // If location service is OFF, still schedule defaults with fallback coords.
-      PermissionService.showNotificationPermissionPopup(context);
-      await DailyReminderService.scheduleDefaultRollingWindowFromApi();
-      return;
+      // Show friendly dialog asking user to enable location
+      final shouldOpenSettings = await _showLocationServiceDialog();
+      if (shouldOpenSettings == true) {
+        await Geolocator.openLocationSettings();
+        // Wait a bit and check again
+        await Future.delayed(const Duration(seconds: 2));
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      }
     }
 
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
+    // If location service is now enabled, request permission
+    if (serviceEnabled) {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
 
-    final hasLocation = permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
+      final hasLocation = permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+
+      // If location granted, fetch prayer times with real coords
+      if (hasLocation) {
+        ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
+      }
+    }
 
     // Show notification popup (your existing behavior)
     PermissionService.showNotificationPermissionPopup(context);
 
-    // ✅ If location granted, upgrade prayer-times + rolling window defaults using real coords
-    if (hasLocation) {
-      // refresh prayer times provider (it will now use real location)
-      ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-    }
-
-    // ✅ Always schedule default rolling window (uses fallback coords if no location)
+    // Always schedule default rolling window (uses real coords or fallback)
     await DailyReminderService.scheduleDefaultRollingWindowFromApi();
+  }
+
+  Future<bool?> _showLocationServiceDialog() async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('লোকেশন চালু করুন'),
+        content: const Text(
+          'নামাজের সঠিক সময় পেতে আপনার ফোনের লোকেশন সার্ভিস চালু করুন।\n\n'
+          'লোকেশন বন্ধ থাকলে ঢাকার সময় অনুযায়ী রিমাইন্ডার পাবেন।'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('পরে করবো'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('লোকেশন চালু করুন'),
+          ),
+        ],
+      ),
+    );
   }
 
 
@@ -974,7 +1004,7 @@ Widget _sunChip({
       }
 
       // Next prayer after nafl is dhuhr
-      nextPrayerName = 'যোহর';
+      nextPrayerName = DateTime.now().weekday == DateTime.friday ? 'জুম\'আ' : 'যোহর';
       final dhuhrTime = state.prayerTimes['dhuhr'];
       if (dhuhrTime != null) {
         nextPrayerTimeStr = _formatTime(dhuhrTime);
@@ -1854,7 +1884,7 @@ Widget _buildPrayerTimeRow(
                     totalSins == 0
                         ? 'মাশাআল্লাহ! আজ কোনো গুনাহ নেই'
                         : pendingKaffara == 0
-                            ? 'আজ $totalSins টি গুনাহ • সব কাফফারা হয়েছে ✓'
+                            ? 'আজ $totalSins টি গুনাহ - সব কাফফারা হয়েছে'
                             : 'আজ $totalSins টি গুনাহ • $pendingKaffara বাকি',
                     style: TextStyle(
                       color: cs.onSurfaceVariant,

@@ -60,7 +60,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -74,7 +74,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             Text(
               'আমল ট্র্যাকার',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: const Color(0xFFD4AF37),
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -82,7 +82,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             Text(
               'ইসলামিক আমলের ডিজিটাল সঙ্গী',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   ),
             ),
           ],

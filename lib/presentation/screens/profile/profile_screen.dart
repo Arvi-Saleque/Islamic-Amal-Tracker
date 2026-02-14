@@ -1,4 +1,4 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
+import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/services/firestore_sync_service.dart';
@@ -46,9 +46,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('নাম আপডেট হয়েছে!'),
-          backgroundColor: Color(0xFF4CAF50),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     }
@@ -57,36 +57,55 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _handleLogout() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'লগআউট করবেন?',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'আপনি কি সত্যিই লগআউট করতে চান?',
-          style: TextStyle(color: Colors.grey[400]),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'না',
-              style: TextStyle(color: Colors.grey[400]),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: buildPremiumCard(
+          context: context,
+          radius: 16,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'লগআউট করবেন?',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            child: const Text('লগআউট'),
+              const SizedBox(height: 12),
+              Text(
+                'আপনি কি সত্যিই লগআউট করতে চান?',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(
+                      'না',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('লগআউট'),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
 
@@ -114,7 +133,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           content: Text(success 
               ? 'সব ডেটা ক্লাউডে ব্যাকআপ হয়েছে!' 
               : 'ব্যাকআপ ব্যর্থ হয়েছে'),
-          backgroundColor: success ? const Color(0xFF4CAF50) : Colors.red,
+          backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -123,34 +142,52 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _handleRestore() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'ডেটা রিস্টোর করবেন?',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'ক্লাউড থেকে সব ডেটা রিস্টোর করলে বর্তমান ডেটা রিপ্লেস হবে। চালিয়ে যেতে চান?',
-          style: TextStyle(color: Colors.grey[400]),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('না', style: TextStyle(color: Colors.grey[400])),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGold,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: buildPremiumCard(
+          context: context,
+          radius: 16,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ডেটা রিস্টোর করবেন?',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            child: const Text('রিস্টোর'),
+              const SizedBox(height: 12),
+              Text(
+                'ক্লাউড থেকে সব ডেটা রিস্টোর করলে বর্তমান ডেটা রিপ্লেস হবে। চালিয়ে যেতে চান?',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text('না', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('রিস্টোর'),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
 
@@ -168,7 +205,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           content: Text(success 
               ? 'সব ডেটা রিস্টোর হয়েছে! অ্যাপ রিস্টার্ট করুন।' 
               : 'রিস্টোর ব্যর্থ হয়েছে'),
-          backgroundColor: success ? const Color(0xFF4CAF50) : Colors.red,
+          backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -179,20 +216,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
+    final bg = Theme.of(context).scaffoldBackgroundColor;
+    final colors = Theme.of(context).colorScheme;
+
+    final iconColor = colors.primary;
+    final titleColor = colors.primary;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0A0A),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[0],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[1],
+                Theme.of(context)
+                    .extension<GradientColors>()!
+                    .appBarGradient[2],
+              ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
         elevation: 0,
         titleSpacing: 0,
-        title: const Text(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: iconColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
           'প্রোফাইল',
           style: TextStyle(
-            color: AppColors.primaryGold,
+            color: titleColor,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: AppColors.primaryGold),
+        centerTitle: true,
+        
       ),
       body: user == null
           ? _buildNotLoggedIn()
@@ -208,19 +281,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.primaryGold,
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                     ),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: AppColors.primaryGold.withOpacity(0.1),
+                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       child: Text(
                         _getInitials(user.displayName ?? user.email ?? 'U'),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
@@ -237,21 +310,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               Expanded(
                                 child: TextField(
                                   controller: _nameController,
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                                   decoration: InputDecoration(
                                     hintText: 'আপনার নাম',
-                                    hintStyle: TextStyle(color: Colors.grey[600]),
+                                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[700]!),
+                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Colors.grey[700]!),
+                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: const BorderSide(color: AppColors.primaryGold),
+                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -264,15 +337,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               IconButton(
                                 onPressed: _isUpdating ? null : _updateName,
                                 icon: _isUpdating
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: AppColors.primaryGold,
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       )
-                                    : const Icon(Icons.check, color: Color(0xFF4CAF50)),
+                                    : Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
                               ),
                               IconButton(
                                 onPressed: () {
@@ -281,7 +354,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     _nameController.text = user.displayName ?? '';
                                   });
                                 },
-                                icon: const Icon(Icons.close, color: Colors.red),
+                                icon: Icon(Icons.close, color: Theme.of(context).colorScheme.error),
                               ),
                             ],
                           )
@@ -292,16 +365,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 user.displayName ?? 'নাম সেট করা হয়নি',
                                 style: TextStyle(
                                   color: user.displayName != null 
-                                      ? Colors.white 
-                                      : Colors.grey[600],
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                                   fontSize: 16,
                                 ),
                               ),
                               IconButton(
                                 onPressed: () => setState(() => _isEditing = true),
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.edit,
-                                  color: AppColors.primaryGold,
+                                  color: Theme.of(context).colorScheme.primary,
                                   size: 20,
                                 ),
                               ),
@@ -319,8 +392,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Expanded(
                           child: Text(
                             user.email ?? '',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                             ),
                           ),
@@ -332,22 +405,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50).withOpacity(0.2),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.verified,
-                                  color: Color(0xFF4CAF50),
+                                  color: Theme.of(context).colorScheme.primary,
                                   size: 14,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
                                   'ভেরিফাইড',
                                   style: TextStyle(
-                                    color: Color(0xFF4CAF50),
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -365,8 +438,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     title: 'অ্যাকাউন্ট তৈরি',
                     child: Text(
                       _formatDate(user.metadata.creationTime),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                       ),
                     ),
@@ -374,24 +447,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 32),
                   
                   // Cloud Sync Section
-                  Container(
+                  buildPremiumCard(
+                    context: context,
+                    radius: 12,
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[850]!),
-                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.cloud_sync, color: AppColors.primaryGold, size: 20),
+                            Icon(Icons.cloud_sync, color: Theme.of(context).colorScheme.primary, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               'ক্লাউড সিংক',
                               style: TextStyle(
-                                color: Colors.grey[500],
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),
@@ -400,17 +470,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.15),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 12),
-                                  SizedBox(width: 4),
+                                  Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 12),
+                                  const SizedBox(width: 4),
                                   Text(
                                     'অটো সিংক অন',
-                                    style: TextStyle(color: Color(0xFF4CAF50), fontSize: 10),
+                                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 10),
                                   ),
                                 ],
                               ),
@@ -426,8 +496,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 icon: const Icon(Icons.cloud_upload, size: 18),
                                 label: const Text('ব্যাকআপ'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryGold,
-                                  foregroundColor: Colors.black,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -439,10 +509,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _isUpdating ? null : _handleRestore,
-                                icon: Icon(Icons.cloud_download, size: 18, color: Colors.grey[300]),
-                                label: Text('রিস্টোর', style: TextStyle(color: Colors.grey[300])),
+                                icon: Icon(Icons.cloud_download, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                label: Text('রিস্টোর', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                                 style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: Colors.grey[600]!),
+                                  side: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -453,24 +523,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ],
                         ),
                         if (_isUpdating)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 12),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
                             child: Center(
                               child: SizedBox(
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppColors.primaryGold,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),
                           ),
                         const SizedBox(height: 8),
                         Text(
-                          '✨ অটো সিংক: ডেটা চেঞ্জ হলেই ক্লাউডে সেভ হয়। অফলাইনে থাকলে নেট আসলে অটো সিংক হবে।\n\n• ব্যাকআপ: সব পুরনো ডেটা একসাথে আপলোড\n• রিস্টোর: ক্লাউড থেকে ডাউনলোড (নতুন ডিভাইসে)',
+                          'অটো সিংক: ডেটা চেঞ্জ হলেই ক্লাউডে সেভ হয়। অফলাইনে থাকলে নেট আসলে অটো সিংক হবে।\n\n• ব্যাকআপ: সব পুরনো ডেটা একসাথে আপলোড\n• রিস্টোর: ক্লাউড থেকে ডাউনলোড (নতুন ডিভাইসে)',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 11,
                           ),
                         ),
@@ -484,16 +554,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _handleLogout,
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
+                      icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+                      label: Text(
                         'লগআউট',
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Theme.of(context).colorScheme.error,
                           fontSize: 16,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
+                        side: BorderSide(color: Theme.of(context).colorScheme.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -515,13 +585,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Icon(
             Icons.account_circle_outlined,
             size: 80,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
           ),
           const SizedBox(height: 16),
           Text(
             'লগইন করা হয়নি',
             style: TextStyle(
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontSize: 18,
             ),
           ),
@@ -533,16 +603,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGold,
-              foregroundColor: Colors.black,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
+            child: Text(
               'লগইন করুন',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ],
@@ -555,24 +628,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required String title,
     required Widget child,
   }) {
-    return Container(
+    return buildPremiumCard(
+      context: context,
+      radius: 12,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[850]!),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primaryGold, size: 18),
+              Icon(icon, color: Theme.of(context).colorScheme.primary, size: 18),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.grey[500],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 12,
                 ),
               ),

@@ -44,7 +44,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     // Show loading indicator
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
               SizedBox(
@@ -52,15 +52,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              SizedBox(width: 12),
-              Text('ক্লাউড থেকে ডেটা লোড হচ্ছে...'),
+              const SizedBox(width: 12),
+              const Text('ক্লাউড থেকে ডেটা লোড হচ্ছে...'),
             ],
           ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Color(0xFF1A1A1A),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Theme.of(context).colorScheme.surface,
         ),
       );
     }
@@ -81,9 +81,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       final success = await authNotifier.forgotPassword(_emailController.text);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে!'),
-            backgroundColor: Color(0xFF4CAF50),
+          SnackBar(
+            content: const Text('পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে!'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
         setState(() {
@@ -122,9 +122,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('নতুন ভেরিফিকেশন লিংক পাঠানো হয়েছে!'),
-          backgroundColor: Color(0xFF4CAF50),
+        SnackBar(
+          content: const Text('নতুন ভেরিফিকেশন লিংক পাঠানো হয়েছে!'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     }
@@ -170,7 +170,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -182,23 +182,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.auto_fix_high,
                   size: 60,
-                  color: AppColors.primaryGold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 24),
               
-              const Text(
+              Text(
                 'আমল ট্র্যাকার',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -212,7 +212,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[400],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 40),
@@ -263,7 +263,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
                           onPressed: () {
                             setState(() {
@@ -292,7 +292,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
                           onPressed: () {
                             setState(() {
@@ -324,7 +324,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           child: Text(
                             'পাসওয়ার্ড ভুলে গেছেন?',
                             style: TextStyle(
-                              color: AppColors.primaryGold.withOpacity(0.8),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                               fontSize: 13,
                             ),
                           ),
@@ -340,19 +340,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       child: ElevatedButton(
                         onPressed: authState.isLoading ? null : _handleSubmit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGold,
-                          foregroundColor: Colors.black,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 0,
                         ),
                         child: authState.isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 24,
                                 height: 24,
                                 child: CircularProgressIndicator(
-                                  color: Colors.black,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   strokeWidth: 2,
                                 ),
                               )
@@ -383,7 +383,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         child: Text(
                           '← লগইন এ ফিরে যান',
                           style: TextStyle(
-                            color: Colors.grey[400],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 14,
                           ),
                         ),
@@ -397,7 +397,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 ? 'অ্যাকাউন্ট নেই?' 
                                 : 'অ্যাকাউন্ট আছে?',
                             style: TextStyle(
-                              color: Colors.grey[400],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontSize: 14,
                             ),
                           ),
@@ -410,8 +410,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             },
                             child: Text(
                               _isLogin ? 'রেজিস্টার করুন' : 'লগইন করুন',
-                              style: const TextStyle(
-                                color: AppColors.primaryGold,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -426,20 +426,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: Divider(color: Colors.grey[700]),
+                          child: Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'অথবা',
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                               fontSize: 12,
                             ),
                           ),
                         ),
                         Expanded(
-                          child: Divider(color: Colors.grey[700]),
+                          child: Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                         ),
                       ],
                     ),
@@ -450,7 +450,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     OutlinedButton(
                       onPressed: _handleSkip,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey[700]!),
+                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -464,14 +464,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         children: [
                           Icon(
                             Icons.cloud_off,
-                            color: Colors.grey[400],
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             'অফলাইনে চালিয়ে যান',
                             style: TextStyle(
-                              color: Colors.grey[400],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontSize: 14,
                             ),
                           ),
@@ -485,7 +485,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     Text(
                       'অফলাইন মোডে ডেটা শুধু এই ডিভাইসে সেভ থাকবে',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                         fontSize: 11,
                       ),
                     ),
@@ -515,33 +515,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         keyboardType: keyboardType,
         obscureText: obscureText,
         validator: validator,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.grey[400]),
-          prefixIcon: Icon(icon, color: Colors.grey[400]),
+          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+          prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
           suffixIcon: suffixIcon,
           filled: true,
-          fillColor: const Color(0xFF1A1A1A),
+          fillColor: Theme.of(context).colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[800]!),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primaryGold),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.red),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.red),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
           ),
         ),
       ),
@@ -550,7 +550,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   Widget _buildVerificationScreen(AuthState authState) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -561,23 +561,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGold.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.mark_email_unread_outlined,
                   size: 80,
-                  color: AppColors.primaryGold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 32),
               
-              const Text(
+              Text(
                 'ইমেইল ভেরিফাই করুন',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryGold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -587,7 +587,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[400],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   height: 1.5,
                 ),
               ),
@@ -596,19 +596,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[800]!),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.email, color: Colors.grey[400], size: 20),
+                    Icon(Icons.email, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), size: 20),
                     const SizedBox(width: 8),
                     Text(
                       _emailController.text,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -624,8 +624,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: ElevatedButton(
                   onPressed: _goBackToLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: Colors.black,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -645,19 +645,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               TextButton.icon(
                 onPressed: authState.isLoading ? null : _resendVerification,
                 icon: authState.isLoading 
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.primaryGold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       )
                     : const Icon(Icons.refresh, size: 18),
                 label: Text(
                   authState.isLoading ? 'পাঠানো হচ্ছে...' : 'আবার লিংক পাঠান',
                   style: TextStyle(
-                    color: AppColors.primaryGold.withOpacity(0.8),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -668,19 +668,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                    Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'ইমেইল না পেলে স্প্যাম ফোল্ডার চেক করুন',
                         style: TextStyle(
-                          color: Colors.blue[200],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                           fontSize: 12,
                         ),
                       ),

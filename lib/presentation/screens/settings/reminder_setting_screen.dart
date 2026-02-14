@@ -944,7 +944,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
+          'Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
           'Settings → Apps → Permissions → Autostart / Background autostart\n'
               '• আমল ট্র্যাকার = ON',
           isImportant: true,
@@ -977,7 +977,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Sleeping Apps বন্ধ',
+          'Sleeping Apps বন্ধ',
           'Settings → Battery → Background usage limits\n'
               '• Put unused apps to sleep = OFF\n'
               '• Sleeping apps / Deep sleeping apps থেকে আমল ট্র্যাকার Remove করুন',
@@ -1006,14 +1006,14 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Auto-launch Enable',
+          'Auto-launch Enable',
           'Settings → Apps → Special app access → Auto-launch\n'
               '• আমল ট্র্যাকার = Enable',
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          '⭐ Deep Optimization বন্ধ',
+          'Deep Optimization বন্ধ',
           'Settings → Battery → Deep optimization\n'
               '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
           isImportant: true,
@@ -1034,7 +1034,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Auto-launch / Startup Manager',
+          'Auto-launch / Startup Manager',
           'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
               '• আমল ট্র্যাকার = Enable\n'
               '• Secondary launch / Background launch = Allow',
@@ -1056,7 +1056,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Auto-start',
+          'Auto-start',
           'Settings → Battery → Background power consumption management / Autostart\n'
               '• আমল ট্র্যাকার = Allow',
           isImportant: true,
@@ -1083,7 +1083,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ App Launch (Manual)',
+          'App Launch (Manual)',
           'Settings → Apps → App launch → আমল ট্র্যাকার\n'
               '• Manage manually = ON\n'
               '• Auto-launch = ON\n'
@@ -1158,7 +1158,7 @@ class _DeviceGuideSheet extends StatelessWidget {
       children: [
         _buildSettingItem(
           context,
-          '⭐ Auto-start',
+          'Auto-start',
           'Settings → Apps → Autostart manager\n'
               '• আমল ট্র্যাকার = Enable',
           isImportant: true,

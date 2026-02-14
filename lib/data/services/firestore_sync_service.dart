@@ -51,7 +51,7 @@ class FirestoreSyncService {
   /// Sync prayer tracking data
   Future<void> syncPrayerTracking(String date, Map<String, dynamic> data) async {
     if (!canSync) {
-      print('⚠️ Cannot sync prayer_tracking - not logged in');
+      print('Cannot sync prayer_tracking - not logged in');
       return;
     }
     try {
@@ -59,16 +59,16 @@ class FirestoreSyncService {
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      print('✅ Synced prayer_tracking for $date');
+      print('Synced prayer_tracking for $date');
     } catch (e) {
-      print('❌ Error syncing prayer tracking: $e');
+      print('Error syncing prayer tracking: $e');
     }
   }
 
   /// Sync daily amal data
   Future<void> syncDailyAmal(String date, Map<String, dynamic> data) async {
     if (!canSync) {
-      print('⚠️ Cannot sync daily_amal - not logged in');
+      print('Cannot sync daily_amal - not logged in');
       return;
     }
     try {
@@ -76,9 +76,9 @@ class FirestoreSyncService {
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      print('✅ Synced daily_amal for $date');
+      print('Synced daily_amal for $date');
     } catch (e) {
-      print('❌ Error syncing daily amal: $e');
+      print('Error syncing daily amal: $e');
     }
   }
 
@@ -155,7 +155,7 @@ class FirestoreSyncService {
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      print('✅ Synced statistics');
+      print('Synced statistics');
     } catch (e) {
       print('Error syncing statistics: $e');
     }
@@ -165,15 +165,15 @@ class FirestoreSyncService {
 
   /// Restore all data from cloud to local
   Future<bool> restoreAllData() async {
-    print('🔄 RestoreAllData called. canSync: $canSync, userId: $userId');
+    print('RestoreAllData called. canSync: $canSync, userId: $userId');
     
     if (!canSync) {
-      print('❌ Cannot sync - Firebase not available or user not logged in');
+      print('Cannot sync - Firebase not available or user not logged in');
       return false;
     }
     
     try {
-      print('📥 Starting restore from Firestore...');
+      print('Starting restore from Firestore...');
       await Future.wait([
         _restorePrayerTracking(),
         _restoreDailyAmal(),
@@ -183,10 +183,10 @@ class FirestoreSyncService {
         _restoreSinTypes(),
         _restoreStatistics(),
       ]);
-      print('✅ All data restored successfully!');
+      print('All data restored successfully!');
       return true;
     } catch (e) {
-      print('❌ Error restoring data: $e');
+      print('Error restoring data: $e');
       return false;
     }
   }
@@ -197,7 +197,7 @@ class FirestoreSyncService {
         .collection('days')
         .get();
     
-    print('📥 Restoring prayer_tracking: ${snapshot.docs.length} documents');
+    print('Restoring prayer_tracking: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('prayer_tracking');
     for (var doc in snapshot.docs) {
       final data = doc.data();
@@ -212,7 +212,7 @@ class FirestoreSyncService {
         .collection('days')
         .get();
     
-    print('📥 Restoring daily_amal: ${snapshot.docs.length} documents');
+    print('Restoring daily_amal: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('daily_amal');
     for (var doc in snapshot.docs) {
       final data = doc.data();
@@ -227,7 +227,7 @@ class FirestoreSyncService {
         .collection('days')
         .get();
     
-    print('📥 Restoring dhikr_counter: ${snapshot.docs.length} documents');
+    print('Restoring dhikr_counter: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('dhikr_counter');
     for (var doc in snapshot.docs) {
       final data = doc.data();
@@ -283,7 +283,7 @@ class FirestoreSyncService {
       data.remove('updatedAt');
       final box = await Hive.openBox('statistics');
       await box.put('statistics_data', data);
-      print('📥 Restored statistics data');
+      print('Restored statistics data');
     }
   }
 

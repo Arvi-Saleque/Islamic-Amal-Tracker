@@ -1,6 +1,6 @@
 class QazaPrayerModel {
   final String date; // Format: yyyy-MM-dd
-  final String prayerName; // ফজর, যুহর, আসর, মাগরিব, এশা
+  final String prayerName; // ফজর, যোহর, আসর, মাগরিব, এশা
   final bool isCompleted;
   final DateTime? completedAt;
 

@@ -525,6 +525,7 @@ class AppTheme {
       onSecondary: AppColors.onSecondaryDark,
       onSurface: AppColors.onSurface,
       onSurfaceVariant: AppColors.onSurfaceVariant,
+      error: AppColors.error,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
     appBarTheme: const AppBarTheme(
@@ -612,6 +613,7 @@ class AppTheme {
       onPrimary: AppColors.onPrimaryTextLight,
       onSecondary: AppColors.onPrimaryTextLight,
       onSurface: AppColors.textLightMode,
+      error: AppColors.error,
     ),
     scaffoldBackgroundColor: AppColors.backgroundLightMode,
     appBarTheme: const AppBarTheme(

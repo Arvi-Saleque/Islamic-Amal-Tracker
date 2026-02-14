@@ -98,7 +98,7 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
         '২ রাকাত ফরয (দেরী করে)': false,
         '২ রাকাত সুন্নাত': false,
       },
-      'যুহর': {
+      'যোহর': {
         '৪ রাকাত সুন্নাত (আগে)': false,
         '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
         '৪ রাকাত ফরয (দেরী করে)': false,
@@ -122,7 +122,7 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
     };
     
     // Check each prayer and migrate
-    for (final prayer in ['ফজর', 'যুহর', 'আসর', 'মাগরিব', 'এশা']) {
+    for (final prayer in ['ফজর', 'যোহর', 'আসর', 'মাগরিব', 'এশা']) {
       final newRakats = Map<String, bool>.from(newFormats[prayer]!);
       final validKeys = newFormats[prayer]!.keys.toSet();
       
@@ -294,7 +294,7 @@ class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
   // Check if prayer is expanded
   final Map<String, bool> _expandedStates = {
     'ফজর': false,
-    'যুহর': false,
+    'যোহর': false,
     'আসর': false,
     'মাগরিব': false,
     'এশা': false,

@@ -93,14 +93,15 @@ class PrayerTimeService {
     return nextTime.difference(now);
   }
   
-  static String getPrayerName(PrayerType type, {bool inBangla = true}) {
+  static String getPrayerName(PrayerType type, {bool inBangla = true, DateTime? date}) {
     if (!inBangla) return type.name;
     
     switch (type) {
       case PrayerType.fajr:
         return 'ফজর';
       case PrayerType.dhuhr:
-        return 'যোহর';
+        final d = date ?? DateTime.now();
+        return d.weekday == DateTime.friday ? 'জুম\'আ' : 'যোহর';
       case PrayerType.asr:
         return 'আসর';
       case PrayerType.maghrib:

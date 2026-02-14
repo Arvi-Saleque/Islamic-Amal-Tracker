@@ -142,13 +142,13 @@ class PermissionService {
     
     if (!notification.isGranted || !alarm.isGranted) {
       if (context.mounted) {
-        // ✅ Show only the GREEN setup dialog
+        // Show only the GREEN setup dialog
         await showNotificationPermissionPopup(context);
       }
       return;
     }
 
-    // ✅ Permissions are granted -> schedule
+    // Permissions are granted -> schedule
     await DailyReminderService.scheduleDefaultDailyAmalReminder();
     await DailyReminderService.rescheduleReminderIfNeeded();
     await DailyReminderService.scheduleDefaultRollingWindowFromApi();

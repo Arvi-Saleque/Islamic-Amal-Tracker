@@ -1,7 +1,7 @@
 name: amal_tracker
 description: Professional Bengali Islamic Amal (practice) tracker app with prayer times, dhikr counters, and analytics
 publish_to: 'none'
-version: 1.0.8+15
+version: 1.0.8+20
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -127,4 +127,22 @@ flutter:
       fonts:
         - asset: assets/fonts/Li Alinur Nakkhatra Unicode.ttf
         - asset: assets/fonts/Li Alinur Nakkhatra Unicode Italic.ttf
+          style: italic
+    
+    - family: MasudKortoa
+      fonts:
+        - asset: assets/fonts/BL Masud Kortoa Unicode Plain.ttf
+        - asset: assets/fonts/BL Masud Kortoa Unicode Plain Italic.ttf
+          style: italic
+    
+    - family: JashirAbhyuday
+      fonts:
+        - asset: assets/fonts/Li Jashir Abhyuday Unicode.ttf
+        - asset: assets/fonts/Li Jashir Abhyuday Unicode Italic.ttf
+          style: italic
+    
+    - family: MehdiEkushey
+      fonts:
+        - asset: assets/fonts/Li Mehdi Ekushey Unicode.ttf
+        - asset: assets/fonts/Li Mehdi Ekushey Unicode Italic.ttf
           style: italic

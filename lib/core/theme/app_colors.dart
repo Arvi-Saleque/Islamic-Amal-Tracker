@@ -61,7 +61,7 @@ static const Color iconBgLightMode =
   // Accent Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color warning = Color(0xFFFF9800); // Orange
-  static const Color error = Color(0xFFE57373); // Light red
+  static const Color error = Color.fromARGB(255, 236, 46, 46); // Light red
   static const Color danger = Colors.red; // Red
 
   // Shadow Colors (Dark Theme)

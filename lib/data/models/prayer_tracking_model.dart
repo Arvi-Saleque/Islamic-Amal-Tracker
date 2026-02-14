@@ -11,7 +11,7 @@ class PrayerTrackingModel {
     Map<String, bool>? qazaDone,
   }) : qazaDone = qazaDone ?? {
           'ফজর': false,
-          'যুহর': false,
+          'যোহর': false,
           'আসর': false,
           'মাগরিব': false,
           'এশা': false,
@@ -32,18 +32,33 @@ class PrayerTrackingModel {
 
   // Create from JSON
   factory PrayerTrackingModel.fromJson(Map<String, dynamic> json) {
+    final prayerDone = Map<String, bool>.from(json['prayerDone'] as Map);
+    final rakatsDone = (json['rakatsDone'] as Map).map(
+      (prayer, rakats) => MapEntry(
+        prayer.toString(),
+        Map<String, bool>.from(rakats as Map),
+      ),
+    );
+    var qazaDone = json['qazaDone'] != null
+        ? Map<String, bool>.from(json['qazaDone'] as Map)
+        : null;
+
+    // Migrate old 'যুহর' key to 'যোহর'
+    if (prayerDone.containsKey('যুহর') && !prayerDone.containsKey('যোহর')) {
+      prayerDone['যোহর'] = prayerDone.remove('যুহর')!;
+    }
+    if (rakatsDone.containsKey('যুহর') && !rakatsDone.containsKey('যোহর')) {
+      rakatsDone['যোহর'] = rakatsDone.remove('যুহর')!;
+    }
+    if (qazaDone != null && qazaDone.containsKey('যুহর') && !qazaDone.containsKey('যোহর')) {
+      qazaDone['যোহর'] = qazaDone.remove('যুহর')!;
+    }
+
     return PrayerTrackingModel(
       date: json['date'] as String,
-      prayerDone: Map<String, bool>.from(json['prayerDone'] as Map),
-      rakatsDone: (json['rakatsDone'] as Map).map(
-        (prayer, rakats) => MapEntry(
-          prayer.toString(),
-          Map<String, bool>.from(rakats as Map),
-        ),
-      ),
-      qazaDone: json['qazaDone'] != null 
-          ? Map<String, bool>.from(json['qazaDone'] as Map)
-          : null,
+      prayerDone: prayerDone,
+      rakatsDone: rakatsDone,
+      qazaDone: qazaDone,
     );
   }
 
@@ -53,7 +68,7 @@ class PrayerTrackingModel {
       date: date,
       prayerDone: {
         'ফজর': false,
-        'যুহর': false,
+        'যোহর': false,
         'আসর': false,
         'মাগরিব': false,
         'এশা': false,
@@ -64,7 +79,7 @@ class PrayerTrackingModel {
           '২ রাকাত ফরয (দেরী করে)': false,
           '২ রাকাত সুন্নাত': false,
         },
-        'যুহর': {
+        'যোহর': {
           '৪ রাকাত সুন্নাত (আগে)': false,
           '৪ রাকাত ফরয (জামাতে/আউয়াল ওয়াক্তে)': false,
           '৪ রাকাত ফরয (দেরী করে)': false,

@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:flutter/material.dart';
 import '../../../providers/statistics_provider.dart';
 import '../../../../data/models/sin_tracker_model.dart';
@@ -309,7 +310,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               runSpacing: 8,
               children: prayer.prayerDone.entries.map((entry) {
                 return _PrayerChip(
-                  name: entry.key,
+                  name: fridayAwareDisplay(entry.key, date: widget.date),
                   isCompleted: entry.value,
                 );
               }).toList(),
@@ -338,7 +339,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
           ? Column(
               children: amal.items.map((item) {
                 return _AmalItem(
-                  title: item.title,
+                  title: fridayAwareDisplay(item.title, date: widget.date),
                   isCompleted: item.isCompleted,
                 );
               }).toList(),

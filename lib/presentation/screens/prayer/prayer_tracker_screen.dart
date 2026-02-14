@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +17,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     with TickerProviderStateMixin {
   final Map<String, bool> expanded = {
     'ফজর': false,
-    'যুহর': false,
+    'যোহর': false,
     'আসর': false,
     'মাগরিব': false,
     'এশা': false,
@@ -103,7 +104,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
               const SizedBox(height: 14),
               _buildPrayerTile('ফজর'),
               const SizedBox(height: 12),
-              _buildPrayerTile('যুহর'),
+              _buildPrayerTile('যোহর'),
               const SizedBox(height: 12),
               _buildPrayerTile('আসর'),
               const SizedBox(height: 12),
@@ -173,7 +174,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                           children: [
                             Expanded(
                               child: Text(
-                                prayer,
+                                fridayAwareDisplay(prayer),
                                 style: TextStyle(
                                   color: titleColor,
                                   fontSize: 17.5,
@@ -337,7 +338,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  rakat,
+                  fridayAwareRakat(prayer, rakat),
                   style: TextStyle(
                     color: textColor,
                     fontSize: 14.8,
@@ -779,7 +780,6 @@ class _InfoCard extends StatelessWidget {
               fontSize: 14,
               height: 1.7,
               fontWeight: FontWeight.w600,
-              fontFamily: 'AlinurBanglaborno',
             ),
           ),
         ],

@@ -167,27 +167,15 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // ---------- UI helpers (NO borders, small shadow) ----------
+  // ---------- UI helpers (Premium card styling) ----------
 
   Widget _softCard({
     required BuildContext context,
     required Widget child,
   }) {
-    final cardColor = Theme.of(context).colorScheme.surface;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 16,
-            spreadRadius: 0,
-            offset: const Offset(0, 8),
-            color: Theme.of(context).shadowColor.withOpacity(0.06),
-          ),
-        ],
-      ),
+    return buildPremiumCard(
+      context: context,
+      radius: 16,
       child: child,
     );
   }
@@ -257,7 +245,7 @@ class SettingsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'অ্যাপ সম্পর্কে 📱',
+            'অ্যাপ সম্পর্কে',
             style: TextStyle(
               color: headerColor,
               fontSize: 16,
@@ -315,25 +303,13 @@ class SettingsScreen extends ConsumerWidget {
     required Color titleColor,
     required Color subColor,
   }) {
-    final tileBg = Theme.of(context).colorScheme.surface;
-
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
-      child: Container(
+      child: buildPremiumCard(
+        context: context,
+        radius: 16,
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: tileBg,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 16,
-              spreadRadius: 0,
-              offset: const Offset(0, 8),
-              color: Theme.of(context).shadowColor.withOpacity(0.06),
-            ),
-          ],
-        ),
         child: Row(
           children: [
             Container(
@@ -408,86 +384,98 @@ class SettingsScreen extends ConsumerWidget {
   void _showVersionDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Row(
-          children: const [
-            Icon(Icons.info, color: Color(0xFFD4AF37)),
-            SizedBox(width: 8),
-            Text(
-              'আমল ট্র্যাকার',
-              style: TextStyle(color: Color(0xFFD4AF37)),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'সংস্করণ: v1.0.8',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 16,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: buildPremiumCard(
+          context: context,
+          radius: 16,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.info, color: Color(0xFFD4AF37)),
+                  SizedBox(width: 8),
+                  Text(
+                    'আমল ট্র্যাকার',
+                    style: TextStyle(color: Color(0xFFD4AF37), fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'বিল্ড: 13',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'ডেভেলপার: Salek Bin Hossain, Effy Tech',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () async {
-                final Uri emailUri = Uri(scheme: 'mailto', path: 'effttech@gmail.com');
-                try {
-                  await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-                } catch (_) {}
-              },
-              child: const Text(
-                'effttech@gmail.com',
+              const SizedBox(height: 16),
+              Text(
+                'সংস্করণ: v1.0.8',
                 style: TextStyle(
-                  color: Color(0xFFD4AF37),
-                  fontSize: 14,
-                  decoration: TextDecoration.underline,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.10)),
-            const SizedBox(height: 8),
-            Text(
-              '© ২০২৬ সর্বস্বত্ব সংরক্ষিত',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 12,
+              const SizedBox(height: 8),
+              Text(
+                'বিল্ড: 13',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'ঠিক আছে',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              Text(
+                'ডেভেলপার: Salek Bin Hossain, Effy Tech',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () async {
+                  final Uri emailUri = Uri(scheme: 'mailto', path: 'effttech@gmail.com');
+                  try {
+                    await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+                  } catch (_) {}
+                },
+                child: const Text(
+                  'effttech@gmail.com',
+                  style: TextStyle(
+                    color: Color(0xFFD4AF37),
+                    fontSize: 14,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.10)),
+              const SizedBox(height: 8),
+              Text(
+                '© ২০২৬ সর্বস্বত্ব সংরক্ষিত',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'ঠিক আছে',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
