@@ -547,7 +547,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    fontFamily: 'HindSiliguri',
+    fontFamily: 'MehdiEkushey',
     textTheme: const TextTheme(
       headlineLarge: TextStyle(
         fontSize: 32,
@@ -640,7 +640,7 @@ class AppTheme {
       color: AppColors.borderLightMode,
       thickness: 1,
     ),
-    fontFamily: 'HindSiliguri',
+    fontFamily: 'MehdiEkushey',
     textTheme: const TextTheme(
       titleLarge: TextStyle(
         fontSize: 18,
