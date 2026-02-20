@@ -229,7 +229,7 @@ class DailyReminderService {
     await _notifications.show(
       0,
       'আমল রিমাইন্ডার',
-      'আজকের আমলগুলো করতে ভুলবেন না!',
+      'যে সকল আমল(যিকির/পড়াশোনা) বাকি আছে সেগুলো সম্পন্ন করে নিন।',
       notificationDetails,
     );
   }
@@ -293,11 +293,11 @@ class DailyReminderService {
     }
 
     const offsets = {
-      'fajr': 30,
+      'fajr': 5,
       'dhuhr': 60,
       'asr': 15,
       'maghrib': 10,
-      'isha': 60,
+      'isha': 30,
     };
 
     for (final prayer in PrayerName.values) {
@@ -334,8 +334,8 @@ class DailyReminderService {
 
       await _notifications.zonedSchedule(
         _getDefaultPrayerNotificationId(prayer),
-        '${_displayPrayerName(prayer)} নামাজ',
-        'নামাজ আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।',
+        '${_displayPrayerName(prayer)} এর সালাত',
+        '${_displayPrayerName(prayer)} এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
         target,
         details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -376,7 +376,7 @@ class DailyReminderService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       styleInformation: BigTextStyleInformation(
-        'প্রতিদিনের নির্ধারিত আমলসমূহ সম্পন্ন না করলে সম্পন্ন করুন।',
+        'যে সকল আমল(যিকির/পড়াশোনা) বাকি আছে সেগুলো সম্পন্ন করে নিন।',
         contentTitle: 'দৈনিক আমল রিমাইন্ডার',
       ),
     );
@@ -1050,11 +1050,11 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
     // Offsets (your default rules)
     const offsets = <String, int>{
-      'fajr': 30,
+      'fajr': 5,
       'dhuhr': 60,
       'asr': 15,
       'maghrib': 10,
-      'isha': 60,
+      'isha': 30,
     };
 
     for (int i = 0; i < daysAhead; i++) {
@@ -1098,8 +1098,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
         await _notifications.zonedSchedule(
           _defaultPrayerIdForDayIndex(i, p),
-          '$prayerLabel নামাজ',
-          'নামাজ আদায় করে নিন। অজুর সময় মিসওয়াক করতে ভুলবেন না।',
+          '$prayerLabel এর সালাত',
+          '$prayerLabel এর সালাতের সময় হয়ে গেছে। সালাত আদায় করে নিন।\nঅজুর সময় মিসওয়াক করতে ভুলবেন না।',
           target,
           const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -1123,7 +1123,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       if (morning.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, true),
-          'Morning Dhikr',
+          'সকালের যিকির',
           'সকালের যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সকালের আযকার সম্পন্ন করুন।',
           morning,
           const NotificationDetails(
@@ -1147,7 +1147,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       if (evening.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, false),
-          'Evening Dhikr',
+          'সন্ধ্যার যিকির',
           'সন্ধ্যার যিকিরের সময় হয়েছে। প্রতিদিনের আমল থেকে সন্ধ্যার আযকার সম্পন্ন করুন।',
           evening,
           const NotificationDetails(
