@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -240,13 +240,13 @@ class DailyReminderService {
 
     final now = tz.TZDateTime.now(tz.local);
 
-    // Default: 10:00 PM
+    // Default: 11:00 PM
     var scheduledDate = tz.TZDateTime(
       tz.local,
       now.year,
       now.month,
       now.day,
-      22,
+      23,
       00,
     );
 
@@ -931,8 +931,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     final last = prefs.getString(_kDefaultDhikrLastScheduledDay);
     if (last == today) return;
 
-    // Morning dhikr = fajr + 60
-    final morning = fajrTime.add(const Duration(minutes: 60));
+    // Morning dhikr = fajr + 30
+    final morning = fajrTime.add(const Duration(minutes: 30));
     await _notifications.cancel(_defaultMorningDhikrId);
     await _notifications.zonedSchedule(
       _defaultMorningDhikrId,
@@ -1119,7 +1119,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
       // ===== Default dhikr =====
       final morning = tz.TZDateTime.from(
-          pt['fajr']!.add(const Duration(minutes: 60)), tz.local);
+          pt['fajr']!.add(const Duration(minutes: 30)), tz.local);
       if (morning.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, true),
