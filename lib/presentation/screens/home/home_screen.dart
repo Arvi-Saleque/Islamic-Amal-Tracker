@@ -20,6 +20,7 @@ import '../statistics/statistics_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
 import '../../../services/daily_reminder_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
@@ -97,34 +98,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await Future.delayed(const Duration(milliseconds: 800));
     if (!mounted) return;
 
-    // Check if location service is ON
-    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Show friendly dialog asking user to enable location
-      final shouldOpenSettings = await _showLocationServiceDialog();
-      if (shouldOpenSettings == true) {
-        await Geolocator.openLocationSettings();
-        // Wait a bit and check again
-        await Future.delayed(const Duration(seconds: 2));
-        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    // Check if user already has a saved location
+    final prefs = await SharedPreferences.getInstance();
+    final hasSavedLocation = prefs.getDouble('saved_lat') != null &&
+        prefs.getDouble('saved_lon') != null;
+
+    if (!hasSavedLocation) {
+      // No saved location — check location service and request permission
+      var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Show friendly dialog asking user to enable location
+        final shouldOpenSettings = await _showLocationServiceDialog();
+        if (shouldOpenSettings == true) {
+          await Geolocator.openLocationSettings();
+          // Wait a bit and check again
+          await Future.delayed(const Duration(seconds: 2));
+          serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        }
+      }
+
+      // If location service is now enabled, request permission
+      if (serviceEnabled) {
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
       }
     }
 
-    // If location service is now enabled, request permission
-    if (serviceEnabled) {
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      final hasLocation = permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse;
-
-      // If location granted, fetch prayer times with real coords
-      if (hasLocation) {
-        ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
-      }
-    }
+    // Always fetch prayer times (provider handles saved/live/default internally)
+    ref.read(prayerTimesProvider.notifier).fetchPrayerTimes();
 
     // Show notification popup (your existing behavior)
     PermissionService.showNotificationPermissionPopup(context);
@@ -157,24 +160,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Refresh — location off thakle dialog dekhabe, on thakle real location fetch korbe
+  /// Refresh — uses saved location if available, otherwise asks to enable location
   Future<void> _refreshAll() async {
     final cs = Theme.of(context).colorScheme;
 
-    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      final shouldOpenSettings = await _showLocationServiceDialog();
-      if (shouldOpenSettings == true) {
-        await Geolocator.openLocationSettings();
-        await Future.delayed(const Duration(seconds: 2));
-        serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      }
-    }
+    // Check if user has a saved location
+    final prefs = await SharedPreferences.getInstance();
+    final hasSavedLocation = prefs.getDouble('saved_lat') != null &&
+        prefs.getDouble('saved_lon') != null;
 
-    if (serviceEnabled) {
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+    if (!hasSavedLocation) {
+      // No saved location — show dialog if location service is off
+      var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        final shouldOpenSettings = await _showLocationServiceDialog();
+        if (shouldOpenSettings == true) {
+          await Geolocator.openLocationSettings();
+          await Future.delayed(const Duration(seconds: 2));
+          serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        }
+      }
+
+      if (serviceEnabled) {
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
       }
     }
 
@@ -189,10 +200,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!mounted) return;
 
     final locationOn = await Geolocator.isLocationServiceEnabled();
+    final hasAnySavedLocation = prefs.getDouble('saved_lat') != null;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          locationOn
+          (locationOn || hasAnySavedLocation)
               ? 'ডেটা আপডেট হয়েছে'
               : 'লোকেশন বন্ধ — ঢাকার সময় দেখাচ্ছে',
         ),

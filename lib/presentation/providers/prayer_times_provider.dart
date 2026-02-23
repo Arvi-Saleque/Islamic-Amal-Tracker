@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PrayerTimesState {
   final Map<String, DateTime> prayerTimes;
@@ -337,6 +338,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
 
       // Reverse geocode to get location name
       String cityName = 'ঢাকা';
+      final cityPrefs = await SharedPreferences.getInstance();
       try {
         final placemarks = await placemarkFromCoordinates(
           position.latitude,
@@ -349,13 +351,21 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
               place.administrativeArea ??
               'ঢাকা';
         }
+        // Save city name for offline use
+        await cityPrefs.setString('saved_city_name', cityName);
       } catch (e) {
-        const fallbackLat = 23.8103;
-        const fallbackLon = 90.4125;
-        final isNearDhaka =
-            (position.latitude - fallbackLat).abs() < 0.01 &&
-            (position.longitude - fallbackLon).abs() < 0.01;
-        cityName = isNearDhaka ? 'ঢাকা' : 'বাংলাদেশ';
+        // Try saved city name first
+        final savedCityName = cityPrefs.getString('saved_city_name');
+        if (savedCityName != null) {
+          cityName = savedCityName;
+        } else {
+          const fallbackLat = 23.8103;
+          const fallbackLon = 90.4125;
+          final isNearDhaka =
+              (position.latitude - fallbackLat).abs() < 0.01 &&
+              (position.longitude - fallbackLon).abs() < 0.01;
+          cityName = isNearDhaka ? 'ঢাকা' : 'বাংলাদেশ';
+        }
       }
 
       // Calculate prayer times using adhan_dart
@@ -463,61 +473,61 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
     const fallbackLat = 23.8103;
     const fallbackLon = 90.4125;
 
+    Position _fallback({double? lat, double? lon}) => Position(
+      latitude: lat ?? fallbackLat,
+      longitude: lon ?? fallbackLon,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+
     try {
+      // 1. Try live location if service + permission available
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return Position(
-          latitude: fallbackLat,
-          longitude: fallbackLon,
-          timestamp: DateTime.now(),
-          accuracy: 0,
-          altitude: 0,
-          heading: 0,
-          speed: 0,
-          speedAccuracy: 0,
-          altitudeAccuracy: 0,
-          headingAccuracy: 0,
-        );
+      if (serviceEnabled) {
+        final permission = await Geolocator.checkPermission();
+        final canUseLocation = permission == LocationPermission.always ||
+            permission == LocationPermission.whileInUse;
+
+        if (canUseLocation) {
+          final pos = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+          // Save location for future use when service is off
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setDouble('saved_lat', pos.latitude);
+          await prefs.setDouble('saved_lon', pos.longitude);
+          return pos;
+        }
       }
 
-      final permission = await Geolocator.checkPermission();
+      // 2. Live location not available — use saved location if exists
+      final prefs = await SharedPreferences.getInstance();
+      final savedLat = prefs.getDouble('saved_lat');
+      final savedLon = prefs.getDouble('saved_lon');
 
-      final canUseLocation = permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse;
-
-      if (!canUseLocation) {
-        // DO NOT request permission here
-        return Position(
-          latitude: fallbackLat,
-          longitude: fallbackLon,
-          timestamp: DateTime.now(),
-          accuracy: 0,
-          altitude: 0,
-          heading: 0,
-          speed: 0,
-          speedAccuracy: 0,
-          altitudeAccuracy: 0,
-          headingAccuracy: 0,
-        );
+      if (savedLat != null && savedLon != null) {
+        return _fallback(lat: savedLat, lon: savedLon);
       }
 
-      // Permission already granted -> safe to read location
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      // 3. No saved, no live — fallback to Dhaka
+      return _fallback();
     } catch (_) {
-      return Position(
-        latitude: fallbackLat,
-        longitude: fallbackLon,
-        timestamp: DateTime.now(),
-        accuracy: 0,
-        altitude: 0,
-        heading: 0,
-        speed: 0,
-        speedAccuracy: 0,
-        altitudeAccuracy: 0,
-        headingAccuracy: 0,
-      );
+      // Error — try saved location, then fallback to Dhaka
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedLat = prefs.getDouble('saved_lat');
+        final savedLon = prefs.getDouble('saved_lon');
+        if (savedLat != null && savedLon != null) {
+          return _fallback(lat: savedLat, lon: savedLon);
+        }
+      } catch (_) {}
+      return _fallback();
     }
   }
 }

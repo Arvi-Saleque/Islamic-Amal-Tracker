@@ -1295,6 +1295,16 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       letterSpacing: 0.3,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'বিঃদ্রঃ বাংলা উচ্চারণ দেওয়া আছে কিন্তু বাংলা উচ্চারণ দেখে পড়ার জন্য নিরুৎসাহিত করা হচ্ছে।',
+                    style: TextStyle(
+                      color: cs.primary.withOpacity(0.3),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
                   const SizedBox(height: 14),
                   // Decorative bottom line
                   Row(

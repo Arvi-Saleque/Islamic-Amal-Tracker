@@ -1026,17 +1026,37 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     double lat = 23.8103;
     double lon = 90.4125;
 
+    bool gotLiveLocation = false;
     final perm = await Geolocator.checkPermission();
     final canUseLocation =
         perm == LocationPermission.always || perm == LocationPermission.whileInUse;
 
     if (canUseLocation) {
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      // Round to 2 decimal places (~1.1km) so same-area devices get identical prayer times
-      lat = (pos.latitude * 100).round() / 100;
-      lon = (pos.longitude * 100).round() / 100;
+      try {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (serviceEnabled) {
+          final pos = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+          // Round to 2 decimal places (~1.1km) so same-area devices get identical prayer times
+          lat = (pos.latitude * 100).round() / 100;
+          lon = (pos.longitude * 100).round() / 100;
+          gotLiveLocation = true;
+          // Save for future use when location service is off
+          await prefs.setDouble('saved_lat', pos.latitude);
+          await prefs.setDouble('saved_lon', pos.longitude);
+        }
+      } catch (_) {}
+    }
+
+    // If live location not available, try saved location
+    if (!gotLiveLocation) {
+      final savedLat = prefs.getDouble('saved_lat');
+      final savedLon = prefs.getDouble('saved_lon');
+      if (savedLat != null && savedLon != null) {
+        lat = (savedLat * 100).round() / 100;
+        lon = (savedLon * 100).round() / 100;
+      }
     }
 // DO NOT request permission here
 

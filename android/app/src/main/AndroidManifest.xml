@@ -33,6 +33,9 @@
         <meta-data
             android:name="google_analytics_default_allow_ad_personalization_signals"
             android:value="false" />
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
         
         <activity
             android:name=".MainActivity"
@@ -62,7 +65,18 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-     <intent>
+            </intent-filter>
+        </receiver>
+
+        <!-- Notification broadcast receiver -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+
+    </application>
+
+    <queries>
+        <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
