@@ -16,8 +16,6 @@ import '../prayer/prayer_tracker_screen.dart';
 import '../daily_amal/daily_amal_screen.dart';
 import '../dhikr/dhikr_counter_screen.dart';
 import '../reading/reading_tracker_screen.dart';
-import '../statistics/statistics_screen.dart';
-import '../settings/settings_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
 import '../../../services/daily_reminder_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -516,28 +514,6 @@ Widget _sunChip({
             icon: Icon(Icons.refresh_rounded, color: cs.primary),
             tooltip: 'রিফ্রেশ',
             onPressed: () => _refreshAll(),
-          ),
-          IconButton(
-            icon: Icon(Icons.bar_chart_rounded, color: cs.primary),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.settings_outlined, color: cs.primary),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
-              );
-            },
           ),
         ],
       ),

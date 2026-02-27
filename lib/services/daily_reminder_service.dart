@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -208,9 +208,68 @@ class DailyReminderService {
 
   }
 
+  // Snooze notification IDs start at 8000
+  static const int _snoozeBaseId = 8000;
+
   static void _onNotificationResponse(NotificationResponse response) {
-    // Handle notification tap - can navigate to specific screen
+    // Handle snooze action
+    if (response.actionId == 'snooze_5' ||
+        response.actionId == 'snooze_10' ||
+        response.actionId == 'snooze_15') {
+      final minutes = response.actionId == 'snooze_5'
+          ? 5
+          : response.actionId == 'snooze_10'
+              ? 10
+              : 15;
+      final title = response.payload ?? 'রিমাইন্ডার';
+      _scheduleSnoozeNotification(
+        originalId: response.id ?? 0,
+        title: title,
+        minutes: minutes,
+      );
+    }
     print('Notification tapped: ${response.payload}');
+  }
+
+  /// Schedule a snooze notification N minutes from now
+  static Future<void> _scheduleSnoozeNotification({
+    required int originalId,
+    required String title,
+    required int minutes,
+  }) async {
+    final snoozeId = _snoozeBaseId + (originalId % 1000);
+    final target = tz.TZDateTime.now(tz.local).add(Duration(minutes: minutes));
+
+    const androidDetails = AndroidNotificationDetails(
+      'custom_reminder_channel',
+      'কাস্টম রিমাইন্ডার',
+      channelDescription: 'কাস্টম রিমাইন্ডার নোটিফিকেশন',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    await _notifications.zonedSchedule(
+      snoozeId,
+      title,
+      'স্নুজ করা রিমাইন্ডার',
+      target,
+      const NotificationDetails(android: androidDetails),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  /// Schedule a snooze for an arbitrary notification (called from UI)
+  static Future<void> scheduleSnooze({
+    required int originalId,
+    required String title,
+    required int minutes,
+  }) async {
+    await _scheduleSnoozeNotification(
+      originalId: originalId,
+      title: title,
+      minutes: minutes,
+    );
   }
 
   /// Show an immediate test notification
@@ -829,9 +888,38 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     await _cancelCustomReminderNotification(id);
   }
 
+  /// Get notification channel ID based on reminder category
+  static String _getChannelForCategory(ReminderCategory category) {
+    switch (category) {
+      case ReminderCategory.quran:
+        return 'daily_reminder_channel';
+      case ReminderCategory.dhikr:
+        return 'dhikr_reminder_channel';
+      case ReminderCategory.dua:
+        return 'dhikr_reminder_channel';
+      case ReminderCategory.general:
+        return 'custom_reminder_channel';
+    }
+  }
+
+  static String _getChannelNameForCategory(ReminderCategory category) {
+    switch (category) {
+      case ReminderCategory.quran:
+        return 'দৈনিক আমল রিমাইন্ডার';
+      case ReminderCategory.dhikr:
+        return 'যিকির রিমাইন্ডার';
+      case ReminderCategory.dua:
+        return 'যিকির রিমাইন্ডার';
+      case ReminderCategory.general:
+        return 'কাস্টম রিমাইন্ডার';
+    }
+  }
+
   /// Schedule notification for a custom reminder
   static Future<void> _scheduleCustomReminderNotification(
-      CustomReminder reminder) async {
+      CustomReminder reminder, {
+      Map<String, DateTime>? prayerTimes,
+  }) async {
     final now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime? scheduledDate;
 
@@ -848,7 +936,24 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       );
 
       if (scheduledDate.isBefore(now)) {
+        if (reminder.isOneTime) return; // one-time already passed, skip
         scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+    } else if ((reminder.type == ReminderType.afterPrayer ||
+            reminder.type == ReminderType.beforePrayer) &&
+        reminder.prayer != null &&
+        prayerTimes != null) {
+      final prayerTime = prayerTimes[reminder.prayer!.name];
+      if (prayerTime != null) {
+        final offsetMinutes = reminder.type == ReminderType.beforePrayer
+            ? -reminder.minutesOffset.abs()
+            : reminder.minutesOffset.abs();
+        final when = prayerTime.add(Duration(minutes: offsetMinutes));
+        scheduledDate = tz.TZDateTime.from(when, tz.local);
+        if (scheduledDate.isBefore(now)) {
+          if (reminder.isOneTime) return;
+          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        }
       }
     }
 
@@ -857,29 +962,67 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     final notificationId =
         _customReminderBaseId + int.parse(reminder.id) % 1000;
 
-    const androidDetails = AndroidNotificationDetails(
-      'custom_reminder_channel',
-      'কাস্টম রিমাইন্ডার',
+    final channelId = _getChannelForCategory(reminder.category);
+    final channelName = _getChannelNameForCategory(reminder.category);
+
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelName,
       channelDescription: 'কাস্টম রিমাইন্ডার নোটিফিকেশন',
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
+      actions: const [
+        AndroidNotificationAction('snooze_5', 'স্নুজ ৫ মিনিট'),
+        AndroidNotificationAction('snooze_10', 'স্নুজ ১০ মিনিট'),
+      ],
     );
 
-    const notificationDetails =
-        NotificationDetails(android: androidDetails);
+    final notificationDetails = NotificationDetails(android: androidDetails);
 
-    await _notifications.zonedSchedule(
-      notificationId,
-      '${reminder.title}',
-      reminder.description ?? 'আপনার কাস্টম রিমাইন্ডার',
-      scheduledDate,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    // One-time: don't repeat (no matchDateTimeComponents)
+    if (reminder.isOneTime) {
+      await _notifications.zonedSchedule(
+        notificationId,
+        reminder.title,
+        reminder.description ?? 'আপনার কাস্টম রিমাইন্ডার',
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: reminder.title,
+      );
+    } else {
+      // Check repeat days
+      DateTimeComponents? components;
+      if (reminder.repeatDays.isEmpty) {
+        components = DateTimeComponents.time; // daily
+      } else {
+        components = DateTimeComponents.dayOfWeekAndTime;
+      }
 
-    print('Custom reminder "${reminder.title}" scheduled');
+      await _notifications.zonedSchedule(
+        notificationId,
+        reminder.title,
+        reminder.description ?? 'আপনার কাস্টম রিমাইন্ডার',
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: components,
+        payload: reminder.title,
+      );
+    }
+
+    print('Custom reminder "${reminder.title}" scheduled (oneTime: ${reminder.isOneTime}, category: ${reminder.category})');
+  }
+
+  /// Auto-disable a one-time reminder after it fires
+  static Future<void> disableOneTimeReminder(String reminderId) async {
+    final reminders = await getCustomReminders();
+    final index = reminders.indexWhere((r) => r.id == reminderId);
+    if (index != -1 && reminders[index].isOneTime) {
+      reminders[index] = reminders[index].copyWith(isEnabled: false);
+      await _saveCustomReminders(reminders);
+    }
   }
 
   /// Cancel notification for a custom reminder
@@ -918,6 +1061,15 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     final customReminders = await getCustomReminders();
     for (final reminder in customReminders.where((r) => r.isEnabled)) {
       await _scheduleCustomReminderNotification(reminder);
+    }
+  }
+
+  /// Reschedule custom reminders with prayer times (for prayer-relative reminders)
+  static Future<void> rescheduleCustomRemindersWithPrayerTimes(
+      Map<String, DateTime> prayerTimes) async {
+    final customReminders = await getCustomReminders();
+    for (final reminder in customReminders.where((r) => r.isEnabled)) {
+      await _scheduleCustomReminderNotification(reminder, prayerTimes: prayerTimes);
     }
   }
 

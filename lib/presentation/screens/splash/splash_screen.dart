@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../home/home_screen.dart';
+import '../main_shell.dart';
 import '../auth/auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../../../firebase_options.dart';
@@ -46,7 +46,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (user != null) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainShell()),
       );
     } else {
       Navigator.of(context).pushReplacement(

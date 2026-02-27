@@ -18,7 +18,6 @@ class SettingsScreen extends ConsumerWidget {
     ref.watch(appThemeModeProvider);
     
     final colors = Theme.of(context).colorScheme;
-    final iconColor = colors.primary;
     final titleColor = colors.primary;
 
 
@@ -52,10 +51,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         elevation: 0,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: iconColor),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           'সেটিংস',
           style: TextStyle(
@@ -64,7 +60,7 @@ class SettingsScreen extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         
       ),
       body: SingleChildScrollView(

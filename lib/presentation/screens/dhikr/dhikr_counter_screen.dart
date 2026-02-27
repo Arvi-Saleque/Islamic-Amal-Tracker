@@ -20,7 +20,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     final dhikrState = ref.watch(dhikrCounterProvider);
     final dhikrNotifier = ref.read(dhikrCounterProvider.notifier);
 
-    final iconColor = Theme.of(context).colorScheme.primary;
     final titleColor = Theme.of(context).colorScheme.primary;
 
     final totalCount = dhikrState.todayData.totalCount;
@@ -57,10 +56,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         ),
         elevation: 0,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: iconColor),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           'যিকির কাউন্টার',
           style: TextStyle(
@@ -69,7 +65,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         actions: [
           // Info button
           IconButton(

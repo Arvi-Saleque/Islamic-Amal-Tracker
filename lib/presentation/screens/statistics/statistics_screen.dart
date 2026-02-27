@@ -40,7 +40,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
     final colors = Theme.of(context).colorScheme;
 
-    final iconColor = colors.primary;
     final titleColor = colors.primary;
 
     return Scaffold(
@@ -73,10 +72,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         ),
         elevation: 0,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: iconColor),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           'পরিসংখ্যান',
           style: TextStyle(
@@ -85,7 +81,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         
       ),
       body: SingleChildScrollView(

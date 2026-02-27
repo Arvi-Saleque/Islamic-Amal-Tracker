@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/services/firestore_sync_service.dart';
 import '../../providers/auth_provider.dart';
-import '../home/home_screen.dart';
+import '../main_shell.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -36,7 +36,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      MaterialPageRoute(builder: (context) => const MainShell()),
     );
   }
 
