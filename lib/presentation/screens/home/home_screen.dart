@@ -499,7 +499,7 @@ Widget _sunChip({
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         title: Text(
           'আমল ট্র্যাকার',
           style: TextStyle(

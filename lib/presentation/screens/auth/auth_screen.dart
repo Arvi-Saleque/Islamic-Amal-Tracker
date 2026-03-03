@@ -1,4 +1,3 @@
-import 'package:amal_tracker/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/services/firestore_sync_service.dart';
@@ -152,7 +151,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -176,22 +175,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               
               // App Icon & Title
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.auto_fix_high,
-                  size: 60,
+                  size: 48,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               
               Text(
                 'আমল ট্র্যাকার',
@@ -215,7 +214,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
               
               // Form
               Form(
@@ -420,7 +419,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ],
                       ),
                     
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                     
                     // Divider
                     Row(
@@ -444,38 +443,38 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ],
                     ),
                     
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
                     
                     // Skip Button (Offline Mode)
-                    OutlinedButton(
-                      onPressed: _handleSkip,
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.cloud_off,
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                            size: 20,
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: _handleSkip,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'অফলাইনে চালিয়ে যান',
-                            style: TextStyle(
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.cloud_off,
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              fontSize: 14,
+                              size: 20,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              'অফলাইনে চালিয়ে যান',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     

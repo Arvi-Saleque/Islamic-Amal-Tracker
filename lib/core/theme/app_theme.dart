@@ -594,6 +594,12 @@ class AppTheme {
       color: AppColors.dividerDark,
       thickness: 1,
     ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: const Color(0xFF2C2C2C),
+      contentTextStyle: const TextStyle(color: Colors.white),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ),
     extensions: const <ThemeExtension<dynamic>>[
       GradientColors.dark,
       PremiumCardStyle.dark,
@@ -656,6 +662,12 @@ class AppTheme {
         fontSize: 13,
         color: AppColors.textSecondaryLightMode,
       ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: const Color(0xFF2A2A2A),
+      contentTextStyle: const TextStyle(color: Colors.white),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     extensions: const <ThemeExtension<dynamic>>[
       GradientColors.light,

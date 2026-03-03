@@ -1,11 +1,13 @@
 import 'package:amal_tracker/core/theme/theme_mode_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../auth/auth_screen.dart';
 import '../profile/profile_screen.dart';
-import 'reminders_screen.dart';
 import 'usage_rules.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
 
 // false = dark (default), true = light
 
@@ -50,7 +52,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
           'সেটিংস',
@@ -110,44 +112,96 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 14),
 
-            // Profile + Reminders card
+            // Language card
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _softCard(
                 context: context,
-                child: Column(
-                  children: [
-                    _buildNavigationTile(
-                      context: context,
-                      icon: Icons.person_outline,
-                      title: 'প্রোফাইল',
-                      subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfileScreen(),
-                          ),
-                        );
-                      },
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    _softDivider(context: context),
-                    _buildNavigationTile(
-                      context: context,
-                      icon: Icons.notifications_active,
-                      title: 'রিমাইন্ডারস',
-                      subtitle: 'দৈনিক রিমাইন্ডার সেট করুন',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RemindersScreen(),
-                          ),
-                        );
-                      },
+                    child: Icon(Icons.language_rounded,
+                        color: Theme.of(context).colorScheme.primary, size: 22),
+                  ),
+                  title: Text(
+                    'ভাষা / Language',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
+                  ),
+                  subtitle: Text(
+                    context.locale.languageCode == 'bn' ? 'বাংলা' : 'English',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      fontSize: 12,
+                    ),
+                  ),
+                  trailing: Icon(Icons.chevron_right,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45)),
+                  onTap: () => _showLanguagePicker(context),
                 ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Account card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _softCard(
+                context: context,
+                child: Builder(builder: (context) {
+                  final authState = ref.watch(authProvider);
+                  final isLoggedIn = authState.isAuthenticated;
+                  final email = authState.user?.email;
+                  return Column(
+                    children: [
+                      _buildNavigationTile(
+                        context: context,
+                        icon: isLoggedIn
+                            ? Icons.account_circle_rounded
+                            : Icons.login_rounded,
+                        title: isLoggedIn ? 'অ্যাকাউন্ট' : 'লগইন করুন',
+                        subtitle: isLoggedIn
+                            ? (email ?? 'ক্লাউড সিঙ্ক সক্রিয়')
+                            : 'ক্লাউড ব্যাকআপ ও সিঙ্কের জন্য লগইন করুন',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => isLoggedIn
+                                  ? const ProfileScreen()
+                                  : const AuthScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      if (isLoggedIn) ...[
+                        _softDivider(context: context),
+                        _buildNavigationTile(
+                          context: context,
+                          icon: Icons.person_outline,
+                          title: 'প্রোফাইল',
+                          subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ],
+                  );
+                }),
               ),
             ),
 
@@ -349,6 +403,129 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  // ---------- Language picker ----------
+
+  void _showLanguagePicker(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final currentLang = context.locale.languageCode;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'ভাষা বেছে নিন / Select Language',
+              style: TextStyle(
+                color: cs.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _langOption(
+              ctx: ctx,
+              flag: '🇧🇩',
+              label: 'বাংলা',
+              sublabel: 'Bengali',
+              langCode: 'bn',
+              isSelected: currentLang == 'bn',
+              cs: cs,
+            ),
+            const SizedBox(height: 8),
+            _langOption(
+              ctx: ctx,
+              flag: '🇬🇧',
+              label: 'English',
+              sublabel: 'ইংরেজি',
+              langCode: 'en',
+              isSelected: currentLang == 'en',
+              cs: cs,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _langOption({
+    required BuildContext ctx,
+    required String flag,
+    required String label,
+    required String sublabel,
+    required String langCode,
+    required bool isSelected,
+    required ColorScheme cs,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () {
+        ctx.setLocale(Locale(langCode));
+        Navigator.pop(ctx);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? cs.primary.withOpacity(0.12)
+              : cs.surfaceContainerHighest.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? cs.primary.withOpacity(0.4) : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    sublabel,
+                    style: TextStyle(
+                      color: cs.onSurface.withOpacity(0.55),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: cs.primary, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ---------- Bug report + version dialog (unchanged logic) ----------
 
   Future<void> _sendBugReport(BuildContext context) async {
@@ -366,11 +543,11 @@ class SettingsScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'ইমেইল অ্যাপ খুলতে পারছে না। effttech@gmail.com এ ইমেইল করুন।',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }

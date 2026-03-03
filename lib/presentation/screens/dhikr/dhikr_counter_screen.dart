@@ -55,7 +55,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
           'যিকির কাউন্টার',

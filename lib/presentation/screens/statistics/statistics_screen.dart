@@ -71,7 +71,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
           'পরিসংখ্যান',

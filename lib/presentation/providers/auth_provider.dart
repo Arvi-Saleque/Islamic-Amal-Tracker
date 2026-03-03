@@ -274,6 +274,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: false, user: null);
   }
 
+  // Restore an already-authenticated session (called from SplashScreen)
+  void restoreSession(User user) {
+    state = state.copyWith(user: user, isLoading: false);
+  }
+
   // Clear messages
   void clearMessages() {
     state = state.copyWith(errorMessage: null, successMessage: null);

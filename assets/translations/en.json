@@ -1,0 +1,60 @@
+{
+  "app_name": "Amal Tracker",
+  "home": "Home",
+  "prayers": "Prayers",
+  "dhikr": "Dhikr",
+  "daily_amal": "Daily Amal",
+  "reading": "Reading",
+  "history": "History",
+  "settings": "Settings",
+  
+  "prayer_times": "Prayer Times",
+  "next_prayer": "Next Prayer",
+  "today_progress": "Today's Progress",
+  
+  "fajr": "Fajr",
+  "dhuhr": "Dhuhr",
+  "asr": "Asr",
+  "maghrib": "Maghrib",
+  "isha": "Isha",
+  
+  "fard": "Fard",
+  "sunnah": "Sunnah",
+  "witr": "Witr",
+  "rakat": "Rakat",
+  
+  "dhikr_counter": "Dhikr Counter",
+  "total_today": "Total Dhikr Today",
+  "target": "Target",
+  "completed": "Completed",
+  
+  "miswak": "Miswak",
+  "times_daily": "times (daily)",
+  "post_prayer_azkar": "Post-Prayer Azkar",
+  
+  "quran": "Quran",
+  "tafsir": "Tafsir",
+  "hadith": "Hadith",
+  "pages": "Pages",
+  "portions": "Portions",
+  
+  "daily": "Daily",
+  "weekly": "Weekly",
+  "monthly": "Monthly",
+  
+  "add_custom": "Add Custom",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
+  "cancel": "Cancel",
+  
+  "permission_required": "Permission Required",
+  "location_permission_message": "Location permission is required to determine accurate prayer times.",
+  "allow": "Allow",
+  "deny": "Deny",
+  
+  "streak": "Streak",
+  "days": "Days",
+  "achievement": "Achievement",
+  "statistics": "Statistics"
+}

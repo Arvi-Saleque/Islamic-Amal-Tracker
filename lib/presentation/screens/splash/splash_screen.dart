@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../main_shell.dart';
-import '../auth/auth_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../../../firebase_options.dart';
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -17,42 +17,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuthAndNavigate();
+    _initAndNavigate();
   }
 
-  Future<void> _checkAuthAndNavigate() async {
+  Future<void> _initAndNavigate() async {
     await Future.delayed(const Duration(milliseconds: 150));
     if (!mounted) return;
 
+    // Try to init Firebase and restore existing session silently
     try {
-      // Needed so FirebaseAuth.currentUser works
       if (Firebase.apps.isEmpty) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
       }
+      // If user is already logged in, update the auth provider state
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        ref.read(authProvider.notifier).restoreSession(user);
+      }
     } catch (_) {
-      // If init fails, treat as not logged in (AuthScreen)
-    }
-
-    User? user;
-    try {
-      user = FirebaseAuth.instance.currentUser;
-    } catch (_) {
-      user = null;
+      // Firebase unavailable — continue in offline mode
     }
 
     if (!mounted) return;
-
-    if (user != null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainShell()),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
-    }
+    // Always go to MainShell — login is optional and accessible from Settings
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const MainShell()),
+    );
   }
 
 

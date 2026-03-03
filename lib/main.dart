@@ -23,7 +23,7 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('bn')],
+      supportedLocales: const [Locale('bn'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('bn'),
       child: const ProviderScope(

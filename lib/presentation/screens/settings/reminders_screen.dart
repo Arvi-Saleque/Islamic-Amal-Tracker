@@ -115,6 +115,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   // Custom Reminders
   List<CustomReminder> _customReminders = [];
 
+  // Today's summary expand/collapse
+  bool _showTodayDetails = false;
+
   // Default times (computed from prayer times)
   TimeOfDay? _defaultFajrTime;
   TimeOfDay? _defaultZuhrTime;
@@ -572,7 +575,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
           'রিমাইন্ডারস',
@@ -589,15 +592,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             icon: Icon(Icons.add_alert_rounded, color: activeColor),
             tooltip: 'প্রিসেট যোগ করুন',
             onPressed: _showPresetsSheet,
-          ),
-          IconButton(
-            icon: Icon(Icons.tune_rounded, color: activeColor),
-            tooltip: 'রিমাইন্ডার সেটিংস',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const DailyReminderScreen()),
-            ),
           ),
         ],
       ),
@@ -664,21 +658,25 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
   // ── Today's summary card ──────────────────────────────────────────────────
 
+  String _fmtTime(DateTime t) {
+    final h = t.hour > 12 ? t.hour - 12 : (t.hour == 0 ? 12 : t.hour);
+    final m = t.minute.toString().padLeft(2, '0');
+    final period = t.hour >= 12 ? 'PM' : 'AM';
+    return '$h:$m $period';
+  }
+
   Widget _buildTodaySummaryCard(BuildContext context, Color activeColor) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _buildTodayItems();
-    final pending = items.where((r) => !r.isPassed).length;
+    final pendingItems = items.where((r) => !r.isPassed).toList();
+    final pending = pendingItems.length;
     final total = items.length;
     final next = _nextReminder();
 
     String nextText;
     if (next != null) {
-      final h = next.time.hour > 12
-          ? next.time.hour - 12
-          : (next.time.hour == 0 ? 12 : next.time.hour);
-      final m = next.time.minute.toString().padLeft(2, '0');
-      final period = next.time.hour >= 12 ? 'PM' : 'AM';
-      nextText = '${next.title} — $h:$m $period';
+      nextText = '${next.title} — ${_fmtTime(next.time)}';
     } else {
       nextText = 'আজকের সব রিমাইন্ডার শেষ';
     }
@@ -690,6 +688,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header row
           Row(
             children: [
               Container(
@@ -736,9 +735,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 child: Text(
                   '$pending',
                   style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black
-                        : cs.onPrimary,
+                    color: isDark ? Colors.black : cs.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -746,11 +743,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               ),
             ],
           ),
+
+          // Next reminder chip
           if (next != null) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: activeColor.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(12),
@@ -758,8 +756,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.schedule_rounded,
-                      color: activeColor, size: 16),
+                  Icon(Icons.schedule_rounded, color: activeColor, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -772,6 +769,127 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ],
+
+          // Expand/collapse toggle
+          if (pendingItems.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => setState(() => _showTodayDetails = !_showTodayDetails),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _showTodayDetails ? 'কম দেখুন' : 'সব দেখুন (${pendingItems.length})',
+                      style: TextStyle(
+                        color: activeColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _showTodayDetails
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      color: activeColor,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          // Pending reminder list (expandable)
+          if (_showTodayDetails && pendingItems.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: activeColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: activeColor.withOpacity(0.12)),
+              ),
+              child: Column(
+                children: pendingItems.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final r = entry.value;
+                  final isLast = idx == pendingItems.length - 1;
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: r.isDefault
+                                    ? Colors.green
+                                    : r.isCustom
+                                        ? activeColor.withOpacity(0.7)
+                                        : activeColor,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                r.title,
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.85),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              _fmtTime(r.time),
+                              style: TextStyle(
+                                color: activeColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (r.isDefault) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'ডিফল্ট',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (!isLast)
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          indent: 14,
+                          endIndent: 14,
+                          color: activeColor.withOpacity(0.1),
+                        ),
+                    ],
+                  );
+                }).toList(),
               ),
             ),
           ],
