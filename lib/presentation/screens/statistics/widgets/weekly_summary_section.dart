@@ -177,7 +177,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
               child: _SummaryCard(
                 icon: Icons.check_circle_outline,
                 iconColor: primary,
-                title: 'মোট আমল',
+                title: 'stats_total_amal'.tr(),
                 value: totalAmal.toString(),
                 subtitle: '/${maxAmal.toString()}',
               ),
@@ -187,7 +187,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
               child: _SummaryCard(
                 icon: Icons.favorite,
                 iconColor: primary,
-                title: 'মোট\nযিকির',
+                title: 'stats_total_dhikr'.tr(),
                 value: totalDhikr.toString(),
                 subtitle: '/${maxDhikr.toString()}',
               ),
@@ -201,9 +201,9 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
               child: _SummaryCard(
                 icon: Icons.menu_book,
                 iconColor: primary,
-                title: 'পড়ার সময়',
+                title: 'stats_reading_time'.tr(),
                 value: totalReadingMinutes.toString(),
-                subtitle: '/${maxReadingMinutes.toString()} মিনিট',
+                subtitle: '/${maxReadingMinutes.toString()} ${'stats_minutes'.tr()}',
               ),
             ),
             const SizedBox(width: 12),
@@ -212,9 +212,9 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
               child: _SummaryCard(
                 icon: Icons.star,
                 iconColor: primary,
-                title: 'পূর্ণ দিন',
+                title: 'stats_full_day'.tr(),
                 value: perfectDays.toString(),
-                subtitle: '/${totalDays.toString()} দিন',
+                subtitle: '/${totalDays.toString()} ${'stats_days'.tr()}',
               ),
             ),
           ],
@@ -354,7 +354,7 @@ class _SinCountCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'মোট গুনাহ',
+                  'stats_total_sins'.tr(),
                   style: TextStyle(
                     color: bulletTextColor,
                     fontSize: 12,
@@ -363,8 +363,8 @@ class _SinCountCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   sinCount == 0
-                      ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
-                      : '$sinCount টি গুনাহ',
+                      ? 'stats_mashallah_no_sin'.tr()
+                      : 'stats_sin_count'.tr(namedArgs: {'count': sinCount.toString()}),
                   style: TextStyle(
                     color: sinCount == 0
                         ? const Color(0xFF4CAF50)
@@ -434,7 +434,7 @@ class _PrayerDetailCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'মোট নামাজ',
+                      'stats_total_prayer'.tr(),
                       style: TextStyle(
                         color: bulletTextColor,
                         fontSize: 12,
@@ -453,7 +453,7 @@ class _PrayerDetailCard extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: '/${maxPrayers.toString()} ওয়াক্ত',
+                            text: '/${maxPrayers.toString()} ${'stats_waqt'.tr()}',
                             style: TextStyle(
                               color: bulletTextColor,
                               fontSize: 14,
@@ -501,14 +501,14 @@ class _PrayerDetailCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'জামাতে/সময়মত',
+                                'stats_on_time'.tr(),
                                 style: TextStyle(
                                   color: bulletTextColor,
                                   fontSize: 10,
                                 ),
                               ),
                               Text(
-                                '$jamaatPrayers ওয়াক্ত',
+                                '$jamaatPrayers ${'stats_waqt'.tr()}',
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontSize: 14,
@@ -538,14 +538,14 @@ class _PrayerDetailCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'দেরীতে',
+                                'stats_late'.tr(),
                                 style: TextStyle(
                                   color: bulletTextColor,
                                   fontSize: 10,
                                 ),
                               ),
                               Text(
-                                '$delayedPrayers ওয়াক্ত',
+                                '$delayedPrayers ${'stats_waqt'.tr()}',
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontSize: 14,

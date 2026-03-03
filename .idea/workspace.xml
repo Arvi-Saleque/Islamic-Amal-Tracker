@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="82c4fd51-404f-4b27-a245-f6976a462bd7" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/translations/bn.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/translations/bn.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/translations/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/translations/en.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/constants/app_constants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/constants/app_constants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/data/local/hive_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/data/local/hive_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/daily_amal/daily_amal_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/daily_amal/daily_amal_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/dhikr/dhikr_counter_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/dhikr/dhikr_counter_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/qaza_prayer_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/qaza_prayer_section.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_summary_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_summary_section.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -1,5 +1,4 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
-import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -192,7 +191,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            fridayAwareDisplay(summary.prayerName),
+                            _localizedPrayerName(summary.prayerName),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 17,
@@ -202,8 +201,8 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                           const SizedBox(height: 4),
                           Text(
                             hasPending
-                                ? 'বাকি: $pendingCount ওয়াক্ত'
-                                : 'সব কাজা আদায় হয়েছে',
+                                ? 'stats_qaza_pending_waqt'.tr(namedArgs: {'count': pendingCount.toString()})
+                                : 'stats_qaza_all_done'.tr(),
                             style: TextStyle(
                               color: hasPending
                                   ? primary.withOpacity(0.8)
@@ -272,7 +271,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Text(
-                        'কোনো বাকি কাজা নেই',
+                        'stats_qaza_none_pending'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
                           fontSize: 14,
@@ -300,8 +299,8 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     final bulletColor = gradients.bulletTextColor;
     
     final date = DateTime.parse(qaza.date);
-    final formattedDate = _formatDateBengali(date);
-    final weekday = _getWeekdayBengali(date.weekday);
+    final formattedDate = _formatDate(date);
+    final weekday = _getWeekday(date.weekday);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -418,35 +417,34 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     }
   }
 
-  String _formatDateBengali(DateTime date) {
-    final months = [
-      'জানুয়ারি',
-      'ফেব্রুয়ারি',
-      'মার্চ',
-      'এপ্রিল',
-      'মে',
-      'জুন',
-      'জুলাই',
-      'আগস্ট',
-      'সেপ্টেম্বর',
-      'অক্টোবর',
-      'নভেম্বর',
-      'ডিসেম্বর'
-    ];
-    return '${date.day} ${months[date.month - 1]}';
+  String _localizedPrayerName(String prayerName) {
+    final isFriday = DateTime.now().weekday == DateTime.friday;
+    if (isFriday && prayerName == 'যোহর') return 'prayer_jumua'.tr();
+    const keys = {
+      'ফজর': 'prayer_fajr',
+      'যোহর': 'prayer_dhuhr',
+      'আসর': 'prayer_asr',
+      'মাগরিব': 'prayer_maghrib',
+      'এশা': 'prayer_isha',
+    };
+    final key = keys[prayerName];
+    return key != null ? key.tr() : prayerName;
   }
 
-  String _getWeekdayBengali(int weekday) {
-    final days = [
-      'সোমবার',
-      'মঙ্গলবার',
-      'বুধবার',
-      'বৃহস্পতিবার',
-      'শুক্রবার',
-      'শনিবার',
-      'রবিবার'
+  String _formatDate(DateTime date) {
+    const monthKeys = [
+      'month_jan', 'month_feb', 'month_mar', 'month_apr', 'month_may', 'month_jun',
+      'month_jul', 'month_aug', 'month_sep', 'month_oct', 'month_nov', 'month_dec',
     ];
-    return days[weekday - 1];
+    return '${date.day} ${monthKeys[date.month - 1].tr()}';
+  }
+
+  String _getWeekday(int weekday) {
+    const dayKeys = [
+      'weekday_mon', 'weekday_tue', 'weekday_wed', 'weekday_thu',
+      'weekday_fri', 'weekday_sat', 'weekday_sun',
+    ];
+    return dayKeys[weekday - 1].tr();
   }
 
   String _getDaysAgo(DateTime date) {
@@ -455,8 +453,8 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     final targetDate = DateTime(date.year, date.month, date.day);
     final difference = today.difference(targetDate).inDays;
 
-    if (difference == 1) return 'গতকাল';
-    if (difference == 2) return 'পরশু';
-    return '$difference দিন আগে';
+    if (difference == 1) return 'stats_yesterday'.tr();
+    if (difference == 2) return 'stats_day_before_yesterday'.tr();
+    return 'stats_days_ago'.tr(namedArgs: {'days': difference.toString()});
   }
 }
