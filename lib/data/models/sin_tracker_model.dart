@@ -164,10 +164,10 @@ class DailySinRecord {
 // ডিফল্ট গুনাহের ধরন
 List<SinType> getDefaultSinTypes() {
   return [
-    SinType(id: 'sin_lie', name: 'মিথ্যা বলা', isDefault: true, icon: 'voice'),
-    SinType(id: 'sin_backbiting', name: 'গিবত করা', isDefault: true, icon: 'chat'),
-    SinType(id: 'sin_eye', name: 'চোখের গুনাহ', isDefault: true, icon: 'eye'),
-    SinType(id: 'sin_ear', name: 'কানের গুনাহ', isDefault: true, icon: 'ear'),
+    SinType(id: 'sin_lie', name: 'sin_lie', isDefault: true, icon: 'voice'),
+    SinType(id: 'sin_backbiting', name: 'sin_backbiting', isDefault: true, icon: 'chat'),
+    SinType(id: 'sin_eye', name: 'sin_eye', isDefault: true, icon: 'eye'),
+    SinType(id: 'sin_ear', name: 'sin_ear', isDefault: true, icon: 'ear'),
   ];
 }
 

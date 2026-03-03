@@ -288,7 +288,7 @@ class SinTrackerScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              sinType.name,
+                              _localizedSinName(context, sinType),
                               style: TextStyle(
                                 color: cs.onSurface,
                                 fontSize: 15,
@@ -310,7 +310,7 @@ class SinTrackerScreen extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            '${'sin_kaffara'.tr()}: ${KaffaraType.getName(kaffaraType)}',
+                            '${'sin_kaffara'.tr()}: ${_localizedKaffaraName(kaffaraType)}',
                             style: TextStyle(
                               color: sinColor,
                               fontSize: 12,
@@ -436,6 +436,42 @@ class SinTrackerScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _localizedSinName(BuildContext context, SinType sinType) {
+    if (!sinType.isDefault) {
+      // Custom sins: show the name exactly as the user entered it
+      return sinType.name;
+    }
+
+    switch (sinType.id) {
+      case 'sin_lie':
+        return 'sin_lie_label'.tr();
+      case 'sin_backbiting':
+        return 'sin_backbiting_label'.tr();
+      case 'sin_eye':
+        return 'sin_eye_label'.tr();
+      case 'sin_ear':
+        return 'sin_ear_label'.tr();
+      default:
+        // Fallback to stored name if we don't recognize the id
+        return sinType.name;
+    }
+  }
+
+  String _localizedKaffaraName(String kaffaraType) {
+    switch (kaffaraType) {
+      case KaffaraType.istighfar:
+        return 'sin_kaffara_dhikr'.tr();
+      case KaffaraType.quran:
+        return 'sin_kaffara_quran'.tr();
+      case KaffaraType.charity:
+        return 'sin_kaffara_charity'.tr();
+      case KaffaraType.prayer:
+        return 'sin_kaffara_prayer'.tr();
+      default:
+        return kaffaraType;
+    }
   }
 
   IconData _getSinIcon(String iconName) {

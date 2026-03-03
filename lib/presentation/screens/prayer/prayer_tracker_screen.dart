@@ -1,5 +1,4 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
-import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,6 +118,132 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     );
   }
 
+  String _prayerIdFromBangla(String prayer) {
+    switch (prayer) {
+      case 'ফজর':
+        return 'fajr';
+      case 'যোহর':
+        return 'dhuhr';
+      case 'আসর':
+        return 'asr';
+      case 'মাগরিব':
+        return 'maghrib';
+      case 'এশা':
+        return 'isha';
+      default:
+        return prayer;
+    }
+  }
+
+  String _localizedPrayerName(BuildContext context, String prayerBangla) {
+    final id = _prayerIdFromBangla(prayerBangla);
+    final isFriday = DateTime.now().weekday == DateTime.friday;
+
+    if (id == 'dhuhr' && isFriday) {
+      // On Friday, show Jumu'ah instead of Dhuhr
+      return 'jumuah'.tr();
+    }
+    return id.tr();
+  }
+
+  String _localizedRakatLabel(
+    BuildContext context,
+    String prayerBangla,
+    String rakatKey,
+  ) {
+    final isFriday = DateTime.now().weekday == DateTime.friday;
+
+    // Bengali locale: keep existing Bengali labels (with Friday-aware adjustment)
+    if (context.locale.languageCode == 'bn') {
+      // Existing behaviour from prayer_name_utils (now inlined)
+      if (isFriday &&
+          prayerBangla == 'যোহর' &&
+          rakatKey == '২ রাকাত সুন্নাত (পরে)') {
+        return '৪ রাকাত সুন্নাত (পরে)';
+      }
+      return rakatKey;
+    }
+
+    // English (and other) locales: map common Bengali rakat strings to English labels
+    // Fajr
+    if (prayerBangla == 'ফজর') {
+      if (rakatKey.contains('ফরয') &&
+          rakatKey.contains('জামাতে/আউয়াল ওয়াক্তে')) {
+        return '2 rakat Fard (congregation / on time)';
+      }
+      if (rakatKey.contains('ফরয') && rakatKey.contains('দেরী করে')) {
+        return '2 rakat Fard (late)';
+      }
+      if (rakatKey.contains('সুন্নাত')) {
+        return '2 rakat Sunnah';
+      }
+    }
+
+    // Dhuhr / Jumu'ah
+    if (prayerBangla == 'যোহর') {
+      if (rakatKey.contains('সুন্নাত (আগে)')) {
+        return '4 rakat Sunnah (before)';
+      }
+      if (rakatKey.contains('ফরয') &&
+          rakatKey.contains('জামাতে/আউয়াল ওয়াক্তে')) {
+        return '4 rakat Fard (congregation / on time)';
+      }
+      if (rakatKey.contains('ফরয') && rakatKey.contains('দেরী করে')) {
+        return '4 rakat Fard (late)';
+      }
+      if (rakatKey.contains('সুন্নাত (পরে)')) {
+        // On Friday, show 4 rakat Sunnah after; otherwise 2 rakat
+        final count = isFriday ? 4 : 2;
+        return '$count rakat Sunnah (after)';
+      }
+    }
+
+    // Asr
+    if (prayerBangla == 'আসর') {
+      if (rakatKey.contains('ফরয') &&
+          rakatKey.contains('জামাতে/আউয়াল ওয়াক্তে')) {
+        return '4 rakat Fard (congregation / on time)';
+      }
+      if (rakatKey.contains('ফরয') && rakatKey.contains('দেরী করে')) {
+        return '4 rakat Fard (late)';
+      }
+    }
+
+    // Maghrib
+    if (prayerBangla == 'মাগরিব') {
+      if (rakatKey.contains('ফরয') &&
+          rakatKey.contains('জামাতে/আউয়াল ওয়াক্তে')) {
+        return '3 rakat Fard (congregation / on time)';
+      }
+      if (rakatKey.contains('ফরয') && rakatKey.contains('দেরী করে')) {
+        return '3 rakat Fard (late)';
+      }
+      if (rakatKey.contains('সুন্নাত')) {
+        return '2 rakat Sunnah';
+      }
+    }
+
+    // Isha
+    if (prayerBangla == 'এশা') {
+      if (rakatKey.contains('ফরয') &&
+          rakatKey.contains('জামাতে/আউয়াল ওয়াক্তে')) {
+        return '4 rakat Fard (congregation / on time)';
+      }
+      if (rakatKey.contains('ফরয') && rakatKey.contains('দেরী করে')) {
+        return '4 rakat Fard (late)';
+      }
+      if (rakatKey.contains('সুন্নাত')) {
+        return '2 rakat Sunnah';
+      }
+      if (rakatKey.contains('বেতের')) {
+        return '3 rakat Witr';
+      }
+    }
+
+    // Fallback: show raw key if we don't recognize the pattern
+    return rakatKey;
+  }
+
   Widget _buildPrayerTile(String prayer) {
     final prayerState = ref.watch(prayerTrackingProvider);
     final notifier = ref.read(prayerTrackingProvider.notifier);
@@ -175,7 +300,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                           children: [
                             Expanded(
                               child: Text(
-                                fridayAwareDisplay(prayer),
+                                _localizedPrayerName(context, prayer),
                                 style: TextStyle(
                                   color: titleColor,
                                   fontSize: 17.5,
@@ -337,7 +462,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  fridayAwareRakat(prayer, rakat),
+                  _localizedRakatLabel(context, prayer, rakat),
                   style: TextStyle(
                     color: textColor,
                     fontSize: 14.8,
