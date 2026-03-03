@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UsageRulesScreen extends StatelessWidget {
@@ -52,7 +53,7 @@ class UsageRulesScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'ব্যবহারের নিয়ম',
+          'usage_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -135,7 +136,7 @@ class UsageRulesScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'এই অ্যাপটি আপনার দৈনন্দিন ইবাদত ট্র্যাক করার জন্য তৈরি। নামাজের সময় আপনার লোকেশন অনুযায়ী সঠিক ক্যালকুলেশন, স্মার্ট রিমাইন্ডার সিস্টেম এবং বিস্তারিত আমল ট্র্যাকিং সুবিধা পাবেন।',
+            'usage_intro'.tr(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14,

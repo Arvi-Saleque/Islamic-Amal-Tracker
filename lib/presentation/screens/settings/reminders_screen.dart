@@ -1221,7 +1221,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 color: activeColor.withOpacity(0.4), size: 40),
             const SizedBox(height: 12),
             Text(
-              'কোনো কাস্টম রিমাইন্ডার নেই',
+              'custom_rem_empty'.tr(),
               style: TextStyle(
                 color: cs.onSurface.withOpacity(0.55),
                 fontSize: 14,
@@ -1235,7 +1235,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   onPressed: _openCustomReminders,
                   icon: Icon(Icons.add_rounded, color: activeColor, size: 18),
                   label: Text(
-                    'নতুন যোগ করুন',
+                    'reminder_add_new'.tr(),
                     style: TextStyle(color: activeColor),
                   ),
                 ),
@@ -1245,7 +1245,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   icon: Icon(Icons.auto_awesome_rounded,
                       color: activeColor, size: 18),
                   label: Text(
-                    'প্রিসেট',
+                    'reminder_preset_tab'.tr(),
                     style: TextStyle(color: activeColor),
                   ),
                 ),
@@ -1388,18 +1388,18 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final cs = Theme.of(context).colorScheme;
 
     final defaults = [
-      (Icons.wb_twilight_rounded, 'ফজরের ৫ মিনিট পর', _defaultFajrTime),
-      (Icons.wb_sunny_rounded,
-          DateTime.now().weekday == DateTime.friday
-              ? 'জুম\'আর ৬০ মিনিট পর'
-              : 'যোহরের ৬০ মিনিট পর',
-          _defaultZuhrTime),
-      (Icons.wb_sunny_outlined, 'আসরের ১৫ মিনিট পর', _defaultAsrTime),
-      (Icons.nights_stay_rounded, 'মাগরিবের ১০ মিনিট পর', _defaultMaghribTime),
-      (Icons.nights_stay_outlined, 'ইশার ৩০ মিনিট পর', _defaultIshaTime),
-      (Icons.wb_sunny_outlined, 'সকালের যিকির (ফজর+৩০)', _defaultMorningDhikrTime),
-      (Icons.nights_stay_outlined, 'সন্ধ্যার যিকির (মাগরিব+৩০)', _defaultEveningDhikrTime),
-      (Icons.star_rounded, 'দৈনিক আমল (রাত ১১টা)', _defaultDailyAmalTime),
+      (Icons.wb_twilight_rounded, 'reminder_default_fajr_label'.tr(), _defaultFajrTime),
+      (
+        Icons.wb_sunny_rounded,
+        'reminder_default_dhuhr_label'.tr(),
+        _defaultZuhrTime
+      ),
+      (Icons.wb_sunny_outlined, 'reminder_default_asr_label'.tr(), _defaultAsrTime),
+      (Icons.nights_stay_rounded, 'reminder_default_maghrib_label'.tr(), _defaultMaghribTime),
+      (Icons.nights_stay_outlined, 'reminder_default_isha_label'.tr(), _defaultIshaTime),
+      (Icons.wb_sunny_outlined, 'reminder_default_morning_dhikr_label'.tr(), _defaultMorningDhikrTime),
+      (Icons.nights_stay_outlined, 'reminder_default_evening_dhikr_label'.tr(), _defaultEveningDhikrTime),
+      (Icons.star_rounded, 'reminder_default_daily_amal_label'.tr(), _defaultDailyAmalTime),
     ];
 
     return Column(
@@ -1417,7 +1417,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'এই রিমাইন্ডারগুলো সবসময় চালু থাকে এবং নামাজের সময়ের উপর ভিত্তি করে স্বয়ংক্রিয়ভাবে সেট হয়।',
+                      'reminder_defaults_info'.tr(),
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.7),
                         fontSize: 12,

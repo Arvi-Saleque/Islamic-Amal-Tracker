@@ -2,6 +2,7 @@ import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../../data/models/statistics_model.dart';
 import '../../../providers/sin_tracker_provider.dart';
 
@@ -143,8 +144,9 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
       if (day.overallScore >= 80) perfectDays++;
     }
 
-    final title =
-        widget.isMonthly ? 'মাসিক সারসংক্ষেপ' : 'সাপ্তাহিক সারসংক্ষেপ';
+    final title = widget.isMonthly
+        ? 'stats_monthly_summary'.tr()
+        : 'stats_weekly_summary'.tr();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../services/daily_reminder_service.dart';
@@ -142,13 +143,13 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     String permissionName = '';
     switch (permission) {
       case Permission.notification:
-        permissionName = 'নোটিফিকেশন';
+        permissionName = 'reminder_set_perm_notification'.tr();
         break;
       case Permission.scheduleExactAlarm:
-        permissionName = 'সঠিক সময়ে অ্যালার্ম';
+        permissionName = 'reminder_set_perm_exact_alarm'.tr();
         break;
       default:
-        permissionName = 'এই';
+        permissionName = 'reminder_set_perm_this'.tr();
     }
 
     showDialog(
@@ -157,17 +158,17 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         backgroundColor: const Color(0xFF121212),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'অনুমতি প্রয়োজন',
+          'permission_required'.tr(),
           style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         content: Text(
-          '$permissionName অনুমতি সেটিংস থেকে দিতে হবে।',
+          'reminder_set_perm_dialog_msg'.tr(namedArgs: {'perm': permissionName}),
           style: TextStyle(color: Colors.white70, height: 1.35),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('বাতিল', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -175,7 +176,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
               openAppSettings();
             },
             child: Text(
-              'সেটিংসে যান',
+              'reminder_set_go_settings'.tr(),
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
           ),
@@ -206,13 +207,13 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       await _requestPermission(Permission.notification);
       await _checkPermissions();
       if (!(_permissionStatuses[Permission.notification]?.isGranted ?? false)) {
-        _showSnackBar('নোটিফিকেশন অনুমতি দিন');
+        _showSnackBar('reminder_set_grant_perm'.tr());
         return;
       }
     }
 
     await DailyReminderService.showTestNotification();
-    _showSnackBar('টেস্ট নোটিফিকেশন পাঠানো হয়েছে');
+    _showSnackBar('reminder_set_test_sent'.tr());
   }
 
   @override
@@ -316,7 +317,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         Padding(
           padding: const EdgeInsets.only(left: 2, bottom: 10),
           child: Text(
-            'অনুমতি স্থিতি',
+            'reminder_set_perm_status'.tr(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontSize: 15,
@@ -327,7 +328,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         ),
         _buildPermissionTile(
           permission: Permission.notification,
-          title: 'নোটিফিকেশন',
+          title: 'reminder_set_perm_notification'.tr(),
           description: 'রিমাইন্ডার দেখানোর জন্য প্রয়োজন',
           icon: Icons.notifications,
         ),
@@ -335,7 +336,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         if (_isAndroid12Plus)
           _buildPermissionTile(
             permission: Permission.scheduleExactAlarm,
-            title: 'সঠিক সময়ে অ্যালার্ম',
+            title: 'reminder_set_perm_exact_alarm'.tr(),
             description: 'নির্দিষ্ট সময়ে রিমাইন্ডার পাঠাতে প্রয়োজন',
             icon: Icons.alarm,
           ),
@@ -343,7 +344,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Text(
-              'ℹ️ আপনার ডিভাইসে (Android 12-এর কম) Exact Alarm অনুমতি দরকার নেই।',
+              'reminder_set_android12_note'.tr(),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.55),
                 fontSize: 12,
@@ -519,10 +520,10 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 child: Icon(Icons.tips_and_updates, color: primary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'নোটিফিকেশন কাজ না করলে',
-                  style: TextStyle(
+                  'reminder_set_not_working'.tr(),
+                  style: const TextStyle(
                     color: Colors.red,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -533,7 +534,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           ),
           const SizedBox(height: 10),
           Text(
-            'কিছু ফোনে (বিশেষ করে Xiaomi / Samsung / Oppo ইত্যাদি) Battery/Auto-start সেটিংসের কারণে নোটিফিকেশন delay বা off থাকতে পারে। নিচের গাইড থেকে আপনার ডিভাইস অনুযায়ী অপশনগুলো চেক করুন।',
+            'reminder_set_battery_guide_intro'.tr(),
             style: TextStyle(
               color: gradients.bulletTextColor,
               fontSize: 12.6,
@@ -549,7 +550,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 child: ElevatedButton.icon(
                   onPressed: _showDeviceSpecificGuide,
                   icon: const Icon(Icons.phone_android),
-                  label: const Text('আমার ফোন'),
+                      label: Text('reminder_set_my_phone'.tr()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -566,7 +567,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 child: OutlinedButton.icon(
                   onPressed: _showAllBrandsGuide,
                   icon: const Icon(Icons.list_alt),
-                  label: const Text('সব ব্র্যান্ড'),
+                  label: Text('reminder_set_all_brands'.tr()),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -782,10 +783,14 @@ class _DeviceGuideSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('সব Android ফোনের জন্য (আগে এগুলো চেক করুন)', context),
+                  _buildSectionTitle('reminder_set_all_for'.tr(), context),
                   _buildCommonSettings(context),
                   const SizedBox(height: 22),
-                  _buildSectionTitle('${_getBrandDisplayName(brand)} এর জন্য বিশেষ সেটিংস', context),
+                  _buildSectionTitle(
+                    'reminder_set_brand_specific'
+                        .tr(namedArgs: {'brand': _getBrandDisplayName(brand)}),
+                    context,
+                  ),
                   _buildBrandSpecificSettings(brand, context),
                   const SizedBox(height: 22),
 
@@ -794,10 +799,11 @@ class _DeviceGuideSheet extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => openAppSettings(),
                       icon: const Icon(Icons.settings),
-                      label: const Text('অ্যাপ সেটিংস খুলুন'),
+                      label: Text('reminder_set_open_app_settings'.tr()),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                         elevation: 0,
                         padding: const EdgeInsets.all(14),
                         shape: RoundedRectangleBorder(

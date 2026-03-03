@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/services/firestore_sync_service.dart';
 import '../../providers/auth_provider.dart';
@@ -47,7 +48,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('নাম আপডেট হয়েছে!'),
+          content: Text('profile_name_updated'.tr()),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
@@ -70,13 +71,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'লগআউট করবেন?',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+                'profile_logout_title'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
-                'আপনি কি সত্যিই লগআউট করতে চান?',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                'profile_logout_confirm'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -85,8 +92,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
                     child: Text(
-                      'না',
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      'no'.tr(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -99,7 +108,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('লগআউট'),
+                    child: Text('profile_logout'.tr()),
                   ),
                 ],
               ),
@@ -130,9 +139,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success 
-              ? 'সব ডেটা ক্লাউডে ব্যাকআপ হয়েছে!' 
-              : 'ব্যাকআপ ব্যর্থ হয়েছে'),
+          content: Text(
+            success
+                ? 'profile_backup_success'.tr()
+                : 'profile_backup_fail'.tr(),
+          ),
           backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
         ),
       );
@@ -155,13 +166,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'ডেটা রিস্টোর করবেন?',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+                'profile_restore_title'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
-                'ক্লাউড থেকে সব ডেটা রিস্টোর করলে বর্তমান ডেটা রিপ্লেস হবে। চালিয়ে যেতে চান?',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                'profile_restore_confirm'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -169,19 +186,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text('না', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    child: Text(
+                      'no'.tr(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('রিস্টোর'),
+                    child: Text('profile_restore_btn'.tr()),
                   ),
                 ],
               ),
@@ -202,9 +225,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success 
-              ? 'সব ডেটা রিস্টোর হয়েছে! অ্যাপ রিস্টার্ট করুন।' 
-              : 'রিস্টোর ব্যর্থ হয়েছে'),
+          content: Text(
+            success
+                ? 'profile_restore_success'.tr()
+                : 'profile_restore_fail'.tr(),
+          ),
           backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
         ),
       );
@@ -257,7 +282,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'প্রোফাইল',
+          'profile_title_full'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -303,7 +328,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   // Name Section
                   _buildInfoCard(
                     icon: Icons.person_outline,
-                    title: 'নাম',
+                    title: 'profile_name_label'.tr(),
                     child: _isEditing
                         ? Row(
                             children: [
@@ -312,8 +337,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   controller: _nameController,
                                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                                   decoration: InputDecoration(
-                                    hintText: 'আপনার নাম',
-                                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                    hintText: 'profile_name_hint'.tr(),
+                                    hintStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
@@ -362,11 +391,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                user.displayName ?? 'নাম সেট করা হয়নি',
+                                user.displayName ??
+                                    'profile_name_not_set'.tr(),
                                 style: TextStyle(
-                                  color: user.displayName != null 
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                                  color: user.displayName != null
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                   fontSize: 16,
                                 ),
                               ),
@@ -386,7 +420,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   // Email Section
                   _buildInfoCard(
                     icon: Icons.email_outlined,
-                    title: 'ইমেইল',
+                    title: 'profile_email_label'.tr(),
                     child: Row(
                       children: [
                         Expanded(
@@ -418,9 +452,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'ভেরিফাইড',
+                                  'profile_verified'.tr(),
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -435,7 +471,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   // Account Created
                   _buildInfoCard(
                     icon: Icons.calendar_today_outlined,
-                    title: 'অ্যাকাউন্ট তৈরি',
+                    title: 'profile_account_created'.tr(),
                     child: Text(
                       _formatDate(user.metadata.creationTime),
                       style: TextStyle(
@@ -459,9 +495,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Icon(Icons.cloud_sync, color: Theme.of(context).colorScheme.primary, size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              'ক্লাউড সিংক',
+                              'profile_cloud_sync_label'.tr(),
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),
@@ -476,11 +514,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 12),
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                    size: 12,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'অটো সিংক অন',
-                                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 10),
+                                    'profile_auto_sync_on'.tr(),
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -494,7 +543,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               child: ElevatedButton.icon(
                                 onPressed: _isUpdating ? null : _handleBackup,
                                 icon: const Icon(Icons.cloud_upload, size: 18),
-                                label: const Text('ব্যাকআপ'),
+                                label: Text('profile_backup_btn'.tr()),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Theme.of(context).colorScheme.primary,
                                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -509,8 +558,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _isUpdating ? null : _handleRestore,
-                                icon: Icon(Icons.cloud_download, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                label: Text('রিস্টোর', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                                icon: Icon(
+                                  Icons.cloud_download,
+                                  size: 18,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                                label: Text(
+                                  'profile_restore_label'.tr(),
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                ),
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -538,9 +600,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                         const SizedBox(height: 8),
                         Text(
-                          'অটো সিংক: ডেটা চেঞ্জ হলেই ক্লাউডে সেভ হয়। অফলাইনে থাকলে নেট আসলে অটো সিংক হবে।\n\n• ব্যাকআপ: সব পুরনো ডেটা একসাথে আপলোড\n• রিস্টোর: ক্লাউড থেকে ডাউনলোড (নতুন ডিভাইসে)',
+                          'profile_auto_sync_info'.tr(),
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                             fontSize: 11,
                           ),
                         ),
@@ -556,7 +620,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       onPressed: _handleLogout,
                       icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
                       label: Text(
-                        'লগআউট',
+                        'profile_logout'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
                           fontSize: 16,
@@ -589,9 +653,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'লগইন করা হয়নি',
+            'profile_not_logged_in'.tr(),
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withOpacity(0.6),
               fontSize: 18,
             ),
           ),
@@ -611,7 +678,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             child: Text(
-              'লগইন করুন',
+              'profile_login_btn'.tr(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -667,12 +734,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   String _formatDate(DateTime? date) {
-    if (date == null) return 'অজানা';
-    final months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 
-      'মে', 'জুন', 'জুলাই', 'আগস্ট',
-      'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+    if (date == null) return 'profile_unknown_date'.tr();
+
+    final monthKeys = [
+      'month_jan',
+      'month_feb',
+      'month_mar',
+      'month_apr',
+      'month_may',
+      'month_jun',
+      'month_jul',
+      'month_aug',
+      'month_sep',
+      'month_oct',
+      'month_nov',
+      'month_dec',
     ];
-    return '${date.day} ${months[date.month - 1]}, ${date.year}';
+
+    final monthName = monthKeys[date.month - 1].tr();
+    return '${date.day} $monthName, ${date.year}';
   }
 }

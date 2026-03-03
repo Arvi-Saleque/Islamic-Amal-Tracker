@@ -140,19 +140,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('লোকেশন চালু করুন'),
-        content: const Text(
-          'নামাজের সঠিক সময় পেতে আপনার ফোনের লোকেশন সার্ভিস চালু করুন।\n\n'
-          'লোকেশন বন্ধ থাকলে ঢাকার সময় অনুযায়ী রিমাইন্ডার পাবেন।'
+        title: Text('home_location_enable_title'.tr()),
+        content: Text(
+          'home_location_enable_body'.tr(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('পরে করবো'),
+            child: Text('home_later'.tr()),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('লোকেশন চালু করুন'),
+            child: Text('home_enable_location'.tr()),
           ),
         ],
       ),
@@ -204,8 +203,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       SnackBar(
         content: Text(
           (locationOn || hasAnySavedLocation)
-              ? 'ডেটা আপডেট হয়েছে'
-              : 'লোকেশন বন্ধ — ঢাকার সময় দেখাচ্ছে',
+              ? 'home_data_updated'.tr()
+              : 'home_location_off'.tr(),
         ),
         duration: const Duration(seconds: 2),
         backgroundColor: cs.primary,

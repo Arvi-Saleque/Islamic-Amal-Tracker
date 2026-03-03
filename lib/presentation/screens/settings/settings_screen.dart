@@ -534,8 +534,8 @@ class SettingsScreen extends ConsumerWidget {
       scheme: 'mailto',
       path: 'effttech@gmail.com',
       query: _encodeQueryParameters(<String, String>{
-        'subject': 'আমাল ট্র্যাকার - বাগ রিপোর্ট',
-        'body': 'দয়া করে এখানে বাগের বিবরণ লিখুন:\n\n',
+        'subject': 'settings_bug_subject'.tr(),
+        'body': 'settings_bug_body'.tr(),
       }),
     );
 
@@ -545,9 +545,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'ইমেইল অ্যাপ খুলতে পারছে না। effttech@gmail.com এ ইমেইল করুন।',
-            ),
+            content: Text('settings_email_error'.tr()),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -575,14 +573,14 @@ class SettingsScreen extends ConsumerWidget {
                   Icon(Icons.info, color: Color(0xFFD4AF37)),
                   SizedBox(width: 8),
                   Text(
-                    'আমল ট্র্যাকার',
+                    'Amal Tracker',
                     style: TextStyle(color: Color(0xFFD4AF37), fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Text(
-                'সংস্করণ: v1.0.8',
+                '${'settings_version'.tr()}: v1.0.8',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
@@ -590,7 +588,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'বিল্ড: 13',
+                '${'settings_build'.tr()}: 13',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
@@ -598,7 +596,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'ডেভেলপার: Salek Bin Hossain, Effy Tech',
+                '${'settings_developer'.tr()}: Salek Bin Hossain, Effy Tech',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
@@ -625,7 +623,7 @@ class SettingsScreen extends ConsumerWidget {
               Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.10)),
               const SizedBox(height: 8),
               Text(
-                '© ২০২৬ সর্বস্বত্ব সংরক্ষিত',
+                'settings_copyright'.tr(),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 12,
@@ -638,7 +636,7 @@ class SettingsScreen extends ConsumerWidget {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'ঠিক আছে',
+                      'ok'.tr(),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,

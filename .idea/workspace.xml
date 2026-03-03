@@ -6,19 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="82c4fd51-404f-4b27-a245-f6976a462bd7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/android/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/translations/bn.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/translations/bn.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/translations/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/translations/en.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/core/theme/app_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/theme/app_theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/dhikr/dhikr_counter_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/dhikr/dhikr_counter_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/prayer/prayer_tracker_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/prayer/prayer_tracker_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/reading/reading_tracker_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/reading/reading_tracker_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/sin_tracker/sin_tracker_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/sin_tracker/sin_tracker_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/home/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/home/home_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/profile/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/profile/profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/settings/custom_reminders_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/settings/custom_reminders_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/settings/reminder_setting_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/settings/reminder_setting_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/settings/reminders_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/settings/reminders_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/settings/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/settings/settings_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/settings/usage_rules.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/settings/usage_rules.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/statistics_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/statistics_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/category_progress_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/category_progress_section.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/monthly_calendar_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/monthly_calendar_view.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/qaza_prayer_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/qaza_prayer_section.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/streak_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/streak_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/tab_selector.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/tab_selector.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_progress_chart.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_progress_chart.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_summary_section.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/presentation/screens/statistics/widgets/weekly_summary_section.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

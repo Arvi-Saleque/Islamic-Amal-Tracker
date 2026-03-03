@@ -2,6 +2,7 @@ import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../providers/qaza_prayer_provider.dart';
 
 class QazaPrayerSection extends ConsumerStatefulWidget {
@@ -79,12 +80,12 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
               Flexible(
                 child: Text(
                   totalPending > 0
-                      ? 'বাকি কাজা নামাজ: $totalPending'
-                      : 'আলহামদুলিল্লাহ! কোনো কাজা নেই',
+                      ? 'stats_qaza_pending'
+                          .tr(namedArgs: {'count': totalPending.toString()})
+                      : 'stats_qaza_none'.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color:
-                        totalPending > 0 ? primary : Colors.green,
+                    color: totalPending > 0 ? primary : Colors.green,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -95,9 +96,11 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           if (totalPending > 0) ...[
             const SizedBox(height: 16),
             Text(
-              'গত 30 দিনের মধ্যে',
+              'stats_qaza_last30'.tr(),
               style: TextStyle(
-                color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
+                color: Theme.of(context)
+                    .extension<GradientColors>()!
+                    .bulletTextColor,
                 fontSize: 14,
               ),
             ),
@@ -125,7 +128,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'কাজা আদায় করার পর চেকমার্ক দিন। একবার মার্ক করলে পরে আর দেখাবে না।',
+              'stats_qaza_instruction'.tr(),
               style: TextStyle(
                 color: onSurface.withOpacity(0.9),
                 fontSize: 13,

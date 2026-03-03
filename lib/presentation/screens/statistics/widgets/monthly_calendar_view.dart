@@ -1,6 +1,7 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class MonthlyCalendarView extends StatefulWidget {
@@ -180,12 +181,22 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  String _getMonthNameBengali(int month) {
-    final months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+  String _getMonthNameLocalized(int month) {
+    const keys = [
+      'month_jan',
+      'month_feb',
+      'month_mar',
+      'month_apr',
+      'month_may',
+      'month_jun',
+      'month_jul',
+      'month_aug',
+      'month_sep',
+      'month_oct',
+      'month_nov',
+      'month_dec',
     ];
-    return months[month - 1];
+    return keys[month - 1].tr();
   }
 
   Color _getDateColor(BuildContext context, int score) {
@@ -229,7 +240,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                 icon: Icon(Icons.chevron_left, color: bulletColor),
               ),
               Text(
-                '${_getMonthNameBengali(widget.selectedMonth.month)} ${widget.selectedMonth.year}',
+                '${_getMonthNameLocalized(widget.selectedMonth.month)} ${widget.selectedMonth.year}',
                 style: TextStyle(
                   color: primary,
                   fontSize: 18,
@@ -253,13 +264,13 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _WeekdayHeader('শনি', bulletColor),
-              _WeekdayHeader('রবি', bulletColor),
-              _WeekdayHeader('সোম', bulletColor),
-              _WeekdayHeader('মঙ্গল', bulletColor),
-              _WeekdayHeader('বুধ', bulletColor),
-              _WeekdayHeader('বৃহ', bulletColor),
-              _WeekdayHeader('শুক্র', bulletColor),
+              _WeekdayHeader('weekday_sat_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_sun_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_mon_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_tue_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_wed_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_thu_short'.tr(), bulletColor),
+              _WeekdayHeader('weekday_fri_short'.tr(), bulletColor),
             ],
           ),
           const SizedBox(height: 12),

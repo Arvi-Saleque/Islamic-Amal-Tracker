@@ -1,6 +1,7 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../../data/models/statistics_model.dart';
 
 class WeeklyProgressChart extends StatelessWidget {
@@ -47,7 +48,7 @@ class WeeklyProgressChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'সাপ্তাহিক অগ্রগতি',
+            'stats_weekly_progress'.tr(),
             style: TextStyle(
               color: onSurface,
               fontSize: 18,
@@ -76,7 +77,7 @@ class WeeklyProgressChart extends StatelessWidget {
                   child: weeklyStats.days.isEmpty
                       ? Center(
                           child: Text(
-                            'এখনো কোনো ডেটা নেই',
+                            'stats_no_data_yet'.tr(),
                             style: TextStyle(color: bulletTextColor),
                           ),
                         )

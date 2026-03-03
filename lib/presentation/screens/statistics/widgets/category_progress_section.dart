@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/models/statistics_model.dart';
 
@@ -41,7 +42,7 @@ class CategoryProgressSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'বিভাগ অনুযায়ী অগ্রগতি',
+            'stats_category_progress'.tr(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
@@ -54,7 +55,7 @@ class CategoryProgressSection extends StatelessWidget {
           _CategoryProgressItem(
             icon: Icons.mosque,
             iconColor: primary,
-            title: 'নামাজ',
+            title: 'prayer_section'.tr(),
             progress: avgPrayer,
           ),
           const SizedBox(height: 16),
@@ -63,7 +64,7 @@ class CategoryProgressSection extends StatelessWidget {
           _CategoryProgressItem(
             icon: Icons.check_circle_outline,
             iconColor: primary,
-            title: 'প্রতিদিনের আমল',
+            title: 'daily_section'.tr(),
             progress: avgAmal,
           ),
           const SizedBox(height: 16),
@@ -72,7 +73,7 @@ class CategoryProgressSection extends StatelessWidget {
           _CategoryProgressItem(
             icon: Icons.favorite,
             iconColor: primary,
-            title: 'যিকির',
+            title: 'dhikr_section'.tr(),
             progress: avgDhikr,
           ),
           const SizedBox(height: 16),
@@ -81,7 +82,7 @@ class CategoryProgressSection extends StatelessWidget {
           _CategoryProgressItem(
             icon: Icons.menu_book,
             iconColor: primary,
-            title: 'পড়াশোনা',
+            title: 'reading_section'.tr(),
             progress: avgReading,
           ),
         ],

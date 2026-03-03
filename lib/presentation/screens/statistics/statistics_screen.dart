@@ -201,7 +201,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'মাসিক অগ্রগতি',
+            'stats_monthly_progress'.tr(),
             style: TextStyle(
               color: onSurface,
               fontSize: 18,

@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../data/models/custom_reminder.dart';
 import '../../../services/daily_reminder_service.dart';
@@ -58,13 +59,20 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'রিমাইন্ডার মুছুন?',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold),
+                'custom_rem_delete_title'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
-                '"${reminder.title}" মুছে ফেলতে চান?',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                'custom_rem_delete_confirm'
+                    .tr(namedArgs: {'title': reminder.title}),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -72,12 +80,25 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text('বাতিল', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                    child: Text(
+                      'cancel'.tr(),
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: Text('মুছুন', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    child: Text(
+                      'custom_rem_delete_tooltip'.tr(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -94,7 +115,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('রিমাইন্ডার মুছে ফেলা হয়েছে'),
+            content: Text('custom_rem_deleted'.tr()),
             backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
           ),
         );
@@ -159,7 +180,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'কাস্টম রিমাইন্ডার',
+          'custom_rem_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -180,7 +201,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         icon: const Icon(Icons.add),
-        label: const Text('নতুন রিমাইন্ডার'),
+        label: Text('custom_rem_new'.tr()),
       ),
     );
   }
@@ -196,16 +217,16 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
             color: Colors.grey.withOpacity(0.5),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'কোনো কাস্টম রিমাইন্ডার নেই',
-            style: TextStyle(
+          Text(
+            'custom_rem_empty'.tr(),
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'নতুন কাস্টম রিমাইন্ডার যোগ করুন',
+            'custom_rem_add_hint'.tr(),
             style: TextStyle(
               color: Colors.grey.withOpacity(0.7),
               fontSize: 14,
@@ -318,7 +339,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                           onPressed: () => _openAddReminderScreen(reminder),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          tooltip: 'সম্পাদনা',
+                          tooltip: 'custom_rem_edit_tooltip'.tr(),
                         ),
                         const SizedBox(width: 12),
                         IconButton(
@@ -327,7 +348,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                           onPressed: () => _deleteReminder(reminder),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          tooltip: 'মুছুন',
+                          tooltip: 'custom_rem_delete_tooltip'.tr(),
                         ),
                       ],
                     ),
@@ -421,7 +442,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('রিমাইন্ডারের নাম দিন'),
+          content: Text('custom_rem_name_required'.tr()),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -431,7 +452,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('অন্তত একটি দিন নির্বাচন করুন'),
+          content: Text('custom_rem_day_required'.tr()),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -465,7 +486,10 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              _isEditing ? 'রিমাইন্ডার আপডেট হয়েছে' : 'রিমাইন্ডার যোগ হয়েছে'),
+            _isEditing
+                ? 'custom_rem_updated'.tr()
+                : 'custom_rem_added'.tr(),
+          ),
           backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
         ),
       );
@@ -520,7 +544,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          _isEditing ? 'রিমাইন্ডার সম্পাদনা' : 'নতুন রিমাইন্ডার',
+          _isEditing ? 'custom_rem_edit_title'.tr() : 'custom_rem_new'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -538,14 +562,19 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             // Title Input Section
             _buildSectionCard(
               icon: Icons.title,
-              title: 'রিমাইন্ডার টাইটেল',
+              title: 'custom_rem_title_label'.tr(),
               child: TextField(
                 controller: _titleController,
                 maxLength: 50,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
-                  hintText: 'যেমন: কোরআন তেলাওয়াত, দোয়া পড়া...',
-                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                  hintText: 'custom_rem_title_hint'.tr(),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.3),
+                  ),
                   border: InputBorder.none,
                   counterStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                 ),
@@ -557,15 +586,17 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             // Time Selection Section
             _buildSectionCard(
               icon: Icons.access_time,
-              title: 'রিমাইন্ডার সময়',
+              title: 'custom_rem_time_label'.tr(),
               child: GestureDetector(
                 onTap: _selectTime,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'সময় নির্বাচন করুন',
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      'custom_rem_time_select'.tr(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     Row(
                       children: [
@@ -592,7 +623,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             // Day Selection Section
             _buildSectionCard(
               icon: Icons.calendar_today,
-              title: 'পুনরাবৃত্তির দিন',
+              title: 'custom_rem_repeat_days'.tr(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -601,7 +632,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        'অন্তত একটি দিন নির্বাচন করুন',
+                        'custom_rem_day_required'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
                           fontSize: 12,
@@ -620,9 +651,11 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
               child: ElevatedButton.icon(
                 onPressed: _saveReminder,
                 icon: const Icon(Icons.add),
-                label: Text(_isEditing
-                    ? 'রিমাইন্ডার সেভ করুন'
-                    : 'রিমাইন্ডার সংরক্ষণ করুন'),
+                label: Text(
+                  _isEditing
+                      ? 'custom_rem_save'.tr()
+                      : 'custom_rem_save'.tr(),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -677,7 +710,15 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
   }
 
   Widget _buildDaySelector() {
-    final dayNames = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি', 'রবি'];
+    final dayNames = [
+      'weekday_mon_short'.tr(),
+      'weekday_tue_short'.tr(),
+      'weekday_wed_short'.tr(),
+      'weekday_thu_short'.tr(),
+      'weekday_fri_short'.tr(),
+      'weekday_sat_short'.tr(),
+      'weekday_sun_short'.tr(),
+    ];
 
     return Wrap(
       spacing: 8,

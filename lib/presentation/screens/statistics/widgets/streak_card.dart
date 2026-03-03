@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class StreakCard extends StatelessWidget {
   final int currentStreak;
@@ -53,7 +54,7 @@ class StreakCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'বর্তমান স্ট্রিক',
+                      'stats_streak'.tr(),
                       style: TextStyle(
                         color: primary,
                         fontSize: 14,
@@ -94,7 +95,7 @@ class StreakCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'সর্বোচ্চ স্ট্রিক',
+                      'stats_best_streak'.tr(),
                       style: TextStyle(
                         color: primary,
                         fontSize: 14,
@@ -123,7 +124,7 @@ class StreakCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'স্ট্রিক কাউন্টের জন্য কমপক্ষে 60%+ প্রোগ্রেস পূরণ করতে হবে',
+                    'stats_streak_threshold'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: bulletTextColor,

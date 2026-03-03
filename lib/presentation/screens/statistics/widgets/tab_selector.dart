@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 enum StatisticsTab { weekly, monthly, qaza }
 
@@ -43,7 +44,7 @@ class TabSelector extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'সাপ্তাহিক',
+                    'stats_weekly'.tr(),
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.weekly 
                           ? onPrimary 
@@ -70,7 +71,7 @@ class TabSelector extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'মাসিক',
+                    'stats_monthly'.tr(),
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.monthly 
                           ? onPrimary 
@@ -97,7 +98,7 @@ class TabSelector extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'কাজা',
+                    'stats_qaza'.tr(),
                     style: TextStyle(
                       color: selectedTab == StatisticsTab.qaza 
                           ? onPrimary 
