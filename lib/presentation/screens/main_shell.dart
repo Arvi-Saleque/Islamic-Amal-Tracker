@@ -5,6 +5,7 @@ import '../providers/main_shell_tab_provider.dart';
 import 'home/home_screen.dart';
 import 'settings/reminders_screen.dart';
 import 'dhikr/dhikr_counter_screen.dart';
+import 'doa/doa_screen.dart';
 import 'statistics/statistics_screen.dart';
 import 'settings/settings_screen.dart';
 
@@ -19,7 +20,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   static const _screens = [
     HomeScreen(),
     RemindersScreen(),
-    DhikrCounterScreen(),
+    DoaScreen(),
     StatisticsScreen(),
     SettingsScreen(),
   ];
@@ -35,12 +36,19 @@ class _MainShellState extends ConsumerState<MainShell> {
     final activeColor = isDark ? gold : cs.primary;
     final inactiveColor = cs.onSurface.withOpacity(0.45);
 
-    return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Column(
+    return PopScope(
+      canPop: currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          ref.read(mainShellTabIndexProvider.notifier).state = 0;
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Golden gradient top divider
@@ -88,9 +96,9 @@ class _MainShellState extends ConsumerState<MainShell> {
                 inactiveColor: inactiveColor,
               ),
               _buildDestination(
-                icon: Icons.favorite_outline_rounded,
-                selectedIcon: Icons.favorite_rounded,
-                label: 'tab_dhikr'.tr(),
+                icon: Icons.menu_book_outlined,
+                selectedIcon: Icons.menu_book_rounded,
+                label: 'tab_dua'.tr(),
                 isSelected: currentIndex == 2,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
@@ -114,6 +122,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             ],
           ),
         ],
+      ),
       ),
     );
   }

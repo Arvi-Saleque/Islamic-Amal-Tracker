@@ -9,6 +9,7 @@ import '../../providers/prayer_times_provider.dart';
 import '../statistics/widgets/digital_time_picker.dart';
 import 'custom_reminders_screen.dart';
 import 'reminder_setting_screen.dart';
+import '../../providers/main_shell_tab_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Quick-add preset definitions
@@ -631,13 +632,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openCustomReminders,
-        backgroundColor: activeColor,
-        foregroundColor: isDark ? Colors.black : cs.onPrimary,
-        icon: const Icon(Icons.add_rounded),
-        label: Text('add_reminder'.tr()),
-      ),
+      floatingActionButton: ref.watch(mainShellTabIndexProvider) == 1
+          ? FloatingActionButton.extended(
+              onPressed: _openCustomReminders,
+              backgroundColor: activeColor,
+              foregroundColor: isDark ? Colors.black : cs.onPrimary,
+              icon: const Icon(Icons.add_rounded),
+              label: Text('add_reminder'.tr()),
+            )
+          : null,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: activeColor))
           : RefreshIndicator(
