@@ -17,3 +17,9 @@ Thumbs.db
 android/key.properties
 *.jks
 *.keystore
+
+.idea/
+.vscode/
+.cursor/
+.cursor/
+.gradle/

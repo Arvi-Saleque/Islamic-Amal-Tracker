@@ -1187,17 +1187,35 @@ Widget _sunChip({
                   state.timeToCurrentPrayerEnd != null) ||
               (state.isNaflTime && state.timeToNextPrayer != null)) ...[
             const SizedBox(height: 8),
-            Text(
-              _toBengaliString(state.isNaflTime
-                  ? state.timeToNextPrayer!
-                  : state.timeToCurrentPrayerEnd!),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDark ? _gold : cs.primary,
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
+            Builder(
+              builder: (context) {
+                final raw = state.isNaflTime
+                    ? state.timeToNextPrayer!
+                    : state.timeToCurrentPrayerEnd!;
+                final isBangla = context.locale.languageCode == 'bn';
+
+                String countdownText;
+                if (isBangla) {
+                  // Bengali locale: Bengali digits + Bengali units
+                  countdownText = _toBengaliString(raw);
+                } else {
+                  // English (or other) locale: keep ASCII digits, map Bengali units to English
+                  countdownText = raw
+                      .replaceAll('ঘ', 'h')
+                      .replaceAll('মি', 'm');
+                }
+
+                return Text(
+                  countdownText,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDark ? _gold : cs.primary,
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 4),
             Text(
