@@ -256,7 +256,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'নামাজের হিসাব',
+          'reminder_set_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -264,7 +264,6 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           ),
         ),
         centerTitle: true,
-        
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -329,7 +328,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
         _buildPermissionTile(
           permission: Permission.notification,
           title: 'reminder_set_perm_notification'.tr(),
-          description: 'রিমাইন্ডার দেখানোর জন্য প্রয়োজন',
+          description: 'reminder_set_perm_desc_notification'.tr(),
           icon: Icons.notifications,
         ),
         const SizedBox(height: 10),
@@ -337,7 +336,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           _buildPermissionTile(
             permission: Permission.scheduleExactAlarm,
             title: 'reminder_set_perm_exact_alarm'.tr(),
-            description: 'নির্দিষ্ট সময়ে রিমাইন্ডার পাঠাতে প্রয়োজন',
+            description: 'reminder_set_perm_desc_exact_alarm'.tr(),
             icon: Icons.alarm,
           ),
         if (!_isAndroid12Plus)
@@ -429,7 +428,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                         border: Border.all(color: badgeColor.withOpacity(0.22)),
                       ),
                       child: Text(
-                        isGranted ? 'Granted' : 'Required',
+                        isGranted
+                            ? 'reminder_set_granted'.tr()
+                            : 'reminder_set_required'.tr(),
                         style: TextStyle(
                           color: badgeColor,
                           fontSize: 11,
@@ -463,13 +464,13 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child:  const Text(
-                'দিন',
-                style: TextStyle(
-                  fontSize: 12, fontWeight: 
-                  FontWeight.w900,
-                  color: Colors.white
-                  ),
+              child: Text(
+                'reminder_set_grant_btn'.tr(),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
               ),
             ),
         ],
@@ -625,7 +626,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       child: ElevatedButton.icon(
         onPressed: _testNotification,
         icon: const Icon(Icons.send),
-        label: const Text('টেস্ট নোটিফিকেশন পাঠান'),
+        label: Text('reminder_set_test'.tr()),
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -872,41 +873,34 @@ class _DeviceGuideSheet extends StatelessWidget {
   }
 
   Widget _buildCommonSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'A) App Notifications',
-          'Settings → Apps → আমল ট্রাকার → Notifications\n'
-              '• Allow notifications = ON\n'
-              '• Lock screen / Pop-up / Banner / Sound = ON',
+          'reminder_set_guide_a_title'.tr(),
+          'reminder_set_guide_a_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'B) Battery Optimization বন্ধ',
-          'Settings → Apps → আমল ট্রাকার → Battery\n'
-              '• Unrestricted / Don\'t optimize সিলেক্ট করুন',
+          'reminder_set_guide_b_title'.tr(),
+          'reminder_set_guide_b_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'C) Background Data',
-          'Settings → Apps → আমল ট্রাকার → Mobile data & Wi-Fi\n'
-              '• Background data = ON\n'
-              '• Unrestricted data usage = ON',
+          'reminder_set_guide_c_title'.tr(),
+          'reminder_set_guide_c_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'D) Unused app বন্ধ',
-          'App info → আমল ট্রাকার\n'
-              '• Pause app activity if unused = OFF\n'
-              '• Remove permissions if unused = OFF',
+          'reminder_set_guide_d_title'.tr(),
+          'reminder_set_guide_d_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'E) Exact Alarm (Android 12+)',
-          'Settings → Special app access → Alarms & reminders\n'
-              '• Allow',
+          'reminder_set_guide_f_title'.tr(),
+          'reminder_set_guide_f_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
@@ -945,269 +939,247 @@ class _DeviceGuideSheet extends StatelessWidget {
   }
 
   Widget _buildXiaomiSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
-          'Settings → Apps → Permissions → Autostart / Background autostart\n'
-              '• আমল ট্র্যাকার = ON',
+          'reminder_set_guide_xiaomi_autostart_title'.tr(),
+          'reminder_set_guide_xiaomi_autostart_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery Settings',
-          'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n'
-              '• No restrictions / Unrestricted\n'
-              '• Allow background activity = ON',
+          'reminder_set_guide_xiaomi_battery_title'.tr(),
+          'reminder_set_guide_xiaomi_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Recents Lock',
-          'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস → Lock',
+          'reminder_set_guide_xiaomi_recents_title'.tr(),
+          'reminder_set_guide_xiaomi_recents_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Security App',
-          'Security app → Battery → App battery saver\n'
-              '• No restrictions',
+          'reminder_set_guide_xiaomi_security_title'.tr(),
+          'reminder_set_guide_xiaomi_security_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildSamsungSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Sleeping Apps বন্ধ',
-          'Settings → Battery → Background usage limits\n'
-              '• Put unused apps to sleep = OFF\n'
-              '• Sleeping apps / Deep sleeping apps থেকে আমল ট্র্যাকার Remove করুন',
+          'reminder_set_guide_samsung_sleeping_title'.tr(),
+          'reminder_set_guide_samsung_sleeping_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery',
-          'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-              '• Unrestricted',
+          'reminder_set_guide_samsung_battery_title'.tr(),
+          'reminder_set_guide_samsung_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Notifications',
-          'Settings → Notifications → App notifications\n'
-              '• আমল ট্র্যাকার = ON\n'
-              '• Notification categories সব ON',
+          'reminder_set_guide_samsung_notif_title'.tr(),
+          'reminder_set_guide_samsung_notif_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildOnePlusSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Auto-launch Enable',
-          'Settings → Apps → Special app access → Auto-launch\n'
-              '• আমল ট্র্যাকার = Enable',
+          'reminder_set_guide_oneplus_autostart_title'.tr(),
+          'reminder_set_guide_oneplus_autostart_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Deep Optimization বন্ধ',
-          'Settings → Battery → Deep optimization\n'
-              '• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
+          'reminder_set_guide_oneplus_deep_title'.tr(),
+          'reminder_set_guide_oneplus_deep_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Settings → Battery → Battery optimization\n'
-              '• আমল ট্র্যাকার → Don\'t optimize',
+          'reminder_set_guide_oneplus_battery_title'.tr(),
+          'reminder_set_guide_oneplus_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildOppoSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Auto-launch / Startup Manager',
-          'Settings → Apps → Special app access → Auto-launch / Startup manager\n'
-              '• আমল ট্র্যাকার = Enable\n'
-              '• Secondary launch / Background launch = Allow',
+          'reminder_set_guide_oppo_autostart_title'.tr(),
+          'reminder_set_guide_oppo_autostart_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Settings → Battery → Battery optimization\n'
-              '• আমল ট্র্যাকার → Don\'t optimize',
+          'reminder_set_guide_oppo_battery_title'.tr(),
+          'reminder_set_guide_oppo_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildVivoSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Auto-start',
-          'Settings → Battery → Background power consumption management / Autostart\n'
-              '• আমল ট্র্যাকার = Allow',
+          'reminder_set_guide_vivo_autostart_title'.tr(),
+          'reminder_set_guide_vivo_autostart_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'High Background Power',
-          'Settings → Battery → High background power consumption\n'
-              '• আমল ট্র্যাকার = Allow / Don\'t restrict',
+          'reminder_set_guide_vivo_high_title'.tr(),
+          'reminder_set_guide_vivo_high_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Apps → আমল ট্র্যাকার → Battery\n'
-              '• No restrictions',
+          'reminder_set_guide_vivo_battery_title'.tr(),
+          'reminder_set_guide_vivo_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildHuaweiSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'App Launch (Manual)',
-          'Settings → Apps → App launch → আমল ট্র্যাকার\n'
-              '• Manage manually = ON\n'
-              '• Auto-launch = ON\n'
-              '• Secondary launch = ON\n'
-              '• Run in background = ON',
+          'reminder_set_guide_huawei_launch_title'.tr(),
+          'reminder_set_guide_huawei_launch_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Battery optimization\n'
-              '• Don\'t allow optimize / Unrestricted',
+          'reminder_set_guide_huawei_battery_title'.tr(),
+          'reminder_set_guide_huawei_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildMotorolaSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Battery',
-          'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-              '• Unrestricted',
+          'reminder_set_guide_samsung_battery_title'.tr(),
+          'reminder_set_guide_motorola_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Settings → Battery → Battery optimization\n'
-              '• আমল ট্র্যাকার → Not optimized',
+          'reminder_set_guide_oneplus_battery_title'.tr(),
+          'reminder_set_guide_motorola_opt_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Data',
-          'Mobile data → Background data = ON',
+          'reminder_set_guide_c_title'.tr(),
+          'reminder_set_guide_data_desc'.tr(),
         ),
       ],
     );
   }
 
   Widget _buildPixelSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-              '• Unrestricted',
+          'reminder_set_guide_pixel_battery_title'.tr(),
+          'reminder_set_guide_pixel_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Battery Saver',
-          'Settings → Battery → Battery Saver\n'
-              '• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)',
+          'reminder_set_guide_pixel_saver_title'.tr(),
+          'reminder_set_guide_pixel_saver_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Exact Alarm',
-          'Settings → Apps → Special app access → Alarms & reminders\n'
-              '• আমল ট্র্যাকার = Allow',
+          'reminder_set_guide_pixel_exact_title'.tr(),
+          'reminder_set_guide_pixel_exact_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildTecnoSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Auto-start',
-          'Settings → Apps → Autostart manager\n'
-              '• আমল ট্র্যাকার = Enable',
+          'reminder_set_guide_tecno_autostart_title'.tr(),
+          'reminder_set_guide_tecno_autostart_desc'.tr(namedArgs: {'appName': appName}),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
-          'Battery/Power Manager',
-          'Battery lab / Power manager\n'
-              '• Don\'t restrict',
+          'reminder_set_guide_tecno_battery_title'.tr(),
+          'reminder_set_guide_tecno_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Background Activity',
-          'Allow background activity = ON',
+          'reminder_set_guide_tecno_background_title'.tr(),
+          'reminder_set_guide_tecno_background_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Recents Lock',
-          'Lock in recent apps (যদি থাকে)',
+          'reminder_set_guide_tecno_recents_title'.tr(),
+          'reminder_set_guide_tecno_recents_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
   Widget _buildGenericSettings(BuildContext context) {
+    final appName = 'app_name'.tr();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingItem(
           context,
-          'Battery Optimization',
-          'Settings → Apps → আমল ট্র্যাকার → Battery\n'
-              '• Unrestricted / Don\'t optimize',
+          'reminder_set_guide_b_title'.tr(),
+          'reminder_set_guide_b_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _buildSettingItem(
           context,
-          'Auto-start (যদি থাকে)',
-          'Settings → Apps → Special app access → Auto-launch\n'
-              '• Enable করুন',
+          'reminder_set_guide_generic_autostart_title'.tr(),
+          'reminder_set_guide_generic_autostart_note'.tr(),
         ),
         _buildSettingItem(
           context,
-          'Background Data',
+          'reminder_set_guide_c_title'.tr(),
           'Background data = ON',
         ),
       ],
@@ -1287,15 +1259,15 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
   late TabController _tabController;
 
   final List<Map<String, dynamic>> _brands = [
-    {'name': 'সবার জন্য', 'icon': Icons.android},
-    {'name': 'Xiaomi', 'icon': Icons.phone_android},
-    {'name': 'Samsung', 'icon': Icons.phone_android},
-    {'name': 'OnePlus', 'icon': Icons.phone_android},
-    {'name': 'Oppo/Realme', 'icon': Icons.phone_android},
-    {'name': 'Vivo', 'icon': Icons.phone_android},
-    {'name': 'Huawei', 'icon': Icons.phone_android},
-    {'name': 'Pixel', 'icon': Icons.phone_android},
-    {'name': 'Tecno', 'icon': Icons.phone_android},
+    {'id': 'all', 'name': null, 'icon': Icons.android},
+    {'id': 'xiaomi', 'name': 'Xiaomi', 'icon': Icons.phone_android},
+    {'id': 'samsung', 'name': 'Samsung', 'icon': Icons.phone_android},
+    {'id': 'oneplus', 'name': 'OnePlus', 'icon': Icons.phone_android},
+    {'id': 'oppo_realme', 'name': 'Oppo/Realme', 'icon': Icons.phone_android},
+    {'id': 'vivo', 'name': 'Vivo', 'icon': Icons.phone_android},
+    {'id': 'huawei', 'name': 'Huawei', 'icon': Icons.phone_android},
+    {'id': 'pixel', 'name': 'Pixel', 'icon': Icons.phone_android},
+    {'id': 'tecno', 'name': 'Tecno', 'icon': Icons.phone_android},
   ];
 
   @override
@@ -1352,7 +1324,7 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'ব্র্যান্ড অনুযায়ী গাইড',
+                        'reminder_set_brand_guide'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 16.5,
@@ -1380,7 +1352,12 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
               unselectedLabelColor: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
               tabAlignment: TabAlignment.start,
               dividerColor: Colors.transparent,
-              tabs: _brands.map((b) => Tab(text: b['name'])).toList(),
+              tabs: _brands.map((b) {
+                if (b['id'] == 'all') {
+                  return Tab(text: 'reminder_set_all_for_label'.tr());
+                }
+                return Tab(text: b['name'] as String);
+              }).toList(),
             ),
           ),
 
@@ -1388,15 +1365,15 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildCommonTab(),
-                _buildXiaomiTab(),
-                _buildSamsungTab(),
-                _buildOnePlusTab(),
-                _buildOppoTab(),
-                _buildVivoTab(),
-                _buildHuaweiTab(),
-                _buildPixelTab(),
-                _buildTecnoTab(),
+                _buildCommonTab(context),
+                _buildXiaomiTab(context),
+                _buildSamsungTab(context),
+                _buildOnePlusTab(context),
+                _buildOppoTab(context),
+                _buildVivoTab(context),
+                _buildHuaweiTab(context),
+                _buildPixelTab(context),
+                _buildTecnoTab(context),
               ],
             ),
           ),
@@ -1405,224 +1382,214 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
     );
   }
 
-  Widget _buildCommonTab() {
-    return const _GuideTab(
-      title: 'সব Android ফোনে আগে এগুলো চেক করুন',
+  Widget _buildCommonTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_common_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'A) App Notifications',
-          desc:
-              'Settings → Apps → আমল ট্র্যাকার → Notifications\n• Allow notifications = ON\n• Lock screen / Pop-up / Banner / Sound = ON',
+          title: 'reminder_set_guide_a_title'.tr(),
+          desc: 'reminder_set_guide_a_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'B) Battery Optimization বন্ধ',
-          desc:
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted / Don\'t optimize সিলেক্ট করুন',
+          title: 'reminder_set_guide_b_title'.tr(),
+          desc: 'reminder_set_guide_b_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'C) Background Data',
-          desc:
-              'Settings → Apps → আমল ট্র্যাকার → Mobile data & Wi-Fi\n• Background data = ON\n• Unrestricted data usage = ON',
+          title: 'reminder_set_guide_c_title'.tr(),
+          desc: 'reminder_set_guide_c_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'D) Unused app বন্ধ',
-          desc:
-              'App info → আমল ট্র্যাকার\n• Pause app activity if unused = OFF\n• Remove permissions if unused = OFF',
+          title: 'reminder_set_guide_d_title'.tr(),
+          desc: 'reminder_set_guide_d_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'E) Do Not Disturb',
-          desc: 'Do Not Disturb / Focus mode OFF রাখুন অথবা exception এ যোগ করুন',
+          title: 'reminder_set_guide_e_title'.tr(),
+          desc: 'reminder_set_guide_e_desc'.tr(),
         ),
         _GuideStep(
-          title: 'F) Exact Alarm (Android 12+)',
-          desc:
-              'Settings → Special app access → Alarms & reminders\n• Allow',
+          title: 'reminder_set_guide_f_title'.tr(),
+          desc: 'reminder_set_guide_f_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildXiaomiTab() {
-    return const _GuideTab(
-      title: 'Xiaomi / Redmi / Poco (MIUI / HyperOS)',
+  Widget _buildXiaomiTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_xiaomi_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Auto-start (সবচেয়ে গুরুত্বপূর্ণ)',
-          desc:
-              'Settings → Apps → Permissions → Autostart / Background autostart\n• আমল ট্র্যাকার = ON',
+          title: 'reminder_set_guide_xiaomi_autostart_title'.tr(),
+          desc: 'reminder_set_guide_xiaomi_autostart_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Battery Settings',
-          desc:
-              'Settings → Apps → Manage apps → আমল ট্র্যাকার → Battery\n• No restrictions / Unrestricted\n• Allow background activity = ON',
+          title: 'reminder_set_guide_xiaomi_battery_title'.tr(),
+          desc: 'reminder_set_guide_xiaomi_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Recents Lock',
-          desc:
-              'Recent apps খুলুন → আমল ট্র্যাকার লং প্রেস করুন → Lock icon এ ট্যাপ',
+          title: 'reminder_set_guide_xiaomi_recents_title'.tr(),
+          desc: 'reminder_set_guide_xiaomi_recents_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Security App',
-          desc:
-              'Security app → Battery → App battery saver\n• No restrictions\n• "Clear cache/Boost speed" এ আমল ট্র্যাকার exclude করুন',
+          title: 'reminder_set_guide_xiaomi_security_title'.tr(),
+          desc: 'reminder_set_guide_xiaomi_security_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildSamsungTab() {
-    return const _GuideTab(
-      title: 'Samsung (One UI)',
+  Widget _buildSamsungTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_samsung_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Sleeping Apps বন্ধ',
-          desc:
-              'Settings → Battery → Background usage limits\n• Put unused apps to sleep = OFF\n• Sleeping apps / Deep sleeping apps এ থাকলে Remove করুন',
+          title: 'reminder_set_guide_samsung_sleeping_title'.tr(),
+          desc: 'reminder_set_guide_samsung_sleeping_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Battery',
-          desc:
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted',
+          title: 'reminder_set_guide_samsung_battery_title'.tr(),
+          desc: 'reminder_set_guide_samsung_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Notifications',
-          desc:
-              'Settings → Notifications → App notifications\n• আমল ট্র্যাকার = ON\n• Notification categories এ সব category ON করুন',
+          title: 'reminder_set_guide_samsung_notif_title'.tr(),
+          desc: 'reminder_set_guide_samsung_notif_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildOnePlusTab() {
-    return const _GuideTab(
-      title: 'OnePlus (OxygenOS)',
+  Widget _buildOnePlusTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_oneplus_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Auto-launch Enable',
-          desc:
-              'Settings → Apps → Special app access → Auto-launch\n• আমল ট্র্যাকার = Enable\n• Secondary launch / Background launch = Allow',
+          title: 'reminder_set_guide_oneplus_autostart_title'.tr(),
+          desc: 'reminder_set_guide_oneplus_autostart_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Deep Optimization বন্ধ',
-          desc:
-              'Settings → Battery → Deep optimization\n• OFF করুন অথবা আমল ট্র্যাকার exclude করুন',
+          title: 'reminder_set_guide_oneplus_deep_title'.tr(),
+          desc: 'reminder_set_guide_oneplus_deep_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Battery Optimization',
-          desc:
-              'Settings → Battery → Battery optimization\n• আমল ট্র্যাকার → Don\'t optimize',
-        ),
-        _GuideStep(title: 'Recents Lock', desc: 'Recents → Lock (কিছু মডেলে আছে)'),
-      ],
-    );
-  }
-
-  Widget _buildOppoTab() {
-    return const _GuideTab(
-      title: 'Oppo / Realme (ColorOS / Realme UI)',
-      steps: [
-        _GuideStep(
-          title: 'Auto-launch / Startup',
-          desc:
-              'Settings → Apps → Special app access → Auto-launch / Startup manager\n• আমল ট্র্যাকার = Enable\n• Secondary launch / Background launch = Allow',
-          important: true,
+          title: 'reminder_set_guide_oneplus_battery_title'.tr(),
+          desc: 'reminder_set_guide_oneplus_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Battery Optimization',
-          desc:
-              'Settings → Battery → Battery optimization\n• আমল ট্র্যাকার → Don\'t optimize',
+          title: 'reminder_set_guide_oneplus_recents_title'.tr(),
+          desc: 'reminder_set_guide_oneplus_recents_desc'.tr(),
         ),
       ],
     );
   }
 
-  Widget _buildVivoTab() {
-    return const _GuideTab(
-      title: 'Vivo / iQOO (Funtouch OS)',
+  Widget _buildOppoTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_oppo_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Auto-start',
-          desc:
-              'Settings → Battery → Background power consumption management / Autostart\n• আমল ট্র্যাকার = Allow',
+          title: 'reminder_set_guide_oppo_autostart_title'.tr(),
+          desc: 'reminder_set_guide_oppo_autostart_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'High Background Power',
-          desc:
-              'Settings → Battery → High background power consumption\n• আমল ট্র্যাকার = Allow / Don\'t restrict',
-        ),
-        _GuideStep(
-          title: 'Battery Optimization',
-          desc: 'Apps → আমল ট্র্যাকার → Battery\n• No restrictions',
+          title: 'reminder_set_guide_oppo_battery_title'.tr(),
+          desc: 'reminder_set_guide_oppo_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildHuaweiTab() {
-    return const _GuideTab(
-      title: 'Huawei / Honor (EMUI / MagicOS)',
+  Widget _buildVivoTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_vivo_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'App Launch (Manual)',
-          desc:
-              'Settings → Apps → App launch → আমল ট্র্যাকার\n• Manage manually = ON\n• Auto-launch = ON\n• Secondary launch = ON\n• Run in background = ON',
+          title: 'reminder_set_guide_vivo_autostart_title'.tr(),
+          desc: 'reminder_set_guide_vivo_autostart_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Battery Optimization',
-          desc: 'Battery optimization\n• Don\'t allow optimize / Unrestricted',
+          title: 'reminder_set_guide_vivo_high_title'.tr(),
+          desc: 'reminder_set_guide_vivo_high_desc'.tr(namedArgs: {'appName': appName}),
+        ),
+        _GuideStep(
+          title: 'reminder_set_guide_vivo_battery_title'.tr(),
+          desc: 'reminder_set_guide_vivo_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildPixelTab() {
-    return const _GuideTab(
-      title: 'Google Pixel / Stock Android',
+  Widget _buildHuaweiTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_huawei_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Battery Optimization',
-          desc:
-              'Settings → Apps → আমল ট্র্যাকার → Battery\n• Unrestricted',
+          title: 'reminder_set_guide_huawei_launch_title'.tr(),
+          desc: 'reminder_set_guide_huawei_launch_desc'.tr(namedArgs: {'appName': appName}),
+          important: true,
         ),
         _GuideStep(
-          title: 'Battery Saver',
-          desc: 'Settings → Battery → Battery Saver\n• OFF থাকলে ভালো (ON থাকলে delay হতে পারে)',
-        ),
-        _GuideStep(
-          title: 'Exact Alarm',
-          desc:
-              'Settings → Apps → Special app access → Alarms & reminders\n• আমল ট্র্যাকার = Allow',
+          title: 'reminder_set_guide_huawei_battery_title'.tr(),
+          desc: 'reminder_set_guide_huawei_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
   }
 
-  Widget _buildTecnoTab() {
-    return const _GuideTab(
-      title: 'Tecno / Infinix / Itel (HiOS / XOS)',
+  Widget _buildPixelTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_pixel_title'.tr(),
       steps: [
         _GuideStep(
-          title: 'Auto-start',
-          desc: 'Settings → Apps → Autostart manager\n• আমল ট্র্যাকার = Enable',
+          title: 'reminder_set_guide_pixel_battery_title'.tr(),
+          desc: 'reminder_set_guide_pixel_battery_desc'.tr(namedArgs: {'appName': appName}),
+        ),
+        _GuideStep(
+          title: 'reminder_set_guide_pixel_saver_title'.tr(),
+          desc: 'reminder_set_guide_pixel_saver_desc'.tr(namedArgs: {'appName': appName}),
+        ),
+        _GuideStep(
+          title: 'reminder_set_guide_pixel_exact_title'.tr(),
+          desc: 'reminder_set_guide_pixel_exact_desc'.tr(namedArgs: {'appName': appName}),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTecnoTab(BuildContext context) {
+    final appName = 'app_name'.tr();
+    return _GuideTab(
+      title: 'reminder_set_guide_tecno_title'.tr(),
+      steps: [
+        _GuideStep(
+          title: 'reminder_set_guide_tecno_autostart_title'.tr(),
+          desc: 'reminder_set_guide_tecno_autostart_desc'.tr(namedArgs: {'appName': appName}),
           important: true,
         ),
         _GuideStep(
-          title: 'Battery / Power Manager',
-          desc: 'Battery lab / Power manager\n• Don\'t restrict',
+          title: 'reminder_set_guide_tecno_battery_title'.tr(),
+          desc: 'reminder_set_guide_tecno_battery_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Background Activity',
-          desc: 'Allow background activity = ON',
+          title: 'reminder_set_guide_tecno_background_title'.tr(),
+          desc: 'reminder_set_guide_tecno_background_desc'.tr(namedArgs: {'appName': appName}),
         ),
         _GuideStep(
-          title: 'Recents Lock',
-          desc: 'Lock in recent apps (যদি থাকে)',
+          title: 'reminder_set_guide_tecno_recents_title'.tr(),
+          desc: 'reminder_set_guide_tecno_recents_desc'.tr(namedArgs: {'appName': appName}),
         ),
       ],
     );
