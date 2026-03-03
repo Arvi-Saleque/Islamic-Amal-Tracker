@@ -28,26 +28,32 @@ class AppConstants {
   // Default Dhikr List
   static const List<Map<String, dynamic>> defaultDhikrList = [
     {
+      'id': 'subhanallah_100',
       'name_bn': 'সুবহানাল্লাহ',
       'target': 100,
     },
     {
+      'id': 'alhamdulillah_100',
       'name_bn': 'আলহামদুলিল্লাহ',
       'target': 100,
     },
     {
+      'id': 'allahu_akbar_100',
       'name_bn': 'আল্লাহু আকবার',
       'target': 100,
     },
     {
+      'id': 'kalima_100',
       'name_bn': 'লা ইলাহা ইল্লাল্লাহ',
       'target': 100,
     },
     {
+      'id': 'durood_100',
       'name_bn': 'দুরূদ শরীফ',
       'target': 100,
     },
     {
+      'id': 'astaghfirullah_100',
       'name_bn': 'আস্তাগফিরুল্লাহ',
       'target': 100,
     },

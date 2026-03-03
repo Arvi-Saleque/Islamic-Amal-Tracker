@@ -49,13 +49,13 @@ class HiveService {
       );
       settingsBox.put('app_settings', defaultSettings.toJson());
       
-      // Initialize default dhikr
+      // Initialize default dhikr (use stable IDs so they can be localized by ID)
       for (final dhikr in AppConstants.defaultDhikrList) {
         final dhikrCategory = AmalCategory(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          name: dhikr['name_bn'],
+          id: dhikr['id'] as String,
+          name: dhikr['name_bn'] as String,
           categoryType: CategoryType.dhikr,
-          targetCount: dhikr['target'],
+          targetCount: dhikr['target'] as int,
           isCustom: false,
           isActive: true,
           modelVersion: AppConstants.currentModelVersion,

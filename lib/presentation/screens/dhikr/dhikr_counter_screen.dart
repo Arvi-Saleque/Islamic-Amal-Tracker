@@ -329,7 +329,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                             const SizedBox(height: 8),
                           ],
                           Text(
-                            dhikr.title,
+                            _localizedDhikrTitle(context, dhikr),
                             style: TextStyle(
                               color: isCompleted
                                   ? titleColor
@@ -445,7 +445,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'লক্ষ্য: ${dhikr.targetCount}',
+                                  '${'daily_amal_goal'.tr()}: ${dhikr.targetCount}',
                                   style: TextStyle(
                                     color: cs.onSurfaceVariant,
                                     fontSize: 12,
@@ -987,8 +987,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'dhikr_delete_confirm'
-                      .tr(namedArgs: {'title': dhikr.title}),
+                  'dhikr_delete_confirm'.tr(
+                    namedArgs: {'title': _localizedDhikrTitle(context, dhikr)},
+                  ),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 14,
@@ -1034,6 +1035,28 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
+  String _localizedDhikrTitle(BuildContext context, DhikrItem dhikr) {
+    if (dhikr.isCustom) {
+      return dhikr.title;
+    }
+    switch (dhikr.id) {
+      case 'subhanallah_100':
+        return 'dhikr_subhanallah_label'.tr();
+      case 'alhamdulillah_100':
+        return 'dhikr_alhamdulillah_label'.tr();
+      case 'allahu_akbar_100':
+        return 'dhikr_allahu_akbar_label'.tr();
+      case 'astaghfirullah_100':
+        return 'dhikr_astaghfirullah_label'.tr();
+      case 'durood_100':
+        return 'dhikr_durood_label'.tr();
+      case 'kalima_100':
+        return 'dhikr_kalima_label'.tr();
+      default:
+        return dhikr.title;
+    }
+  }
+
   void _showManualInputDialog(
     BuildContext context,
     DhikrItem dhikr,
@@ -1064,7 +1087,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  dhikr.title,
+                  _localizedDhikrTitle(context, dhikr),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
