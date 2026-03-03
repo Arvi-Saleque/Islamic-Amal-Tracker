@@ -425,7 +425,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      fridayAwareDisplay(item.title),
+                      _localizedAmalTitle(context, item),
                       style: TextStyle(
                         color: item.isCompleted ? cs.primary : cs.onSurface,
                         fontSize: 16,
@@ -462,6 +462,79 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         ),
       ),
     );
+  }
+
+  String _localizedAmalTitle(BuildContext context, DailyAmalItem item) {
+    // Custom items: show the exact stored title (with Friday-aware tweak only in Bangla)
+    if (item.id.startsWith('custom_')) {
+      if (context.locale.languageCode == 'bn') {
+        return fridayAwareDisplay(item.title);
+      }
+      return item.title;
+    }
+
+    // Default checklist items: use translation keys based on a stable ID
+    final key = _amalTitleKeyForId(item.id);
+    if (key != null) {
+      return key.tr();
+    }
+
+    // Fallback: keep previous behaviour
+    if (context.locale.languageCode == 'bn') {
+      return fridayAwareDisplay(item.title);
+    }
+    return item.title;
+  }
+
+  String? _amalTitleKeyForId(String id) {
+    switch (id) {
+      // Miswak before prayers
+      case 'miswak_fajr':
+        return 'amal_miswak_fajr';
+      case 'miswak_dhuhr':
+        return 'amal_miswak_dhuhr';
+      case 'miswak_asr':
+        return 'amal_miswak_asr';
+      case 'miswak_maghrib':
+        return 'amal_miswak_maghrib';
+      case 'miswak_isha':
+        return 'amal_miswak_isha';
+
+      // Surah readings
+      case 'surah_mulk':
+        return 'amal_surah_mulk';
+      case 'surah_waqi':
+        return 'amal_surah_waqi';
+      case 'surah_kahf':
+        return 'amal_surah_kahf';
+      case 'surah_yaseen':
+        return 'amal_surah_yaseen';
+
+      // Duas
+      case 'dua_morning':
+        return 'amal_dua_morning';
+      case 'dua_evening':
+        return 'amal_dua_evening';
+      case 'dua_sleep':
+        return 'amal_dua_sleep';
+
+      // Nafl prayers and other deeds
+      case 'tahajjud':
+        return 'amal_tahajjud';
+      case 'ishraq':
+        return 'amal_ishraq';
+      case 'duha':
+        return 'amal_duha';
+      case 'awwabin':
+        return 'amal_awwabin';
+      case 'charity':
+        return 'amal_charity';
+      case 'helping':
+        return 'amal_helping';
+
+      default:
+        return null;
+    }
   }
 
   Widget _buildEmptyState() {
