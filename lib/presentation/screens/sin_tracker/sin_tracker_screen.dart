@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +48,7 @@ class SinTrackerScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'প্রতিদিনের গুনাহ',
+          'sin_tracker_title_full'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -60,7 +61,7 @@ class SinTrackerScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddSinTypeDialog(context, ref),
         backgroundColor: cs.primary,
-        tooltip: 'নতুন গুনাহ যোগ করুন',
+        tooltip: 'sin_add'.tr(),
         mini: true,
         child: Icon(Icons.add, color: gradients.onPrimaryText),
       ),
@@ -85,7 +86,7 @@ class SinTrackerScreen extends ConsumerWidget {
                   
                   // Sin Types List
                   Text(
-                    'গুনাহ সমূহ',
+                    'sin_list_title'.tr(),
                     style: TextStyle(
                       color: cs.primary,
                       fontSize: 18,
@@ -110,14 +111,15 @@ class SinTrackerScreen extends ConsumerWidget {
   Widget _buildMotivationCard(SinTrackerState state, BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final pendingKaffara = state.todayRecord.pendingKaffaraCount;
-    
+
     String message;
     if (state.todayRecord.totalSinCount == 0) {
-      message = 'মাশাআল্লাহ! আজ কোনো গুনাহ হয়নি।';
+      message = 'sin_no_sins'.tr();
     } else if (pendingKaffara == 0) {
-      message = 'আলহামদুলিল্লাহ! সব গুনাহের কাফফারা দিয়েছেন।';
+      message = 'sin_kaffara_done_all'.tr();
     } else {
-      message = '$pendingKaffara টি গুনাহের কাফফারা বাকি আছে। তওবা করুন।';
+      message = 'sin_kaffara_pending'
+          .tr(namedArgs: {'count': pendingKaffara.toString()});
     }
     
     return Container(
@@ -161,7 +163,7 @@ class SinTrackerScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(
-            'মোট গুনাহ',
+            'sin_total'.tr(),
             '$totalSins',
             cs.primary,
             context,
@@ -172,7 +174,7 @@ class SinTrackerScreen extends ConsumerWidget {
             color: cs.outlineVariant.withOpacity(0.5),
           ),
           _buildStatItem(
-            'বাকি কাফফারা',
+            'sin_kaffara_pending_label'.tr(),
             '$pendingKaffara',
             cs.primary.withOpacity(0.8),
             context,
@@ -183,7 +185,7 @@ class SinTrackerScreen extends ConsumerWidget {
             color: cs.outlineVariant.withOpacity(0.5),
           ),
           _buildStatItem(
-            'কাফফারা হয়েছে',
+            'sin_kaffara_done_label'.tr(),
             '$completedKaffara',
             cs.primary.withOpacity(0.6),
             context,
@@ -304,11 +306,11 @@ class SinTrackerScreen extends ConsumerWidget {
                             ),
                         ],
                       ),
-                      if (hasSinned && kaffaraDone && kaffaraType != null)
+                        if (hasSinned && kaffaraDone && kaffaraType != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            'কাফফারা: ${KaffaraType.getName(kaffaraType)}',
+                            '${'sin_kaffara'.tr()}: ${KaffaraType.getName(kaffaraType)}',
                             style: TextStyle(
                               color: sinColor,
                               fontSize: 12,
@@ -344,7 +346,7 @@ class SinTrackerScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          hasSinned ? 'হয়েছে' : 'হয়নি',
+                          hasSinned ? 'sin_done'.tr() : 'sin_not_done'.tr(),
                           style: TextStyle(
                             color: sin2Color,
                             fontSize: 13,
@@ -365,13 +367,13 @@ class SinTrackerScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Row(
                 children: [
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.istighfar, 'যিকির'),
+                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.istighfar, 'sin_kaffara_dhikr'),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.quran, 'কোরআন'),
+                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.quran, 'sin_kaffara_quran'),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.charity, 'দান'),
+                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.charity, 'sin_kaffara_charity'),
                   const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.prayer, 'নামাজ'),
+                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.prayer, 'sin_kaffara_prayer'),
                 ],
               ),
             ),
@@ -387,7 +389,7 @@ class SinTrackerScreen extends ConsumerWidget {
                   ref.read(sinTrackerProvider.notifier).undoKaffara(sinType.id);
                 },
                 child: Text(
-                  'কাফফারা বাতিল করুন',
+                  'sin_undo_kaffara'.tr(),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 12,
@@ -416,14 +418,14 @@ class SinTrackerScreen extends ConsumerWidget {
           HapticFeedback.mediumImpact();
           ref.read(sinTrackerProvider.notifier).giveKaffara(sinTypeId, kaffaraType);
         },
-        child: Container(
+          child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: cs.primary.withOpacity(0.15),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
-            label,
+            label.tr(),
             style: TextStyle(
               color: cs.primary,
               fontSize: 11,
@@ -472,7 +474,7 @@ class SinTrackerScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'নতুন গুনাহ যোগ করুন',
+                  'sin_add'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -481,31 +483,33 @@ class SinTrackerScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-            controller: controller,
-            autofocus: true,
-            style: TextStyle(color: cs.onSurface),
-            decoration: InputDecoration(
-              hintText: 'গুনাহের নাম',
-              hintStyle: TextStyle(color: cs.onSurfaceVariant.withOpacity(0.5)),
-              filled: true,
-              fillColor: cs.surfaceContainerHighest,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: cs.outline),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: cs.primary),
-              ),
-            ),
-          ),
+                  controller: controller,
+                  autofocus: true,
+                  style: TextStyle(color: cs.onSurface),
+                  decoration: InputDecoration(
+                    hintText: 'sin_name_hint'.tr(),
+                    hintStyle:
+                        TextStyle(color: cs.onSurfaceVariant.withOpacity(0.5)),
+                    filled: true,
+                    fillColor: cs.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: cs.primary),
+                    ),
+                  ),
+                ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('বাতিল', style: TextStyle(color: cs.onSurfaceVariant)),
+                child:
+                    Text('cancel'.tr(), style: TextStyle(color: cs.onSurfaceVariant)),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -522,7 +526,7 @@ class SinTrackerScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('যোগ করুন'),
+                child: Text('sin_add'.tr()),
               ),
             ],
           ),
@@ -553,7 +557,7 @@ class SinTrackerScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'গুনাহ মুছে ফেলুন?',
+                  'sin_delete_title'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -562,7 +566,8 @@ class SinTrackerScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '"${sinType.name}" মুছে ফেলতে চান?',
+                  'sin_delete_confirm'
+                      .tr(namedArgs: {'name': sinType.name}),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 14,
@@ -574,7 +579,8 @@ class SinTrackerScreen extends ConsumerWidget {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('না', style: TextStyle(color: cs.onSurfaceVariant)),
+                      child: Text('no'.tr(),
+                          style: TextStyle(color: cs.onSurfaceVariant)),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -583,13 +589,13 @@ class SinTrackerScreen extends ConsumerWidget {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE53935),
-                        foregroundColor: Colors.white,
+                        backgroundColor: cs.error,
+                        foregroundColor: cs.onError,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('হ্যাঁ'),
+                      child: Text('yes'.tr()),
                     ),
                   ],
                 ),

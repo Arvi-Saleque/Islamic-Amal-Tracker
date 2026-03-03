@@ -140,12 +140,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         radius: 18,
         padding: const EdgeInsets.all(16),
         child: Column(
-          children: [
-            Row(
+              children: [
+              Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'আজকের মোট',
+                  'dhikr_today_total'.tr(),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 18,
@@ -176,7 +176,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     ],
                   ),
                   child: Text(
-                    '$completed/$total সম্পন্ন',
+                    '$completed/$total ${'dhikr_complete'.tr()}',
                     style: TextStyle(
                       color: cs.primary,
                       fontSize: 13,
@@ -206,7 +206,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'লক্ষ্য: $target',
+                        '${'daily_amal_goal'.tr()}: $target',
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 14,
@@ -500,7 +500,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${(progress * 100).toInt()}% সম্পন্ন',
+                          '${(progress * 100).toInt()}% ${'dhikr_complete'.tr()}',
                           style: TextStyle(
                             color: cs.onSurfaceVariant,
                             fontSize: 13,
@@ -528,7 +528,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'সম্পূর্ণ',
+                                  'dhikr_complete'.tr(),
                                   style: TextStyle(
                                     color: completedText,
                                     fontSize: 12,
@@ -550,7 +550,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                               color: cs.onSurfaceVariant,
                             ),
                             label: Text(
-                              'রিসেট',
+                              'dhikr_reset'.tr(),
                               style: TextStyle(
                                 color: cs.onSurfaceVariant,
                                 fontSize: 12,
@@ -704,7 +704,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'নতুন যিকির যোগ করুন',
+                  'dhikr_add'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -718,7 +718,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     color: cs.onSurface,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'যিকিরের নাম',
+                    labelText: 'dhikr_name'.tr(),
                     filled: true,
                     fillColor: fieldFill,
                     labelStyle: TextStyle(
@@ -747,7 +747,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     fontSize: 20,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'আরবি (ঐচ্ছিক)',
+                    labelText: 'dhikr_arabic_optional'.tr(),
                     filled: true,
                     fillColor: fieldFill,
                     labelStyle: TextStyle(
@@ -776,7 +776,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   ),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'লক্ষ্য সংখ্যা',
+                    labelText: 'dhikr_target_count'.tr(),
                     filled: true,
                     fillColor: fieldFill,
                     labelStyle: TextStyle(
@@ -806,7 +806,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       style: TextButton.styleFrom(
                         foregroundColor: cs.onSurface,
                       ),
-                      child: const Text('বাতিল'),
+                      child: Text('cancel'.tr()),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -834,7 +834,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       ),
-                      child: const Text('যোগ করুন'),
+                      child: Text('dhikr_add'.tr()),
                     ),
                   ],
                 ),
@@ -875,7 +875,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'লক্ষ্য সংখ্যা পরিবর্তন করুন',
+                  'dhikr_edit_target_title'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -884,13 +884,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-              controller: targetController,
-              style: TextStyle(
-                color: cs.onSurface,
-              ),
-              keyboardType: TextInputType.number,
+                  controller: targetController,
+                  style: TextStyle(
+                    color: cs.onSurface,
+                  ),
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'নতুন লক্ষ্য',
+                    labelText: 'dhikr_new_target'.tr(),
                     filled: true,
                     fillColor: fieldFill,
                 labelStyle: TextStyle(
@@ -920,7 +920,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       style: TextButton.styleFrom(
                         foregroundColor: cs.onSurface,
                       ),
-                      child: const Text('বাতিল'),
+                      child: Text('cancel'.tr()),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -942,7 +942,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       ),
-                      child: const Text('আপডেট করুন'),
+                      child: Text('dhikr_update'.tr()),
                     ),
                   ],
                 ),
@@ -978,7 +978,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'মুছে ফেলবেন?',
+                  'daily_amal_delete_title'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -987,7 +987,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '"${dhikr.title}" মুছে ফেলতে চান?',
+                  'dhikr_delete_confirm'
+                      .tr(namedArgs: {'title': dhikr.title}),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 14,
@@ -1002,7 +1003,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       style: TextButton.styleFrom(
                         foregroundColor: cs.onSurface,
                       ),
-                      child: const Text('না'),
+                      child: Text('no'.tr()),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -1011,8 +1012,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                        backgroundColor: cs.error,
+                        foregroundColor: cs.onError,
                         elevation: 2,
                         shadowColor: theme.shadowColor,
                         shape: RoundedRectangleBorder(
@@ -1021,7 +1022,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       ),
-                      child: const Text('হ্যাঁ, মুছুন'),
+                      child: Text('daily_amal_delete_confirm'.tr()),
                     ),
                   ],
                 ),
@@ -1082,7 +1083,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'কাউন্ট লিখুন',
+                    labelText: 'dhikr_enter_count'.tr(),
                     filled: true,
                     fillColor: fieldFill,
                     labelStyle: TextStyle(
@@ -1105,7 +1106,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'লক্ষ্য: ${dhikr.targetCount}',
+                  '${'daily_amal_goal'.tr()}: ${dhikr.targetCount}',
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 14,
@@ -1120,7 +1121,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       style: TextButton.styleFrom(
                         foregroundColor: cs.onSurface,
                       ),
-                      child: const Text('বাতিল'),
+                      child: Text('cancel'.tr()),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -1151,7 +1152,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       ),
-                      child: const Text('সেট করুন'),
+                      child: Text('dhikr_set_count'.tr()),
                     ),
                   ],
                 ),
@@ -1165,33 +1166,6 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
 
   
       
-
-  // Helper method for showing snackbars
-  void _showSnack(BuildContext context, String message, {bool success = true}) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    final bg = success
-        ? cs.primary.withOpacity(0.2)
-        : Colors.red.withOpacity(0.15);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: bg,
-        elevation: 2,
-        margin: const EdgeInsets.all(14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        content: Text(
-          message,
-          style: TextStyle(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
 
   // Show info bottom sheet
   void _showInfoBottomSheet(BuildContext context) {
@@ -1246,7 +1220,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'যিকির - তথ্য ও ফযিলত',
+                        'dhikr_info_title'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 19,
@@ -1268,119 +1242,103 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     // How it works
                     _buildInfoSection(
                       icon: Icons.touch_app,
-                      title: 'কিভাবে ব্যবহার করবেন?',
-                      content: '''
-• প্রতিটি যিকির কার্ডে ট্যাপ করলে কাউন্ট বাড়বে
-• টার্গেট পূরণ হলে স্বয়ংক্রিয়ভাবে সম্পন্ন হবে
-• ৬টি ডিফল্ট যিকির রয়েছে যেগুলোর লক্ষ্য ১০০ বার নির্ধারিত এবং পরিবর্তনযোগ্য নয়
-• নিজের পছন্দমতো কাস্টম যিকির যোগ করতে পারবেন এবং সেগুলোর লক্ষ্য সংখ্যা পরিবর্তন করতে পারবেন  
-• কমলা সংখ্যায় ট্যাপ করে দ্রুত কাউন্ট যোগ করতে পারবেন
-• প্রতিদিন মধ্যরাতে স্বয়ংক্রিয়ভাবে রিসেট হয়''',
+                      title: 'dhikr_info_how_title'.tr(),
+                      content: 'dhikr_info_how_body'.tr(),
                     ),
                     const SizedBox(height: 20),
 
                     // Tasbih section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.favorite,
-                      title: 'তাসবীহ ফাতেমীর ফযিলত',
+                      title: 'dhikr_info_tasbih_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'প্রতি নামাজের পর ৩৩ বার সুবহানাল্লাহ, ৩৩ বার আলহামদুলিল্লাহ, ৩৩ বার আল্লাহু আকবার বললে গুনাহ মাফ হয়, যদিও সমুদ্রের ফেনার মতো হয়।',
-                      reference: 'সহীহ মুসলিম: ৬৯৭',
+                      hadith: 'dhikr_info_hadith1_text',
+                      reference: 'dhikr_info_hadith1_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'দুটি কালেমা আছে যা জিহ্বায় হালকা কিন্তু মীযানে ভারী: সুবহানাল্লাহি ওয়া বিহামদিহি ও লা ইলাহা ইল্লাল্লাহু ওয়াল্লাহু আকবার।',
-                      reference: 'সহীহ বুখারী: ৬৩৬০, সহীহ মুসলিম: ২৬৯২',
+                      hadith: 'dhikr_info_hadith2_text',
+                      reference: 'dhikr_info_hadith2_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // SubhanAllah section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.star,
-                      title: 'সুবহানাল্লাহির ফযিলত',
+                      title: 'dhikr_info_subhanallah_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'সুবহানাল্লাহি ওয়াল হামদুলিল্লাহ - এটি মীযানকে ভরপুর করে দেয়, অথবা আসমান ও জমিনের মধ্যবর্তী স্থানের মতো।',
-                      reference: 'সহীহ মুসলিম: ২৬৯৬',
+                      hadith: 'dhikr_info_hadith3_text',
+                      reference: 'dhikr_info_hadith3_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি দিনে ১০০ বার সুবহানাল্লাহ বলবে, তার জন্য ১০০০ নেকী লেখা হবে এবং ১০০ গুনাহ মাফ হবে।',
-                      reference: 'সহীহ মুসলিম: ২৬৯২',
+                      hadith: 'dhikr_info_hadith4_text',
+                      reference: 'dhikr_info_hadith4_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // Istighfar section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.healing,
-                      title: 'ইস্তিগফারের ফযিলত',
+                      title: 'dhikr_info_istighfar_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি নিয়মিত ইস্তিগফার করবে, আল্লাহ তার সব দুশ্চিন্তা দূর করে দেবেন, সব সংকট থেকে বের করে দেবেন এবং অপ্রত্যাশিত জায়গা থেকে রিযিিক দেবেন।',
-                      reference: 'সুনানে আবু দাউদ: ১৫১৮',
+                      hadith: 'dhikr_info_hadith5_text',
+                      reference: 'dhikr_info_hadith5_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'আমি দিনে ৭০ বারেরও বেশি আল্লাহর কাছে তাওবা করি এবং ইস্তিগফার করি।',
-                      reference: 'সহীহ বুখারী: ৬৩০৭',
+                      hadith: 'dhikr_info_hadith6_text',
+                      reference: 'dhikr_info_hadith6_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // La ilaha illallah section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.brightness_high,
-                      title: 'লা ইলাহা ইল্লাল্লাহর ফযিলত',
+                      title: 'dhikr_info_lailaha_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'সর্বোত্তম যিকির হলো লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু, লাহুল মুলকু ওয়া লাহুল হামদু, ওয়া হুয়া আলা কুল্লি শাইইন কাদীর।',
-                      reference: 'জামে তিরমিযী: ৩৫৮৫',
+                      hadith: 'dhikr_info_hadith7_text',
+                      reference: 'dhikr_info_hadith7_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি দিনে ১০০ বার লা ইলাহা ইল্লাল্লাহু ওয়াহদাহু লা শারীকা লাহু... বলবে, তা ১০টি গোলাম মুক্ত করার সমান, ১০০ নেকী লেখা হবে, ১০০ গুনাহ মাফ হবে এবং সন্ধ্যা পর্যন্ত শয়তান থেকে রক্ষা হবে।',
-                      reference: 'সহীহ বুখারী: ৬৩০৩, সহীহ মুসলিম: ২৬৯১',
+                      hadith: 'dhikr_info_hadith8_text',
+                      reference: 'dhikr_info_hadith8_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // Durood section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.auto_awesome,
-                      title: 'দরূদ শরীফের ফযিলত',
+                      title: 'dhikr_info_durud_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি আমার উপর একবার দরূদ পাঠাবে, আল্লাহ তার উপর দশবার রহমত বর্ষণ করেন।',
-                      reference: 'সহীহ মুসলিম: ৪০২',
+                      hadith: 'dhikr_info_hadith9_text',
+                      reference: 'dhikr_info_hadith9_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'কিয়ামতের দিন আমার নিকটতম হবে সেই ব্যক্তি যে আমার উপর সবচেয়ে বেশি দরূদ পাঠাবে।',
-                      reference: 'জামে তিরমিযী: ৪৮৪',
+                      hadith: 'dhikr_info_hadith10_text',
+                      reference: 'dhikr_info_hadith10_ref',
                     ),
 
                     const SizedBox(height: 30),
@@ -1507,6 +1465,8 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hadithText = hadith.tr();
+    final referenceText = reference.tr();
     final hadithTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return buildPremiumCard(
@@ -1533,7 +1493,7 @@ class _HadithCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  hadith,
+                  hadithText,
                   style: TextStyle(
                     color: hadithTextColor,
                     fontSize: 14,
@@ -1555,7 +1515,7 @@ class _HadithCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                reference,
+                referenceText,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 12,

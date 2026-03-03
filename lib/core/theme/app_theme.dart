@@ -547,44 +547,52 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    fontFamily: 'MehdiEkushey',
+    fontFamily: 'Cascadia Mono',
     textTheme: const TextTheme(
       headlineLarge: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         color: AppColors.primaryGold,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       headlineMedium: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.bold,
         color: AppColors.primaryGold,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       headlineSmall: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
         color: AppColors.primaryGold,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       titleLarge: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       titleMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       bodyLarge: TextStyle(
         fontSize: 16,
         color: AppColors.textPrimary,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       bodyMedium: TextStyle(
         fontSize: 14,
         color: AppColors.textTertiary,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       bodySmall: TextStyle(
         fontSize: 12,
         color: AppColors.grey500,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
     ),
     iconTheme: const IconThemeData(
@@ -646,21 +654,24 @@ class AppTheme {
       color: AppColors.borderLightMode,
       thickness: 1,
     ),
-    fontFamily: 'MehdiEkushey',
+    fontFamily: 'Cascadia Mono',
     textTheme: const TextTheme(
       titleLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: AppColors.textLightMode,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       titleMedium: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppColors.textLightMode,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
       bodyMedium: TextStyle(
         fontSize: 13,
         color: AppColors.textSecondaryLightMode,
+        fontFamilyFallback: ['MehdiEkushey'],
       ),
     ),
     snackBarTheme: SnackBarThemeData(

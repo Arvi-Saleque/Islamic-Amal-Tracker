@@ -63,7 +63,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
@@ -192,7 +192,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          isDone ? 'Complete' : 'Tap to expand rakats',
+                          isDone
+                              ? 'prayer_complete'.tr()
+                              : 'prayer_tap_expand'.tr(),
                           style: TextStyle(
                             color: isDone
                                 ? Theme.of(context)
@@ -290,10 +292,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     required bool done,
   }) {
     final notifier = ref.read(prayerTrackingProvider.notifier);
-
-    final rowBg = done
-        ? Theme.of(context).colorScheme.primary.withOpacity(0.06)
-        : Theme.of(context).scaffoldBackgroundColor;
 
     final textColor = done
         ? Theme.of(context).colorScheme.primary
@@ -416,7 +414,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'নামাজের তথ্য ও ফযিলত',
+                        'prayer_info_title'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 19,
@@ -436,82 +434,66 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                   children: [
                     _InfoCard(
                       icon: Icons.calculate_outlined,
-                      title: 'হিসাব কিভাবে হয়?',
-                      body: '''
-• শুধুমাত্র ফরয নামাজ পড়লেই ওয়াক্ত কাউন্ট হবে
-• ফরযের ২টি অপশন আছে:
-  ১) জামাতে/আউয়াল ওয়াক্তে - সময়মতো পড়লে
-  ২) দেরী করে - দেরী করে পড়লে
-• যেকোনো একটি ফরয অপশন সিলেক্ট করলেই নামাজ complete
-• ৫ ওয়াক্ত ফরয পড়লে দিনের নামাজ ১০০% complete''',
+                      title: 'prayer_info_how_title'.tr(),
+                      body: 'prayer_info_how_body'.tr(),
                       bodyTextColor: bodyTextColor,
                     ),
                     const SizedBox(height: 20),
-                    const _SectionHeader(
+                    _SectionHeader(
                         icon: Icons.mosque_outlined,
-                        title: 'জামাতে নামাজের ফযিলত'
+                        title: 'prayer_info_congregation_title'.tr()),
+                    const SizedBox(height: 12),
+                    const _HadithCard(
+                      hadith: 'prayer_info_hadith1_text',
+                      reference: 'prayer_info_hadith1_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'জামাতে নামাজ পড়া একাকী নামাজ পড়ার চেয়ে সাতাশ গুণ বেশি মর্যাদাসম্পন্ন।',
-                      reference: 'সহীহ বুখারী: ৬৪৫, সহীহ মুসলিম: ৬৫০',
+                      hadith: 'prayer_info_hadith2_text',
+                      reference: 'prayer_info_hadith2_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি এশার সালাত জামাআতের সাথে আদায় করবে, সে অর্ধেক রাত্রি ক্বিয়াম করার ছোয়াব পাবে। আর যে ব্যক্তি এশা ও ফজর জামাআতের সাথে আদায় করবে, সে পূর্ণ রাত্রি ক্বিয়াম করার ছোয়াব পাবে।',
-                      reference: 'সহীহ মুসলিম: ৬৫৬',
+                      hadith: 'prayer_info_hadith3_text',
+                      reference: 'prayer_info_hadith3_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি চল্লিশ দিন জামাতের সাথে নামাজ আদায় করে এবং প্রথম তাকবীর পায়, তার জন্য দুটি মুক্তি লেখা হয়: জাহান্নাম থেকে মুক্তি এবং মুনাফিকী থেকে মুক্তি।',
-                      reference: 'জামে তিরমিযী: ২৪১',
+                      hadith: 'prayer_info_hadith4_text',
+                      reference: 'prayer_info_hadith4_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'জামাআত ধরার জন্য হেটে যাওয়া প্রতিটি পদক্ষেপের বিনিময়ে মুসল্লির মর্যাদা বৃদ্ধি পায়, গুনাহ মাফ হয় ও নেকী লেখা হতে থাকে।',
-                      reference: 'সহীহ বুখারী: ৬৪৭',
-                    ),
-                    const SizedBox(height: 12),
-                    const _HadithCard(
-                      hadith:
-                          'মুনাফিকদের জন্য ফজর ও এশার নামাজ সবচেয়ে ভারী। তারা যদি জানত এতে কী পরিমাণ সওয়াব আছে, তাহলে হামাগুড়ি দিয়ে হলেও আসত।',
-                      reference: 'সহীহ বুখারী: ৬৫৭',
+                      hadith: 'prayer_info_hadith5_text',
+                      reference: 'prayer_info_hadith5_ref',
                     ),
                     const SizedBox(height: 18),
-                    const _SectionHeader(
+                    _SectionHeader(
                         icon: Icons.access_time_rounded,
-                        title: 'আউয়াল ওয়াক্তে নামাজের ফযিলত'),
+                        title: 'prayer_info_early_title'.tr()),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'রাসূলুল্লাহ (সা.) কে জিজ্ঞাসা করা হলো, কোন আমল সবচেয়ে উত্তম? তিনি বললেন: ওয়াক্তের শুরুতে নামাজ আদায় করা।',
-                      reference: 'জামে তিরমিযী: ১৭০, সুনানে আবু দাউদ: ৪২৬',
+                      hadith: 'prayer_info_hadith6_text',
+                      reference: 'prayer_info_hadith6_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'নামাজের প্রথম ওয়াক্ত আল্লাহর সন্তুষ্টি এবং শেষ ওয়াক্ত আল্লাহর ক্ষমা।',
-                      reference: 'জামে তিরমিযী: ১৭২',
+                      hadith: 'prayer_info_hadith7_text',
+                      reference: 'prayer_info_hadith7_ref',
                     ),
                     const SizedBox(height: 18),
-                    const _SectionHeader(
+                    _SectionHeader(
                         icon: Icons.auto_awesome_rounded,
-                        title: 'সুন্নাত নামাজের ফযিলত'),
+                        title: 'prayer_info_sunnah_title'.tr()),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'দুই রাকাত ফজরের সুন্নাত দুনিয়া ও তার মধ্যে যা আছে তার চেয়ে উত্তম।',
-                      reference: 'সহীহ মুসলিম: ৭২৫',
+                      hadith: 'prayer_info_hadith8_text',
+                      reference: 'prayer_info_hadith8_ref',
                     ),
                     const SizedBox(height: 12),
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি দিনে-রাতে ১২ রাকাত সুন্নাত নামাজ আদায় করবে, তার জন্য জান্নাতে একটি ঘর নির্মাণ করা হবে।',
-                      reference: 'সহীহ মুসলিম: ৭২৮',
+                      hadith: 'prayer_info_hadith9_text',
+                      reference: 'prayer_info_hadith9_ref',
                     ),
                     const SizedBox(height: 30),
                   ],
@@ -559,7 +541,7 @@ class _TopSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'আজকের অগ্রগতি',
+                  'today_progress'.tr(),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,
@@ -568,7 +550,7 @@ class _TopSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$completed / 5 ফরয সম্পন্ন',
+                  '$completed / 5 ${'fard'.tr()} ${'completed'.tr()}',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 16,
@@ -800,6 +782,8 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hadithText = hadith.tr();
+    final referenceText = reference.tr();
     final hadithTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return buildPremiumCard(
@@ -826,7 +810,7 @@ class _HadithCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  hadith,
+                  hadithText,
                   style: TextStyle(
                     color: hadithTextColor,
                     fontSize: 14,
@@ -848,7 +832,7 @@ class _HadithCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                reference,
+                referenceText,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 12,

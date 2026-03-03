@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/reading_tracker_provider.dart';
@@ -57,13 +58,13 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
           ),
         ),
         elevation: 0,
-        titleSpacing: 0,
+        titleSpacing: 16,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: iconColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'পড়াশোনা',
+          'reading_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -92,7 +93,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             _buildReadingTypeCard(
               context,
               type: ReadingType.quran,
-              title: 'কুরআন তেলাওয়াত',
+              title: 'reading_quran'.tr(),
               icon: Icons.menu_book,
               progress: quranProgress,
               currentMinutes: readingState.todayData.quranMinutes,
@@ -104,7 +105,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             _buildReadingTypeCard(
               context,
               type: ReadingType.tafsir,
-              title: 'তাফসীর অধ্যয়ন',
+              title: 'reading_tafsir'.tr(),
               icon: Icons.book,
               progress: tafsirProgress,
               currentMinutes: readingState.todayData.tafsirMinutes,
@@ -116,7 +117,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             _buildReadingTypeCard(
               context,
               type: ReadingType.hadith,
-              title: 'হাদিস পাঠ',
+              title: 'reading_hadith'.tr(),
               icon: Icons.auto_stories,
               progress: hadithProgress,
               currentMinutes: readingState.todayData.hadithMinutes,
@@ -165,7 +166,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'আজকের মোট পড়া',
+                  'reading_total_today'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -180,7 +181,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${data.totalSessions} সেশন',
+                    '${data.totalSessions} ${'reading_sessions'.tr()}',
                     style: TextStyle(
                       color: cs.primary,
                       fontSize: 14,
@@ -198,7 +199,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${data.totalMinutes} মিনিট',
+                        '${data.totalMinutes} ${'reading_minutes'.tr()}',
                         style: TextStyle(
                           color: cs.primary,
                           fontSize: 36,
@@ -208,7 +209,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'লক্ষ্য: ${data.goal.totalMinutes} মিনিট',
+                        '${'reading_goal'.tr()}: ${data.goal.totalMinutes} ${'reading_minutes'.tr()}',
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 14,
@@ -310,7 +311,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '$currentMinutes / $goalMinutes মিনিট',
+                              '$currentMinutes / $goalMinutes ${'reading_minutes'.tr()}',
                               style: TextStyle(
                                 color: cs.onSurfaceVariant,
                                 fontSize: 14,
@@ -327,7 +328,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           readingNotifier,
                         ),
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('যোগ করুন'),
+                        label: Text('reading_add_session'.tr()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: cs.primary,
                           foregroundColor: gradients.onPrimaryText,
@@ -446,7 +447,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '${session.durationMinutes} মিনিট',
+              '${session.durationMinutes} ${'reading_minutes'.tr()}',
               style: TextStyle(
                 color: cs.primary,
                 fontSize: 13,
@@ -502,7 +503,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$typeTitle সেশন যোগ করুন',
+                    '$typeTitle ${'reading_add_session'.tr()}',
                     style: TextStyle(
                       color: cs.onSurface,
                       fontSize: 18,
@@ -515,10 +516,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     labelText: type == ReadingType.quran
-                        ? 'সূরাহর নাম'
+                        ? 'reading_quran_name'.tr()
                         : type == ReadingType.tafsir
-                            ? 'তাফসীরের নাম'
-                            : 'হাদিসের নাম',
+                            ? 'reading_tafsir_name'.tr()
+                            : 'reading_hadith_name'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -542,7 +543,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           keyboardType: TextInputType.number,
                           style: TextStyle(color: cs.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'আয়াত থেকে',
+                            labelText: 'reading_quran_from_ayah'.tr(),
                             labelStyle: TextStyle(color: cs.onSurfaceVariant),
                             filled: true,
                             fillColor: cs.surfaceContainerHighest,
@@ -564,7 +565,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           keyboardType: TextInputType.number,
                           style: TextStyle(color: cs.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'আয়াত পর্যন্ত',
+                            labelText: 'reading_quran_to_ayah'.tr(),
                             labelStyle: TextStyle(color: cs.onSurfaceVariant),
                             filled: true,
                             fillColor: cs.surfaceContainerHighest,
@@ -588,7 +589,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   keyboardType: TextInputType.number,
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
-                    labelText: 'সময় (মিনিট)',
+                    labelText: 'reading_time_minutes'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -608,7 +609,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   style: TextStyle(color: cs.onSurface),
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: 'নোট (ঐচ্ছিক)',
+                    labelText: 'reading_notes_optional'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -629,7 +630,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'বাতিল',
+                        'cancel'.tr(),
                         style: TextStyle(color: cs.onSurfaceVariant),
                       ),
                     ),
@@ -663,7 +664,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('যোগ করুন'),
+                      child: Text('reading_add_session'.tr()),
                     ),
                   ],
                 ),
@@ -699,7 +700,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'মুছে ফেলবেন?',
+                  'daily_amal_delete_title'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -708,7 +709,8 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '"${session.title}" সেশন মুছে ফেলতে চান?',
+                  'reading_delete_session_confirm'
+                      .tr(namedArgs: {'title': session.title}),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 14,
@@ -721,7 +723,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'না',
+                        'no'.tr(),
                         style: TextStyle(color: cs.onSurfaceVariant),
                       ),
                     ),
@@ -738,7 +740,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('হ্যাঁ, মুছুন'),
+                      child: Text('daily_amal_delete_confirm'.tr()),
                     ),
                   ],
                 ),
@@ -784,7 +786,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'দৈনিক লক্ষ্য নির্ধারণ করুন',
+                  'reading_set_goal'.tr(),
                   style: TextStyle(
                     color: cs.onSurface,
                     fontSize: 18,
@@ -797,7 +799,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   keyboardType: TextInputType.number,
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
-                    labelText: 'কুরআন (মিনিট)',
+                    labelText: 'reading_goal_quran_minutes'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -817,7 +819,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   keyboardType: TextInputType.number,
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
-                    labelText: 'তাফসীর (মিনিট)',
+                    labelText: 'reading_goal_tafsir_minutes'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -837,7 +839,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   keyboardType: TextInputType.number,
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
-                    labelText: 'হাদিস (মিনিট)',
+                    labelText: 'reading_goal_hadith_minutes'.tr(),
                     labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -858,7 +860,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'বাতিল',
+                        'cancel'.tr(),
                         style: TextStyle(color: cs.onSurfaceVariant),
                       ),
                     ),
@@ -879,7 +881,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('সংরক্ষণ করুন'),
+                      child: Text('save'.tr()),
                     ),
                   ],
                 ),
@@ -944,7 +946,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'পড়াশোনা - তথ্য ও ফযিলত',
+                        'reading_info_title'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 19,
@@ -966,103 +968,90 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     // How it works
                     _buildInfoSection(
                       icon: Icons.timer_outlined,
-                      title: 'কিভাবে ব্যবহার করবেন?',
-                      content: '''
-• প্রতিটি ক্যাটাগরিতে সেশন যোগ করুন
-• মিনিট এবং পৃষ্ঠা/আয়াত/হাদিস সংখ্যা লিখুন
-• সেটিংস থেকে দৈনিক লক্ষ্য নির্ধারণ করুন
-• লক্ষ্য পূরণ হলে সম্পন্ন দেখাবে
-• প্রতিদিন মধ্যরাতে স্বয়ংক্রিয়ভাবে রিসেট হয়''',
+                      title: 'reading_info_how_title'.tr(),
+                      content: 'reading_info_how_body'.tr(),
                     ),
                     const SizedBox(height: 20),
 
                     // Quran section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.menu_book,
-                      title: 'কুরআন তেলাওয়াতের ফযিলত',
+                      title: 'reading_info_quran_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'কুরআনের প্রতিটি অক্ষর পাঠে একটি নেকী এবং প্রতিটি নেকী দশগুণে বৃদ্ধি পায়।',
-                      reference: 'জামে তিরমিযী: ২৯১০',
+                      hadith: 'reading_info_hadith1_text',
+                      reference: 'reading_info_hadith1_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি কুরআন পড়ে এবং তা মুখস্থ করে, সে সম্মানিত নেক ফেরেশতাদের সাথে থাকবে। আর যে কষ্ট করে পড়ে, তার জন্য দুই সওয়াব।',
-                      reference: 'সহীহ বুখারী: ৪৯৩৭',
+                      hadith: 'reading_info_hadith2_text',
+                      reference: 'reading_info_hadith2_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'তোমরা কুরআন পড়ো, কারণ এটি কিয়ামতের দিন তার পাঠকদের জন্য সুপারিশকারী হিসেবে আসবে।',
-                      reference: 'সহীহ মুসলিম: ৭৩০',
+                      hadith: 'reading_info_hadith3_text',
+                      reference: 'reading_info_hadith3_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // Tafsir section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.book,
-                      title: 'কুরআন বোঝার গুরুত্ব',
+                      title: 'reading_info_tafsir_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'তোমাদের মধ্যে সেই ব্যক্তি সর্বোত্তম যে কুরআন শেখে এবং অন্যকে শেখায়।',
-                      reference: 'সহীহ বুখারী: ৫০২২',
+                      hadith: 'reading_info_hadith4_text',
+                      reference: 'reading_info_hadith4_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, আল্লাহ তার জন্য জান্নাতের পথ সহজ করে দেন।',
-                      reference: 'সহীহ মুসলিম: ২৬৭৬',
+                      hadith: 'reading_info_hadith5_text',
+                      reference: 'reading_info_hadith5_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // Hadith section
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.auto_stories,
-                      title: 'হাদিস শিক্ষার গুরুত্ব',
+                      title: 'reading_info_hadith_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'আল্লাহ সেই ব্যক্তির চেহারা উজ্জ্বল (সজীব) করুন, যে আমার কথা শুনেছে, তা সংরক্ষণ (মুখস্থ) করেছে এবং তা অন্যের কাছে পৌঁছে দিয়েছে।',
-                      reference: 'জামে তিরমিযী: ২৬৫৭',
+                      hadith: 'reading_info_hadith6_text',
+                      reference: 'reading_info_hadith6_ref',
                     ),
                     const SizedBox(height: 18),
 
                     // Knowledge seeking
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.school,
-                      title: 'ইলম অর্জনের ফযিলত',
+                      title: 'reading_info_ilm_title'.tr(),
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith: 'ইলম অর্জন করা প্রতিটি মুসলিম নর-নারীর জন্য ফরজ।',
-                      reference: 'সুনানে ইবনে মাজাহ: ২২৬',
+                      hadith: 'reading_info_hadith7_text',
+                      reference: 'reading_info_hadith7_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'যে ব্যক্তি ইলম অর্জনের পথে বের হয়, সে ফিরে আসা পর্যন্ত সে আল্লাহর পথে থাকে।',
-                      reference: 'জামে তিরমিযী: ২৬৫৪',
+                      hadith: 'reading_info_hadith8_text',
+                      reference: 'reading_info_hadith8_ref',
                     ),
                     const SizedBox(height: 12),
 
                     const _HadithCard(
-                      hadith:
-                          'আলেমরা নবীদের উত্তরাধিকারী। নবীগণ উত্তরাধিকারী রেখে যাননি দিনার-দিরহাম, বরং রেখে গেছেন ইলম।',
-                      reference: 'সুনানে আবু দাউদ: ৩৬৪১',
+                      hadith: 'reading_info_hadith9_text',
+                      reference: 'reading_info_hadith9_ref',
                     ),
 
                     const SizedBox(height: 30),
@@ -1189,6 +1178,8 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hadithText = hadith.tr();
+    final referenceText = reference.tr();
     final hadithTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return buildPremiumCard(
@@ -1215,7 +1206,7 @@ class _HadithCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  hadith,
+                  hadithText,
                   style: TextStyle(
                     color: hadithTextColor,
                     fontSize: 14,
@@ -1237,7 +1228,7 @@ class _HadithCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                reference,
+                referenceText,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 12,
