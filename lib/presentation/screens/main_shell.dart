@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home/home_screen.dart';
@@ -73,7 +74,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               _buildDestination(
                 icon: Icons.home_outlined,
                 selectedIcon: Icons.home_rounded,
-                label: 'হোম',
+                label: 'tab_home'.tr(),
                 isSelected: _currentIndex == 0,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
@@ -81,7 +82,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               _buildDestination(
                 icon: Icons.notifications_outlined,
                 selectedIcon: Icons.notifications_rounded,
-                label: 'রিমাইন্ডার',
+                label: 'tab_reminders'.tr(),
                 isSelected: _currentIndex == 1,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
@@ -89,7 +90,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               _buildDestination(
                 icon: Icons.favorite_outline_rounded,
                 selectedIcon: Icons.favorite_rounded,
-                label: 'যিকির',
+                label: 'tab_dhikr'.tr(),
                 isSelected: _currentIndex == 2,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
@@ -97,7 +98,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               _buildDestination(
                 icon: Icons.bar_chart_outlined,
                 selectedIcon: Icons.bar_chart_rounded,
-                label: 'পরিসংখ্যান',
+                label: 'tab_statistics'.tr(),
                 isSelected: _currentIndex == 3,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
@@ -105,7 +106,7 @@ class _MainShellState extends ConsumerState<MainShell> {
               _buildDestination(
                 icon: Icons.settings_outlined,
                 selectedIcon: Icons.settings_rounded,
-                label: 'সেটিংস',
+                label: 'tab_settings'.tr(),
                 isSelected: _currentIndex == 4,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,

@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -74,7 +75,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
-          'পরিসংখ্যান',
+          'statistics_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,

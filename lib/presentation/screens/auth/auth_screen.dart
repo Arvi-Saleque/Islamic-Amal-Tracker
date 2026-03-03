@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/services/firestore_sync_service.dart';
@@ -40,7 +41,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _restoreDataFromCloud() async {
-    // Show loading indicator
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -95,7 +95,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         _passwordController.text,
       );
       if (success && mounted) {
-        // Auto restore data from cloud on login
         await _restoreDataFromCloud();
         _navigateToHome();
       }
@@ -141,21 +140,141 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     _navigateToHome();
   }
 
+  void _showLanguagePicker() {
+    final cs = Theme.of(context).colorScheme;
+    final currentLang = context.locale.languageCode;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'language_select'.tr(),
+              style: TextStyle(
+                color: cs.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _langOption(
+              ctx: ctx,
+              flag: '🇧🇩',
+              label: 'বাংলা',
+              sublabel: 'Bengali',
+              langCode: 'bn',
+              isSelected: currentLang == 'bn',
+              cs: cs,
+            ),
+            const SizedBox(height: 8),
+            _langOption(
+              ctx: ctx,
+              flag: '🇬🇧',
+              label: 'English',
+              sublabel: 'ইংরেজি',
+              langCode: 'en',
+              isSelected: currentLang == 'en',
+              cs: cs,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _langOption({
+    required BuildContext ctx,
+    required String flag,
+    required String label,
+    required String sublabel,
+    required String langCode,
+    required bool isSelected,
+    required ColorScheme cs,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () {
+        ctx.setLocale(Locale(langCode));
+        Navigator.pop(ctx);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? cs.primary.withOpacity(0.12)
+              : cs.surfaceContainerHighest.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? cs.primary.withOpacity(0.4) : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    sublabel,
+                    style: TextStyle(
+                      color: cs.onSurface.withOpacity(0.55),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: cs.primary, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final cs = Theme.of(context).colorScheme;
 
-    // Show error message
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            backgroundColor: cs.error,
           ),
         );
       }
-      // Show verification screen when needed
       if (next.needsEmailVerification && !previous!.needsEmailVerification) {
         setState(() {
           _showVerificationScreen = true;
@@ -163,7 +282,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     });
 
-    // Show verification screen
     if (_showVerificationScreen) {
       return _buildVerificationScreen(authState);
     }
@@ -171,328 +289,345 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              
-              // App Icon & Title
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.auto_fix_high,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              
-              Text(
-                'আমল ট্র্যাকার',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              
-              Text(
-                _isForgotPassword 
-                    ? 'পাসওয়ার্ড রিসেট করুন'
-                    : _isLogin 
-                        ? 'আপনার অ্যাকাউন্টে লগইন করুন' 
-                        : 'নতুন অ্যাকাউন্ট তৈরি করুন',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Form
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Name field (only for register)
-                    if (!_isLogin && !_isForgotPassword)
-                      _buildTextField(
-                        controller: _nameController,
-                        label: 'আপনার নাম',
-                        icon: Icons.person_outline,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'নাম লিখুন';
-                          }
-                          return null;
-                        },
-                      ),
-                    
-                    // Email field
-                    _buildTextField(
-                      controller: _emailController,
-                      label: 'ইমেইল',
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'ইমেইল লিখুন';
-                        }
-                        if (!value.contains('@')) {
-                          return 'সঠিক ইমেইল লিখুন';
-                        }
-                        return null;
-                      },
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  
+                  // Logo
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 90,
+                    height: 90,
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // App title
+                  Text(
+                    'app_title'.tr(),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: cs.primary,
                     ),
-                    
-                    // Password field (not for forgot password)
-                    if (!_isForgotPassword)
-                      _buildTextField(
-                        controller: _passwordController,
-                        label: 'পাসওয়ার্ড',
-                        icon: Icons.lock_outline,
-                        obscureText: _obscurePassword,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Subtitle / mode label
+                  Text(
+                    _isForgotPassword 
+                        ? 'forgot_password_title'.tr()
+                        : _isLogin 
+                            ? 'login_title'.tr()
+                            : 'register_title'.tr(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: cs.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Form
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        // Name field (only for register)
+                        if (!_isLogin && !_isForgotPassword)
+                          _buildTextField(
+                            controller: _nameController,
+                            label: 'name'.tr(),
+                            icon: Icons.person_outline,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'নাম লিখুন';
+                              }
+                              return null;
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
+                        
+                        // Email field
+                        _buildTextField(
+                          controller: _emailController,
+                          label: 'email'.tr(),
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'ইমেইল লিখুন';
+                            }
+                            if (!value.contains('@')) {
+                              return 'সঠিক ইমেইল লিখুন';
+                            }
+                            return null;
                           },
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'পাসওয়ার্ড লিখুন';
-                          }
-                          if (value.length < 6) {
-                            return 'কমপক্ষে ৬ অক্ষর দিন';
-                          }
-                          return null;
-                        },
-                      ),
-                    
-                    // Confirm Password field (only for register)
-                    if (!_isLogin && !_isForgotPassword)
-                      _buildTextField(
-                        controller: _confirmPasswordController,
-                        label: 'পাসওয়ার্ড নিশ্চিত করুন',
-                        icon: Icons.lock_outline,
-                        obscureText: _obscureConfirmPassword,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
-                            });
-                          },
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'পাসওয়ার্ড নিশ্চিত করুন';
-                          }
-                          if (value != _passwordController.text) {
-                            return 'পাসওয়ার্ড মিলছে না';
-                          }
-                          return null;
-                        },
-                      ),
-                    
-                    // Forgot Password link
-                    if (_isLogin && !_isForgotPassword)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isForgotPassword = true;
-                            });
-                          },
-                          child: Text(
-                            'পাসওয়ার্ড ভুলে গেছেন?',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                              fontSize: 13,
+                        
+                        // Password field
+                        if (!_isForgotPassword)
+                          _buildTextField(
+                            controller: _passwordController,
+                            label: 'password'.tr(),
+                            icon: Icons.lock_outline,
+                            obscureText: _obscurePassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                color: cs.onSurface.withOpacity(0.6),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'পাসওয়ার্ড লিখুন';
+                              }
+                              if (value.length < 6) {
+                                return 'কমপক্ষে ৬ অক্ষর দিন';
+                              }
+                              return null;
+                            },
                           ),
-                        ),
-                      ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: authState.isLoading ? null : _handleSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                        
+                        // Confirm Password field (only for register)
+                        if (!_isLogin && !_isForgotPassword)
+                          _buildTextField(
+                            controller: _confirmPasswordController,
+                            label: 'confirm_password'.tr(),
+                            icon: Icons.lock_outline,
+                            obscureText: _obscureConfirmPassword,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                color: cs.onSurface.withOpacity(0.6),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                });
+                              },
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'পাসওয়ার্ড নিশ্চিত করুন';
+                              }
+                              if (value != _passwordController.text) {
+                                return 'পাসওয়ার্ড মিলছে না';
+                              }
+                              return null;
+                            },
                           ),
-                          elevation: 0,
-                        ),
-                        child: authState.isLoading
-                            ? SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                _isForgotPassword 
-                                    ? 'রিসেট লিংক পাঠান'
-                                    : _isLogin 
-                                        ? 'লগইন করুন' 
-                                        : 'রেজিস্টার করুন',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        
+                        // Forgot Password link
+                        if (_isLogin && !_isForgotPassword)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isForgotPassword = true;
+                                });
+                              },
+                              child: Text(
+                                'forgot_password_link'.tr(),
+                                style: TextStyle(
+                                  color: cs.primary.withOpacity(0.8),
+                                  fontSize: 13,
                                 ),
                               ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Toggle Login/Register or Back
-                    if (_isForgotPassword)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _isForgotPassword = false;
-                          });
-                        },
-                        child: Text(
-                          '← লগইন এ ফিরে যান',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                            fontSize: 14,
-                          ),
-                        ),
-                      )
-                    else
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _isLogin 
-                                ? 'অ্যাকাউন্ট নেই?' 
-                                : 'অ্যাকাউন্ট আছে?',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              fontSize: 14,
                             ),
                           ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Submit Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: authState.isLoading ? null : _handleSubmit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: cs.primary,
+                              foregroundColor: cs.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: authState.isLoading
+                                ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: cs.onPrimary,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    _isForgotPassword 
+                                        ? 'submit_reset'.tr()
+                                        : _isLogin 
+                                            ? 'submit_login'.tr()
+                                            : 'submit_register'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Toggle Login/Register or Back
+                        if (_isForgotPassword)
                           TextButton(
                             onPressed: () {
                               setState(() {
-                                _isLogin = !_isLogin;
-                                _formKey.currentState?.reset();
+                                _isForgotPassword = false;
                               });
                             },
                             child: Text(
-                              _isLogin ? 'রেজিস্টার করুন' : 'লগইন করুন',
+                              'back_to_login'.tr(),
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: cs.onSurface.withOpacity(0.6),
                                 fontSize: 14,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                          )
+                        else
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _isLogin 
+                                    ? 'no_account'.tr()
+                                    : 'have_account'.tr(),
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.6),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isLogin = !_isLogin;
+                                    _formKey.currentState?.reset();
+                                  });
+                                },
+                                child: Text(
+                                  _isLogin ? 'register'.tr() : 'submit_login'.tr(),
+                                  style: TextStyle(
+                                    color: cs.primary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'অথবা',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // Skip Button (Offline Mode)
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: OutlinedButton(
-                        onPressed: _handleSkip,
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Divider
+                        Row(
                           children: [
-                            Icon(
-                              Icons.cloud_off,
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              size: 20,
+                            Expanded(
+                              child: Divider(color: cs.onSurface.withOpacity(0.2)),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'অফলাইনে চালিয়ে যান',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                fontSize: 14,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'or'.tr(),
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.4),
+                                  fontSize: 12,
+                                ),
                               ),
+                            ),
+                            Expanded(
+                              child: Divider(color: cs.onSurface.withOpacity(0.2)),
                             ),
                           ],
                         ),
-                      ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        // Skip Button (Offline Mode)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton(
+                            onPressed: _handleSkip,
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: cs.onSurface.withOpacity(0.2)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.cloud_off,
+                                  color: cs.onSurface.withOpacity(0.6),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'offline_mode'.tr(),
+                                  style: TextStyle(
+                                    color: cs.onSurface.withOpacity(0.6),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Info text
+                        Text(
+                          'offline_info'.tr(),
+                          style: TextStyle(
+                            color: cs.onSurface.withOpacity(0.5),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Info text
-                    Text(
-                      'অফলাইন মোডে ডেটা শুধু এই ডিভাইসে সেভ থাকবে',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Language switcher button (top-right)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: TextButton.icon(
+                onPressed: _showLanguagePicker,
+                icon: Icon(Icons.language_rounded, size: 18, color: cs.primary),
+                label: Text(
+                  context.locale.languageCode == 'bn' ? 'EN' : 'বাং',
+                  style: TextStyle(
+                    color: cs.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -507,6 +642,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
@@ -514,33 +650,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         keyboardType: keyboardType,
         obscureText: obscureText,
         validator: validator,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        style: TextStyle(color: cs.onSurface),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-          prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+          labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.6)),
+          prefixIcon: Icon(icon, color: cs.onSurface.withOpacity(0.6)),
           suffixIcon: suffixIcon,
           filled: true,
-          fillColor: Theme.of(context).colorScheme.surface,
+          fillColor: cs.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+            borderSide: BorderSide(color: cs.onSurface.withOpacity(0.1)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            borderSide: BorderSide(color: cs.primary),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
+            borderSide: BorderSide(color: cs.error),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
+            borderSide: BorderSide(color: cs.error),
           ),
         ),
       ),
@@ -548,6 +684,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Widget _buildVerificationScreen(AuthState authState) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -556,17 +693,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Email Icon
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: cs.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.mark_email_unread_outlined,
                   size: 80,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: cs.primary,
                 ),
               ),
               const SizedBox(height: 32),
@@ -576,7 +712,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: cs.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -586,7 +722,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: cs.onSurface.withOpacity(0.7),
                   height: 1.5,
                 ),
               ),
@@ -595,19 +731,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+                  color: cs.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                  border: Border.all(color: cs.onSurface.withOpacity(0.1)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.email, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), size: 20),
+                    Icon(Icons.email, color: cs.onSurface.withOpacity(0.6), size: 20),
                     const SizedBox(width: 8),
                     Text(
                       _emailController.text,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: cs.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -616,22 +752,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
               const SizedBox(height: 40),
               
-              // Login Button
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
                   onPressed: _goBackToLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: cs.primary,
+                    foregroundColor: cs.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'লগইন করুন',
-                    style: TextStyle(
+                  child: Text(
+                    'submit_login'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -640,7 +775,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
               const SizedBox(height: 16),
               
-              // Resend Button
               TextButton.icon(
                 onPressed: authState.isLoading ? null : _resendVerification,
                 icon: authState.isLoading 
@@ -649,37 +783,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: cs.primary,
                         ),
                       )
                     : const Icon(Icons.refresh, size: 18),
                 label: Text(
                   authState.isLoading ? 'পাঠানো হচ্ছে...' : 'আবার লিংক পাঠান',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    color: cs.primary.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
               ),
               const SizedBox(height: 24),
               
-              // Info
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: cs.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+                  border: Border.all(color: cs.primary.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 20),
+                    Icon(Icons.info_outline, color: cs.primary, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'ইমেইল না পেলে স্প্যাম ফোল্ডার চেক করুন',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          color: cs.onSurface.withOpacity(0.8),
                           fontSize: 12,
                         ),
                       ),

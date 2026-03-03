@@ -1,10 +1,10 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
 import '../../providers/daily_amal_provider.dart';
 import '../../../data/models/daily_amal_model.dart';
 import '../../../core/theme/app_theme.dart';
-import 'dart:ui' show FontFeature;
 
 class DailyAmalScreen extends ConsumerStatefulWidget {
   const DailyAmalScreen({super.key});
@@ -21,13 +21,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   static const double _cardRadius = 18;
   static const double _sectionRadius = 18;
 
-  final Map<String, String> _categoryNames = {
-    'all': 'সবগুলো',
-    'miswak': 'মিসওয়াক',
-    'surah': 'সূরাহ',
-    'dua': 'দোয়া',
-    'prayer': 'নফল নামাজ',
-    'other': 'অন্যান্য',
+  Map<String, String> get _categoryNames => {
+    'all': 'all'.tr(),
+    'miswak': 'miswak'.tr(),
+    'surah': 'surah'.tr(),
+    'dua': 'dua'.tr(),
+    'prayer': 'nafl_prayer'.tr(),
+    'other': 'other'.tr(),
   };
 
   final Map<String, IconData> _categoryIcons = {
@@ -89,7 +89,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'প্রতিদিনের আমল',
+          'daily_amal_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -274,7 +274,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'আজকের মোট',
+                  'daily_amal_total'.tr(),
                   style: TextStyle(
                     color: cs.onSurfaceVariant,
                     fontSize: 18,
@@ -305,7 +305,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     ],
                   ),
                   child: Text(
-                    '$completed/$total সম্পন্ন',
+                    '$completed/$total ${'daily_amal_done_label'.tr()}',
                     style: TextStyle(
                       color: cs.primary,
                       fontSize: 14,
@@ -333,7 +333,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'লক্ষ্য: $total',
+                        '${'daily_amal_goal'.tr()}: $total',
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 14,
@@ -438,7 +438,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     if (item.completedAt != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        'সম্পন্ন: ${_formatTime(item.completedAt!)}',
+                        '${'daily_amal_completed_at'.tr()}: ${_formatTime(item.completedAt!)}',
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 12,
@@ -479,7 +479,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'কোনো ${_categoryNames[_selectedCategory]} নেই',
+            'daily_amal_empty'.tr(),
             style: TextStyle(
               color: cs.onSurfaceVariant.withOpacity(0.70),
               fontSize: 16,
@@ -568,7 +568,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'নতুন আমল যোগ করুন',
+                        'daily_amal_add'.tr(),
                         style: TextStyle(
                           color: cs.primary,
                           fontSize: 18,
@@ -584,7 +584,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   controller: titleController,
                   style: TextStyle(color: cs.onSurface),
                   decoration:
-                      deco(hint: 'আমলের নাম লিখুন', icon: Icons.edit_outlined),
+                      deco(hint: 'daily_amal_name_hint'.tr(), icon: Icons.edit_outlined),
                 ),
                 const SizedBox(height: 16),
                 // Dropdown
@@ -595,7 +595,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     dropdownColor: cs.surfaceContainerHighest,
                     style: TextStyle(color: cs.onSurface),
                     decoration: deco(
-                        hint: 'ক্যাটাগরি নির্বাচন করুন',
+                        hint: 'daily_amal_category_hint'.tr(),
                         icon: Icons.category_outlined),
                     items: _categoryNames.entries
                         .where((e) => e.key != 'all')
@@ -622,7 +622,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'বাতিল',
+                        'cancel'.tr(),
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
@@ -654,9 +654,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         );
                         Navigator.pop(context);
                       },
-                      child: const Text(
-                        'যোগ করুন',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Text(
+                        'daily_amal_add_btn'.tr(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -708,7 +708,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'মুছে ফেলবেন?',
+                      'daily_amal_delete_title'.tr(),
                       style: TextStyle(
                         color: cs.primary,
                         fontSize: 18,
@@ -721,7 +721,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               const SizedBox(height: 16),
               // Content
               Text(
-                '"${item.title}" মুছে ফেলতে চান?',
+                '"${item.title}" ${'daily_amal_delete_msg'.tr()}',
                 style: TextStyle(
                   color: cs.onSurfaceVariant,
                   fontSize: 15,
@@ -736,7 +736,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'না',
+                      'no'.tr(),
                       style: TextStyle(
                         color: cs.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
@@ -761,9 +761,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       ),
                       elevation: 2,
                     ),
-                    child: const Text(
-                      'হ্যাঁ, মুছুন',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Text(
+                      'daily_amal_delete_confirm'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -831,7 +831,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'প্রতিদিনের আমল - তথ্য ও ফযিলত',
+                          'daily_amal_info_title'.tr(),
                           style: TextStyle(
                             color: cs.primary,
                             fontSize: 19,
@@ -1239,8 +1239,8 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                cs.primary.withOpacity(0.4),
-                                cs.primary.withOpacity(0),
+                                cs.primary.withValues(alpha: 0.4),
+                                cs.primary.withValues(alpha: 0),
                               ],
                             ),
                           ),
@@ -1820,7 +1820,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'আরবী',
+                          'arabic'.tr(),
                           style: TextStyle(
                             color: cs.primary,
                             fontSize: 10,
@@ -1862,7 +1862,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: cs.outline.withOpacity(0.10),
+                  color: cs.outline.withValues(alpha: 0.10),
                 ),
               ),
               child: Column(
@@ -1877,7 +1877,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'উচ্চারণ',
+                        'pronunciation'.tr(),
                         style: TextStyle(
                           color: cs.tertiary,
                           fontSize: 12,
@@ -1924,7 +1924,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'অর্থ',
+                        'meaning'.tr(),
                         style: TextStyle(
                           color: cs.secondary,
                           fontSize: 12,
@@ -1977,7 +1977,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'ফযীলত',
+                        'virtue'.tr(),
                         style: TextStyle(
                           color: cs.primary,
                           fontSize: 12,

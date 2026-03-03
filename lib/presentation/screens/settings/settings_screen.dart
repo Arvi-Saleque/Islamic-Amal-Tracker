@@ -1,6 +1,7 @@
 import 'package:amal_tracker/core/theme/theme_mode_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../auth/auth_screen.dart';
@@ -55,7 +56,7 @@ class SettingsScreen extends ConsumerWidget {
         titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
-          'সেটিংস',
+          'settings_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -84,14 +85,14 @@ class SettingsScreen extends ConsumerWidget {
                         .setTheme(v ? 'light' : 'dark'),
 
                       title: Text(
-                        'থিম পরিবর্তন',
+                        'theme_toggle'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       subtitle: Text(
-                        'শুধু সেটিংস পেজে থিম পরিবর্তন হবে',
+                        'theme_subtitle'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 12,
@@ -128,7 +129,7 @@ class SettingsScreen extends ConsumerWidget {
                         color: Theme.of(context).colorScheme.primary, size: 22),
                   ),
                   title: Text(
-                    'ভাষা / Language',
+                    'language'.tr(),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
@@ -167,10 +168,10 @@ class SettingsScreen extends ConsumerWidget {
                         icon: isLoggedIn
                             ? Icons.account_circle_rounded
                             : Icons.login_rounded,
-                        title: isLoggedIn ? 'অ্যাকাউন্ট' : 'লগইন করুন',
+                        title: isLoggedIn ? 'account'.tr() : 'login'.tr(),
                         subtitle: isLoggedIn
-                            ? (email ?? 'ক্লাউড সিঙ্ক সক্রিয়')
-                            : 'ক্লাউড ব্যাকআপ ও সিঙ্কের জন্য লগইন করুন',
+                            ? (email ?? 'cloud_sync_active'.tr())
+                            : 'login_subtitle'.tr(),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -187,8 +188,8 @@ class SettingsScreen extends ConsumerWidget {
                         _buildNavigationTile(
                           context: context,
                           icon: Icons.person_outline,
-                          title: 'প্রোফাইল',
-                          subtitle: 'অ্যাকাউন্ট ও ক্লাউড সিঙ্ক',
+                          title: 'profile'.tr(),
+                          subtitle: 'profile_subtitle'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -295,7 +296,7 @@ class SettingsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'অ্যাপ সম্পর্কে',
+            'about'.tr(),
             style: TextStyle(
               color: headerColor,
               fontSize: 16,
@@ -307,8 +308,8 @@ class SettingsScreen extends ConsumerWidget {
           _aboutTile(
             context: context,
             icon: Icons.help,
-            title: 'ব্যবহারের নিয়ম',
-            subtitle: 'অ্যাপ কীভাবে ব্যবহার করতে হয় জানুন',
+            title: 'usage_rules'.tr(),
+            subtitle: 'usage_rules_subtitle'.tr(),
             titleColor: titleColor,
             subColor: subColor,
             onTap: () {
@@ -322,8 +323,8 @@ class SettingsScreen extends ConsumerWidget {
           _aboutTile(
             context: context,
             icon: Icons.bug_report,
-            title: 'বাগ রিপোর্ট করুন',
-            subtitle: 'সমস্যা পেলে আমাদের জানান',
+            title: 'bug_report'.tr(),
+            subtitle: 'bug_report_subtitle'.tr(),
             titleColor: titleColor,
             subColor: subColor,
             onTap: () => _sendBugReport(context),
@@ -333,7 +334,7 @@ class SettingsScreen extends ConsumerWidget {
           _aboutTile(
             context: context,
             icon: Icons.info,
-            title: 'সংস্করণ',
+            title: 'version'.tr(),
             subtitle: 'v1.0.8',
             titleColor: titleColor,
             subColor: subColor,
@@ -433,7 +434,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'ভাষা বেছে নিন / Select Language',
+              'language_select'.tr(),
               style: TextStyle(
                 color: cs.primary,
                 fontSize: 16,

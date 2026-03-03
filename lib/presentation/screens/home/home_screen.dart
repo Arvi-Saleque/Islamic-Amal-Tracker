@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -501,7 +502,7 @@ Widget _sunChip({
         elevation: 0,
         titleSpacing: 16,
         title: Text(
-          'আমল ট্র্যাকার',
+          'app_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,
@@ -512,7 +513,7 @@ Widget _sunChip({
         actions: [
           IconButton(
             icon: Icon(Icons.refresh_rounded, color: cs.primary),
-            tooltip: 'রিফ্রেশ',
+            tooltip: 'refresh'.tr(),
             onPressed: () => _refreshAll(),
           ),
         ],
@@ -1582,17 +1583,17 @@ Widget _buildPrayerTimeRow(
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'আজকের অগ্রগতি',
-                    style: TextStyle(
-                      color: cs.primary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.2,
+                  Expanded(
+                    child: Text(
+                      'today_progress'.tr(),
+                      style: TextStyle(
+                        color: cs.primary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.2,
+                      ),
                     ),
                   ),
-                ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -1621,7 +1622,7 @@ Widget _buildPrayerTimeRow(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'সামগ্রিক অগ্রগতি',
+                      'overall_progress'.tr(),
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.6),
                         fontSize: 13,
@@ -1681,9 +1682,9 @@ Widget _buildPrayerTimeRow(
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildProgressCircle(context, completedPrayers, 5, 'নামাজ'),
-                _buildProgressCircle(context, completedAmal, totalAmal, 'প্রতিদিন'),
-                _buildProgressCircle(context, dhikrCount, dhikrTarget, 'যিকির'),
+                _buildProgressCircle(context, completedPrayers, 5, 'prayer_section'.tr()),
+                _buildProgressCircle(context, completedAmal, totalAmal, 'daily_section'.tr()),
+                _buildProgressCircle(context, dhikrCount, dhikrTarget, 'dhikr_section'.tr()),
               ],
             ),
           ],
@@ -1708,13 +1709,13 @@ Widget _buildPrayerTimeRow(
 
   String _getProgressMessage(double progress) {
     if (progress >= 0.8) {
-      return 'অসাধারণ! ';
+      return 'progress_excellent'.tr();
     } else if (progress >= 0.5) {
-      return 'ভালো চলছে ';
+      return 'progress_good'.tr();
     } else if (progress >= 0.25) {
-      return 'চেষ্টা চালিয়ে যান ';
+      return 'progress_keep_going'.tr();
     } else {
-      return 'শুরু করুন';
+      return 'progress_start'.tr();
     }
   }
 
@@ -1803,7 +1804,7 @@ Widget _buildPrayerTimeRow(
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 16),
             child: Text(
-              'আজকের আমল',
+              'todays_amal'.tr(),
               style: TextStyle(
                 color: cs.primary,
                 fontSize: 20,
@@ -1813,8 +1814,8 @@ Widget _buildPrayerTimeRow(
           ),
           _buildAmalCard(
             context,
-            title: 'নামাজ',
-            subtitle: '৫ ওয়াক্ত নামাজ',
+            title: 'prayer_section'.tr(),
+            subtitle: 'prayer_five_times'.tr(),
             icon: Icons.mosque,
             current: completedPrayers,
             total: 5,
@@ -1830,8 +1831,8 @@ Widget _buildPrayerTimeRow(
           const SizedBox(height: 14),
           _buildAmalCard(
             context,
-            title: 'প্রতিদিনের আমল',
-            subtitle: 'মিসওয়াক, সূরাহ আমল',
+            title: 'daily_amal_title'.tr(),
+            subtitle: 'daily_amal_subtitle'.tr(),
             icon: Icons.check_circle_outline,
             current: completedAmal,
             total: totalAmal,
@@ -1847,8 +1848,8 @@ Widget _buildPrayerTimeRow(
           const SizedBox(height: 14),
           _buildAmalCard(
             context,
-            title: 'যিকির',
-            subtitle: 'দোয়া, তাসবীহ, ইস্তিগফার',
+            title: 'dhikr_section'.tr(),
+            subtitle: 'dhikr_subtitle'.tr(),
             icon: Icons.favorite_outline,
             current: dhikrCount,
             total: dhikrTarget,
@@ -1864,8 +1865,8 @@ Widget _buildPrayerTimeRow(
           const SizedBox(height: 14),
           _buildAmalCard(
             context,
-            title: 'পড়াশোনা',
-            subtitle: 'কুরআন, তাফসীর, হাদিস',
+            title: 'reading_section'.tr(),
+            subtitle: 'reading_subtitle'.tr(),
             icon: Icons.book_outlined,
             current: readingMinutes,
             total: readingGoal,
@@ -1921,8 +1922,8 @@ Widget _buildPrayerTimeRow(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'প্রতিদিনের গুনাহ',
+                    Text(
+                    'sin_tracker_title'.tr(),
                     style: TextStyle(
                       color: cs.onSurface.withOpacity(0.9),
                       fontSize: 16,

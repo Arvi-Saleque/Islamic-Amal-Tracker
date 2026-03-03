@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,7 +69,7 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'নামাজের হিসাব',
+          'prayer_tracker_title'.tr(),
           style: TextStyle(
             color: titleColor,
             fontSize: 20,

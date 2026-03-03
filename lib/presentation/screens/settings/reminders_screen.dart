@@ -1,4 +1,5 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -436,17 +437,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'দ্রুত যোগ করুন',
-                      style: TextStyle(
-                        color: activeColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'একটি প্রিসেট বেছে নিন',
+            Text(
+              'preset_add_quick'.tr(),
+              style: TextStyle(
+                color: activeColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'preset_select'.tr(),
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.55),
                         fontSize: 13,
@@ -578,7 +579,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         titleSpacing: 16,
         automaticallyImplyLeading: false,
         title: Text(
-          'রিমাইন্ডারস',
+          'reminders'.tr(),
           style: TextStyle(
             color: activeColor,
             fontSize: 20,
@@ -590,7 +591,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.add_alert_rounded, color: activeColor),
-            tooltip: 'প্রিসেট যোগ করুন',
+            tooltip: 'add_preset'.tr(),
             onPressed: _showPresetsSheet,
           ),
         ],
@@ -600,7 +601,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         backgroundColor: activeColor,
         foregroundColor: isDark ? Colors.black : cs.onPrimary,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('নতুন রিমাইন্ডার'),
+        label: Text('add_reminder'.tr()),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: activeColor))
@@ -615,19 +616,19 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   children: [
                     _buildTodaySummaryCard(context, activeColor),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('নামাজের রিমাইন্ডার', activeColor),
+                    _buildSectionTitle('reminder_prayer'.tr(), activeColor),
                     const SizedBox(height: 10),
                     _buildPrayerRemindersSection(context, activeColor),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('যিকির ও আমল', activeColor),
+                    _buildSectionTitle('reminder_dhikr_amal'.tr(), activeColor),
                     const SizedBox(height: 10),
                     _buildDhikrAmalSection(context, activeColor),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('কাস্টম রিমাইন্ডার', activeColor),
+                    _buildSectionTitle('reminder_custom'.tr(), activeColor),
                     const SizedBox(height: 10),
                     _buildCustomRemindersSection(context, activeColor),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('ডিফল্ট রিমাইন্ডার (সবসময় চালু)', activeColor),
+                    _buildSectionTitle('reminder_defaults'.tr(), activeColor),
                     const SizedBox(height: 10),
                     _buildDefaultsSection(context, activeColor),
                     const SizedBox(height: 20),
@@ -678,7 +679,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     if (next != null) {
       nextText = '${next.title} — ${_fmtTime(next.time)}';
     } else {
-      nextText = 'আজকের সব রিমাইন্ডার শেষ';
+      nextText = 'reminder_all_done'.tr();
     }
 
     return buildPremiumCard(
@@ -707,7 +708,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'আজকের রিমাইন্ডার',
+                      'todays_reminder'.tr(),
                       style: TextStyle(
                         color: activeColor,
                         fontSize: 16,
@@ -716,7 +717,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$total টি মোট • $pending টি বাকি',
+                      '$total ${'reminder_total'.tr()} • $pending ${'reminder_left'.tr()}',
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.55),
                         fontSize: 12,
@@ -760,7 +761,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'পরবর্তী: $nextText',
+                      '${'reminder_next'.tr()}: $nextText',
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.85),
                         fontSize: 13,
@@ -785,7 +786,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _showTodayDetails ? 'কম দেখুন' : 'সব দেখুন (${pendingItems.length})',
+                      _showTodayDetails ? 'reminder_see_less'.tr() : '${'reminder_see_all'.tr()} (${pendingItems.length})',
                       style: TextStyle(
                         color: activeColor,
                         fontSize: 12,
@@ -926,7 +927,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'নামাজের রিমাইন্ডার',
+                      'reminder_prayer'.tr(),
                       style: TextStyle(
                         color: cs.onSurface,
                         fontSize: 15,
@@ -935,7 +936,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '৫ ওয়াক্তের জন্য আলাদা সময়',
+                      'reminder_prayer_subtitle'.tr(),
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.55),
                         fontSize: 12,
@@ -1063,8 +1064,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           context: context,
           activeColor: activeColor,
           icon: Icons.wb_sunny_outlined,
-          title: 'সকালের যিকির',
-          subtitle: 'সকালের আযকার',
+          title: 'morning_dhikr'.tr(),
+          subtitle: 'morning_dhikr'.tr(),
           time: _morningDhikrTime,
           isEnabled: _isMorningDhikrEnabled,
           onToggle: (v) async {
@@ -1080,8 +1081,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           context: context,
           activeColor: activeColor,
           icon: Icons.nights_stay_outlined,
-          title: 'সন্ধ্যার যিকির',
-          subtitle: 'সন্ধ্যার আযকার',
+          title: 'evening_dhikr'.tr(),
+          subtitle: 'evening_dhikr'.tr(),
           time: _eveningDhikrTime,
           isEnabled: _isEveningDhikrEnabled,
           onToggle: (v) async {
@@ -1097,8 +1098,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           context: context,
           activeColor: activeColor,
           icon: Icons.star_rounded,
-          title: 'দৈনিক আমল রিমাইন্ডার',
-          subtitle: 'প্রতিদিনের আমলের সময়',
+          title: 'daily_amal_reminder'.tr(),
+          subtitle: 'daily_amal_title'.tr(),
           time: _dailyReminderTime,
           isEnabled: _isDailyReminderEnabled,
           onToggle: (v) async {
@@ -1275,9 +1276,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             Icon(Icons.manage_accounts_rounded,
                 color: activeColor, size: 20),
             const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                'সব কাস্টম রিমাইন্ডার ম্যানেজ করুন',
+                  Flexible(
+                child: Text(
+                  'manage_reminders'.tr(),
                 style: TextStyle(
                   color: activeColor,
                   fontSize: 14,
@@ -1343,14 +1344,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                           border: Border.all(
                               color: Colors.orange.withOpacity(0.3)),
                         ),
-                        child: const Text(
-                          'একবার',
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                                child: Text(
+                                  'one_time_badge'.tr(),
+                                  style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                       ),
                   ],
                 ),
@@ -1506,17 +1507,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'রিমাইন্ডার সেটিংস',
-                    style: TextStyle(
-                      color: cs.onSurface,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    Text(
+                      'reminder_settings'.tr(),
+                      style: TextStyle(
+                        color: cs.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'পারমিশন, ব্যাটারি অপ্টিমাইজেশন, ডিভাইস গাইড',
+                    const SizedBox(height: 3),
+                    Text(
+                      'reminder_settings_subtitle'.tr(),
                     style: TextStyle(
                       color: cs.onSurface.withOpacity(0.55),
                       fontSize: 12,
