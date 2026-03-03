@@ -12,7 +12,7 @@ class WeeklyProgressChart extends StatelessWidget {
     required this.weeklyStats,
   });
 
-  // Get Bengali weekday name from date string
+  // Get localized weekday short name from date string
   String _getWeekdayFromDate(String dateStr) {
     try {
       final parts = dateStr.split('-');
@@ -23,8 +23,16 @@ class WeeklyProgressChart extends StatelessWidget {
           int.parse(parts[2]),
         );
         // Dart weekday: 1=Mon, 2=Tue, ..., 7=Sun
-        final weekdays = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি', 'রবি'];
-        return weekdays[date.weekday - 1];
+        const weekdayKeys = [
+          'weekday_mon_short',
+          'weekday_tue_short',
+          'weekday_wed_short',
+          'weekday_thu_short',
+          'weekday_fri_short',
+          'weekday_sat_short',
+          'weekday_sun_short',
+        ];
+        return weekdayKeys[date.weekday - 1].tr();
       }
     } catch (e) {
       // ignore
