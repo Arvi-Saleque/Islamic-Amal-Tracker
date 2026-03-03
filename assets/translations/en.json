@@ -574,6 +574,12 @@
   "reminder_personal_morning_dhikr": "Morning dhikr reminder",
   "reminder_personal_evening_dhikr": "Evening dhikr reminder",
 
+  "reminder_prayer_fajr": "Reminder for Fajr prayer",
+  "reminder_prayer_dhuhr": "Reminder for Dhuhr prayer",
+  "reminder_prayer_asr": "Reminder for Asr prayer",
+  "reminder_prayer_maghrib": "Reminder for Maghrib prayer",
+  "reminder_prayer_isha": "Reminder for Isha prayer",
+
   "reminder_add_new": "Add new",
   "reminder_preset_tab": "Presets",
   "reminder_defaults_info": "These reminders are always on and are automatically set based on prayer times.",

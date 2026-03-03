@@ -574,6 +574,12 @@
   "reminder_personal_morning_dhikr": "সকালের যিকির রিমাইন্ডার",
   "reminder_personal_evening_dhikr": "সন্ধ্যার যিকির রিমাইন্ডার",
 
+  "reminder_prayer_fajr": "ফজর সালাতের রিমাইন্ডার",
+  "reminder_prayer_dhuhr": "যোহর সালাতের রিমাইন্ডার",
+  "reminder_prayer_asr": "আসর সালাতের রিমাইন্ডার",
+  "reminder_prayer_maghrib": "মাগরিব সালাতের রিমাইন্ডার",
+  "reminder_prayer_isha": "এশা সালাতের রিমাইন্ডার",
+
   "reminder_add_new": "নতুন যোগ করুন",
   "reminder_preset_tab": "প্রিসেট",
   "reminder_defaults_info": "এই রিমাইন্ডারগুলো সবসময় চালু থাকে এবং নামাজের সময়ের উপর ভিত্তি করে স্বয়ংক্রিয়ভাবে সেট হয়।",

@@ -311,31 +311,64 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final now = DateTime.now();
     final items = <_ReminderItem>[];
 
-    void add(String title, TimeOfDay? t, {bool isDefault = false}) {
+    void add(
+      String id,
+      String title,
+      TimeOfDay? t, {
+      bool isDefault = false,
+      bool isCustom = false,
+    }) {
       if (t == null) return;
-      final dt =
-          DateTime(now.year, now.month, now.day, t.hour, t.minute);
-      items.add(_ReminderItem(
-          title: title, time: dt, isPassed: now.isAfter(dt), isDefault: isDefault));
+      final dt = DateTime(now.year, now.month, now.day, t.hour, t.minute);
+      items.add(
+        _ReminderItem(
+          id: id,
+          title: title,
+          time: dt,
+          isPassed: now.isAfter(dt),
+          isDefault: isDefault,
+          isCustom: isCustom,
+        ),
+      );
     }
 
-    add('ফজরের পর (ডিফল্ট)', _defaultFajrTime, isDefault: true);
-    add('যোহরের পর (ডিফল্ট)', _defaultZuhrTime, isDefault: true);
-    add('আসরের পর (ডিফল্ট)', _defaultAsrTime, isDefault: true);
-    add('মাগরিবের পর (ডিফল্ট)', _defaultMaghribTime, isDefault: true);
-    add('ইশার পর (ডিফল্ট)', _defaultIshaTime, isDefault: true);
-    add('সকালের যিকির (ডিফল্ট)', _defaultMorningDhikrTime, isDefault: true);
-    add('সন্ধ্যার যিকির (ডিফল্ট)', _defaultEveningDhikrTime, isDefault: true);
-    add('দৈনিক আমল (ডিফল্ট)', _defaultDailyAmalTime, isDefault: true);
+    // Default system reminders (always on)
+    add('default_fajr', 'ফজরের পর (ডিফল্ট)', _defaultFajrTime,
+        isDefault: true);
+    add('default_dhuhr', 'যোহরের পর (ডিফল্ট)', _defaultZuhrTime,
+        isDefault: true);
+    add('default_asr', 'আসরের পর (ডিফল্ট)', _defaultAsrTime, isDefault: true);
+    add('default_maghrib', 'মাগরিবের পর (ডিফল্ট)', _defaultMaghribTime,
+        isDefault: true);
+    add('default_isha', 'ইশার পর (ডিফল্ট)', _defaultIshaTime, isDefault: true);
+    add('default_morning_dhikr', 'সকালের যিকির (ডিফল্ট)',
+        _defaultMorningDhikrTime,
+        isDefault: true);
+    add('default_evening_dhikr', 'সন্ধ্যার যিকির (ডিফল্ট)',
+        _defaultEveningDhikrTime,
+        isDefault: true);
+    add('default_daily_amal', 'দৈনিক আমল (ডিফল্ট)', _defaultDailyAmalTime,
+        isDefault: true);
 
-    if (_isDailyReminderEnabled) add('দৈনিক আমল রিমাইন্ডার', _dailyReminderTime);
-    if (_isMorningDhikrEnabled) add('সকালের যিকির', _morningDhikrTime);
-    if (_isEveningDhikrEnabled) add('সন্ধ্যার যিকির', _eveningDhikrTime);
+    // User-toggled \"personal\" reminders
+    if (_isDailyReminderEnabled) {
+      add('personal_daily_amal', 'দৈনিক আমল রিমাইন্ডার', _dailyReminderTime);
+    }
+    if (_isMorningDhikrEnabled) {
+      add('personal_morning_dhikr', 'সকালের যিকির', _morningDhikrTime);
+    }
+    if (_isEveningDhikrEnabled) {
+      add('personal_evening_dhikr', 'সন্ধ্যার যিকির', _eveningDhikrTime);
+    }
     if (_arePrayerRemindersEnabled) {
       for (final p in PrayerName.values) {
         final t = _prayerReminderTimes[p];
         if (t != null) {
-          add('${CustomReminder.getPrayerBengaliName(p)} সালাত', t);
+          add(
+            'prayer_${p.name}',
+            '${CustomReminder.getPrayerBengaliName(p)} সালাত',
+            t,
+          );
         }
       }
     }
@@ -351,10 +384,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         final dt = DateTime(
             now.year, now.month, now.day, r.fixedHour!, r.fixedMinute!);
         items.add(_ReminderItem(
-            title: r.title,
-            time: dt,
-            isPassed: now.isAfter(dt),
-            isCustom: true));
+          id: 'custom_${r.id}',
+          title: r.title,
+          time: dt,
+          isPassed: now.isAfter(dt),
+          isCustom: true,
+        ));
       }
     }
 
@@ -659,6 +694,57 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
   // ── Today's summary card ──────────────────────────────────────────────────
 
+  String _localizeReminderTitle(BuildContext context, _ReminderItem item) {
+    if (item.isCustom) {
+      // User-created custom reminders keep their original title
+      return item.title;
+    }
+
+    switch (item.id) {
+      // Default system reminders
+      case 'default_fajr':
+        return 'reminder_default_fajr'.tr();
+      case 'default_dhuhr':
+        return 'reminder_default_dhuhr'.tr();
+      case 'default_asr':
+        return 'reminder_default_asr'.tr();
+      case 'default_maghrib':
+        return 'reminder_default_maghrib'.tr();
+      case 'default_isha':
+        return 'reminder_default_isha'.tr();
+      case 'default_morning_dhikr':
+        return 'reminder_default_morning_dhikr'.tr();
+      case 'default_evening_dhikr':
+        return 'reminder_default_evening_dhikr'.tr();
+      case 'default_daily_amal':
+        return 'reminder_default_daily_amal'.tr();
+
+      // Personal toggles
+      case 'personal_daily_amal':
+        return 'reminder_personal_daily_amal'.tr();
+      case 'personal_morning_dhikr':
+        return 'reminder_personal_morning_dhikr'.tr();
+      case 'personal_evening_dhikr':
+        return 'reminder_personal_evening_dhikr'.tr();
+
+      // Per-prayer reminders
+      case 'prayer_fajr':
+        return 'reminder_prayer_fajr'.tr();
+      case 'prayer_dhuhr':
+        return 'reminder_prayer_dhuhr'.tr();
+      case 'prayer_asr':
+        return 'reminder_prayer_asr'.tr();
+      case 'prayer_maghrib':
+        return 'reminder_prayer_maghrib'.tr();
+      case 'prayer_isha':
+        return 'reminder_prayer_isha'.tr();
+
+      default:
+        // Fallback: stored title (e.g. old data)
+        return item.title;
+    }
+  }
+
   String _fmtTime(DateTime t) {
     final h = t.hour > 12 ? t.hour - 12 : (t.hour == 0 ? 12 : t.hour);
     final m = t.minute.toString().padLeft(2, '0');
@@ -677,7 +763,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     String nextText;
     if (next != null) {
-      nextText = '${next.title} — ${_fmtTime(next.time)}';
+      final nextTitle = _localizeReminderTitle(context, next);
+      nextText = '$nextTitle — ${_fmtTime(next.time)}';
     } else {
       nextText = 'reminder_all_done'.tr();
     }
@@ -843,7 +930,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                r.title,
+                                _localizeReminderTitle(context, r),
                                 style: TextStyle(
                                   color: cs.onSurface.withOpacity(0.85),
                                   fontSize: 13,
@@ -867,9 +954,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                   color: Colors.green.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
-                                  'ডিফল্ট',
-                                  style: TextStyle(
+                                child: Text(
+                                  'default_badge'.tr(),
+                                  style: const TextStyle(
                                     color: Colors.green,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
@@ -977,11 +1064,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       PrayerName.isha: Icons.nights_stay_outlined,
     };
     final names = {
-      PrayerName.fajr: 'ফজর',
-      PrayerName.dhuhr: isFriday ? 'জুম\'আ' : 'যোহর',
-      PrayerName.asr: 'আসর',
-      PrayerName.maghrib: 'মাগরিব',
-      PrayerName.isha: 'এশা',
+      PrayerName.fajr: 'fajr'.tr(),
+      PrayerName.dhuhr: isFriday ? 'jumuah'.tr() : 'dhuhr'.tr(),
+      PrayerName.asr: 'asr'.tr(),
+      PrayerName.maghrib: 'maghrib'.tr(),
+      PrayerName.isha: 'isha'.tr(),
     };
 
     return PrayerName.values.map((prayer) {
@@ -1539,6 +1626,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 // Internal data class
 // ─────────────────────────────────────────────────────────────────────────────
 class _ReminderItem {
+  final String id;
   final String title;
   final DateTime time;
   final bool isPassed;
@@ -1546,6 +1634,7 @@ class _ReminderItem {
   final bool isDefault;
 
   _ReminderItem({
+    required this.id,
     required this.title,
     required this.time,
     required this.isPassed,
