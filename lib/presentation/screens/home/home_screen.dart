@@ -222,7 +222,6 @@ static const Color _gold = Color(0xFFD4AF37);
 Widget _buildHomeBackground(BuildContext context) {
   final theme = Theme.of(context);
   final gradients = theme.extension<GradientColors>()!;
-  final cs = theme.colorScheme;
 
   return Stack(
     children: [
@@ -466,8 +465,6 @@ Widget _sunChip({
     final prayerTimesState = ref.watch(prayerTimesProvider);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-
-    final iconColor = cs.primary;
     final titleColor = cs.primary;
 
     return Scaffold(
@@ -658,14 +655,14 @@ Widget _sunChip({
                     children: [
                       _sunChip(
                         context: context,
-                        label: 'সূর্যোদয়',
+                        label: 'home_sunrise'.tr(),
                         time: sunriseTime ?? '--:--',
                         icon: Icons.wb_sunny_rounded,
                       ),
                       const SizedBox(height: 12),
                       _sunChip(
                         context: context,
-                        label: 'সূর্যাস্ত',
+                        label: 'home_sunset'.tr(),
                         time: sunsetTime ?? '--:--',
                         icon: Icons.nights_stay_rounded,
                       ),
@@ -796,7 +793,6 @@ Widget _sunChip({
     // Bengali year starts around April 14
     int bengaliMonth;
     int bengaliDay;
-    int bengaliYear = date.year - 594;
 
     const bengaliMonthNames = [
       'পৌষ',
@@ -834,10 +830,6 @@ Widget _sunChip({
       // Simplified for other months
       bengaliMonth = (date.month + 8) % 12;
       bengaliDay = (date.day + 15) % 30 + 1;
-    }
-
-    if (bengaliMonth <= 3) {
-      bengaliYear = date.year - 594;
     }
 
     return '${_toBengaliNumber(bengaliDay)} ${bengaliMonthNames[bengaliMonth]}';
@@ -895,9 +887,9 @@ Widget _sunChip({
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Text(
-                          'ত্রুটি: ${state.error}',
-                          style: const TextStyle(
-                            color: Colors.red,
+                          'home_error'.tr(),
+                          style: TextStyle(
+                            color: cs.error,
                             fontSize: 14,
                           ),
                         ),
@@ -907,7 +899,7 @@ Widget _sunChip({
                     if (state.prayerTimes['fajr'] != null)
                       _buildPrayerTimeRow(
                         context,
-                        'ফজর',
+                        'fajr'.tr(),
                         _formatTime(state.prayerTimes['fajr']!),
                         state.currentPrayer == 'fajr',
                       ),
@@ -923,7 +915,7 @@ Widget _sunChip({
                     if (state.prayerTimes['asr'] != null)
                       _buildPrayerTimeRow(
                         context,
-                        'আসর',
+                        'asr'.tr(),
                         _formatTime(state.prayerTimes['asr']!),
                         state.currentPrayer == 'asr',
                       ),
@@ -931,7 +923,7 @@ Widget _sunChip({
                     if (state.prayerTimes['maghrib'] != null)
                       _buildPrayerTimeRow(
                         context,
-                        'মাগরিব',
+                        'maghrib'.tr(),
                         _formatTime(state.prayerTimes['maghrib']!),
                         state.currentPrayer == 'maghrib',
                       ),
@@ -939,7 +931,7 @@ Widget _sunChip({
                     if (state.prayerTimes['isha'] != null)
                       _buildPrayerTimeRow(
                         context,
-                        'এশা',
+                        'isha'.tr(),
                         _formatTime(state.prayerTimes['isha']!),
                         state.currentPrayer == 'isha',
                       ),
@@ -964,22 +956,20 @@ Widget _sunChip({
     String? subtitleText;
 
     if (state.isForbiddenTime) {
-      statusColor = Colors.red;
-      statusText = 'নিষিদ্ধ সময়';
-      mainText = 'নামাজ পড়া যাবে না';
-      subtitleText = state.timeToCurrentPrayerEnd != null
-          ? 'আর ${_toBengaliString(state.timeToCurrentPrayerEnd!)} বাকি'
-          : null;
+      statusColor = cs.error;
+      statusText = 'prayer_forbidden_time'.tr();
+      mainText = 'prayer_forbidden_msg'.tr();
+      subtitleText = null;
     } else if (state.isNaflTime) {
       statusColor = isDark ? _gold : cs.primary;
-      statusText = 'এখন চলছে';
-      mainText = 'নফল';
+      statusText = 'prayer_now'.tr();
+      mainText = 'prayer_nafl'.tr();
       subtitleText = null;
     } else if (state.currentPrayer != null) {
       statusColor = isDark ? _gold : cs.primary;
-      statusText = 'এখন চলছে';
+      statusText = 'prayer_now'.tr();
       mainText = _getPrayerDisplayName(state.currentPrayer!);
-      subtitleText = 'পরবর্তী ওয়াক্তের বাকি';
+      subtitleText = 'prayer_next_time'.tr();
     } else {
       return const SizedBox.shrink();
     }
@@ -1030,12 +1020,12 @@ Widget _sunChip({
         final nextPrayer = prayers[currentIndex + 1];
         final nextTime = state.prayerTimes[nextPrayer];
         if (nextTime != null) {
-          nextPrayerName = _getPrayerNameInBangla(nextPrayer);
+          nextPrayerName = _getPrayerDisplayName(nextPrayer);
           nextPrayerTimeStr = _formatTime(nextTime);
         }
       } else {
         // If it's Isha (last prayer), show tomorrow's Fajr
-        nextPrayerName = 'ফজর';
+        nextPrayerName = _getPrayerDisplayName('fajr');
         nextPrayerTimeStr = null;
       }
     } else if (state.isNaflTime && state.prayerTimes.isNotEmpty) {
@@ -1055,7 +1045,9 @@ Widget _sunChip({
       }
 
       // Next prayer after nafl is dhuhr
-      nextPrayerName = DateTime.now().weekday == DateTime.friday ? 'জুম\'আ' : 'যোহর';
+      nextPrayerName = _getPrayerDisplayName(
+        DateTime.now().weekday == DateTime.friday ? 'jumuah' : 'dhuhr',
+      );
       final dhuhrTime = state.prayerTimes['dhuhr'];
       if (dhuhrTime != null) {
         nextPrayerTimeStr = _formatTime(dhuhrTime);
@@ -1151,8 +1143,8 @@ Widget _sunChip({
             const SizedBox(height: 4),
             Text(
               state.isNaflTime
-                  ? 'পরবর্তী ওয়াক্তের বাকি'
-                  : (subtitleText ?? 'পরবর্তী ওয়াক্তের বাকি'),
+                  ? 'prayer_next_time'.tr()
+                  : (subtitleText ?? 'prayer_next_time'.tr()),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: cs.onSurface.withOpacity(0.5),
@@ -1242,9 +1234,7 @@ Widget _sunChip({
               const SizedBox(height: 16),
               Builder(
                 builder: (context) {
-                  final theme = Theme.of(context);
-                  final cs = theme.colorScheme;
-                  final isDark = theme.brightness == Brightness.dark;
+                  final cs = Theme.of(context).colorScheme;
 
                   final bg = cs.surfaceContainerHighest;
                   final textColor = cs.onSurface.withOpacity(0.85);
@@ -1266,7 +1256,9 @@ Widget _sunChip({
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'পরবর্তী: $nextPrayerName - $nextPrayerTimeStr',
+                          '${'home_next_prayer'.tr(
+                            namedArgs: {'name': nextPrayerName!},
+                          )} - $nextPrayerTimeStr',
                           style: TextStyle(
                             color: textColor,
                             fontSize: 13,
@@ -1305,7 +1297,9 @@ Widget _sunChip({
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'পরবর্তী: $nextPrayerName (আগামীকাল)',
+                          '${'home_next_prayer'.tr(
+                            namedArgs: {'name': nextPrayerName!},
+                          )} (${'common_tomorrow'.tr()})',
                           style: TextStyle(
                             color: textColor,
                             fontSize: 13,
@@ -1326,19 +1320,21 @@ Widget _sunChip({
   String _getPrayerDisplayName(String prayerName) {
     switch (prayerName.toLowerCase()) {
       case 'fajr':
-        return 'ফজর';
+        return 'fajr'.tr();
       case 'dhuhr':
         // Check if Friday
-        if (DateTime.now().weekday == 5) {
-          return 'জুম\'আ';
+        if (DateTime.now().weekday == DateTime.friday) {
+          return 'jumuah'.tr();
         }
-        return 'যোহর';
+        return 'dhuhr'.tr();
+      case 'jumuah':
+        return 'jumuah'.tr();
       case 'asr':
-        return 'আসর';
+        return 'asr'.tr();
       case 'maghrib':
-        return 'মাগরিব';
+        return 'maghrib'.tr();
       case 'isha':
-        return 'এশা';
+        return 'isha'.tr();
       default:
         return prayerName;
     }
@@ -1351,26 +1347,8 @@ Widget _sunChip({
     return '$hour:$minute'.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join();
   }
 
-  String _getPrayerNameInBangla(String prayerName) {
-    switch (prayerName.toLowerCase()) {
-      case 'fajr':
-        return 'ফজর';
-      case 'dhuhr':
-        // Check if Friday
-        if (DateTime.now().weekday == 5) {
-          return 'জুম\'আ';
-        }
-        return 'যোহর';
-      case 'asr':
-        return 'আসর';
-      case 'maghrib':
-        return 'মাগরিব';
-      case 'isha':
-        return 'এশা';
-      default:
-        return prayerName;
-    }
-  }
+  // _getPrayerNameInBangla is no longer needed because prayer names
+  // are now fully localized via translation keys.
 
   String _formatTime(DateTime time) {
     final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
@@ -1933,10 +1911,14 @@ Widget _buildPrayerTimeRow(
                   const SizedBox(height: 6),
                   Text(
                     totalSins == 0
-                        ? 'মাশাআল্লাহ! আজ কোনো গুনাহ নেই'
+                        ? 'home_sin_no_sins'.tr()
                         : pendingKaffara == 0
-                            ? 'আজ $totalSins টি গুনাহ - সব কাফফারা হয়েছে'
-                            : 'আজ $totalSins টি গুনাহ • $pendingKaffara বাকি',
+                            ? 'home_sin_all_kaffara'.tr()
+                            : 'home_sin_pending'.tr(
+                                namedArgs: {
+                                  'count': pendingKaffara.toString(),
+                                },
+                              ),
                     style: TextStyle(
                       color: cs.onSurfaceVariant,
                       fontSize: 12.8,

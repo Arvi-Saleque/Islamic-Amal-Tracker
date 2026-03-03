@@ -1,5 +1,6 @@
 import 'package:amal_tracker/core/theme/app_theme.dart';
 import 'package:amal_tracker/core/utils/prayer_name_utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../providers/statistics_provider.dart';
 import '../../../../data/models/sin_tracker_model.dart';
@@ -75,35 +76,58 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  String _formatDateBengali(DateTime date) {
-    final months = [
-      'জানুয়ারি',
-      'ফেব্রুয়ারি',
-      'মার্চ',
-      'এপ্রিল',
-      'মে',
-      'জুন',
-      'জুলাই',
-      'আগস্ট',
-      'সেপ্টেম্বর',
-      'অক্টোবর',
-      'নভেম্বর',
-      'ডিসেম্বর'
-    ];
-    return '${date.day} ${months[date.month - 1]}, ${date.year}';
+  String _formatDateLocalized(DateTime date) {
+    final monthKey = () {
+      switch (date.month) {
+        case 1:
+          return 'month_jan';
+        case 2:
+          return 'month_feb';
+        case 3:
+          return 'month_mar';
+        case 4:
+          return 'month_apr';
+        case 5:
+          return 'month_may';
+        case 6:
+          return 'month_jun';
+        case 7:
+          return 'month_jul';
+        case 8:
+          return 'month_aug';
+        case 9:
+          return 'month_sep';
+        case 10:
+          return 'month_oct';
+        case 11:
+          return 'month_nov';
+        case 12:
+        default:
+          return 'month_dec';
+      }
+    }();
+
+    return '${date.day} ${monthKey.tr()}, ${date.year}';
   }
 
-  String _getWeekdayBengali(int weekday) {
-    final days = [
-      'সোমবার',
-      'মঙ্গলবার',
-      'বুধবার',
-      'বৃহস্পতিবার',
-      'শুক্রবার',
-      'শনিবার',
-      'রবিবার'
-    ];
-    return days[weekday - 1];
+  String _getWeekdayLocalized(int weekday) {
+    switch (weekday) {
+      case DateTime.monday:
+        return 'weekday_mon'.tr();
+      case DateTime.tuesday:
+        return 'weekday_tue'.tr();
+      case DateTime.wednesday:
+        return 'weekday_wed'.tr();
+      case DateTime.thursday:
+        return 'weekday_thu'.tr();
+      case DateTime.friday:
+        return 'weekday_fri'.tr();
+      case DateTime.saturday:
+        return 'weekday_sat'.tr();
+      case DateTime.sunday:
+      default:
+        return 'weekday_sun'.tr();
+    }
   }
 
   int _calculateOverallScore() {
@@ -252,7 +276,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _formatDateBengali(widget.date),
+                  _formatDateLocalized(widget.date),
                   style: TextStyle(
                     color: primary,
                     fontSize: 20,
@@ -260,7 +284,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                   ),
                 ),
                 Text(
-                  _getWeekdayBengali(widget.date.weekday),
+                  _getWeekdayLocalized(widget.date.weekday),
                   style: TextStyle(
                     color: gradients.bulletTextColor,
                     fontSize: 14,
@@ -294,15 +318,19 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
   }
 
   Widget _buildNamazSection() {
-    final gradients = Theme.of(context).extension<GradientColors>()!;
     final prayer = detailedData?.prayerModel;
     final completedCount = prayer?.completedPrayersCount ?? 0;
     final progress = completedCount / 5;
 
     return _CategoryCard(
       icon: Icons.mosque,
-      title: 'নামাজ',
-      subtitle: '$completedCount টি / 5 টি সম্পন্ন',
+      title: 'prayer_section'.tr(),
+      subtitle: 'stats_completed_of'.tr(
+        namedArgs: {
+          'done': completedCount.toString(),
+          'total': '5',
+        },
+      ),
       progress: progress,
       child: prayer != null
           ? Wrap(
@@ -316,9 +344,13 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               }).toList(),
             )
             : Text(
-              'কোনো ডেটা নেই',
-              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
-            ),
+                'stats_no_data'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .extension<GradientColors>()!
+                      .bulletTextColor,
+                ),
+              ),
     );
   }
 
@@ -330,9 +362,13 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
     return _CategoryCard(
       icon: Icons.check_circle_outline,
-      title: 'প্রতিদিনের আমল',
-      subtitle:
-          '$completedCount টি / $totalCount টি সম্পন্ন',
+      title: 'daily_section'.tr(),
+      subtitle: 'stats_completed_of'.tr(
+        namedArgs: {
+          'done': completedCount.toString(),
+          'total': totalCount.toString(),
+        },
+      ),
       progress: progress,
       isExpandable: true,
       child: amal != null
@@ -345,8 +381,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               }).toList(),
             )
           : Text(
-              'কোনো ডেটা নেই',
-              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
+              'stats_no_data'.tr(),
+              style: TextStyle(
+                color: Theme.of(context)
+                    .extension<GradientColors>()!
+                    .bulletTextColor,
+              ),
             ),
     );
   }
@@ -360,9 +400,13 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
     return _CategoryCard(
       icon: Icons.favorite,
-      title: 'যিকির',
-      subtitle:
-          '$totalCount বার / $totalTarget বার সম্পন্ন',
+      title: 'dhikr_section'.tr(),
+      subtitle: 'stats_completed_of'.tr(
+        namedArgs: {
+          'done': totalCount.toString(),
+          'total': totalTarget.toString(),
+        },
+      ),
       progress: progress,
       isExpandable: true,
       child: dhikr != null
@@ -377,8 +421,12 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
               }).toList(),
             )
           : Text(
-              'কোনো ডেটা নেই',
-              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
+              'stats_no_data'.tr(),
+              style: TextStyle(
+                color: Theme.of(context)
+                    .extension<GradientColors>()!
+                    .bulletTextColor,
+              ),
             ),
     );
   }
@@ -393,36 +441,44 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
 
     return _CategoryCard(
       icon: Icons.menu_book,
-      title: 'পড়াশোনা',
-      subtitle:
-          '$totalMinutes মিনিট / $targetMinutes মিনিট সম্পন্ন',
+      title: 'reading_section'.tr(),
+      subtitle: 'stats_completed_of'.tr(
+        namedArgs: {
+          'done': totalMinutes.toString(),
+          'total': targetMinutes.toString(),
+        },
+      ),
       progress: progress,
       child: reading != null
           ? Column(
               children: [
                 _ReadingItem(
                   icon: Icons.book,
-                  title: 'কুরআন তিলাওয়াত',
+                  title: 'reading_quran'.tr(),
                   minutes: reading.quranMinutes,
                   target: reading.goal.quranMinutes,
                 ),
                 _ReadingItem(
                   icon: Icons.book_outlined,
-                  title: 'তাফসীর',
+                  title: 'reading_tafsir'.tr(),
                   minutes: reading.tafsirMinutes,
                   target: reading.goal.tafsirMinutes,
                 ),
                 _ReadingItem(
                   icon: Icons.auto_stories,
-                  title: 'হাদিস',
+                  title: 'reading_hadith'.tr(),
                   minutes: reading.hadithMinutes,
                   target: reading.goal.hadithMinutes,
                 ),
               ],
             )
           : Text(
-              'কোনো ডেটা নেই',
-              style: TextStyle(color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
+              'stats_no_data'.tr(),
+              style: TextStyle(
+                color: Theme.of(context)
+                    .extension<GradientColors>()!
+                    .bulletTextColor,
+              ),
             ),
     );
   }
@@ -450,7 +506,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
           return sinType.name;
         }
       }
-      return 'অজানা গুনাহ';
+          return 'sin_unknown'.tr();
     }
 
     String getKaffaraName(String? kaffaraType) {
@@ -486,7 +542,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'গুনাহ ট্র্যাকার',
+                      'stats_sin_tracker'.tr(),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
@@ -495,8 +551,13 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                     ),
                     Text(
                       totalSins == 0
-                          ? 'মাশাআল্লাহ! কোনো গুনাহ নেই'
-                          : '$totalSins টি গুনাহ, $kaffaraDone টি কাফফারা দেওয়া',
+                          ? 'stats_mashallah_no_sin'.tr()
+                          : 'stats_sin_kaffara_summary'.tr(
+                              namedArgs: {
+                                'total': totalSins.toString(),
+                                'done': kaffaraDone.toString(),
+                              },
+                            ),
                       style: TextStyle(
                         color: totalSins == 0
                             ? const Color(0xFF4CAF50)
@@ -567,7 +628,7 @@ class _DayDetailsSheetState extends State<DayDetailsSheet> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'কাফফারা বাকি',
+                          'stats_kaffara_pending'.tr(),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.error,
                             fontSize: 11,
@@ -613,7 +674,6 @@ class _CategoryCardState extends State<_CategoryCard> {
   Widget build(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    final shadowColor = Theme.of(context).shadowColor;
     final percentage = (widget.progress * 100).toInt();
 
     return buildPremiumCard(
@@ -940,7 +1000,7 @@ class _ReadingItem extends StatelessWidget {
               ),
             ),
             child: Text(
-              '$minutes/$target মি.',
+              '$minutes/$target',
               style: TextStyle(
                 color: minutes >= target ? primary : bulletColor,
                 fontSize: 13,

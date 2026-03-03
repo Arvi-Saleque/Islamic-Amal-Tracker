@@ -504,6 +504,7 @@
   "stats_day_before_yesterday": "Day before yesterday",
   "stats_days_ago": "{days} days ago",
   "stats_streak_threshold": "You need at least 60%+ progress for a day to count toward streaks",
+  "sin_unknown": "Unknown sin",
 
   "home_location_enable_title": "Enable location",
   "home_location_enable_body": "Turn on your phone's location service to get accurate prayer times.\n\nIf location is off, reminders will use Dhaka time.",
@@ -514,6 +515,7 @@
   "home_sin_pending": "{count} sins still need kaffara. Repent sincerely.",
   "home_error": "Something went wrong. Please try again later.",
   "home_next_prayer": "Next: {name}",
+  "common_tomorrow": "Tomorrow",
 
   "preset_tahajjud_title": "Tahajjud reminder",
   "preset_tahajjud_desc": "Wake up in the last third of the night",

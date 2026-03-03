@@ -504,6 +504,7 @@
   "stats_day_before_yesterday": "পরশু",
   "stats_days_ago": "{days} দিন আগে",
   "stats_streak_threshold": "স্ট্রিক কাউন্টের জন্য কমপক্ষে 60%+ প্রোগ্রেস পূরণ করতে হবে",
+  "sin_unknown": "অজানা গুনাহ",
 
   "home_location_enable_title": "লোকেশন চালু করুন",
   "home_location_enable_body": "নামাজের সঠিক সময় পেতে আপনার ফোনের লোকেশন সার্ভিস চালু করুন।\n\nলোকেশন বন্ধ থাকলে ঢাকার সময় অনুযায়ী রিমাইন্ডার পাবেন।",
@@ -514,6 +515,7 @@
   "home_sin_pending": "{count} টি গুনাহের কাফফারা বাকি আছে। তওবা করুন।",
   "home_error": "কিছু ভুল হয়েছে। পরে আবার চেষ্টা করুন।",
   "home_next_prayer": "পরবর্তী: {name}",
+  "common_tomorrow": "আগামীকাল",
 
   "preset_tahajjud_title": "তাহাজ্জুদ রিমাইন্ডার",
   "preset_tahajjud_desc": "রাতের শেষ তৃতীয়াংশে উঠুন",
