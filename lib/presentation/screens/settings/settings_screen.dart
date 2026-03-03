@@ -596,7 +596,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                '${'settings_developer'.tr()}: Salek Bin Hossain, Effy Tech',
+                '${'settings_developer'.tr()}: Effy Tech',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,

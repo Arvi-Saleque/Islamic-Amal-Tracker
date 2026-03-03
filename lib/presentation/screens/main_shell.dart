@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/main_shell_tab_provider.dart';
 import 'home/home_screen.dart';
 import 'settings/reminders_screen.dart';
 import 'dhikr/dhikr_counter_screen.dart';
@@ -15,8 +16,6 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  int _currentIndex = 0;
-
   static const _screens = [
     HomeScreen(),
     RemindersScreen(),
@@ -27,6 +26,7 @@ class _MainShellState extends ConsumerState<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(mainShellTabIndexProvider);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -37,7 +37,7 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
+        index: currentIndex,
         children: _screens,
       ),
       bottomNavigationBar: Column(
@@ -59,9 +59,9 @@ class _MainShellState extends ConsumerState<MainShell> {
             ),
           ),
           NavigationBar(
-            selectedIndex: _currentIndex,
+            selectedIndex: currentIndex,
             onDestinationSelected: (index) {
-              setState(() => _currentIndex = index);
+              ref.read(mainShellTabIndexProvider.notifier).state = index;
             },
             backgroundColor: cs.surface,
             elevation: 0,
@@ -75,7 +75,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 icon: Icons.home_outlined,
                 selectedIcon: Icons.home_rounded,
                 label: 'tab_home'.tr(),
-                isSelected: _currentIndex == 0,
+                isSelected: currentIndex == 0,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
               ),
@@ -83,7 +83,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 icon: Icons.notifications_outlined,
                 selectedIcon: Icons.notifications_rounded,
                 label: 'tab_reminders'.tr(),
-                isSelected: _currentIndex == 1,
+                isSelected: currentIndex == 1,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
               ),
@@ -91,7 +91,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 icon: Icons.favorite_outline_rounded,
                 selectedIcon: Icons.favorite_rounded,
                 label: 'tab_dhikr'.tr(),
-                isSelected: _currentIndex == 2,
+                isSelected: currentIndex == 2,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
               ),
@@ -99,7 +99,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 icon: Icons.bar_chart_outlined,
                 selectedIcon: Icons.bar_chart_rounded,
                 label: 'tab_statistics'.tr(),
-                isSelected: _currentIndex == 3,
+                isSelected: currentIndex == 3,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
               ),
@@ -107,7 +107,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 icon: Icons.settings_outlined,
                 selectedIcon: Icons.settings_rounded,
                 label: 'tab_settings'.tr(),
-                isSelected: _currentIndex == 4,
+                isSelected: currentIndex == 4,
                 activeColor: activeColor,
                 inactiveColor: inactiveColor,
               ),

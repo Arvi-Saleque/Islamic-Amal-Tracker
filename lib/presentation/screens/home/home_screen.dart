@@ -15,9 +15,9 @@ import '../../providers/statistics_provider.dart';
 import '../../providers/sin_tracker_provider.dart';
 import '../prayer/prayer_tracker_screen.dart';
 import '../daily_amal/daily_amal_screen.dart';
-import '../dhikr/dhikr_counter_screen.dart';
 import '../reading/reading_tracker_screen.dart';
 import '../sin_tracker/sin_tracker_screen.dart';
+import '../../providers/main_shell_tab_provider.dart';
 import '../../../services/daily_reminder_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -544,181 +544,203 @@ Widget _sunChip({
 
     
   Widget _buildDateSunCard(BuildContext context, PrayerTimesState state) {
-      final now = DateTime.now();
-  
-      // Hijri date (adjust by -1 day for correct date)
-      final yesterday = now.subtract(const Duration(days: 1));
-      final hijri = HijriCalendar.fromDate(yesterday);
-      final hijriMonthBengali = _getHijriMonthBengali(hijri.hMonth);
-      final hijriDay = _toBengaliNumber(hijri.hDay);
-  
-      // Bengali date (approximate)
-      final bengaliDate = _getBengaliDate(now);
-  
-      // Gregorian date in Bengali
-      final dayName = _getBengaliDayName(now.weekday);
-      final dayNum = _toBengaliNumber(now.day);
-      final monthName = _getBengaliMonthName(now.month);
-  
-      // Prayer times for sunrise/sunset
-      String? sunriseTime;
-      String? sunsetTime;
+    final now = DateTime.now();
+    final locale = context.locale;
+    final isBangla = locale.languageCode == 'bn';
+
+    // Hijri date (adjust by -1 day for correct date)
+    final yesterday = now.subtract(const Duration(days: 1));
+    final hijri = HijriCalendar.fromDate(yesterday);
+    final hijriMonthKey = _getHijriMonthKey(hijri.hMonth);
+    final hijriMonth = hijriMonthKey.tr();
+    final hijriDayStr =
+        isBangla ? _toBengaliNumber(hijri.hDay) : hijri.hDay.toString();
+
+    // Bengali calendar-style date (approximate, but now using i18n keys)
+    final bengaliDate = _getBengaliDate(context, now);
+
+    // Localized Gregorian date line (weekday + day + month)
+    final weekdayKey = _getWeekdayKey(now.weekday);
+    final weekdayLabel = weekdayKey.tr();
+    final monthKey = _getMonthKey(now.month);
+    final monthLabel = monthKey.tr();
+    final dayNumStr =
+        isBangla ? _toBengaliNumber(now.day) : now.day.toString();
+
+    // Prayer times for sunrise/sunset
+    String? sunriseTime;
+    String? sunsetTime;
       if (state.prayerTimes.isNotEmpty) {
         final sunrise = state.prayerTimes['sunrise'];
         final maghrib = state.prayerTimes['maghrib'];
-        if (sunrise != null) sunriseTime = _formatTimeShort(sunrise);
-        if (maghrib != null) sunsetTime = _formatTimeShort(maghrib);
+        if (sunrise != null) {
+          sunriseTime = _formatTimeShort(context, sunrise);
+        }
+        if (maghrib != null) {
+          sunsetTime = _formatTimeShort(context, maghrib);
+        }
       }
-  
-      return buildPremiumCard(
-        context: context,
-        margin: const EdgeInsets.all(16),
-        padding: EdgeInsets.zero,
-        radius: 22,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final cs = Theme.of(context).colorScheme;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '$hijriDay $hijriMonthBengali',
-                                  style: TextStyle(
-                                    color: cs.primary,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '$dayName, $dayNum $monthName',
-                                  style: TextStyle(
-                                    color: cs.onSurface.withOpacity(0.65),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.1,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  bengaliDate,
-                                  style: TextStyle(
-                                    color: cs.onSurface.withOpacity(0.55),
-                                    fontSize: 12,
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Builder(
-                    builder: (context) {
-                      final cs = Theme.of(context).colorScheme;
-                      return Container(
-                        height: 76,
-                        width: 1,
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              cs.primary.withOpacity(0.25),
-                              cs.primary.withOpacity(0.55),
-                              cs.primary.withOpacity(0.25),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+
+    return buildPremiumCard(
+      context: context,
+      margin: const EdgeInsets.all(16),
+      padding: EdgeInsets.zero,
+      radius: 22,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sunChip(
-                        context: context,
-                        label: 'home_sunrise'.tr(),
-                        time: sunriseTime ?? '--:--',
-                        icon: Icons.wb_sunny_rounded,
-                      ),
-                      const SizedBox(height: 12),
-                      _sunChip(
-                        context: context,
-                        label: 'home_sunset'.tr(),
-                        time: sunsetTime ?? '--:--',
-                        icon: Icons.nights_stay_rounded,
+                      Builder(
+                        builder: (context) {
+                          final cs = Theme.of(context).colorScheme;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$hijriDayStr $hijriMonth',
+                                style: TextStyle(
+                                  color: cs.primary,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '$weekdayLabel, $dayNumStr $monthLabel',
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.65),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                bengaliDate,
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.55),
+                                  fontSize: 12,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ],
+                  ),
+                ),
+                Builder(
+                  builder: (context) {
+                    final cs = Theme.of(context).colorScheme;
+                    return Container(
+                      height: 76,
+                      width: 1,
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            cs.primary.withOpacity(0.25),
+                            cs.primary.withOpacity(0.55),
+                            cs.primary.withOpacity(0.25),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _sunChip(
+                      context: context,
+                      label: 'home_sunrise'.tr(),
+                      time: sunriseTime ?? '--:--',
+                      icon: Icons.wb_sunny_rounded,
+                    ),
+                    const SizedBox(height: 12),
+                    _sunChip(
+                      context: context,
+                      label: 'home_sunset'.tr(),
+                      time: sunsetTime ?? '--:--',
+                      icon: Icons.nights_stay_rounded,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (state.locationName != null) ...[
+            Container(
+              height: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(0.7),
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    state.locationName!,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.7),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
             ),
-            if (state.locationName != null) ...[
-              Container(
-                height: 1,
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                      Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                      Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      state.locationName!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
-        ),
-      );
-    }
-  
-    String _formatTimeShort(DateTime time) {
+        ],
+      ),
+    );
+  }
+
+  String _formatTimeShort(BuildContext context, DateTime time) {
+    final isBangla = context.locale.languageCode == 'bn';
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
-    return '${_toBengaliNumber(hour)}:$minute'.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join();
+    var timeStr = '$hour:$minute';
+    if (isBangla) {
+      timeStr = _toBengaliString(timeStr);
+    }
+    return timeStr;
   }
 
   String _toBengaliNumber(int number) {
@@ -739,74 +761,105 @@ Widget _sunChip({
     }).join();
   }
 
-  String _getHijriMonthBengali(int month) {
-    const months = [
-      'মুহাররম',
-      'সফর',
-      'রবিউল আউয়াল',
-      'রবিউস সানি',
-      'জমাদিউল আউয়াল',
-      'জমাদিউস সানি',
-      'রজব',
-      'শা\'বান',
-      'রমজান',
-      'শাওয়াল',
-      'জিলক্বদ',
-      'জিলহজ্জ'
-    ];
-    return months[month - 1];
+  String _getHijriMonthKey(int month) {
+    switch (month) {
+      case 1:
+        return 'hijri_muharram';
+      case 2:
+        return 'hijri_safar';
+      case 3:
+        return 'hijri_rabi_al_awwal';
+      case 4:
+        return 'hijri_rabi_al_thani';
+      case 5:
+        return 'hijri_jumada_al_ula';
+      case 6:
+        return 'hijri_jumada_al_akhirah';
+      case 7:
+        return 'hijri_rajab';
+      case 8:
+        return 'hijri_shaban';
+      case 9:
+        return 'hijri_ramadan';
+      case 10:
+        return 'hijri_shawwal';
+      case 11:
+        return 'hijri_dhul_qadah';
+      case 12:
+      default:
+        return 'hijri_dhul_hijjah';
+    }
   }
 
-  String _getBengaliDayName(int weekday) {
-    const days = [
-      'সোমবার',
-      'মঙ্গলবার',
-      'বুধবার',
-      'বৃহস্পতিবার',
-      'শুক্রবার',
-      'শনিবার',
-      'রবিবার'
-    ];
-    return days[weekday - 1];
+  String _getWeekdayKey(int weekday) {
+    switch (weekday) {
+      case DateTime.monday:
+        return 'weekday_mon';
+      case DateTime.tuesday:
+        return 'weekday_tue';
+      case DateTime.wednesday:
+        return 'weekday_wed';
+      case DateTime.thursday:
+        return 'weekday_thu';
+      case DateTime.friday:
+        return 'weekday_fri';
+      case DateTime.saturday:
+        return 'weekday_sat';
+      case DateTime.sunday:
+      default:
+        return 'weekday_sun';
+    }
   }
 
-  String _getBengaliMonthName(int month) {
-    const months = [
-      'জানুয়ারি',
-      'ফেব্রুয়ারি',
-      'মার্চ',
-      'এপ্রিল',
-      'মে',
-      'জুন',
-      'জুলাই',
-      'আগস্ট',
-      'সেপ্টেম্বর',
-      'অক্টোবর',
-      'নভেম্বর',
-      'ডিসেম্বর'
-    ];
-    return months[month - 1];
+  String _getMonthKey(int month) {
+    switch (month) {
+      case 1:
+        return 'month_jan';
+      case 2:
+        return 'month_feb';
+      case 3:
+        return 'month_mar';
+      case 4:
+        return 'month_apr';
+      case 5:
+        return 'month_may';
+      case 6:
+        return 'month_jun';
+      case 7:
+        return 'month_jul';
+      case 8:
+        return 'month_aug';
+      case 9:
+        return 'month_sep';
+      case 10:
+        return 'month_oct';
+      case 11:
+        return 'month_nov';
+      case 12:
+      default:
+        return 'month_dec';
+    }
   }
 
-  String _getBengaliDate(DateTime date) {
+  String _getBengaliDate(BuildContext context, DateTime date) {
     // Approximate Bengali calendar calculation
     // Bengali year starts around April 14
     int bengaliMonth;
     int bengaliDay;
 
-    const bengaliMonthNames = [
-      'পৌষ',
-      'মাঘ',
-      'ফাল্গুন',
-      'চৈত্র',
-      'বৈশাখ',
-      'জ্যৈষ্ঠ',
-      'আষাঢ়',
-      'শ্রাবণ',
-      'ভাদ্র',
-      'আশ্বিন',
-      'কার্তিক',
-      'অগ্রহায়ণ'
+    const bengaliMonthKeys = [
+      'bengali_poush',
+      'bengali_magh',
+      'bengali_falgun',
+      'bengali_chaitra',
+      'bengali_baishakh',
+      'bengali_jaishtha',
+      'bengali_ashar',
+      'bengali_shrabon',
+      'bengali_bhadro',
+      'bengali_ashwin',
+      'bengali_kartik',
+      'bengali_agrahayon',
     ];
 
     // Find current Bengali month based on Gregorian date
@@ -832,7 +885,13 @@ Widget _sunChip({
       bengaliDay = (date.day + 15) % 30 + 1;
     }
 
-    return '${_toBengaliNumber(bengaliDay)} ${bengaliMonthNames[bengaliMonth]}';
+    final isBangla = context.locale.languageCode == 'bn';
+    final dayStr =
+        isBangla ? _toBengaliNumber(bengaliDay) : bengaliDay.toString();
+    final monthKey = bengaliMonthKeys[bengaliMonth];
+    final monthLabel = monthKey.tr();
+
+    return '$dayStr $monthLabel';
   }
 
     
@@ -900,7 +959,7 @@ Widget _sunChip({
                       _buildPrayerTimeRow(
                         context,
                         'fajr'.tr(),
-                        _formatTime(state.prayerTimes['fajr']!),
+                        _formatTime(context, state.prayerTimes['fajr']!),
                         state.currentPrayer == 'fajr',
                       ),
                     const SizedBox(height: 8),
@@ -908,7 +967,7 @@ Widget _sunChip({
                       _buildPrayerTimeRow(
                         context,
                         _getPrayerDisplayName('dhuhr'),
-                        _formatTime(state.prayerTimes['dhuhr']!),
+                        _formatTime(context, state.prayerTimes['dhuhr']!),
                         state.currentPrayer == 'dhuhr',
                       ),
                     const SizedBox(height: 8),
@@ -916,7 +975,7 @@ Widget _sunChip({
                       _buildPrayerTimeRow(
                         context,
                         'asr'.tr(),
-                        _formatTime(state.prayerTimes['asr']!),
+                        _formatTime(context, state.prayerTimes['asr']!),
                         state.currentPrayer == 'asr',
                       ),
                     const SizedBox(height: 8),
@@ -924,7 +983,7 @@ Widget _sunChip({
                       _buildPrayerTimeRow(
                         context,
                         'maghrib'.tr(),
-                        _formatTime(state.prayerTimes['maghrib']!),
+                        _formatTime(context, state.prayerTimes['maghrib']!),
                         state.currentPrayer == 'maghrib',
                       ),
                     const SizedBox(height: 8),
@@ -932,7 +991,7 @@ Widget _sunChip({
                       _buildPrayerTimeRow(
                         context,
                         'isha'.tr(),
-                        _formatTime(state.prayerTimes['isha']!),
+                        _formatTime(context, state.prayerTimes['isha']!),
                         state.currentPrayer == 'isha',
                       ),
                   ],
@@ -1009,8 +1068,8 @@ Widget _sunChip({
         if (totalDuration > 0 && elapsedDuration > 0) {
           progress = (elapsedDuration / totalDuration).clamp(0.0, 1.0);
         }
-        currentPrayerTimeStr = _formatTimeShort2(currentPrayerTime);
-        prayerEndTimeStr = _formatTimeShort2(prayerEndTime);
+        currentPrayerTimeStr = _formatTimeShort2(context, currentPrayerTime);
+        prayerEndTimeStr = _formatTimeShort2(context, prayerEndTime);
       }
 
       // Get next prayer
@@ -1021,7 +1080,7 @@ Widget _sunChip({
         final nextTime = state.prayerTimes[nextPrayer];
         if (nextTime != null) {
           nextPrayerName = _getPrayerDisplayName(nextPrayer);
-          nextPrayerTimeStr = _formatTime(nextTime);
+          nextPrayerTimeStr = _formatTime(context, nextTime);
         }
       } else {
         // If it's Isha (last prayer), show tomorrow's Fajr
@@ -1040,8 +1099,8 @@ Widget _sunChip({
         if (totalDuration > 0 && elapsedDuration > 0) {
           progress = (elapsedDuration / totalDuration).clamp(0.0, 1.0);
         }
-        currentPrayerTimeStr = _formatTimeShort2(sunrise);
-        prayerEndTimeStr = _formatTimeShort2(dhuhr);
+        currentPrayerTimeStr = _formatTimeShort2(context, sunrise);
+        prayerEndTimeStr = _formatTimeShort2(context, dhuhr);
       }
 
       // Next prayer after nafl is dhuhr
@@ -1050,7 +1109,7 @@ Widget _sunChip({
       );
       final dhuhrTime = state.prayerTimes['dhuhr'];
       if (dhuhrTime != null) {
-        nextPrayerTimeStr = _formatTime(dhuhrTime);
+        nextPrayerTimeStr = _formatTime(context, dhuhrTime);
       }
     }
 
@@ -1340,22 +1399,32 @@ Widget _sunChip({
     }
   }
 
-  String _formatTimeShort2(DateTime time) {
+  String _formatTimeShort2(BuildContext context, DateTime time) {
+    final isBangla = context.locale.languageCode == 'bn';
     final hour =
         time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute'.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join();
+    var timeStr = '$hour:$minute';
+    if (isBangla) {
+      timeStr = _toBengaliString(timeStr);
+    }
+    return timeStr;
   }
 
   // _getPrayerNameInBangla is no longer needed because prayer names
   // are now fully localized via translation keys.
 
-  String _formatTime(DateTime time) {
-    final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
+  String _formatTime(BuildContext context, DateTime time) {
+    final isBangla = context.locale.languageCode == 'bn';
+    final hour =
+        time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
-    final timeStr = '$hour:$minute';
-    return '${timeStr.split('').map((c) => '0123456789'.contains(c) ? _toBengaliNumber(int.parse(c)) : c).join()} $period';
+    var timeStr = '$hour:$minute';
+    if (isBangla) {
+      timeStr = _toBengaliString(timeStr);
+    }
+    return '$timeStr $period';
   }
 
 // Replace your existing _buildPrayerTimeRow with this one
@@ -1831,12 +1900,8 @@ Widget _buildPrayerTimeRow(
             current: dhikrCount,
             total: dhikrTarget,
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DhikrCounterScreen(),
-                ),
-              );
+              // Switch to Dhikr tab in MainShell instead of pushing a new screen
+              ref.read(mainShellTabIndexProvider.notifier).state = 2;
             },
           ),
           const SizedBox(height: 14),

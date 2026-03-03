@@ -198,18 +198,28 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${data.totalMinutes} ${'reading_minutes'.tr()}',
-                        style: TextStyle(
-                          color: cs.primary,
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          height: 1,
+                      SizedBox(
+                        height: 40,
+                        child: FittedBox(
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '${data.totalMinutes} ${'reading_minutes'.tr()}',
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: cs.primary,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              height: 1,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${'reading_goal'.tr()}: ${data.goal.totalMinutes} ${'reading_minutes'.tr()}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 14,
