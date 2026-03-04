@@ -6,7 +6,7 @@ import '../../../services/daily_reminder_service.dart';
 import '../statistics/widgets/digital_time_picker.dart';
 
 class CustomRemindersScreen extends StatefulWidget {
-  final VoidCallback? onRemindersChanged;
+  final Future<void> Function()? onRemindersChanged;
 
   const CustomRemindersScreen({
     super.key,
@@ -40,7 +40,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
     final updated = reminder.copyWith(isEnabled: !reminder.isEnabled);
     await DailyReminderService.updateCustomReminder(updated);
     await _loadReminders();
-    widget.onRemindersChanged?.call();
+    await widget.onRemindersChanged?.call();
   }
 
   Future<void> _deleteReminder(CustomReminder reminder) async {
@@ -111,7 +111,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
     if (confirmed == true) {
       await DailyReminderService.deleteCustomReminder(reminder.id);
       await _loadReminders();
-      widget.onRemindersChanged?.call();
+      await widget.onRemindersChanged?.call();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -131,7 +131,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
           existingReminder: existingReminder,
           onSave: () async {
             await _loadReminders();
-            widget.onRemindersChanged?.call();
+            await widget.onRemindersChanged?.call();
           },
         ),
       ),
@@ -387,7 +387,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
 // Add/Edit Custom Reminder Screen
 class AddCustomReminderScreen extends StatefulWidget {
   final CustomReminder? existingReminder;
-  final VoidCallback onSave;
+  final Future<void> Function() onSave;
 
   const AddCustomReminderScreen({
     super.key,
@@ -473,24 +473,30 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
       createdAt: widget.existingReminder?.createdAt,
     );
 
-    if (_isEditing) {
-      await DailyReminderService.updateCustomReminder(reminder);
-    } else {
-      await DailyReminderService.addCustomReminder(reminder);
+    try {
+      if (_isEditing) {
+        await DailyReminderService.updateCustomReminder(reminder);
+      } else {
+        await DailyReminderService.addCustomReminder(reminder);
+      }
+    } catch (e) {
+      print('Error saving/scheduling custom reminder: $e');
+      // Still proceed — data is saved even if notification scheduling fails
     }
 
-    widget.onSave();
+    await widget.onSave();
 
     if (mounted) {
+      final messenger = ScaffoldMessenger.of(context);
+      final snackBarBg = Theme.of(context).snackBarTheme.backgroundColor;
+      final message = _isEditing
+          ? 'custom_rem_updated'.tr()
+          : 'custom_rem_added'.tr();
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            _isEditing
-                ? 'custom_rem_updated'.tr()
-                : 'custom_rem_added'.tr(),
-          ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor,
+          content: Text(message),
+          backgroundColor: snackBarBg,
         ),
       );
     }

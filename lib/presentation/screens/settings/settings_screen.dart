@@ -580,7 +580,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                '${'settings_version'.tr()}: v1.0.8',
+                '${'settings_version'.tr()}: v1.0.9',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,

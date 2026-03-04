@@ -859,7 +859,11 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     await _saveCustomReminders(reminders);
 
     if (reminder.isEnabled) {
-      await _scheduleCustomReminderNotification(reminder);
+      try {
+        await _scheduleCustomReminderNotification(reminder);
+      } catch (e) {
+        print('Error scheduling custom reminder notification: $e');
+      }
     }
   }
 
@@ -873,9 +877,13 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       await _saveCustomReminders(reminders);
 
       // Cancel existing and reschedule if enabled
-      await _cancelCustomReminderNotification(reminder.id);
-      if (reminder.isEnabled) {
-        await _scheduleCustomReminderNotification(reminder);
+      try {
+        await _cancelCustomReminderNotification(reminder.id);
+        if (reminder.isEnabled) {
+          await _scheduleCustomReminderNotification(reminder);
+        }
+      } catch (e) {
+        print('Error rescheduling custom reminder notification: $e');
       }
     }
   }

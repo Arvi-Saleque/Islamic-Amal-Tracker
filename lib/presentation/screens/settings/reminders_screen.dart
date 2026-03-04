@@ -630,6 +630,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             tooltip: 'add_preset'.tr(),
             onPressed: _showPresetsSheet,
           ),
+          IconButton(
+            icon: Icon(Icons.settings_rounded, color: activeColor),
+            tooltip: 'reminder_settings'.tr(),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DailyReminderScreen()),
+            ),
+          ),
         ],
       ),
       floatingActionButton: ref.watch(mainShellTabIndexProvider) == 1
@@ -637,8 +645,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               onPressed: _openCustomReminders,
               backgroundColor: activeColor,
               foregroundColor: isDark ? Colors.black : cs.onPrimary,
-              icon: const Icon(Icons.add_rounded),
-              label: Text('add_reminder'.tr()),
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: Text(
+                'add_reminder'.tr(),
+                style: const TextStyle(fontSize: 12),
+              ),
+              extendedPadding: const EdgeInsets.symmetric(horizontal: 12),
+              extendedTextStyle: const TextStyle(fontSize: 12),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             )
           : null,
       body: _isLoading
@@ -669,8 +683,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     _buildSectionTitle('reminder_defaults'.tr(), activeColor),
                     const SizedBox(height: 10),
                     _buildDefaultsSection(context, activeColor),
-                    const SizedBox(height: 20),
-                    _buildSettingsLink(context, activeColor),
                   ],
                 ),
               ),
@@ -1567,62 +1579,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     );
   }
 
-  // ── Settings link ─────────────────────────────────────────────────────────
-
-  Widget _buildSettingsLink(BuildContext context, Color activeColor) {
-    final cs = Theme.of(context).colorScheme;
-
-    return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const DailyReminderScreen()),
-      ),
-      borderRadius: BorderRadius.circular(14),
-      child: buildPremiumCard(
-        context: context,
-        radius: 14,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: activeColor.withOpacity(0.14),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.settings_rounded, color: activeColor, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                    Text(
-                      'reminder_settings'.tr(),
-                      style: TextStyle(
-                        color: cs.onSurface,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'reminder_settings_subtitle'.tr(),
-                    style: TextStyle(
-                      color: cs.onSurface.withOpacity(0.55),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: cs.onSurface.withOpacity(0.4), size: 22),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
