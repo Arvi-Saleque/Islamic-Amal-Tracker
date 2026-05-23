@@ -18,7 +18,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLogin = true;
   bool _isForgotPassword = false;
   bool _showVerificationScreen = false;
@@ -63,7 +63,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         ),
       );
     }
-    
+
     try {
       await firestoreSyncService.restoreAllData();
     } catch (e) {
@@ -75,7 +75,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authNotifier = ref.read(authProvider.notifier);
-    
+
     if (_isForgotPassword) {
       final success = await authNotifier.forgotPassword(_emailController.text);
       if (success && mounted) {
@@ -224,7 +224,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               : cs.surfaceContainerHighest.withOpacity(0.4),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? cs.primary.withOpacity(0.4) : Colors.transparent,
+            color: isSelected
+                ? cs.primary.withOpacity(0.4)
+                : Colors.transparent,
           ),
         ),
         child: Row(
@@ -267,7 +269,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final cs = Theme.of(context).colorScheme;
 
     ref.listen<AuthState>(authProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
@@ -296,15 +299,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  
+
                   // Logo
-                  Image.asset(
-                    'assets/images/logo.png',
-                    width: 90,
-                    height: 90,
-                  ),
+                  Image.asset('assets/images/logo.png', width: 90, height: 90),
                   const SizedBox(height: 12),
-                  
+
                   // App title
                   Text(
                     'app_title'.tr(),
@@ -315,14 +314,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Subtitle / mode label
                   Text(
-                    _isForgotPassword 
+                    _isForgotPassword
                         ? 'forgot_password_title'.tr()
-                        : _isLogin 
-                            ? 'login_title'.tr()
-                            : 'register_title'.tr(),
+                        : _isLogin
+                        ? 'login_title'.tr()
+                        : 'register_title'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -330,7 +329,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Form
                   Form(
                     key: _formKey,
@@ -349,7 +348,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               return null;
                             },
                           ),
-                        
+
                         // Email field
                         _buildTextField(
                           controller: _emailController,
@@ -366,7 +365,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             return null;
                           },
                         ),
-                        
+
                         // Password field
                         if (!_isForgotPassword)
                           _buildTextField(
@@ -376,7 +375,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             obscureText: _obscurePassword,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: cs.onSurface.withOpacity(0.6),
                               ),
                               onPressed: () {
@@ -395,7 +396,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               return null;
                             },
                           ),
-                        
+
                         // Confirm Password field (only for register)
                         if (!_isLogin && !_isForgotPassword)
                           _buildTextField(
@@ -405,12 +406,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             obscureText: _obscureConfirmPassword,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                _obscureConfirmPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                                 color: cs.onSurface.withOpacity(0.6),
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  _obscureConfirmPassword =
+                                      !_obscureConfirmPassword;
                                 });
                               },
                             ),
@@ -424,7 +428,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               return null;
                             },
                           ),
-                        
+
                         // Forgot Password link
                         if (_isLogin && !_isForgotPassword)
                           Align(
@@ -444,15 +448,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                             ),
                           ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Submit Button
                         SizedBox(
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton(
-                            onPressed: authState.isLoading ? null : _handleSubmit,
+                            onPressed: authState.isLoading
+                                ? null
+                                : _handleSubmit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: cs.primary,
                               foregroundColor: cs.onPrimary,
@@ -471,11 +477,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     ),
                                   )
                                 : Text(
-                                    _isForgotPassword 
+                                    _isForgotPassword
                                         ? 'submit_reset'.tr()
-                                        : _isLogin 
-                                            ? 'submit_login'.tr()
-                                            : 'submit_register'.tr(),
+                                        : _isLogin
+                                        ? 'submit_login'.tr()
+                                        : 'submit_register'.tr(),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -483,9 +489,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Toggle Login/Register or Back
                         if (_isForgotPassword)
                           TextButton(
@@ -507,7 +513,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                _isLogin 
+                                _isLogin
                                     ? 'no_account'.tr()
                                     : 'have_account'.tr(),
                                 style: TextStyle(
@@ -523,7 +529,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   });
                                 },
                                 child: Text(
-                                  _isLogin ? 'register'.tr() : 'submit_login'.tr(),
+                                  _isLogin
+                                      ? 'register'.tr()
+                                      : 'submit_login'.tr(),
                                   style: TextStyle(
                                     color: cs.primary,
                                     fontSize: 14,
@@ -533,17 +541,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                             ],
                           ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Divider
                         Row(
                           children: [
                             Expanded(
-                              child: Divider(color: cs.onSurface.withOpacity(0.2)),
+                              child: Divider(
+                                color: cs.onSurface.withOpacity(0.2),
+                              ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               child: Text(
                                 'or'.tr(),
                                 style: TextStyle(
@@ -553,13 +565,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                             ),
                             Expanded(
-                              child: Divider(color: cs.onSurface.withOpacity(0.2)),
+                              child: Divider(
+                                color: cs.onSurface.withOpacity(0.2),
+                              ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         // Skip Button (Offline Mode)
                         SizedBox(
                           width: double.infinity,
@@ -567,7 +581,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           child: OutlinedButton(
                             onPressed: _handleSkip,
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: cs.onSurface.withOpacity(0.2)),
+                              side: BorderSide(
+                                color: cs.onSurface.withOpacity(0.2),
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -592,9 +608,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Info text
                         Text(
                           'offline_info'.tr(),
@@ -706,7 +722,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               Text(
                 'ইমেইল ভেরিফাই করুন',
                 style: TextStyle(
@@ -716,7 +732,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               Text(
                 'আপনার ইমেইল ঠিকানায় একটি ভেরিফিকেশন লিংক পাঠানো হয়েছে। লিংকে ক্লিক করে ইমেইল ভেরিফাই করুন, তারপর লগইন করুন।',
                 textAlign: TextAlign.center,
@@ -727,9 +743,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              
+
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: cs.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -738,7 +757,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.email, color: cs.onSurface.withOpacity(0.6), size: 20),
+                    Icon(
+                      Icons.email,
+                      color: cs.onSurface.withOpacity(0.6),
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       _emailController.text,
@@ -751,7 +774,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -774,10 +797,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               TextButton.icon(
                 onPressed: authState.isLoading ? null : _resendVerification,
-                icon: authState.isLoading 
+                icon: authState.isLoading
                     ? SizedBox(
                         width: 16,
                         height: 16,
@@ -796,7 +819,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

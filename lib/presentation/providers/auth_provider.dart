@@ -28,7 +28,8 @@ class AuthState {
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
       successMessage: successMessage,
-      needsEmailVerification: needsEmailVerification ?? this.needsEmailVerification,
+      needsEmailVerification:
+          needsEmailVerification ?? this.needsEmailVerification,
     );
   }
 
@@ -48,7 +49,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       _auth = FirebaseAuth.instance;
       _isFirebaseAvailable = true;
-      
+
       // Listen to auth state changes
       _auth!.authStateChanges().listen((user) {
         state = state.copyWith(user: user);
@@ -60,14 +61,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   // Register with Email & Password
-  Future<bool> registerWithEmail(String email, String password, String name) async {
+  Future<bool> registerWithEmail(
+    String email,
+    String password,
+    String name,
+  ) async {
     if (!_isFirebaseAvailable || _auth == null) {
       state = state.copyWith(
         errorMessage: 'Firebase উপলব্ধ নেই। অফলাইন মোডে চালিয়ে যান।',
       );
       return false;
     }
-    
+
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -79,13 +84,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       // Update display name
       await userCredential.user?.updateDisplayName(name.trim());
-      
+
       // Send email verification
       await userCredential.user?.sendEmailVerification();
-      
+
       // Sign out so user must verify first
       await _auth!.signOut();
-      
+
       state = state.copyWith(
         user: null,
         isLoading: false,
@@ -116,7 +121,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       return false;
     }
-    
+
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -124,22 +129,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
         email: email.trim(),
         password: password,
       );
-      
+
       // Check if email is verified
       if (userCredential.user != null && !userCredential.user!.emailVerified) {
         // Send another verification email
         await userCredential.user!.sendEmailVerification();
         await _auth!.signOut();
-        
+
         state = state.copyWith(
           user: null,
           isLoading: false,
           needsEmailVerification: true,
-          errorMessage: 'ইমেইল ভেরিফাই করা হয়নি। নতুন ভেরিফিকেশন লিংক পাঠানো হয়েছে।',
+          errorMessage:
+              'ইমেইল ভেরিফাই করা হয়নি। নতুন ভেরিফিকেশন লিংক পাঠানো হয়েছে।',
         );
         return false;
       }
-      
+
       state = state.copyWith(
         user: userCredential.user,
         isLoading: false,
@@ -164,17 +170,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Forgot Password
   Future<bool> forgotPassword(String email) async {
     if (!_isFirebaseAvailable || _auth == null) {
-      state = state.copyWith(
-        errorMessage: 'Firebase উপলব্ধ নেই।',
-      );
+      state = state.copyWith(errorMessage: 'Firebase উপলব্ধ নেই।');
       return false;
     }
-    
+
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
 
       await _auth!.sendPasswordResetEmail(email: email.trim());
-      
+
       state = state.copyWith(
         isLoading: false,
         successMessage: 'পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে!',
@@ -198,24 +202,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Resend verification email
   Future<bool> resendVerificationEmail(String email, String password) async {
     if (!_isFirebaseAvailable || _auth == null) {
-      state = state.copyWith(
-        errorMessage: 'Firebase উপলব্ধ নেই।',
-      );
+      state = state.copyWith(errorMessage: 'Firebase উপলব্ধ নেই।');
       return false;
     }
-    
+
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
-      
+
       // Sign in temporarily to send verification
       final userCredential = await _auth!.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
-      
+
       await userCredential.user?.sendEmailVerification();
       await _auth!.signOut();
-      
+
       state = state.copyWith(
         isLoading: false,
         successMessage: 'নতুন ভেরিফিকেশন লিংক পাঠানো হয়েছে!',
@@ -233,21 +235,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Update Display Name
   Future<bool> updateDisplayName(String name) async {
     if (!_isFirebaseAvailable || _auth == null || _auth!.currentUser == null) {
-      state = state.copyWith(
-        errorMessage: 'লগইন করা হয়নি',
-      );
+      state = state.copyWith(errorMessage: 'লগইন করা হয়নি');
       return false;
     }
-    
+
     try {
       await _auth!.currentUser!.updateDisplayName(name);
       await _auth!.currentUser!.reload();
       state = state.copyWith(user: _auth!.currentUser);
       return true;
     } catch (e) {
-      state = state.copyWith(
-        errorMessage: 'নাম আপডেট করতে সমস্যা হয়েছে',
-      );
+      state = state.copyWith(errorMessage: 'নাম আপডেট করতে সমস্যা হয়েছে');
       return false;
     }
   }
@@ -257,10 +255,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       await _auth?.signOut();
-      state = state.copyWith(
-        user: null,
-        isLoading: false,
-      );
+      state = state.copyWith(user: null, isLoading: false);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

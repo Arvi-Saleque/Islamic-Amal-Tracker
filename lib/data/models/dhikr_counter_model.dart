@@ -71,15 +71,9 @@ class DhikrCounterModel {
   final String date;
   final List<DhikrItem> items;
 
-  DhikrCounterModel({
-    required this.date,
-    required this.items,
-  });
+  DhikrCounterModel({required this.date, required this.items});
 
-  DhikrCounterModel copyWith({
-    String? date,
-    List<DhikrItem>? items,
-  }) {
+  DhikrCounterModel copyWith({String? date, List<DhikrItem>? items}) {
     return DhikrCounterModel(
       date: date ?? this.date,
       items: items ?? this.items,
@@ -87,17 +81,18 @@ class DhikrCounterModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'date': date,
-      'items': items.map((item) => item.toJson()).toList(),
-    };
+    return {'date': date, 'items': items.map((item) => item.toJson()).toList()};
   }
 
   factory DhikrCounterModel.fromJson(Map<String, dynamic> json) {
     return DhikrCounterModel(
       date: json['date'] as String,
-      items: (json['items'] as List<dynamic>?)
-              ?.map((item) => DhikrItem.fromJson(Map<String, dynamic>.from(item as Map)))
+      items:
+          (json['items'] as List<dynamic>?)
+              ?.map(
+                (item) =>
+                    DhikrItem.fromJson(Map<String, dynamic>.from(item as Map)),
+              )
               .toList() ??
           [],
     );
@@ -105,12 +100,10 @@ class DhikrCounterModel {
 
   factory DhikrCounterModel.empty() {
     final now = DateTime.now();
-    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-    return DhikrCounterModel(
-      date: dateStr,
-      items: _getDefaultDhikrItems(),
-    );
+    return DhikrCounterModel(date: dateStr, items: _getDefaultDhikrItems());
   }
 
   static List<DhikrItem> _getDefaultDhikrItems() {
@@ -134,7 +127,7 @@ class DhikrCounterModel {
         arabic: 'اللّٰهُ أَكْبَرُ',
         targetCount: 100,
       ),
-      
+
       // ইস্তিগফার
       DhikrItem(
         id: 'astaghfirullah_100',
@@ -142,7 +135,7 @@ class DhikrCounterModel {
         arabic: 'أَسْتَغْفِرُ اللّٰهَ',
         targetCount: 100,
       ),
-      
+
       // দরূদ শরীফ
       DhikrItem(
         id: 'durood_100',
@@ -150,7 +143,7 @@ class DhikrCounterModel {
         arabic: 'صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ',
         targetCount: 100,
       ),
-      
+
       // লা ইলাহা ইল্লাল্লাহ
       DhikrItem(
         id: 'kalima_100',
@@ -164,5 +157,6 @@ class DhikrCounterModel {
   int get totalCount => items.fold(0, (sum, item) => sum + item.currentCount);
   int get totalTarget => items.fold(0, (sum, item) => sum + item.targetCount);
   int get completedItemsCount => items.where((item) => item.isCompleted).length;
-  double get overallProgress => totalTarget > 0 ? totalCount / totalTarget : 0.0;
+  double get overallProgress =>
+      totalTarget > 0 ? totalCount / totalTarget : 0.0;
 }

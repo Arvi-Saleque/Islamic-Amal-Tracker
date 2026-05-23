@@ -33,18 +33,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> _updateName() async {
     if (_nameController.text.trim().isEmpty) return;
-    
+
     setState(() => _isUpdating = true);
-    
-    final success = await ref.read(authProvider.notifier).updateDisplayName(
-      _nameController.text.trim(),
-    );
-    
+
+    final success = await ref
+        .read(authProvider.notifier)
+        .updateDisplayName(_nameController.text.trim());
+
     setState(() {
       _isUpdating = false;
       if (success) _isEditing = false;
     });
-    
+
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -131,11 +131,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> _handleBackup() async {
     setState(() => _isUpdating = true);
-    
+
     final success = await firestoreSyncService.backupAllData();
-    
+
     setState(() => _isUpdating = false);
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -144,7 +144,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ? 'profile_backup_success'.tr()
                 : 'profile_backup_fail'.tr(),
           ),
-          backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
+          backgroundColor: success
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -198,8 +200,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onPrimary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -217,11 +218,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (confirm != true) return;
 
     setState(() => _isUpdating = true);
-    
+
     final success = await firestoreSyncService.restoreAllData();
-    
+
     setState(() => _isUpdating = false);
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -230,7 +231,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ? 'profile_restore_success'.tr()
                 : 'profile_restore_fail'.tr(),
           ),
-          backgroundColor: success ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
+          backgroundColor: success
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -256,20 +259,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -290,7 +295,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
         centerTitle: true,
-        
       ),
       body: user == null
           ? _buildNotLoggedIn()
@@ -299,7 +303,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  
+
                   // Profile Avatar
                   Container(
                     padding: const EdgeInsets.all(4),
@@ -312,7 +316,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
                       child: Text(
                         _getInitials(user.displayName ?? user.email ?? 'U'),
                         style: TextStyle(
@@ -324,7 +330,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Name Section
                   _buildInfoCard(
                     icon: Icons.person_outline,
@@ -335,25 +341,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               Expanded(
                                 child: TextField(
                                   controller: _nameController,
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                   decoration: InputDecoration(
                                     hintText: 'profile_name_hint'.tr(),
                                     hintStyle: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -371,19 +393,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         ),
                                       )
-                                    : Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
+                                    : Icon(
+                                        Icons.check,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
                               ),
                               IconButton(
                                 onPressed: () {
                                   setState(() {
                                     _isEditing = false;
-                                    _nameController.text = user.displayName ?? '';
+                                    _nameController.text =
+                                        user.displayName ?? '';
                                   });
                                 },
-                                icon: Icon(Icons.close, color: Theme.of(context).colorScheme.error),
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                               ),
                             ],
                           )
@@ -391,21 +424,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                user.displayName ??
-                                    'profile_name_not_set'.tr(),
+                                user.displayName ?? 'profile_name_not_set'.tr(),
                                 style: TextStyle(
                                   color: user.displayName != null
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                   fontSize: 16,
                                 ),
                               ),
                               IconButton(
-                                onPressed: () => setState(() => _isEditing = true),
+                                onPressed: () =>
+                                    setState(() => _isEditing = true),
                                 icon: Icon(
                                   Icons.edit,
                                   color: Theme.of(context).colorScheme.primary,
@@ -416,7 +447,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Email Section
                   _buildInfoCard(
                     icon: Icons.email_outlined,
@@ -439,7 +470,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -454,9 +487,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 Text(
                                   'profile_verified'.tr(),
                                   style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -467,7 +500,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Account Created
                   _buildInfoCard(
                     icon: Icons.calendar_today_outlined,
@@ -481,7 +514,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  
+
                   // Cloud Sync Section
                   buildPremiumCard(
                     context: context,
@@ -492,23 +525,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.cloud_sync, color: Theme.of(context).colorScheme.primary, size: 20),
+                            Icon(
+                              Icons.cloud_sync,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'profile_cloud_sync_label'.tr(),
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),
                             const Spacer(),
                             // Sync status indicator
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
@@ -516,18 +558,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 children: [
                                   Icon(
                                     Icons.check_circle,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     size: 12,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'profile_auto_sync_on'.tr(),
                                     style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       fontSize: 10,
                                     ),
                                   ),
@@ -545,9 +587,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 icon: const Icon(Icons.cloud_upload, size: 18),
                                 label: Text('profile_backup_btn'.tr()),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -561,21 +609,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 icon: Icon(
                                   Icons.cloud_download,
                                   size: 18,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(
                                   'profile_restore_label'.tr(),
                                   style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                                 style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  side: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -602,9 +656,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Text(
                           'profile_auto_sync_info'.tr(),
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                             fontSize: 11,
                           ),
                         ),
@@ -612,13 +666,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Logout Button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _handleLogout,
-                      icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+                      icon: Icon(
+                        Icons.logout,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                       label: Text(
                         'profile_logout'.tr(),
                         style: TextStyle(
@@ -627,7 +684,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Theme.of(context).colorScheme.error),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -655,10 +714,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Text(
             'profile_not_logged_in'.tr(),
             style: TextStyle(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontSize: 18,
             ),
           ),
@@ -704,7 +760,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: Theme.of(context).colorScheme.primary, size: 18),
+              Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 title,

@@ -52,20 +52,22 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -83,7 +85,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           ),
         ),
         centerTitle: false,
-        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -168,7 +169,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             ],
 
             // Show day details if date is selected
-            if (selectedDate != null && selectedTab == StatisticsTab.monthly) ...[
+            if (selectedDate != null &&
+                selectedTab == StatisticsTab.monthly) ...[
               const SizedBox(height: 20),
               _buildSelectedDayDetails(selectedDate!, statsState),
             ],
@@ -184,7 +186,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     final monthlyStats = statsState.data.getMonthlyStatsForMonth(
       selectedMonth.year,
       selectedMonth.month,
@@ -219,11 +221,26 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('100%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('75%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('50%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('25%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('0%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text(
+                      '100%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '75%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '50%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '25%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '0%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
                   ],
                 ),
                 const SizedBox(width: 8),
@@ -275,10 +292,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       lineBarsData: [
                         LineChartBarData(
                           spots: weeklyAverages.asMap().entries.map((entry) {
-                            return FlSpot(
-                              entry.key.toDouble(),
-                              entry.value,
-                            );
+                            return FlSpot(entry.key.toDouble(), entry.value);
                           }).toList(),
                           isCurved: true,
                           color: primary,
@@ -304,17 +318,21 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   List<double> _calculateWeeklyAverages(List<DailyStatistics> monthlyStats) {
     if (monthlyStats.isEmpty) return [0, 0, 0, 0, 0];
 
-    final daysInMonth = DateTime(selectedMonth.year, selectedMonth.month + 1, 0).day;
+    final daysInMonth = DateTime(
+      selectedMonth.year,
+      selectedMonth.month + 1,
+      0,
+    ).day;
     final weeksCount = (daysInMonth / 7).ceil();
     final weeklyAverages = <double>[];
 
     for (int week = 0; week < weeksCount; week++) {
       final startDay = week * 7 + 1;
       final endDay = (week + 1) * 7;
-      
+
       double sum = 0;
       int count = 0;
-      
+
       for (final stat in monthlyStats) {
         final dateParts = stat.date.split('-');
         if (dateParts.length == 3) {
@@ -325,7 +343,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           }
         }
       }
-      
+
       weeklyAverages.add(count > 0 ? sum / count : 0);
     }
 
@@ -336,12 +354,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     final weeksCount = (daysInMonth / 7).ceil();
     final labels = <String>[];
-    
+
     for (int week = 0; week < weeksCount; week++) {
       final startDay = week * 7 + 1;
       labels.add('$startDay');
     }
-    
+
     return labels;
   }
 
@@ -351,7 +369,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     final dateKey = _formatDate(date);
     final dayStats = statsState.data.dailyStats[dateKey];
 
@@ -390,16 +408,16 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   ),
                   Text(
                     _getWeekdayBengali(date.weekday),
-                    style: TextStyle(
-                      color: bulletTextColor,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: bulletTextColor, fontSize: 14),
                   ),
                 ],
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: shadowColor.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
@@ -437,14 +455,32 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
   String _formatDateBengali(DateTime date) {
     final months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর',
     ];
     return '${date.day} ${months[date.month - 1]}, ${date.year}';
   }
 
   String _getWeekdayBengali(int weekday) {
-    final days = ['সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার', 'রবিবার'];
+    final days = [
+      'সোমবার',
+      'মঙ্গলবার',
+      'বুধবার',
+      'বৃহস্পতিবার',
+      'শুক্রবার',
+      'শনিবার',
+      'রবিবার',
+    ];
     return days[weekday - 1];
   }
 }

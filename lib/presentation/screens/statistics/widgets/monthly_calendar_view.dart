@@ -44,10 +44,14 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
   Future<void> _loadMonthData() async {
     setState(() => _isLoading = true);
-    
+
     final scores = <String, int>{};
-    final daysInMonth = DateTime(widget.selectedMonth.year, widget.selectedMonth.month + 1, 0).day;
-    
+    final daysInMonth = DateTime(
+      widget.selectedMonth.year,
+      widget.selectedMonth.month + 1,
+      0,
+    ).day;
+
     try {
       final prayerBox = await Hive.openBox('prayer_tracking');
       final amalBox = await Hive.openBox('daily_amal');
@@ -55,8 +59,10 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
       final readingBox = await Hive.openBox('reading_tracker');
 
       for (int day = 1; day <= daysInMonth; day++) {
-        final dateKey = _formatDate(DateTime(widget.selectedMonth.year, widget.selectedMonth.month, day));
-        
+        final dateKey = _formatDate(
+          DateTime(widget.selectedMonth.year, widget.selectedMonth.month, day),
+        );
+
         // Get prayer data - Count completed prayers
         int prayersCompleted = 0;
         final prayerData = prayerBox.get(dateKey);
@@ -97,8 +103,14 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
             dhikrTarget = 0;
             for (var item in items) {
               if (item is Map) {
-                dhikrCount += (item['currentCount'] as int? ?? item['count'] as int? ?? 0);
-                dhikrTarget += (item['targetCount'] as int? ?? item['target'] as int? ?? 100);
+                dhikrCount +=
+                    (item['currentCount'] as int? ??
+                    item['count'] as int? ??
+                    0);
+                dhikrTarget +=
+                    (item['targetCount'] as int? ??
+                    item['target'] as int? ??
+                    100);
               }
             }
             if (dhikrTarget == 0) dhikrTarget = 1;
@@ -123,30 +135,33 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         double prayerProgress = prayersCompleted / 5.0;
         double amalProgress = amalCompleted / totalAmal;
         double dhikrProgress = (dhikrCount / dhikrTarget).clamp(0.0, 1.0);
-        double readingProgress = (readingMinutes / 35.0).clamp(0.0, 1.0); // 35 min target (15+10+10)
+        double readingProgress = (readingMinutes / 35.0).clamp(
+          0.0,
+          1.0,
+        ); // 35 min target (15+10+10)
 
         // Count only active categories (has some data for that day)
         double totalProgress = 0;
         int activeCategories = 0;
-        
+
         // Prayer is always counted if there's any prayer data for the day
         if (prayerData != null) {
           totalProgress += prayerProgress;
           activeCategories++;
         }
-        
+
         // Amal is counted if there's amal data
         if (amalData != null && totalAmal > 0) {
           totalProgress += amalProgress;
           activeCategories++;
         }
-        
+
         // Dhikr is counted only if user has done some dhikr
         if (dhikrData != null && dhikrCount > 0) {
           totalProgress += dhikrProgress;
           activeCategories++;
         }
-        
+
         // Reading is counted only if user has read something
         if (readingData != null && readingMinutes > 0) {
           totalProgress += readingProgress;
@@ -157,10 +172,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         if (activeCategories > 0) {
           score = ((totalProgress / activeCategories) * 100).toInt();
         }
-        
+
         // Debug log
-        debugPrint('$dateKey: Prayer=$prayersCompleted/5, Amal=$amalCompleted/$totalAmal, Dhikr=$dhikrCount/$dhikrTarget, Read=${readingMinutes}min, Active=$activeCategories -> Score=$score%');
-        
+        debugPrint(
+          '$dateKey: Prayer=$prayersCompleted/5, Amal=$amalCompleted/$totalAmal, Dhikr=$dhikrCount/$dhikrTarget, Read=${readingMinutes}min, Active=$activeCategories -> Score=$score%',
+        );
+
         if (score > 0) {
           scores[dateKey] = score;
         }
@@ -203,7 +220,9 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     if (score == 0) {
       return Theme.of(context).shadowColor.withOpacity(0.2); // ধূসর (0%)
     } else if (score < 80) {
-      return Theme.of(context).colorScheme.primary.withOpacity(0.4); // হালকা/ডিম গোল্ড (1-79%)
+      return Theme.of(
+        context,
+      ).colorScheme.primary.withOpacity(0.4); // হালকা/ডিম গোল্ড (1-79%)
     }
     return Theme.of(context).colorScheme.primary; // ফুল গোল্ড (80%+)
   }
@@ -214,9 +233,17 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     final primary = Theme.of(context).colorScheme.primary;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletColor = gradients.bulletTextColor;
-    
-    final daysInMonth = DateTime(widget.selectedMonth.year, widget.selectedMonth.month + 1, 0).day;
-    final firstDayOfMonth = DateTime(widget.selectedMonth.year, widget.selectedMonth.month, 1);
+
+    final daysInMonth = DateTime(
+      widget.selectedMonth.year,
+      widget.selectedMonth.month + 1,
+      0,
+    ).day;
+    final firstDayOfMonth = DateTime(
+      widget.selectedMonth.year,
+      widget.selectedMonth.month,
+      1,
+    );
     int startingWeekday = firstDayOfMonth.weekday;
     int adjustedStartDay = (startingWeekday + 1) % 7;
 
@@ -232,10 +259,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
             children: [
               IconButton(
                 onPressed: () {
-                  widget.onMonthChanged(DateTime(
-                    widget.selectedMonth.year,
-                    widget.selectedMonth.month - 1,
-                  ));
+                  widget.onMonthChanged(
+                    DateTime(
+                      widget.selectedMonth.year,
+                      widget.selectedMonth.month - 1,
+                    ),
+                  );
                 },
                 icon: Icon(Icons.chevron_left, color: bulletColor),
               ),
@@ -249,10 +278,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
               ),
               IconButton(
                 onPressed: () {
-                  widget.onMonthChanged(DateTime(
-                    widget.selectedMonth.year,
-                    widget.selectedMonth.month + 1,
-                  ));
+                  widget.onMonthChanged(
+                    DateTime(
+                      widget.selectedMonth.year,
+                      widget.selectedMonth.month + 1,
+                    ),
+                  );
                 },
                 icon: Icon(Icons.chevron_right, color: bulletColor),
               ),
@@ -276,78 +307,103 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           const SizedBox(height: 12),
 
           // Calendar Grid
-          _isLoading 
-            ? SizedBox(
-                height: 200,
-                child: Center(
-                  child: CircularProgressIndicator(color: primary),
-                ),
-              )
-            : GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
-            ),
-            itemCount: 42, // 6 rows * 7 days
-            itemBuilder: (context, index) {
-              final dayNumber = index - adjustedStartDay + 1;
-              
-              if (dayNumber < 1 || dayNumber > daysInMonth) {
-                return const SizedBox();
-              }
-
-              final date = DateTime(widget.selectedMonth.year, widget.selectedMonth.month, dayNumber);
-              final dateKey = _formatDate(date);
-              final score = _monthScores[dateKey] ?? 0;
-              final isSelected = widget.selectedDate != null &&
-                  widget.selectedDate!.year == date.year &&
-                  widget.selectedDate!.month == date.month &&
-                  widget.selectedDate!.day == date.day;
-              final isToday = DateTime.now().year == date.year &&
-                  DateTime.now().month == date.month &&
-                  DateTime.now().day == date.day;
-
-              return GestureDetector(
-                onTap: () => widget.onDateSelected(date),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _getDateColor(context, score),
-                    borderRadius: BorderRadius.circular(8),
-                    border: isSelected
-                        ? Border.all(color: primary, width: 2)
-                        : isToday
-                            ? Border.all(color: primary.withOpacity(0.5), width: 1)
-                            : null,
-                  ),
+          _isLoading
+              ? SizedBox(
+                  height: 200,
                   child: Center(
-                    child: Text(
-                      '$dayNumber',
-                      style: TextStyle(
-                        color: score > 0 ? Theme.of(context).colorScheme.onSurface : bulletColor,
-                        fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 13,
-                      ),
-                    ),
+                    child: CircularProgressIndicator(color: primary),
                   ),
+                )
+              : GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                  ),
+                  itemCount: 42, // 6 rows * 7 days
+                  itemBuilder: (context, index) {
+                    final dayNumber = index - adjustedStartDay + 1;
+
+                    if (dayNumber < 1 || dayNumber > daysInMonth) {
+                      return const SizedBox();
+                    }
+
+                    final date = DateTime(
+                      widget.selectedMonth.year,
+                      widget.selectedMonth.month,
+                      dayNumber,
+                    );
+                    final dateKey = _formatDate(date);
+                    final score = _monthScores[dateKey] ?? 0;
+                    final isSelected =
+                        widget.selectedDate != null &&
+                        widget.selectedDate!.year == date.year &&
+                        widget.selectedDate!.month == date.month &&
+                        widget.selectedDate!.day == date.day;
+                    final isToday =
+                        DateTime.now().year == date.year &&
+                        DateTime.now().month == date.month &&
+                        DateTime.now().day == date.day;
+
+                    return GestureDetector(
+                      onTap: () => widget.onDateSelected(date),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _getDateColor(context, score),
+                          borderRadius: BorderRadius.circular(8),
+                          border: isSelected
+                              ? Border.all(color: primary, width: 2)
+                              : isToday
+                              ? Border.all(
+                                  color: primary.withOpacity(0.5),
+                                  width: 1,
+                                )
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$dayNumber',
+                            style: TextStyle(
+                              color: score > 0
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : bulletColor,
+                              fontWeight: isSelected || isToday
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
           const SizedBox(height: 16),
 
           // Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _LegendItem(color: shadowColor.withOpacity(0.2), label: '0%', textColor: bulletColor),
+              _LegendItem(
+                color: shadowColor.withOpacity(0.2),
+                label: '0%',
+                textColor: bulletColor,
+              ),
               const SizedBox(width: 16),
-              _LegendItem(color: primary.withOpacity(0.4), label: '1-79%', textColor: bulletColor),
+              _LegendItem(
+                color: primary.withOpacity(0.4),
+                label: '1-79%',
+                textColor: bulletColor,
+              ),
               const SizedBox(width: 16),
-              _LegendItem(color: primary, label: '80%+', textColor: bulletColor),
+              _LegendItem(
+                color: primary,
+                label: '80%+',
+                textColor: bulletColor,
+              ),
             ],
           ),
         ],
@@ -404,13 +460,7 @@ class _LegendItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 10,
-          ),
-        ),
+        Text(label, style: TextStyle(color: textColor, fontSize: 10)),
       ],
     );
   }

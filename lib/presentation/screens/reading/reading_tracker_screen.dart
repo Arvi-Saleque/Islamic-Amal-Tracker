@@ -38,20 +38,22 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -79,7 +81,6 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
             onPressed: () => _showInfoBottomSheet(context),
           ),
         ],
-        
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -134,7 +135,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
         builder: (context) {
           final cs = Theme.of(context).colorScheme;
           final gradients = Theme.of(context).extension<GradientColors>()!;
-          
+
           return FloatingActionButton(
             mini: true,
             onPressed: () => _showGoalSettingsDialog(context, readingNotifier),
@@ -174,8 +175,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: cs.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -241,9 +244,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           value: data.overallProgress,
                           strokeWidth: 8,
                           backgroundColor: cs.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            cs.primary,
-                          ),
+                          valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
                         ),
                       ),
                       Text(
@@ -300,11 +301,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                           color: cs.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(
-                          icon,
-                          color: cs.primary,
-                          size: 28,
-                        ),
+                        child: Icon(icon, color: cs.primary, size: 28),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -360,9 +357,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       value: progress,
                       minHeight: 8,
                       backgroundColor: cs.surfaceContainerHighest,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        cs.primary,
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
                     ),
                   ),
                 ],
@@ -401,10 +396,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: cs.outline.withOpacity(0.3),
-            width: 0.5,
-          ),
+          bottom: BorderSide(color: cs.outline.withOpacity(0.3), width: 0.5),
         ),
       ),
       child: Row(
@@ -415,11 +407,7 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
               color: cs.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              Icons.check_circle,
-              color: cs.primary,
-              size: 20,
-            ),
+            child: Icon(Icons.check_circle, color: cs.primary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -522,167 +510,171 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                   ),
                   const SizedBox(height: 20),
                   TextField(
-                  controller: titleController,
-                  style: TextStyle(color: cs.onSurface),
-                  decoration: InputDecoration(
-                    labelText: type == ReadingType.quran
-                        ? 'reading_quran_name'.tr()
-                        : type == ReadingType.tafsir
-                            ? 'reading_tafsir_name'.tr()
-                            : 'reading_hadith_name'.tr(),
-                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                    filled: true,
-                    fillColor: cs.surfaceContainerHighest,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.primary),
+                    controller: titleController,
+                    style: TextStyle(color: cs.onSurface),
+                    decoration: InputDecoration(
+                      labelText: type == ReadingType.quran
+                          ? 'reading_quran_name'.tr()
+                          : type == ReadingType.tafsir
+                          ? 'reading_tafsir_name'.tr()
+                          : 'reading_hadith_name'.tr(),
+                      labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                      filled: true,
+                      fillColor: cs.surfaceContainerHighest,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.primary),
+                      ),
                     ),
                   ),
-                ),
-                if (type == ReadingType.quran) ...[
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: fromAyahController,
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(color: cs.onSurface),
-                          decoration: InputDecoration(
-                            labelText: 'reading_quran_from_ayah'.tr(),
-                            labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                            filled: true,
-                            fillColor: cs.surfaceContainerHighest,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.outline),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.primary),
+                  if (type == ReadingType.quran) ...[
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: fromAyahController,
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(color: cs.onSurface),
+                            decoration: InputDecoration(
+                              labelText: 'reading_quran_from_ayah'.tr(),
+                              labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                              filled: true,
+                              fillColor: cs.surfaceContainerHighest,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: cs.outline),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: cs.primary),
+                              ),
                             ),
                           ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: toAyahController,
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(color: cs.onSurface),
+                            decoration: InputDecoration(
+                              labelText: 'reading_quran_to_ayah'.tr(),
+                              labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                              filled: true,
+                              fillColor: cs.surfaceContainerHighest,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: cs.outline),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: cs.primary),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: minutesController,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: cs.onSurface),
+                    decoration: InputDecoration(
+                      labelText: 'reading_time_minutes'.tr(),
+                      labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                      filled: true,
+                      fillColor: cs.surfaceContainerHighest,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.primary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: notesController,
+                    style: TextStyle(color: cs.onSurface),
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: 'reading_notes_optional'.tr(),
+                      labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                      filled: true,
+                      fillColor: cs.surfaceContainerHighest,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.outline),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: cs.primary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'cancel'.tr(),
+                          style: TextStyle(color: cs.onSurfaceVariant),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: toAyahController,
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(color: cs.onSurface),
-                          decoration: InputDecoration(
-                            labelText: 'reading_quran_to_ayah'.tr(),
-                            labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                            filled: true,
-                            fillColor: cs.surfaceContainerHighest,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.outline),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.primary),
-                            ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (titleController.text.isNotEmpty) {
+                            final minutes =
+                                int.tryParse(minutesController.text) ?? 15;
+                            final fromAyah = int.tryParse(
+                              fromAyahController.text,
+                            );
+                            final toAyah = int.tryParse(toAyahController.text);
+
+                            notifier.addSession(
+                              type: type,
+                              title: titleController.text,
+                              surahName: type == ReadingType.quran
+                                  ? titleController.text
+                                  : null,
+                              fromAyah: fromAyah,
+                              toAyah: toAyah,
+                              notes: notesController.text.isEmpty
+                                  ? null
+                                  : notesController.text,
+                              durationMinutes: minutes,
+                            );
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: cs.primary,
+                          foregroundColor: gradients.onPrimaryText,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        child: Text('reading_add_session'.tr()),
                       ),
                     ],
                   ),
                 ],
-                const SizedBox(height: 16),
-                TextField(
-                  controller: minutesController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: cs.onSurface),
-                  decoration: InputDecoration(
-                    labelText: 'reading_time_minutes'.tr(),
-                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                    filled: true,
-                    fillColor: cs.surfaceContainerHighest,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.primary),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: notesController,
-                  style: TextStyle(color: cs.onSurface),
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    labelText: 'reading_notes_optional'.tr(),
-                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
-                    filled: true,
-                    fillColor: cs.surfaceContainerHighest,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: cs.primary),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        'cancel'.tr(),
-                        style: TextStyle(color: cs.onSurfaceVariant),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (titleController.text.isNotEmpty) {
-                          final minutes = int.tryParse(minutesController.text) ?? 15;
-                          final fromAyah = int.tryParse(fromAyahController.text);
-                          final toAyah = int.tryParse(toAyahController.text);
-
-                          notifier.addSession(
-                            type: type,
-                            title: titleController.text,
-                            surahName:
-                                type == ReadingType.quran ? titleController.text : null,
-                            fromAyah: fromAyah,
-                            toAyah: toAyah,
-                            notes: notesController.text.isEmpty
-                                ? null
-                                : notesController.text,
-                            durationMinutes: minutes,
-                          );
-                          Navigator.pop(context);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: cs.primary,
-                        foregroundColor: gradients.onPrimaryText,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text('reading_add_session'.tr()),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      );
+        );
       },
     );
   }
@@ -719,12 +711,10 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'reading_delete_session_confirm'
-                      .tr(namedArgs: {'title': session.title}),
-                  style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 14,
+                  'reading_delete_session_confirm'.tr(
+                    namedArgs: {'title': session.title},
                   ),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -878,9 +868,12 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                     ElevatedButton(
                       onPressed: () {
                         notifier.updateGoal(
-                          quranMinutes: int.tryParse(quranController.text) ?? 15,
-                          tafsirMinutes: int.tryParse(tafsirController.text) ?? 10,
-                          hadithMinutes: int.tryParse(hadithController.text) ?? 10,
+                          quranMinutes:
+                              int.tryParse(quranController.text) ?? 15,
+                          tafsirMinutes:
+                              int.tryParse(tafsirController.text) ?? 10,
+                          hadithMinutes:
+                              int.tryParse(hadithController.text) ?? 10,
                         );
                         Navigator.pop(context);
                       },
@@ -909,7 +902,9 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
+      backgroundColor: Theme.of(
+        context,
+      ).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.86,
@@ -928,10 +923,9 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -943,15 +937,16 @@ class _ReadingTrackerScreenState extends ConsumerState<ReadingTrackerScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.15),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.info_outline_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 24),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1136,10 +1131,7 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
-  });
+  const _SectionHeader({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -1156,8 +1148,13 @@ class _SectionHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: Theme.of(context).extension<GradientColors>()!.onPrimaryText, size: 18),
+            child: Icon(
+              icon,
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.onPrimaryText,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1181,10 +1178,7 @@ class _HadithCard extends StatelessWidget {
   final String hadith;
   final String reference;
 
-  const _HadithCard({
-    required this.hadith,
-    required this.reference,
-  });
+  const _HadithCard({required this.hadith, required this.reference});
 
   @override
   Widget build(BuildContext context) {
@@ -1206,12 +1200,16 @@ class _HadithCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.format_quote_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 14),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1247,7 +1245,7 @@ class _HadithCard extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

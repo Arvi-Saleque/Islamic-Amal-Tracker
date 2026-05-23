@@ -5,7 +5,7 @@ class ResponsiveUtils {
   /// Get adaptive font size based on screen width
   static double getAdaptiveFontSize(BuildContext context, double baseFontSize) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     // Small phones (width < 360)
     if (screenWidth < 360) {
       return baseFontSize * 0.85;
@@ -27,7 +27,7 @@ class ResponsiveUtils {
   /// Get adaptive padding based on screen width
   static double getAdaptivePadding(BuildContext context, double basePadding) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     if (screenWidth < 360) {
       return basePadding * 0.8;
     } else if (screenWidth < 400) {
@@ -42,7 +42,7 @@ class ResponsiveUtils {
   /// Get adaptive icon size based on screen width
   static double getAdaptiveIconSize(BuildContext context, double baseIconSize) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     if (screenWidth < 360) {
       return baseIconSize * 0.85;
     } else if (screenWidth < 400) {
@@ -67,7 +67,7 @@ class ResponsiveUtils {
   /// Get adaptive horizontal margin
   static double getHorizontalMargin(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     if (screenWidth < 360) {
       return 12;
     } else if (screenWidth < 400) {
@@ -83,30 +83,30 @@ class ResponsiveUtils {
 /// Extension on BuildContext for easy access to responsive utilities
 extension ResponsiveExtension on BuildContext {
   /// Get adaptive font size
-  double adaptiveFontSize(double baseSize) => 
+  double adaptiveFontSize(double baseSize) =>
       ResponsiveUtils.getAdaptiveFontSize(this, baseSize);
-  
+
   /// Get adaptive padding
-  double adaptivePadding(double baseSize) => 
+  double adaptivePadding(double baseSize) =>
       ResponsiveUtils.getAdaptivePadding(this, baseSize);
-  
+
   /// Get adaptive icon size
-  double adaptiveIconSize(double baseSize) => 
+  double adaptiveIconSize(double baseSize) =>
       ResponsiveUtils.getAdaptiveIconSize(this, baseSize);
-  
+
   /// Check if small screen
   bool get isSmallScreen => ResponsiveUtils.isSmallScreen(this);
-  
+
   /// Check if tablet
   bool get isTablet => ResponsiveUtils.isTablet(this);
-  
+
   /// Get horizontal margin
   double get horizontalMargin => ResponsiveUtils.getHorizontalMargin(this);
-  
+
   /// Get screen width
   double get screenWidth => MediaQuery.of(this).size.width;
-  
-  /// Get screen height  
+
+  /// Get screen height
   double get screenHeight => MediaQuery.of(this).size.height;
 }
 

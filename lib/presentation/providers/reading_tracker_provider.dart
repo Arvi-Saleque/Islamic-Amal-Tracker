@@ -9,12 +9,15 @@ Map<String, dynamic> _deepConvert(Map data) {
     if (value is Map) {
       return MapEntry(key.toString(), _deepConvert(value));
     } else if (value is List) {
-      return MapEntry(key.toString(), value.map((e) {
-        if (e is Map) {
-          return _deepConvert(e);
-        }
-        return e;
-      }).toList());
+      return MapEntry(
+        key.toString(),
+        value.map((e) {
+          if (e is Map) {
+            return _deepConvert(e);
+          }
+          return e;
+        }).toList(),
+      );
     }
     return MapEntry(key.toString(), value);
   });
@@ -24,10 +27,7 @@ class ReadingTrackerState {
   final ReadingTrackerModel todayData;
   final bool isLoading;
 
-  ReadingTrackerState({
-    required this.todayData,
-    this.isLoading = false,
-  });
+  ReadingTrackerState({required this.todayData, this.isLoading = false});
 
   ReadingTrackerState copyWith({
     ReadingTrackerModel? todayData,
@@ -44,7 +44,7 @@ class ReadingTrackerNotifier extends StateNotifier<ReadingTrackerState> {
   Box? _box;
 
   ReadingTrackerNotifier()
-      : super(ReadingTrackerState(todayData: ReadingTrackerModel.empty())) {
+    : super(ReadingTrackerState(todayData: ReadingTrackerModel.empty())) {
     _init();
   }
 
@@ -111,7 +111,8 @@ class ReadingTrackerNotifier extends StateNotifier<ReadingTrackerState> {
     _saveToHive();
   }
 
-  void updateSession(String sessionId, {
+  void updateSession(
+    String sessionId, {
     String? title,
     int? surahNumber,
     String? surahName,
@@ -158,27 +159,21 @@ class ReadingTrackerNotifier extends StateNotifier<ReadingTrackerState> {
     _saveToHive();
   }
 
-  void updateGoal({
-    int? quranMinutes,
-    int? tafsirMinutes,
-    int? hadithMinutes,
-  }) {
+  void updateGoal({int? quranMinutes, int? tafsirMinutes, int? hadithMinutes}) {
     final newGoal = DailyReadingGoal(
       quranMinutes: quranMinutes ?? state.todayData.goal.quranMinutes,
       tafsirMinutes: tafsirMinutes ?? state.todayData.goal.tafsirMinutes,
       hadithMinutes: hadithMinutes ?? state.todayData.goal.hadithMinutes,
     );
 
-    state = state.copyWith(
-      todayData: state.todayData.copyWith(goal: newGoal),
-    );
+    state = state.copyWith(todayData: state.todayData.copyWith(goal: newGoal));
     _saveToHive();
   }
 
   void _saveToHive() {
     final json = state.todayData.toJson();
     _box?.put(_todayKey, json);
-    
+
     // Sync to cloud
     firestoreSyncService.syncReadingTracker(_todayKey, json);
   }
@@ -202,5 +197,5 @@ class ReadingTrackerNotifier extends StateNotifier<ReadingTrackerState> {
 
 final readingTrackerProvider =
     StateNotifierProvider<ReadingTrackerNotifier, ReadingTrackerState>((ref) {
-  return ReadingTrackerNotifier();
-});
+      return ReadingTrackerNotifier();
+    });

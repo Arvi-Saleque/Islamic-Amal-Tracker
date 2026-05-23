@@ -141,7 +141,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     final dailySettings = await DailyReminderService.getReminderSettings();
     final dhikrSettings = await DailyReminderService.getDhikrReminderSettings();
-    final prayerSettings = await DailyReminderService.getPrayerReminderSettings();
+    final prayerSettings =
+        await DailyReminderService.getPrayerReminderSettings();
     final customReminders = await DailyReminderService.getCustomReminders();
     final prayerTimes = ref.read(prayerTimesProvider).prayerTimes;
 
@@ -155,10 +156,18 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       _isMorningDhikrEnabled = dhikrSettings['morningEnabled'] ?? false;
       _isEveningDhikrEnabled = dhikrSettings['eveningEnabled'] ?? false;
 
-      final morningDefault = _calcTime(prayerTimes, 'fajr', 30,
-          fallback: const TimeOfDay(hour: 6, minute: 30));
-      final eveningDefault = _calcTime(prayerTimes, 'maghrib', 25,
-          fallback: const TimeOfDay(hour: 18, minute: 25));
+      final morningDefault = _calcTime(
+        prayerTimes,
+        'fajr',
+        30,
+        fallback: const TimeOfDay(hour: 6, minute: 30),
+      );
+      final eveningDefault = _calcTime(
+        prayerTimes,
+        'maghrib',
+        25,
+        fallback: const TimeOfDay(hour: 18, minute: 25),
+      );
 
       _morningDhikrTime = TimeOfDay(
         hour: dhikrSettings['morningHour'] ?? morningDefault.hour,
@@ -174,11 +183,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         final savedHour = prayerSettings['${key}_hour'];
         final savedMinute = prayerSettings['${key}_minute'];
         if (savedHour != null && savedMinute != null) {
-          _prayerReminderTimes[prayer] =
-              TimeOfDay(hour: savedHour, minute: savedMinute);
+          _prayerReminderTimes[prayer] = TimeOfDay(
+            hour: savedHour,
+            minute: savedMinute,
+          );
         } else {
-          _prayerReminderTimes[prayer] =
-              _calcDefaultPrayerTime(prayer, prayerTimes);
+          _prayerReminderTimes[prayer] = _calcDefaultPrayerTime(
+            prayer,
+            prayerTimes,
+          );
         }
       }
 
@@ -189,20 +202,48 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       _customReminders = customReminders;
 
       // Default times for summary
-      _defaultFajrTime = _calcTime(prayerTimes, 'fajr', 5,
-          fallback: const TimeOfDay(hour: 5, minute: 35));
-      _defaultZuhrTime = _calcTime(prayerTimes, 'dhuhr', 60,
-          fallback: const TimeOfDay(hour: 14, minute: 30));
-      _defaultAsrTime = _calcTime(prayerTimes, 'asr', 15,
-          fallback: const TimeOfDay(hour: 16, minute: 30));
-      _defaultMaghribTime = _calcTime(prayerTimes, 'maghrib', 10,
-          fallback: const TimeOfDay(hour: 18, minute: 35));
-      _defaultIshaTime = _calcTime(prayerTimes, 'isha', 30,
-          fallback: const TimeOfDay(hour: 21, minute: 30));
-      _defaultMorningDhikrTime = _calcTime(prayerTimes, 'fajr', 30,
-          fallback: const TimeOfDay(hour: 6, minute: 30));
-      _defaultEveningDhikrTime = _calcTime(prayerTimes, 'maghrib', 30,
-          fallback: const TimeOfDay(hour: 18, minute: 30));
+      _defaultFajrTime = _calcTime(
+        prayerTimes,
+        'fajr',
+        5,
+        fallback: const TimeOfDay(hour: 5, minute: 35),
+      );
+      _defaultZuhrTime = _calcTime(
+        prayerTimes,
+        'dhuhr',
+        60,
+        fallback: const TimeOfDay(hour: 14, minute: 30),
+      );
+      _defaultAsrTime = _calcTime(
+        prayerTimes,
+        'asr',
+        15,
+        fallback: const TimeOfDay(hour: 16, minute: 30),
+      );
+      _defaultMaghribTime = _calcTime(
+        prayerTimes,
+        'maghrib',
+        10,
+        fallback: const TimeOfDay(hour: 18, minute: 35),
+      );
+      _defaultIshaTime = _calcTime(
+        prayerTimes,
+        'isha',
+        30,
+        fallback: const TimeOfDay(hour: 21, minute: 30),
+      );
+      _defaultMorningDhikrTime = _calcTime(
+        prayerTimes,
+        'fajr',
+        30,
+        fallback: const TimeOfDay(hour: 6, minute: 30),
+      );
+      _defaultEveningDhikrTime = _calcTime(
+        prayerTimes,
+        'maghrib',
+        30,
+        fallback: const TimeOfDay(hour: 18, minute: 30),
+      );
 
       _isLoading = false;
     });
@@ -224,7 +265,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   TimeOfDay _calcDefaultPrayerTime(
-      PrayerName prayer, Map<String, DateTime>? prayerTimes) {
+    PrayerName prayer,
+    Map<String, DateTime>? prayerTimes,
+  ) {
     const offsets = {
       PrayerName.fajr: 30,
       PrayerName.dhuhr: 60,
@@ -239,8 +282,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       PrayerName.maghrib: TimeOfDay(hour: 18, minute: 10),
       PrayerName.isha: TimeOfDay(hour: 20, minute: 30),
     };
-    return _calcTime(prayerTimes, prayer.name, offsets[prayer]!,
-        fallback: fallbacks[prayer]!);
+    return _calcTime(
+      prayerTimes,
+      prayer.name,
+      offsets[prayer]!,
+      fallback: fallbacks[prayer]!,
+    );
   }
 
   Future<void> _scheduleAllReminders() async {
@@ -297,9 +344,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   Future<void> _pickTime(
-      TimeOfDay current, ValueChanged<TimeOfDay> onPicked) async {
-    final picked =
-        await DigitalTimePicker.show(context: context, initialTime: current);
+    TimeOfDay current,
+    ValueChanged<TimeOfDay> onPicked,
+  ) async {
+    final picked = await DigitalTimePicker.show(
+      context: context,
+      initialTime: current,
+    );
     if (picked != null) {
       onPicked(picked);
       await _scheduleAllReminders();
@@ -334,22 +385,39 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     }
 
     // Default system reminders (always on)
-    add('default_fajr', 'ফজরের পর (ডিফল্ট)', _defaultFajrTime,
-        isDefault: true);
-    add('default_dhuhr', 'যোহরের পর (ডিফল্ট)', _defaultZuhrTime,
-        isDefault: true);
+    add('default_fajr', 'ফজরের পর (ডিফল্ট)', _defaultFajrTime, isDefault: true);
+    add(
+      'default_dhuhr',
+      'যোহরের পর (ডিফল্ট)',
+      _defaultZuhrTime,
+      isDefault: true,
+    );
     add('default_asr', 'আসরের পর (ডিফল্ট)', _defaultAsrTime, isDefault: true);
-    add('default_maghrib', 'মাগরিবের পর (ডিফল্ট)', _defaultMaghribTime,
-        isDefault: true);
+    add(
+      'default_maghrib',
+      'মাগরিবের পর (ডিফল্ট)',
+      _defaultMaghribTime,
+      isDefault: true,
+    );
     add('default_isha', 'ইশার পর (ডিফল্ট)', _defaultIshaTime, isDefault: true);
-    add('default_morning_dhikr', 'সকালের যিকির (ডিফল্ট)',
-        _defaultMorningDhikrTime,
-        isDefault: true);
-    add('default_evening_dhikr', 'সন্ধ্যার যিকির (ডিফল্ট)',
-        _defaultEveningDhikrTime,
-        isDefault: true);
-    add('default_daily_amal', 'দৈনিক আমল (ডিফল্ট)', _defaultDailyAmalTime,
-        isDefault: true);
+    add(
+      'default_morning_dhikr',
+      'সকালের যিকির (ডিফল্ট)',
+      _defaultMorningDhikrTime,
+      isDefault: true,
+    );
+    add(
+      'default_evening_dhikr',
+      'সন্ধ্যার যিকির (ডিফল্ট)',
+      _defaultEveningDhikrTime,
+      isDefault: true,
+    );
+    add(
+      'default_daily_amal',
+      'দৈনিক আমল (ডিফল্ট)',
+      _defaultDailyAmalTime,
+      isDefault: true,
+    );
 
     // User-toggled \"personal\" reminders
     if (_isDailyReminderEnabled) {
@@ -383,14 +451,21 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           r.fixedHour != null &&
           r.fixedMinute != null) {
         final dt = DateTime(
-            now.year, now.month, now.day, r.fixedHour!, r.fixedMinute!);
-        items.add(_ReminderItem(
-          id: 'custom_${r.id}',
-          title: r.title,
-          time: dt,
-          isPassed: now.isAfter(dt),
-          isCustom: true,
-        ));
+          now.year,
+          now.month,
+          now.day,
+          r.fixedHour!,
+          r.fixedMinute!,
+        );
+        items.add(
+          _ReminderItem(
+            id: 'custom_${r.id}',
+            title: r.title,
+            time: dt,
+            isPassed: now.isAfter(dt),
+            isCustom: true,
+          ),
+        );
       }
     }
 
@@ -473,17 +548,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-            Text(
-              'preset_add_quick'.tr(),
-              style: TextStyle(
-                color: activeColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'preset_select'.tr(),
+                    Text(
+                      'preset_add_quick'.tr(),
+                      style: TextStyle(
+                        color: activeColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'preset_select'.tr(),
                       style: TextStyle(
                         color: cs.onSurface.withOpacity(0.55),
                         fontSize: 13,
@@ -499,11 +574,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   shrinkWrap: true,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                   children: _presets.map((preset) {
-                    final alreadyAdded = _customReminders
-                        .any((r) => r.title == preset.title);
+                    final alreadyAdded = _customReminders.any(
+                      (r) => r.title == preset.title,
+                    );
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 2),
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -532,10 +610,16 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                         ),
                       ),
                       trailing: alreadyAdded
-                          ? const Icon(Icons.check_circle_rounded,
-                              color: Colors.green, size: 22)
-                          : Icon(Icons.add_circle_outline_rounded,
-                              color: activeColor, size: 22),
+                          ? const Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.green,
+                              size: 22,
+                            )
+                          : Icon(
+                              Icons.add_circle_outline_rounded,
+                              color: activeColor,
+                              size: 22,
+                            ),
                       onTap: alreadyAdded
                           ? null
                           : () {
@@ -572,9 +656,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CustomRemindersScreen(
-          onRemindersChanged: _loadAllSettings,
-        ),
+        builder: (_) =>
+            CustomRemindersScreen(onRemindersChanged: _loadAllSettings),
       ),
     );
     await _loadAllSettings();
@@ -604,10 +687,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               colors: gradients.appBarGradient,
             ),
             border: Border(
-              bottom: BorderSide(
-                color: gradients.appBarBorder,
-                width: 1.5,
-              ),
+              bottom: BorderSide(color: gradients.appBarBorder, width: 1.5),
             ),
           ),
         ),
@@ -801,8 +881,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: activeColor.withOpacity(0.2)),
                 ),
-                child: Icon(Icons.notifications_active_rounded,
-                    color: activeColor, size: 22),
+                child: Icon(
+                  Icons.notifications_active_rounded,
+                  color: activeColor,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -829,8 +912,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: activeColor,
                   borderRadius: BorderRadius.circular(20),
@@ -880,7 +965,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           if (pendingItems.isNotEmpty) ...[
             const SizedBox(height: 8),
             InkWell(
-              onTap: () => setState(() => _showTodayDetails = !_showTodayDetails),
+              onTap: () =>
+                  setState(() => _showTodayDetails = !_showTodayDetails),
               borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
@@ -888,7 +974,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _showTodayDetails ? 'reminder_see_less'.tr() : '${'reminder_see_all'.tr()} (${pendingItems.length})',
+                      _showTodayDetails
+                          ? 'reminder_see_less'.tr()
+                          : '${'reminder_see_all'.tr()} (${pendingItems.length})',
                       style: TextStyle(
                         color: activeColor,
                         fontSize: 12,
@@ -927,7 +1015,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         child: Row(
                           children: [
                             Container(
@@ -938,8 +1028,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                                 color: r.isDefault
                                     ? Colors.green
                                     : r.isCustom
-                                        ? activeColor.withOpacity(0.7)
-                                        : activeColor,
+                                    ? activeColor.withOpacity(0.7)
+                                    : activeColor,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -964,7 +1054,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                               const SizedBox(width: 6),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.green.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(6),
@@ -1121,19 +1213,23 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 }),
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: activeColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
-                    border:
-                        Border.all(color: activeColor.withOpacity(0.25)),
+                    border: Border.all(color: activeColor.withOpacity(0.25)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.access_time_rounded,
-                          color: activeColor, size: 14),
+                      Icon(
+                        Icons.access_time_rounded,
+                        color: activeColor,
+                        size: 14,
+                      ),
                       const SizedBox(width: 5),
                       Text(
                         _formatTime(time),
@@ -1144,8 +1240,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Icon(Icons.edit_rounded,
-                          color: activeColor.withOpacity(0.7), size: 12),
+                      Icon(
+                        Icons.edit_rounded,
+                        color: activeColor.withOpacity(0.7),
+                        size: 12,
+                      ),
                     ],
                   ),
                 ),
@@ -1263,12 +1362,17 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 2, vertical: 4),
+                        horizontal: 2,
+                        vertical: 4,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.access_time_rounded,
-                              color: activeColor, size: 13),
+                          Icon(
+                            Icons.access_time_rounded,
+                            color: activeColor,
+                            size: 13,
+                          ),
                           const SizedBox(width: 5),
                           Text(
                             _formatTime(time),
@@ -1279,8 +1383,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Icon(Icons.edit_rounded,
-                              color: activeColor.withOpacity(0.7), size: 12),
+                          Icon(
+                            Icons.edit_rounded,
+                            color: activeColor.withOpacity(0.7),
+                            size: 12,
+                          ),
                         ],
                       ),
                     ),
@@ -1319,8 +1426,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Icon(Icons.add_alert_outlined,
-                color: activeColor.withOpacity(0.4), size: 40),
+            Icon(
+              Icons.add_alert_outlined,
+              color: activeColor.withOpacity(0.4),
+              size: 40,
+            ),
             const SizedBox(height: 12),
             Text(
               'custom_rem_empty'.tr(),
@@ -1344,8 +1454,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 const SizedBox(width: 8),
                 TextButton.icon(
                   onPressed: _showPresetsSheet,
-                  icon: Icon(Icons.auto_awesome_rounded,
-                      color: activeColor, size: 18),
+                  icon: Icon(
+                    Icons.auto_awesome_rounded,
+                    color: activeColor,
+                    size: 18,
+                  ),
                   label: Text(
                     'reminder_preset_tab'.tr(),
                     style: TextStyle(color: activeColor),
@@ -1360,10 +1473,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     return Column(
       children: [
-        ..._customReminders.map((r) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _buildCustomReminderTile(context, r, activeColor),
-            )),
+        ..._customReminders.map(
+          (r) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _buildCustomReminderTile(context, r, activeColor),
+          ),
+        ),
         const SizedBox(height: 4),
         InkWell(
           onTap: _openCustomReminders,
@@ -1372,28 +1487,30 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             context: context,
             radius: 14,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.manage_accounts_rounded,
-                color: activeColor, size: 20),
-            const SizedBox(width: 8),
-                  Flexible(
-                child: Text(
-                  'manage_reminders'.tr(),
-                style: TextStyle(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.manage_accounts_rounded,
                   color: activeColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  size: 20,
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    'manage_reminders'.tr(),
+                    style: TextStyle(
+                      color: activeColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Icon(Icons.chevron_right_rounded, color: activeColor, size: 20),
+              ],
             ),
-            const SizedBox(width: 6),
-            Icon(Icons.chevron_right_rounded,
-                color: activeColor, size: 20),
-          ],
-        ),
           ),
         ),
       ],
@@ -1401,7 +1518,10 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   }
 
   Widget _buildCustomReminderTile(
-      BuildContext context, CustomReminder r, Color activeColor) {
+    BuildContext context,
+    CustomReminder r,
+    Color activeColor,
+  ) {
     final cs = Theme.of(context).colorScheme;
 
     return buildPremiumCard(
@@ -1416,7 +1536,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               color: activeColor.withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_categoryIcon(r.category), color: activeColor, size: 20),
+            child: Icon(
+              _categoryIcon(r.category),
+              color: activeColor,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1439,21 +1563,24 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       Container(
                         margin: const EdgeInsets.only(left: 6),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 3),
+                          horizontal: 7,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.orange.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: Colors.orange.withOpacity(0.3)),
+                            color: Colors.orange.withOpacity(0.3),
+                          ),
                         ),
-                                child: Text(
-                                  'one_time_badge'.tr(),
-                                  style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                        child: Text(
+                          'one_time_badge'.tr(),
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -1473,7 +1600,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             value: r.isEnabled,
             onChanged: (v) async {
               await DailyReminderService.updateCustomReminder(
-                  r.copyWith(isEnabled: v));
+                r.copyWith(isEnabled: v),
+              );
               await _loadAllSettings();
             },
             activeColor: activeColor,
@@ -1490,18 +1618,46 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final cs = Theme.of(context).colorScheme;
 
     final defaults = [
-      (Icons.wb_twilight_rounded, 'reminder_default_fajr_label'.tr(), _defaultFajrTime),
+      (
+        Icons.wb_twilight_rounded,
+        'reminder_default_fajr_label'.tr(),
+        _defaultFajrTime,
+      ),
       (
         Icons.wb_sunny_rounded,
         'reminder_default_dhuhr_label'.tr(),
-        _defaultZuhrTime
+        _defaultZuhrTime,
       ),
-      (Icons.wb_sunny_outlined, 'reminder_default_asr_label'.tr(), _defaultAsrTime),
-      (Icons.nights_stay_rounded, 'reminder_default_maghrib_label'.tr(), _defaultMaghribTime),
-      (Icons.nights_stay_outlined, 'reminder_default_isha_label'.tr(), _defaultIshaTime),
-      (Icons.wb_sunny_outlined, 'reminder_default_morning_dhikr_label'.tr(), _defaultMorningDhikrTime),
-      (Icons.nights_stay_outlined, 'reminder_default_evening_dhikr_label'.tr(), _defaultEveningDhikrTime),
-      (Icons.star_rounded, 'reminder_default_daily_amal_label'.tr(), _defaultDailyAmalTime),
+      (
+        Icons.wb_sunny_outlined,
+        'reminder_default_asr_label'.tr(),
+        _defaultAsrTime,
+      ),
+      (
+        Icons.nights_stay_rounded,
+        'reminder_default_maghrib_label'.tr(),
+        _defaultMaghribTime,
+      ),
+      (
+        Icons.nights_stay_outlined,
+        'reminder_default_isha_label'.tr(),
+        _defaultIshaTime,
+      ),
+      (
+        Icons.wb_sunny_outlined,
+        'reminder_default_morning_dhikr_label'.tr(),
+        _defaultMorningDhikrTime,
+      ),
+      (
+        Icons.nights_stay_outlined,
+        'reminder_default_evening_dhikr_label'.tr(),
+        _defaultEveningDhikrTime,
+      ),
+      (
+        Icons.star_rounded,
+        'reminder_default_daily_amal_label'.tr(),
+        _defaultDailyAmalTime,
+      ),
     ];
 
     return Column(
@@ -1514,8 +1670,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
-                      color: activeColor, size: 18),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: activeColor,
+                    size: 18,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -1552,12 +1711,15 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(color: Colors.green.withOpacity(0.25)),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.25),
+                          ),
                         ),
                         child: Text(
                           _formatTime(time),
@@ -1578,7 +1740,6 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       ],
     );
   }
-
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

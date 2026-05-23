@@ -7,10 +7,7 @@ import '../../../../data/models/statistics_model.dart';
 class WeeklyProgressChart extends StatelessWidget {
   final WeeklyStatistics weeklyStats;
 
-  const WeeklyProgressChart({
-    super.key,
-    required this.weeklyStats,
-  });
+  const WeeklyProgressChart({super.key, required this.weeklyStats});
 
   // Get localized weekday short name from date string
   String _getWeekdayFromDate(String dateStr) {
@@ -47,7 +44,7 @@ class WeeklyProgressChart extends StatelessWidget {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
@@ -73,11 +70,26 @@ class WeeklyProgressChart extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('100%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('75%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('50%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('25%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
-                    Text('0%', style: TextStyle(color: bulletTextColor, fontSize: 10)),
+                    Text(
+                      '100%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '75%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '50%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '25%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
+                    Text(
+                      '0%',
+                      style: TextStyle(color: bulletTextColor, fontSize: 10),
+                    ),
                   ],
                 ),
                 const SizedBox(width: 8),
@@ -96,13 +108,15 @@ class WeeklyProgressChart extends StatelessWidget {
                             barTouchData: BarTouchData(
                               enabled: true,
                               touchTooltipData: BarTouchTooltipData(
-                                getTooltipColor: (group) => shadowColor.withOpacity(0.9),
-                                getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                  return BarTooltipItem(
-                                    '${rod.toY.toInt()}%',
-                                    TextStyle(color: onSurface),
-                                  );
-                                },
+                                getTooltipColor: (group) =>
+                                    shadowColor.withOpacity(0.9),
+                                getTooltipItem:
+                                    (group, groupIndex, rod, rodIndex) {
+                                      return BarTooltipItem(
+                                        '${rod.toY.toInt()}%',
+                                        TextStyle(color: onSurface),
+                                      );
+                                    },
                               ),
                             ),
                             titlesData: FlTitlesData(
@@ -112,8 +126,11 @@ class WeeklyProgressChart extends StatelessWidget {
                                   showTitles: true,
                                   getTitlesWidget: (value, meta) {
                                     final index = value.toInt();
-                                    if (index >= 0 && index < weeklyStats.days.length) {
-                                      final dayName = _getWeekdayFromDate(weeklyStats.days[index].date);
+                                    if (index >= 0 &&
+                                        index < weeklyStats.days.length) {
+                                      final dayName = _getWeekdayFromDate(
+                                        weeklyStats.days[index].date,
+                                      );
                                       return Padding(
                                         padding: const EdgeInsets.only(top: 8),
                                         child: Text(
@@ -149,7 +166,9 @@ class WeeklyProgressChart extends StatelessWidget {
                                 strokeWidth: 1,
                               ),
                             ),
-                            barGroups: weeklyStats.days.asMap().entries.map((entry) {
+                            barGroups: weeklyStats.days.asMap().entries.map((
+                              entry,
+                            ) {
                               final score = entry.value.overallScore.toDouble();
                               return BarChartGroupData(
                                 x: entry.key,

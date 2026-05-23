@@ -5,11 +5,11 @@ import 'dart:io';
 void main() async {
   // Initialize Hive
   Hive.init(Directory.current.path);
-  
+
   final box = await Hive.openBox('dhikr_counter');
-  
+
   print('=== Dhikr Counter Box Contents ===\n');
-  
+
   for (var key in box.keys) {
     print('Date: $key');
     final data = box.get(key);
@@ -18,13 +18,15 @@ void main() async {
       if (items != null) {
         for (var item in items) {
           if (item is Map) {
-            print('  - ${item['title']} | isCustom: ${item['isCustom']} | count: ${item['currentCount']}/${item['targetCount']}');
+            print(
+              '  - ${item['title']} | isCustom: ${item['isCustom']} | count: ${item['currentCount']}/${item['targetCount']}',
+            );
           }
         }
       }
     }
     print('');
   }
-  
+
   await box.close();
 }

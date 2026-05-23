@@ -162,13 +162,18 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         content: Text(
-          'reminder_set_perm_dialog_msg'.tr(namedArgs: {'perm': permissionName}),
+          'reminder_set_perm_dialog_msg'.tr(
+            namedArgs: {'perm': permissionName},
+          ),
           style: TextStyle(color: Colors.white70, height: 1.35),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              'cancel'.tr(),
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -184,7 +189,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
       ),
     );
   }
-  
+
   void _showSnackBar(String message) {
     if (!mounted) return;
 
@@ -230,20 +235,22 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -271,18 +278,20 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context)
-                    .extension<GradientColors>()!
-                    .backgroundGradient[0],
-              Theme.of(context)
-                    .extension<GradientColors>()!
-                    .backgroundGradient[1],
+              Theme.of(
+                context,
+              ).extension<GradientColors>()!.backgroundGradient[0],
+              Theme.of(
+                context,
+              ).extension<GradientColors>()!.backgroundGradient[1],
             ],
           ),
         ),
         child: _isLoading
             ? Center(
-                child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               )
             : RefreshIndicator(
                 onRefresh: _checkPermissions,
@@ -363,7 +372,9 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
     final status = _permissionStatuses[permission];
     final isGranted = status?.isGranted ?? false;
 
-    final badgeColor = isGranted ? Theme.of(context).colorScheme.primary : const Color(0xFFFF5A5A);
+    final badgeColor = isGranted
+        ? Theme.of(context).colorScheme.primary
+        : const Color(0xFFFF5A5A);
     final gradients = Theme.of(context).extension<GradientColors>()!;
 
     return Container(
@@ -397,11 +408,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: badgeColor.withOpacity(0.24)),
             ),
-            child: Icon(
-              icon,
-              color: badgeColor,
-              size: 20,
-            ),
+            child: Icon(icon, color: badgeColor, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -421,7 +428,10 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: badgeColor.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(999),
@@ -461,8 +471,13 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.black,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(
                 'reminder_set_grant_btn'.tr(),
@@ -491,10 +506,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
           colors: gradients.cardGradient,
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: primary.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: primary.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).shadowColor.withOpacity(0.06),
@@ -514,9 +526,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 decoration: BoxDecoration(
                   color: primary.withOpacity(0.14),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: primary.withOpacity(0.24),
-                  ),
+                  border: Border.all(color: primary.withOpacity(0.24)),
                 ),
                 child: Icon(Icons.tips_and_updates, color: primary, size: 20),
               ),
@@ -551,7 +561,7 @@ class _DailyReminderScreenState extends State<DailyReminderScreen>
                 child: ElevatedButton.icon(
                   onPressed: _showDeviceSpecificGuide,
                   icon: const Icon(Icons.phone_android),
-                      label: Text('reminder_set_my_phone'.tr()),
+                  label: Text('reminder_set_my_phone'.tr()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -680,11 +690,7 @@ class _PremiumCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF151515),
-            Color(0xFF111111),
-            Color(0xFF141414),
-          ],
+          colors: [Color(0xFF151515), Color(0xFF111111), Color(0xFF141414)],
         ),
       ),
       child: child,
@@ -699,15 +705,12 @@ class _DeviceGuideSheet extends StatelessWidget {
   final String brand;
   final String model;
 
-  const _DeviceGuideSheet({
-    required this.brand,
-    required this.model,
-  });
+  const _DeviceGuideSheet({required this.brand, required this.model});
 
   @override
   Widget build(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
-    
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.86,
       decoration: BoxDecoration(
@@ -725,9 +728,13 @@ class _DeviceGuideSheet extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(22),
+              ),
               border: Border(
-                bottom: BorderSide(color: Theme.of(context).colorScheme.primary),
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             child: Column(
@@ -743,7 +750,10 @@ class _DeviceGuideSheet extends StatelessWidget {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Icon(Icons.phone_android, color: Theme.of(context).colorScheme.primary),
+                    Icon(
+                      Icons.phone_android,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -759,8 +769,10 @@ class _DeviceGuideSheet extends StatelessWidget {
                           ),
                           Text(
                             model,
-                            style:  TextStyle(
-                              color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).extension<GradientColors>()!.bulletTextColor,
                               fontSize: 13,
                             ),
                           ),
@@ -788,8 +800,9 @@ class _DeviceGuideSheet extends StatelessWidget {
                   _buildCommonSettings(context),
                   const SizedBox(height: 22),
                   _buildSectionTitle(
-                    'reminder_set_brand_specific'
-                        .tr(namedArgs: {'brand': _getBrandDisplayName(brand)}),
+                    'reminder_set_brand_specific'.tr(
+                      namedArgs: {'brand': _getBrandDisplayName(brand)},
+                    ),
                     context,
                   ),
                   _buildBrandSpecificSettings(brand, context),
@@ -803,8 +816,9 @@ class _DeviceGuideSheet extends StatelessWidget {
                       label: Text('reminder_set_open_app_settings'.tr()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary,
                         elevation: 0,
                         padding: const EdgeInsets.all(14),
                         shape: RoundedRectangleBorder(
@@ -946,23 +960,31 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_xiaomi_autostart_title'.tr(),
-          'reminder_set_guide_xiaomi_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_xiaomi_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_xiaomi_battery_title'.tr(),
-          'reminder_set_guide_xiaomi_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_xiaomi_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_xiaomi_recents_title'.tr(),
-          'reminder_set_guide_xiaomi_recents_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_xiaomi_recents_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_xiaomi_security_title'.tr(),
-          'reminder_set_guide_xiaomi_security_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_xiaomi_security_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -976,18 +998,24 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_samsung_sleeping_title'.tr(),
-          'reminder_set_guide_samsung_sleeping_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_samsung_sleeping_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_samsung_battery_title'.tr(),
-          'reminder_set_guide_samsung_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_samsung_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_samsung_notif_title'.tr(),
-          'reminder_set_guide_samsung_notif_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_samsung_notif_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1001,19 +1029,25 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_oneplus_autostart_title'.tr(),
-          'reminder_set_guide_oneplus_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_oneplus_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_oneplus_deep_title'.tr(),
-          'reminder_set_guide_oneplus_deep_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_oneplus_deep_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_oneplus_battery_title'.tr(),
-          'reminder_set_guide_oneplus_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_oneplus_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1027,13 +1061,17 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_oppo_autostart_title'.tr(),
-          'reminder_set_guide_oppo_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_oppo_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_oppo_battery_title'.tr(),
-          'reminder_set_guide_oppo_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_oppo_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1047,18 +1085,24 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_vivo_autostart_title'.tr(),
-          'reminder_set_guide_vivo_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_vivo_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_vivo_high_title'.tr(),
-          'reminder_set_guide_vivo_high_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_vivo_high_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_vivo_battery_title'.tr(),
-          'reminder_set_guide_vivo_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_vivo_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1072,13 +1116,17 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_huawei_launch_title'.tr(),
-          'reminder_set_guide_huawei_launch_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_huawei_launch_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_huawei_battery_title'.tr(),
-          'reminder_set_guide_huawei_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_huawei_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1092,12 +1140,16 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_samsung_battery_title'.tr(),
-          'reminder_set_guide_motorola_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_motorola_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_oneplus_battery_title'.tr(),
-          'reminder_set_guide_motorola_opt_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_motorola_opt_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
@@ -1116,17 +1168,23 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_pixel_battery_title'.tr(),
-          'reminder_set_guide_pixel_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_pixel_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_pixel_saver_title'.tr(),
-          'reminder_set_guide_pixel_saver_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_pixel_saver_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_pixel_exact_title'.tr(),
-          'reminder_set_guide_pixel_exact_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_pixel_exact_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1140,23 +1198,31 @@ class _DeviceGuideSheet extends StatelessWidget {
         _buildSettingItem(
           context,
           'reminder_set_guide_tecno_autostart_title'.tr(),
-          'reminder_set_guide_tecno_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_tecno_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           isImportant: true,
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_tecno_battery_title'.tr(),
-          'reminder_set_guide_tecno_battery_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_tecno_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_tecno_background_title'.tr(),
-          'reminder_set_guide_tecno_background_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_tecno_background_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _buildSettingItem(
           context,
           'reminder_set_guide_tecno_recents_title'.tr(),
-          'reminder_set_guide_tecno_recents_desc'.tr(namedArgs: {'appName': appName}),
+          'reminder_set_guide_tecno_recents_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1194,16 +1260,16 @@ class _DeviceGuideSheet extends StatelessWidget {
   }) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: gradients.cardGradient,
-              ),
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isImportant
@@ -1232,8 +1298,10 @@ class _DeviceGuideSheet extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             description,
-            style:  TextStyle(
-              color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
+            style: TextStyle(
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.bulletTextColor,
               fontSize: 12.8,
               height: 1.35,
             ),
@@ -1285,7 +1353,7 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
   @override
   Widget build(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
-    
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.86,
       decoration: BoxDecoration(
@@ -1302,9 +1370,13 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(22),
+              ),
               border: Border(
-                bottom: BorderSide(color: Theme.of(context).colorScheme.primary),
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             child: Column(
@@ -1313,14 +1385,19 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Icon(Icons.list_alt, color: Theme.of(context).colorScheme.primary),
+                    Icon(
+                      Icons.list_alt,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -1333,7 +1410,12 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, color: Theme.of(context).extension<GradientColors>()!.bulletTextColor),
+                      icon: Icon(
+                        Icons.close,
+                        color: Theme.of(
+                          context,
+                        ).extension<GradientColors>()!.bulletTextColor,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -1349,7 +1431,9 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
               isScrollable: true,
               indicatorColor: Theme.of(context).colorScheme.primary,
               labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
+              unselectedLabelColor: Theme.of(
+                context,
+              ).extension<GradientColors>()!.bulletTextColor,
               tabAlignment: TabAlignment.start,
               dividerColor: Colors.transparent,
               tabs: _brands.map((b) {
@@ -1422,20 +1506,28 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_xiaomi_autostart_title'.tr(),
-          desc: 'reminder_set_guide_xiaomi_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_xiaomi_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_xiaomi_battery_title'.tr(),
-          desc: 'reminder_set_guide_xiaomi_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_xiaomi_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_xiaomi_recents_title'.tr(),
-          desc: 'reminder_set_guide_xiaomi_recents_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_xiaomi_recents_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_xiaomi_security_title'.tr(),
-          desc: 'reminder_set_guide_xiaomi_security_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_xiaomi_security_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1448,16 +1540,22 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_samsung_sleeping_title'.tr(),
-          desc: 'reminder_set_guide_samsung_sleeping_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_samsung_sleeping_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_samsung_battery_title'.tr(),
-          desc: 'reminder_set_guide_samsung_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_samsung_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_samsung_notif_title'.tr(),
-          desc: 'reminder_set_guide_samsung_notif_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_samsung_notif_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1470,17 +1568,23 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_oneplus_autostart_title'.tr(),
-          desc: 'reminder_set_guide_oneplus_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_oneplus_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_oneplus_deep_title'.tr(),
-          desc: 'reminder_set_guide_oneplus_deep_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_oneplus_deep_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_oneplus_battery_title'.tr(),
-          desc: 'reminder_set_guide_oneplus_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_oneplus_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_oneplus_recents_title'.tr(),
@@ -1497,12 +1601,16 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_oppo_autostart_title'.tr(),
-          desc: 'reminder_set_guide_oppo_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_oppo_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_oppo_battery_title'.tr(),
-          desc: 'reminder_set_guide_oppo_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_oppo_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1515,16 +1623,22 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_vivo_autostart_title'.tr(),
-          desc: 'reminder_set_guide_vivo_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_vivo_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_vivo_high_title'.tr(),
-          desc: 'reminder_set_guide_vivo_high_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_vivo_high_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_vivo_battery_title'.tr(),
-          desc: 'reminder_set_guide_vivo_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_vivo_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1537,12 +1651,16 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_huawei_launch_title'.tr(),
-          desc: 'reminder_set_guide_huawei_launch_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_huawei_launch_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_huawei_battery_title'.tr(),
-          desc: 'reminder_set_guide_huawei_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_huawei_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1555,15 +1673,21 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_pixel_battery_title'.tr(),
-          desc: 'reminder_set_guide_pixel_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_pixel_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_pixel_saver_title'.tr(),
-          desc: 'reminder_set_guide_pixel_saver_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_pixel_saver_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_pixel_exact_title'.tr(),
-          desc: 'reminder_set_guide_pixel_exact_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_pixel_exact_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1576,20 +1700,28 @@ class _AllBrandsGuideSheetState extends State<_AllBrandsGuideSheet>
       steps: [
         _GuideStep(
           title: 'reminder_set_guide_tecno_autostart_title'.tr(),
-          desc: 'reminder_set_guide_tecno_autostart_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_tecno_autostart_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
           important: true,
         ),
         _GuideStep(
           title: 'reminder_set_guide_tecno_battery_title'.tr(),
-          desc: 'reminder_set_guide_tecno_battery_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_tecno_battery_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_tecno_background_title'.tr(),
-          desc: 'reminder_set_guide_tecno_background_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_tecno_background_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
         _GuideStep(
           title: 'reminder_set_guide_tecno_recents_title'.tr(),
-          desc: 'reminder_set_guide_tecno_recents_desc'.tr(namedArgs: {'appName': appName}),
+          desc: 'reminder_set_guide_tecno_recents_desc'.tr(
+            namedArgs: {'appName': appName},
+          ),
         ),
       ],
     );
@@ -1606,7 +1738,7 @@ class _GuideTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1621,10 +1753,7 @@ class _GuideTab extends StatelessWidget {
                 colors: gradients.cardGradient,
               ),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: primary.withOpacity(0.2),
-                width: 1,
-              ),
+              border: Border.all(color: primary.withOpacity(0.2), width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
@@ -1664,7 +1793,11 @@ class _GuideStep {
   final String desc;
   final bool important;
 
-  const _GuideStep({required this.title, required this.desc, this.important = false});
+  const _GuideStep({
+    required this.title,
+    required this.desc,
+    this.important = false,
+  });
 }
 
 class _GuideStepTile extends StatelessWidget {
@@ -1682,10 +1815,10 @@ class _GuideStepTile extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: gradients.cardGradient,
-              ),
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradients.cardGradient,
+        ),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: step.important
@@ -1725,6 +1858,3 @@ class _GuideStepTile extends StatelessWidget {
     );
   }
 }
-
-
-

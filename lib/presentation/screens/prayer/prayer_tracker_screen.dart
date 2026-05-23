@@ -33,7 +33,6 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
     final iconColor = colors.primary;
     final titleColor = colors.primary;
 
-
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -42,20 +41,22 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -83,16 +84,15 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             onPressed: () => _showInfoBottomSheet(context),
           ),
         ],
-        
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: Theme.of(context)
-                .extension<GradientColors>()!
-                .backgroundGradient,
+            colors: Theme.of(
+              context,
+            ).extension<GradientColors>()!.backgroundGradient,
           ),
         ),
         child: SafeArea(
@@ -255,8 +255,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
         ? Theme.of(context).colorScheme.primary
         : Theme.of(context).colorScheme.onSurfaceVariant;
 
-    final subColor =
-        Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.75);
+    final subColor = Theme.of(
+      context,
+    ).colorScheme.onSurfaceVariant.withOpacity(0.75);
 
     final arrowColor = isDone
         ? Theme.of(context).colorScheme.primary
@@ -322,10 +323,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                               : 'prayer_tap_expand'.tr(),
                           style: TextStyle(
                             color: isDone
-                                ? Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.70)
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.70)
                                 : subColor,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
@@ -339,8 +339,11 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     turns: isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOut,
-                    child: Icon(Icons.keyboard_arrow_down_rounded,
-                        color: arrowColor, size: 30),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: arrowColor,
+                      size: 30,
+                    ),
                   ),
                 ],
               ),
@@ -356,9 +359,15 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
+                        Theme.of(context)
+                            .extension<GradientColors>()!
+                            .onPrimaryText
+                            .withOpacity(0),
                         Theme.of(context).colorScheme.primary.withOpacity(0.14),
-                        Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
+                        Theme.of(context)
+                            .extension<GradientColors>()!
+                            .onPrimaryText
+                            .withOpacity(0),
                       ],
                     ),
                   ),
@@ -372,18 +381,15 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.10),
-                          Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.06),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.10),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.06),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      
                     ),
                     child: Column(
                       children: rakats.entries
@@ -436,9 +442,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: Theme.of(context)
-                      .extension<GradientColors>()!
-                      .innerCardGradient,
+              colors: Theme.of(
+                context,
+              ).extension<GradientColors>()!.innerCardGradient,
             ),
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
@@ -492,7 +498,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
+      backgroundColor: Theme.of(
+        context,
+      ).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.86,
@@ -511,10 +519,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -526,15 +533,16 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.15),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.info_outline_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 24),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -565,8 +573,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     ),
                     const SizedBox(height: 20),
                     _SectionHeader(
-                        icon: Icons.mosque_outlined,
-                        title: 'prayer_info_congregation_title'.tr()),
+                      icon: Icons.mosque_outlined,
+                      title: 'prayer_info_congregation_title'.tr(),
+                    ),
                     const SizedBox(height: 12),
                     const _HadithCard(
                       hadith: 'prayer_info_hadith1_text',
@@ -594,8 +603,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     ),
                     const SizedBox(height: 18),
                     _SectionHeader(
-                        icon: Icons.access_time_rounded,
-                        title: 'prayer_info_early_title'.tr()),
+                      icon: Icons.access_time_rounded,
+                      title: 'prayer_info_early_title'.tr(),
+                    ),
                     const SizedBox(height: 12),
                     const _HadithCard(
                       hadith: 'prayer_info_hadith6_text',
@@ -608,8 +618,9 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
                     ),
                     const SizedBox(height: 18),
                     _SectionHeader(
-                        icon: Icons.auto_awesome_rounded,
-                        title: 'prayer_info_sunnah_title'.tr()),
+                      icon: Icons.auto_awesome_rounded,
+                      title: 'prayer_info_sunnah_title'.tr(),
+                    ),
                     const SizedBox(height: 12),
                     const _HadithCard(
                       hadith: 'prayer_info_hadith8_text',
@@ -634,13 +645,10 @@ class _PrayerTrackerScreenState extends ConsumerState<PrayerTrackerScreen>
 
 // ---------------- Premium components ----------------
 
-
 class _TopSummaryCard extends StatelessWidget {
   final int completed;
 
-  const _TopSummaryCard({
-    required this.completed,
-  });
+  const _TopSummaryCard({required this.completed});
 
   @override
   Widget build(BuildContext context) {
@@ -657,8 +665,11 @@ class _TopSummaryCard extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(Icons.mosque_rounded,
-                color: Theme.of(context).colorScheme.primary, size: 24),
+            child: Icon(
+              Icons.mosque_rounded,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -700,10 +711,7 @@ class _MiniBadge extends StatelessWidget {
   final String text;
   final bool filled;
 
-  const _MiniBadge({
-    required this.text,
-    required this.filled,
-  });
+  const _MiniBadge({required this.text, required this.filled});
 
   @override
   Widget build(BuildContext context) {
@@ -790,10 +798,7 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
-  });
+  const _SectionHeader({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -810,8 +815,13 @@ class _SectionHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: Theme.of(context).extension<GradientColors>()!.onPrimaryText, size: 18),
+            child: Icon(
+              icon,
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.onPrimaryText,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -859,12 +869,16 @@ class _InfoCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon,
-                    color: Theme.of(context).colorScheme.primary, size: 18),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -900,10 +914,7 @@ class _HadithCard extends StatelessWidget {
   final String hadith;
   final String reference;
 
-  const _HadithCard({
-    required this.hadith,
-    required this.reference,
-  });
+  const _HadithCard({required this.hadith, required this.reference});
 
   @override
   Widget build(BuildContext context) {
@@ -925,12 +936,16 @@ class _HadithCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.format_quote_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 14),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -966,7 +981,7 @@ class _HadithCard extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

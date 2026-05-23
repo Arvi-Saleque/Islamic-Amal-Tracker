@@ -43,12 +43,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (!mounted) return;
     // Always go to MainShell — login is optional and accessible from Settings
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const MainShell()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const MainShell()));
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -58,25 +56,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/logo.png',
-              width: 120,
-              height: 120,
-            ),
+            Image.asset('assets/images/logo.png', width: 120, height: 120),
             const SizedBox(height: 24),
             Text(
               'app_title'.tr(),
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'app_subtitle'.tr(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                  ),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
             ),
           ],
         ),

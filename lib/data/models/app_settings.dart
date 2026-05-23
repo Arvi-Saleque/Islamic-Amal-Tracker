@@ -2,32 +2,32 @@ import 'prayer_record.dart';
 
 class AppSettings {
   final String id;
-  
+
   // General settings
   bool isFirstTime;
   String language;
   String theme; // 'light', 'dark', 'system'
-  
+
   // Prayer settings
   double latitude;
   double longitude;
   String? locationName;
   Map<String, int> prayerTimeAdjustments; // Manual +/- minutes per prayer
-  
+
   // Widget settings
   bool widgetEnabled;
-  
+
   // Cloud sync settings
   bool cloudSyncEnabled;
   String? lastSyncTimestamp;
-  
+
   // Cloud sync fields
   final int modelVersion;
   final DateTime createdAt;
   DateTime updatedAt;
   SyncStatus syncStatus;
   DateTime? lastSyncedAt;
-  
+
   AppSettings({
     required this.id,
     this.isFirstTime = true,
@@ -45,54 +45,54 @@ class AppSettings {
     required this.updatedAt,
     this.syncStatus = SyncStatus.pending,
     this.lastSyncedAt,
-  }) : prayerTimeAdjustments = prayerTimeAdjustments ?? {
-          'fajr': 0,
-          'dhuhr': 0,
-          'asr': 0,
-          'maghrib': 0,
-          'isha': 0,
-        };
-  
+  }) : prayerTimeAdjustments =
+           prayerTimeAdjustments ??
+           {'fajr': 0, 'dhuhr': 0, 'asr': 0, 'maghrib': 0, 'isha': 0};
+
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'isFirstTime': isFirstTime,
-        'language': language,
-        'theme': theme,
-        'latitude': latitude,
-        'longitude': longitude,
-        'locationName': locationName,
-        'prayerTimeAdjustments': prayerTimeAdjustments,
-        'widgetEnabled': widgetEnabled,
-        'cloudSyncEnabled': cloudSyncEnabled,
-        'lastSyncTimestamp': lastSyncTimestamp,
-        'modelVersion': modelVersion,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        'syncStatus': syncStatus.name,
-        'lastSyncedAt': lastSyncedAt?.toIso8601String(),
-      };
-  
+    'id': id,
+    'isFirstTime': isFirstTime,
+    'language': language,
+    'theme': theme,
+    'latitude': latitude,
+    'longitude': longitude,
+    'locationName': locationName,
+    'prayerTimeAdjustments': prayerTimeAdjustments,
+    'widgetEnabled': widgetEnabled,
+    'cloudSyncEnabled': cloudSyncEnabled,
+    'lastSyncTimestamp': lastSyncTimestamp,
+    'modelVersion': modelVersion,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+    'syncStatus': syncStatus.name,
+    'lastSyncedAt': lastSyncedAt?.toIso8601String(),
+  };
+
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
-        id: json['id'],
-        isFirstTime: json['isFirstTime'] ?? true,
-        language: json['language'] ?? 'bn',
-        theme: json['theme'] ?? 'system',
-        latitude: json['latitude'] ?? 23.8103,
-        longitude: json['longitude'] ?? 90.4125,
-        locationName: json['locationName'],
-        prayerTimeAdjustments: json['prayerTimeAdjustments'] != null
-            ? Map<String, int>.from(json['prayerTimeAdjustments'])
-            : null,
-        widgetEnabled: json['widgetEnabled'] ?? true,
-        cloudSyncEnabled: json['cloudSyncEnabled'] ?? false,
-        lastSyncTimestamp: json['lastSyncTimestamp'],
-        modelVersion: json['modelVersion'],
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
-        syncStatus: SyncStatus.values.firstWhere((e) => e.name == json['syncStatus']),
-        lastSyncedAt: json['lastSyncedAt'] != null ? DateTime.parse(json['lastSyncedAt']) : null,
-      );
-  
+    id: json['id'],
+    isFirstTime: json['isFirstTime'] ?? true,
+    language: json['language'] ?? 'bn',
+    theme: json['theme'] ?? 'system',
+    latitude: json['latitude'] ?? 23.8103,
+    longitude: json['longitude'] ?? 90.4125,
+    locationName: json['locationName'],
+    prayerTimeAdjustments: json['prayerTimeAdjustments'] != null
+        ? Map<String, int>.from(json['prayerTimeAdjustments'])
+        : null,
+    widgetEnabled: json['widgetEnabled'] ?? true,
+    cloudSyncEnabled: json['cloudSyncEnabled'] ?? false,
+    lastSyncTimestamp: json['lastSyncTimestamp'],
+    modelVersion: json['modelVersion'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
+    syncStatus: SyncStatus.values.firstWhere(
+      (e) => e.name == json['syncStatus'],
+    ),
+    lastSyncedAt: json['lastSyncedAt'] != null
+        ? DateTime.parse(json['lastSyncedAt'])
+        : null,
+  );
+
   AppSettings copyWith({
     bool? isFirstTime,
     String? language,
@@ -115,7 +115,8 @@ class AppSettings {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       locationName: locationName ?? this.locationName,
-      prayerTimeAdjustments: prayerTimeAdjustments ?? this.prayerTimeAdjustments,
+      prayerTimeAdjustments:
+          prayerTimeAdjustments ?? this.prayerTimeAdjustments,
       widgetEnabled: widgetEnabled ?? this.widgetEnabled,
       cloudSyncEnabled: cloudSyncEnabled ?? this.cloudSyncEnabled,
       lastSyncTimestamp: lastSyncTimestamp ?? this.lastSyncTimestamp,
@@ -127,5 +128,3 @@ class AppSettings {
     );
   }
 }
-
-

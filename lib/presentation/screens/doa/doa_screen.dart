@@ -29,10 +29,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               colors: gradients.appBarGradient,
             ),
             border: Border(
-              bottom: BorderSide(
-                color: gradients.appBarBorder,
-                width: 1.5,
-              ),
+              bottom: BorderSide(color: gradients.appBarBorder, width: 1.5),
             ),
           ),
         ),
@@ -192,10 +189,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
-          colors: [
-            gold.withOpacity(opacity),
-            Colors.transparent,
-          ],
+          colors: [gold.withOpacity(opacity), Colors.transparent],
         ),
       ),
     );
@@ -259,10 +253,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
   }
 
   // ─── Section Header ───
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-  }) {
+  Widget _buildSectionHeader({required IconData icon, required String title}) {
     final cs = Theme.of(context).colorScheme;
 
     return buildPremiumCard(
@@ -278,11 +269,13 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               color: cs.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: Theme.of(context)
-                    .extension<GradientColors>()!
-                    .onPrimaryText,
-                size: 18),
+            child: Icon(
+              icon,
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.onPrimaryText,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -302,10 +295,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
   }
 
   // ─── Hadith Card ───
-  Widget _buildHadithCard({
-    required String hadith,
-    required String reference,
-  }) {
+  Widget _buildHadithCard({required String hadith, required String reference}) {
     final cs = Theme.of(context).colorScheme;
 
     return buildPremiumCard(
@@ -325,8 +315,11 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
                   color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.format_quote_rounded,
-                    color: cs.primary, size: 14),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  color: cs.primary,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -388,11 +381,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               color: cs.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              Icons.wb_twilight,
-              color: cs.primary,
-              size: 20,
-            ),
+            child: Icon(Icons.wb_twilight, color: cs.primary, size: 20),
           ),
           title: Text(
             'daily_amal_adhkar_title'.tr(),
@@ -406,10 +395,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
             padding: const EdgeInsets.only(top: 6),
             child: Text(
               'daily_amal_adhkar_subtitle'.tr(),
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
             ),
           ),
           iconColor: cs.primary,
@@ -698,7 +684,8 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
             // Dhikr 10
             _buildExpandableDuaCard(
               title: 'dhikr_morning_10_title'.tr(),
-              arabic: 'اَعُوْذُ بِكَلِمٰتِ اللّٰهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+              arabic:
+                  'اَعُوْذُ بِكَلِمٰتِ اللّٰهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
               pronunciation: 'dhikr_morning_10_pron'.tr(),
               meaning: 'dhikr_morning_10_meaning'.tr(),
               reference: 'dhikr_morning_10_ref'.tr(),
@@ -896,11 +883,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-          leading: Icon(
-            Icons.format_quote,
-            color: cs.primary,
-            size: 20,
-          ),
+          leading: Icon(Icons.format_quote, color: cs.primary, size: 20),
           title: Text(
             title,
             style: TextStyle(
@@ -934,9 +917,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: cs.outline.withOpacity(0.15),
-                ),
+                border: Border.all(color: cs.outline.withOpacity(0.15)),
                 boxShadow: [
                   BoxShadow(
                     color: theme.shadowColor.withOpacity(0.08),
@@ -952,7 +933,9 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: cs.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(6),
@@ -999,9 +982,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.outline.withValues(alpha: 0.10),
-                ),
+                border: Border.all(color: cs.outline.withValues(alpha: 0.10)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1046,20 +1027,14 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.outline.withOpacity(0.10),
-                ),
+                border: Border.all(color: cs.outline.withOpacity(0.10)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.translate,
-                        color: cs.secondary,
-                        size: 14,
-                      ),
+                      Icon(Icons.translate, color: cs.secondary, size: 14),
                       const SizedBox(width: 6),
                       Text(
                         'meaning'.tr(),
@@ -1092,9 +1067,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
               decoration: BoxDecoration(
                 color: cs.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.primary.withOpacity(0.15),
-                ),
+                border: Border.all(color: cs.primary.withOpacity(0.15)),
                 boxShadow: [
                   BoxShadow(
                     color: theme.shadowColor.withOpacity(0.08),
@@ -1108,11 +1081,7 @@ class _DoaScreenState extends ConsumerState<DoaScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: cs.primary,
-                        size: 14,
-                      ),
+                      Icon(Icons.star, color: cs.primary, size: 14),
                       const SizedBox(width: 6),
                       Text(
                         'virtue'.tr(),

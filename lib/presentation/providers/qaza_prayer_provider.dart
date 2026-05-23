@@ -21,10 +21,7 @@ class QazaPrayerSummary {
   final String prayerName;
   final List<MissedPrayer> missedPrayers;
 
-  QazaPrayerSummary({
-    required this.prayerName,
-    required this.missedPrayers,
-  });
+  QazaPrayerSummary({required this.prayerName, required this.missedPrayers});
 
   int get pendingCount => missedPrayers.where((p) => !p.isQazaDone).length;
   int get completedCount => missedPrayers.where((p) => p.isQazaDone).length;
@@ -36,10 +33,7 @@ class QazaPrayerState {
   final List<QazaPrayerSummary> prayerSummaries;
   final bool isLoading;
 
-  QazaPrayerState({
-    required this.prayerSummaries,
-    this.isLoading = false,
-  });
+  QazaPrayerState({required this.prayerSummaries, this.isLoading = false});
 
   QazaPrayerState copyWith({
     List<QazaPrayerSummary>? prayerSummaries,
@@ -63,10 +57,7 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
 
   final List<String> prayerNames = ['ফজর', 'যোহর', 'আসর', 'মাগরিব', 'এশা'];
 
-  QazaPrayerNotifier()
-      : super(QazaPrayerState(
-          prayerSummaries: [],
-        )) {
+  QazaPrayerNotifier() : super(QazaPrayerState(prayerSummaries: [])) {
     _init();
   }
 
@@ -103,13 +94,16 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
         if (prayerData != null) {
           try {
             final data = Map<String, dynamic>.from(prayerData);
-            final prayerDone = Map<String, bool>.from(data['prayerDone'] as Map);
-            final qazaDone = data['qazaDone'] != null 
+            final prayerDone = Map<String, bool>.from(
+              data['prayerDone'] as Map,
+            );
+            final qazaDone = data['qazaDone'] != null
                 ? Map<String, bool>.from(data['qazaDone'] as Map)
                 : <String, bool>{};
 
             // Migrate old 'যুহর' key to 'যোহর'
-            if (prayerDone.containsKey('যুহর') && !prayerDone.containsKey('যোহর')) {
+            if (prayerDone.containsKey('যুহর') &&
+                !prayerDone.containsKey('যোহর')) {
               prayerDone['যোহর'] = prayerDone.remove('যুহর')!;
             }
             if (qazaDone.containsKey('যুহর') && !qazaDone.containsKey('যোহর')) {
@@ -122,11 +116,13 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
               if (!isDone) {
                 // Prayer was missed
                 final isQazaDone = qazaDone[prayer] ?? false;
-                missedByPrayer[prayer]!.add(MissedPrayer(
-                  date: dateKey,
-                  prayerName: prayer,
-                  isQazaDone: isQazaDone,
-                ));
+                missedByPrayer[prayer]!.add(
+                  MissedPrayer(
+                    date: dateKey,
+                    prayerName: prayer,
+                    isQazaDone: isQazaDone,
+                  ),
+                );
               }
             }
           } catch (e) {
@@ -142,16 +138,10 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
         final prayers = missedByPrayer[prayer] ?? [];
         // Sort by date descending (most recent first)
         prayers.sort((a, b) => b.date.compareTo(a.date));
-        return QazaPrayerSummary(
-          prayerName: prayer,
-          missedPrayers: prayers,
-        );
+        return QazaPrayerSummary(prayerName: prayer, missedPrayers: prayers);
       }).toList();
 
-      state = state.copyWith(
-        prayerSummaries: summaries,
-        isLoading: false,
-      );
+      state = state.copyWith(prayerSummaries: summaries, isLoading: false);
     } catch (e) {
       print('Error loading qaza prayers: $e');
       state = state.copyWith(isLoading: false);
@@ -166,9 +156,9 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
       final prayerData = _box!.get(date);
       if (prayerData != null) {
         final data = Map<String, dynamic>.from(prayerData);
-        
+
         // Get or create qazaDone map
-        final qazaDone = data['qazaDone'] != null 
+        final qazaDone = data['qazaDone'] != null
             ? Map<String, bool>.from(data['qazaDone'] as Map)
             : <String, bool>{
                 'ফজর': false,
@@ -177,16 +167,16 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
                 'মাগরিব': false,
                 'এশা': false,
               };
-        
+
         qazaDone[prayerName] = true;
         data['qazaDone'] = qazaDone;
-        
+
         // Save back to Hive
         await _box!.put(date, data);
-        
+
         // Sync to cloud
         firestoreSyncService.syncPrayerTracking(date, data);
-        
+
         // Reload to update state
         await loadQazaPrayers();
       }
@@ -203,20 +193,20 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
       final prayerData = _box!.get(date);
       if (prayerData != null) {
         final data = Map<String, dynamic>.from(prayerData);
-        
-        final qazaDone = data['qazaDone'] != null 
+
+        final qazaDone = data['qazaDone'] != null
             ? Map<String, bool>.from(data['qazaDone'] as Map)
             : <String, bool>{};
-        
+
         qazaDone[prayerName] = false;
         data['qazaDone'] = qazaDone;
-        
+
         // Save back to Hive
         await _box!.put(date, data);
-        
+
         // Sync to cloud
         firestoreSyncService.syncPrayerTracking(date, data);
-        
+
         // Reload to update state
         await loadQazaPrayers();
       }
@@ -230,14 +220,16 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
     // Find current state
     final summary = state.prayerSummaries.firstWhere(
       (s) => s.prayerName == prayerName,
-      orElse: () => QazaPrayerSummary(prayerName: prayerName, missedPrayers: []),
+      orElse: () =>
+          QazaPrayerSummary(prayerName: prayerName, missedPrayers: []),
     );
-    
+
     final missedPrayer = summary.missedPrayers.firstWhere(
       (p) => p.date == date,
-      orElse: () => MissedPrayer(date: date, prayerName: prayerName, isQazaDone: false),
+      orElse: () =>
+          MissedPrayer(date: date, prayerName: prayerName, isQazaDone: false),
     );
-    
+
     if (missedPrayer.isQazaDone) {
       await unmarkQazaCompleted(date, prayerName);
     } else {
@@ -249,7 +241,8 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
   int getPendingCount(String prayerName) {
     final summary = state.prayerSummaries.firstWhere(
       (s) => s.prayerName == prayerName,
-      orElse: () => QazaPrayerSummary(prayerName: prayerName, missedPrayers: []),
+      orElse: () =>
+          QazaPrayerSummary(prayerName: prayerName, missedPrayers: []),
     );
     return summary.pendingCount;
   }
@@ -263,5 +256,5 @@ class QazaPrayerNotifier extends StateNotifier<QazaPrayerState> {
 // Provider
 final qazaPrayerProvider =
     StateNotifierProvider<QazaPrayerNotifier, QazaPrayerState>((ref) {
-  return QazaPrayerNotifier();
-});
+      return QazaPrayerNotifier();
+    });

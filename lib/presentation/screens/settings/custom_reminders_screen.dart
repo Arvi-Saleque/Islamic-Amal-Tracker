@@ -8,10 +8,7 @@ import '../statistics/widgets/digital_time_picker.dart';
 class CustomRemindersScreen extends StatefulWidget {
   final Future<void> Function()? onRemindersChanged;
 
-  const CustomRemindersScreen({
-    super.key,
-    this.onRemindersChanged,
-  });
+  const CustomRemindersScreen({super.key, this.onRemindersChanged});
 
   @override
   State<CustomRemindersScreen> createState() => _CustomRemindersScreenState();
@@ -68,8 +65,9 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'custom_rem_delete_confirm'
-                    .tr(namedArgs: {'title': reminder.title}),
+                'custom_rem_delete_confirm'.tr(
+                  namedArgs: {'title': reminder.title},
+                ),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -83,10 +81,9 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
                     child: Text(
                       'cancel'.tr(),
                       style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ),
@@ -154,20 +151,22 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -191,11 +190,13 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
       ),
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             )
           : _reminders.isEmpty
-              ? _buildEmptyState()
-              : _buildRemindersList(),
+          ? _buildEmptyState()
+          : _buildRemindersList(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openAddReminderScreen(),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -219,18 +220,12 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
           const SizedBox(height: 16),
           Text(
             'custom_rem_empty'.tr(),
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 16,
-            ),
+            style: const TextStyle(color: Colors.grey, fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
             'custom_rem_add_hint'.tr(),
-            style: TextStyle(
-              color: Colors.grey.withOpacity(0.7),
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 14),
           ),
         ],
       ),
@@ -250,7 +245,7 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
 
   Widget _buildReminderCard(CustomReminder reminder) {
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: buildPremiumCard(
@@ -267,98 +262,106 @@ class _CustomRemindersScreenState extends State<CustomRemindersScreen> {
               child: Row(
                 children: [
                   Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: reminder.isEnabled
-                        ? primary.withOpacity(0.2)
-                        : Colors.grey.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: reminder.isEnabled
+                          ? primary.withOpacity(0.2)
+                          : Colors.grey.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      _getReminderIcon(reminder),
+                      color: reminder.isEnabled ? primary : Colors.grey,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    _getReminderIcon(reminder),
-                    color: reminder.isEnabled
-                        ? primary
-                        : Colors.grey,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        reminder.title,
-                        style: TextStyle(
-                          color: reminder.isEnabled 
-                              ? Theme.of(context).colorScheme.onSurface 
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          reminder.title,
+                          style: TextStyle(
+                            color: reminder.isEnabled
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface.withOpacity(0.5),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        reminder.getTimeDisplayString(),
-                        style: TextStyle(
-                          color: reminder.isEnabled
-                              ? primary
-                              : Colors.grey.withOpacity(0.7),
-                          fontSize: 13,
-                        ),
-                      ),
-                      if (reminder.description != null &&
-                          reminder.description!.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
-                          reminder.description!,
+                          reminder.getTimeDisplayString(),
                           style: TextStyle(
-                            color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
-                            fontSize: 12,
+                            color: reminder.isEnabled
+                                ? primary
+                                : Colors.grey.withOpacity(0.7),
+                            fontSize: 13,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
+                        if (reminder.description != null &&
+                            reminder.description!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            reminder.description!,
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).extension<GradientColors>()!.bulletTextColor,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Switch(
+                        value: reminder.isEnabled,
+                        onChanged: (_) => _toggleReminder(reminder),
+                        activeThumbColor: primary,
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.edit_outlined,
+                              color: primary,
+                              size: 20,
+                            ),
+                            onPressed: () => _openAddReminderScreen(reminder),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: 'custom_rem_edit_tooltip'.tr(),
+                          ),
+                          const SizedBox(width: 12),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            onPressed: () => _deleteReminder(reminder),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: 'custom_rem_delete_tooltip'.tr(),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    Switch(
-                      value: reminder.isEnabled,
-                      onChanged: (_) => _toggleReminder(reminder),
-                      activeThumbColor: primary,
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit_outlined,
-                              color: primary, size: 20),
-                          onPressed: () => _openAddReminderScreen(reminder),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          tooltip: 'custom_rem_edit_tooltip'.tr(),
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red, size: 20),
-                          onPressed: () => _deleteReminder(reminder),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          tooltip: 'custom_rem_delete_tooltip'.tr(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -494,10 +497,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
           : 'custom_rem_added'.tr();
       Navigator.pop(context);
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: snackBarBg,
-        ),
+        SnackBar(content: Text(message), backgroundColor: snackBarBg),
       );
     }
   }
@@ -524,20 +524,22 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -558,7 +560,6 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
           ),
         ),
         centerTitle: true,
-        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -572,17 +573,22 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
               child: TextField(
                 controller: _titleController,
                 maxLength: 50,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   hintText: 'custom_rem_title_hint'.tr(),
                   hintStyle: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.3),
                   ),
                   border: InputBorder.none,
-                  counterStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                  counterStyle: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.5),
+                  ),
                 ),
               ),
             ),
@@ -615,8 +621,11 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.edit,
-                            color: Theme.of(context).colorScheme.primary, size: 18),
+                        Icon(
+                          Icons.edit,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 18,
+                        ),
                       ],
                     ),
                   ],
@@ -658,9 +667,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
                 onPressed: _saveReminder,
                 icon: const Icon(Icons.add),
                 label: Text(
-                  _isEditing
-                      ? 'custom_rem_save'.tr()
-                      : 'custom_rem_save'.tr(),
+                  _isEditing ? 'custom_rem_save'.tr() : 'custom_rem_save'.tr(),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -686,7 +693,7 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
     required Widget child,
   }) {
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 12,
@@ -745,16 +752,22 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 width: 1,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
@@ -764,7 +777,9 @@ class _AddCustomReminderScreenState extends State<AddCustomReminderScreen> {
             child: Text(
               dayNames[index],
               style: TextStyle(
-                color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14,
               ),

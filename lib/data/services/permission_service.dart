@@ -24,17 +24,18 @@ class PermissionService {
       final shouldRequest = await _showPermissionDialog(
         context,
         title: 'লোকেশন অনুমতি প্রয়োজন',
-        message: 'সঠিক নামাজের সময় নির্ধারণের জন্য আপনার লোকেশন অনুমতি প্রয়োজন। এটি শুধুমাত্র নামাজের সময় হিসাব করতে ব্যবহার করা হবে।',
+        message:
+            'সঠিক নামাজের সময় নির্ধারণের জন্য আপনার লোকেশন অনুমতি প্রয়োজন। এটি শুধুমাত্র নামাজের সময় হিসাব করতে ব্যবহার করা হবে।',
       );
-      
+
       if (!shouldRequest) return false;
-      
+
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         return false;
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       await _showPermissionDialog(
         context,
@@ -44,17 +45,17 @@ class PermissionService {
       await Geolocator.openAppSettings();
       return false;
     }
-    
+
     return true;
   }
-  
+
   // Check if location permission is granted
   static Future<bool> checkLocationPermission() async {
     final permission = await Geolocator.checkPermission();
-    return permission == LocationPermission.whileInUse || 
-           permission == LocationPermission.always;
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
   }
-  
+
   static Future<bool> _showPermissionDialog(
     BuildContext context, {
     required String title,
@@ -67,25 +68,16 @@ class PermissionService {
         return AlertDialog(
           title: Text(
             title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          content: Text(
-            message,
-            style: const TextStyle(fontSize: 15),
-          ),
+          content: Text(message, style: const TextStyle(fontSize: 15)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'না',
-                style: TextStyle(color: Colors.grey),
-              ),
+              child: const Text('না', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -104,7 +96,7 @@ class PermissionService {
         );
       },
     );
-    
+
     return result ?? false;
   }
 }

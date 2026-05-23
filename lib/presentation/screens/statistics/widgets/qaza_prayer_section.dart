@@ -58,7 +58,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   Widget _buildSummaryCard(int totalPending, QazaPrayerState state) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
@@ -79,8 +79,9 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
               Flexible(
                 child: Text(
                   totalPending > 0
-                      ? 'stats_qaza_pending'
-                          .tr(namedArgs: {'count': totalPending.toString()})
+                      ? 'stats_qaza_pending'.tr(
+                          namedArgs: {'count': totalPending.toString()},
+                        )
                       : 'stats_qaza_none'.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -97,9 +98,9 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
             Text(
               'stats_qaza_last30'.tr(),
               style: TextStyle(
-                color: Theme.of(context)
-                    .extension<GradientColors>()!
-                    .bulletTextColor,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.bulletTextColor,
                 fontSize: 14,
               ),
             ),
@@ -112,26 +113,19 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
   Widget _buildInfoCard() {
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            color: primary.withOpacity(0.8),
-            size: 20,
-          ),
+          Icon(Icons.info_outline, color: primary.withOpacity(0.8), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               'stats_qaza_instruction'.tr(),
-              style: TextStyle(
-                color: onSurface.withOpacity(0.9),
-                fontSize: 13,
-              ),
+              style: TextStyle(color: onSurface.withOpacity(0.9), fontSize: 13),
             ),
           ),
         ],
@@ -201,7 +195,11 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                           const SizedBox(height: 4),
                           Text(
                             hasPending
-                                ? 'stats_qaza_pending_waqt'.tr(namedArgs: {'count': pendingCount.toString()})
+                                ? 'stats_qaza_pending_waqt'.tr(
+                                    namedArgs: {
+                                      'count': pendingCount.toString(),
+                                    },
+                                  )
                                 : 'stats_qaza_all_done'.tr(),
                             style: TextStyle(
                               color: hasPending
@@ -273,7 +271,9 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                       child: Text(
                         'stats_qaza_none_pending'.tr(),
                         style: TextStyle(
-                          color: Theme.of(context).extension<GradientColors>()!.bulletTextColor,
+                          color: Theme.of(
+                            context,
+                          ).extension<GradientColors>()!.bulletTextColor,
                           fontSize: 14,
                         ),
                       ),
@@ -297,7 +297,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletColor = gradients.bulletTextColor;
-    
+
     final date = DateTime.parse(qaza.date);
     final formattedDate = _formatDate(date);
     final weekday = _getWeekday(date.weekday);
@@ -311,10 +311,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
           decoration: BoxDecoration(
             color: shadowColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: shadowColor.withOpacity(0.15),
-              width: 1,
-            ),
+            border: Border.all(color: shadowColor.withOpacity(0.15), width: 1),
             boxShadow: [
               BoxShadow(
                 color: shadowColor.withOpacity(0.1),
@@ -331,8 +328,8 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: qaza.isQazaDone 
-                      ? Colors.green 
+                  color: qaza.isQazaDone
+                      ? Colors.green
                       : shadowColor.withOpacity(0.15),
                   border: qaza.isQazaDone
                       ? null
@@ -352,11 +349,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                   ],
                 ),
                 child: qaza.isQazaDone
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 16,
-                      )
+                    ? const Icon(Icons.check, color: Colors.white, size: 16)
                     : null,
               ),
               const SizedBox(width: 14),
@@ -371,16 +364,14 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
                         color: qaza.isQazaDone ? bulletColor : onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        decoration:
-                            qaza.isQazaDone ? TextDecoration.lineThrough : null,
+                        decoration: qaza.isQazaDone
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     Text(
                       weekday,
-                      style: TextStyle(
-                        color: bulletColor,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: bulletColor, fontSize: 12),
                     ),
                   ],
                 ),
@@ -388,10 +379,7 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
               // Days ago
               Text(
                 _getDaysAgo(date),
-                style: TextStyle(
-                  color: bulletColor,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: bulletColor, fontSize: 12),
               ),
             ],
           ),
@@ -433,16 +421,31 @@ class _QazaPrayerSectionState extends ConsumerState<QazaPrayerSection> {
 
   String _formatDate(DateTime date) {
     const monthKeys = [
-      'month_jan', 'month_feb', 'month_mar', 'month_apr', 'month_may', 'month_jun',
-      'month_jul', 'month_aug', 'month_sep', 'month_oct', 'month_nov', 'month_dec',
+      'month_jan',
+      'month_feb',
+      'month_mar',
+      'month_apr',
+      'month_may',
+      'month_jun',
+      'month_jul',
+      'month_aug',
+      'month_sep',
+      'month_oct',
+      'month_nov',
+      'month_dec',
     ];
     return '${date.day} ${monthKeys[date.month - 1].tr()}';
   }
 
   String _getWeekday(int weekday) {
     const dayKeys = [
-      'weekday_mon', 'weekday_tue', 'weekday_wed', 'weekday_thu',
-      'weekday_fri', 'weekday_sat', 'weekday_sun',
+      'weekday_mon',
+      'weekday_tue',
+      'weekday_wed',
+      'weekday_thu',
+      'weekday_fri',
+      'weekday_sat',
+      'weekday_sun',
     ];
     return dayKeys[weekday - 1].tr();
   }

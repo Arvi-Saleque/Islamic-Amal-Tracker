@@ -2,30 +2,35 @@ class PrayerTrackingModel {
   final String date; // Format: yyyy-MM-dd
   final Map<String, bool> prayerDone;
   final Map<String, Map<String, bool>> rakatsDone;
-  final Map<String, bool> qazaDone; // Track if qaza has been completed for missed prayers
+  final Map<String, bool>
+  qazaDone; // Track if qaza has been completed for missed prayers
 
   PrayerTrackingModel({
     required this.date,
     required this.prayerDone,
     required this.rakatsDone,
     Map<String, bool>? qazaDone,
-  }) : qazaDone = qazaDone ?? {
-          'ফজর': false,
-          'যোহর': false,
-          'আসর': false,
-          'মাগরিব': false,
-          'এশা': false,
-        };
+  }) : qazaDone =
+           qazaDone ??
+           {
+             'ফজর': false,
+             'যোহর': false,
+             'আসর': false,
+             'মাগরিব': false,
+             'এশা': false,
+           };
 
   // Convert to JSON for Hive storage
   Map<String, dynamic> toJson() {
     return {
       'date': date,
       'prayerDone': prayerDone,
-      'rakatsDone': rakatsDone.map((prayer, rakats) => MapEntry(
-            prayer,
-            rakats.map((rakat, done) => MapEntry(rakat, done)),
-          )),
+      'rakatsDone': rakatsDone.map(
+        (prayer, rakats) => MapEntry(
+          prayer,
+          rakats.map((rakat, done) => MapEntry(rakat, done)),
+        ),
+      ),
       'qazaDone': qazaDone,
     };
   }
@@ -34,10 +39,8 @@ class PrayerTrackingModel {
   factory PrayerTrackingModel.fromJson(Map<String, dynamic> json) {
     final prayerDone = Map<String, bool>.from(json['prayerDone'] as Map);
     final rakatsDone = (json['rakatsDone'] as Map).map(
-      (prayer, rakats) => MapEntry(
-        prayer.toString(),
-        Map<String, bool>.from(rakats as Map),
-      ),
+      (prayer, rakats) =>
+          MapEntry(prayer.toString(), Map<String, bool>.from(rakats as Map)),
     );
     var qazaDone = json['qazaDone'] != null
         ? Map<String, bool>.from(json['qazaDone'] as Map)
@@ -50,7 +53,9 @@ class PrayerTrackingModel {
     if (rakatsDone.containsKey('যুহর') && !rakatsDone.containsKey('যোহর')) {
       rakatsDone['যোহর'] = rakatsDone.remove('যুহর')!;
     }
-    if (qazaDone != null && qazaDone.containsKey('যুহর') && !qazaDone.containsKey('যোহর')) {
+    if (qazaDone != null &&
+        qazaDone.containsKey('যুহর') &&
+        !qazaDone.containsKey('যোহর')) {
       qazaDone['যোহর'] = qazaDone.remove('যুহর')!;
     }
 
@@ -126,7 +131,8 @@ class PrayerTrackingModel {
     return PrayerTrackingModel(
       date: date ?? this.date,
       prayerDone: prayerDone ?? Map.from(this.prayerDone),
-      rakatsDone: rakatsDone ??
+      rakatsDone:
+          rakatsDone ??
           this.rakatsDone.map(
             (prayer, rakats) => MapEntry(prayer, Map.from(rakats)),
           ),

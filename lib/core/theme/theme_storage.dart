@@ -6,7 +6,8 @@ class ThemeStorage {
   /// Get the currently selected theme name
   /// Returns 'dark', 'light', or future themes like 'green'
   static String getSelectedTheme() {
-    return HiveService.settingsBox.get(_themeKey, defaultValue: 'dark') as String;
+    return HiveService.settingsBox.get(_themeKey, defaultValue: 'dark')
+        as String;
   }
 
   /// Set the selected theme name

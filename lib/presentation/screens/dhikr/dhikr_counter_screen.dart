@@ -36,20 +36,22 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -74,16 +76,15 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             onPressed: () => _showInfoBottomSheet(context),
           ),
         ],
-        
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: Theme.of(context)
-                .extension<GradientColors>()!
-                .backgroundGradient,
+            colors: Theme.of(
+              context,
+            ).extension<GradientColors>()!.backgroundGradient,
           ),
         ),
         child: SafeArea(
@@ -92,7 +93,11 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
             children: [
               // Overall Progress Card
               _buildOverallProgress(
-                  totalCount, totalTarget, completedItems, totalItems),
+                totalCount,
+                totalTarget,
+                completedItems,
+                totalItems,
+              ),
 
               // Dhikr List
               Expanded(
@@ -127,7 +132,11 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 
   Widget _buildOverallProgress(
-      int count, int target, int completed, int total) {
+    int count,
+    int target,
+    int completed,
+    int total,
+  ) {
     final percentage = target > 0 ? (count / target).clamp(0.0, 1.0) : 0.0;
 
     final theme = Theme.of(context);
@@ -140,8 +149,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         radius: 18,
         padding: const EdgeInsets.all(16),
         child: Column(
-              children: [
-              Row(
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
@@ -154,13 +163,17 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: theme.extension<GradientColors>()!.innerCardGradient,
+                      colors: theme
+                          .extension<GradientColors>()!
+                          .innerCardGradient,
                     ),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
@@ -302,299 +315,299 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
         radius: 18,
         padding: EdgeInsets.zero,
         child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (dhikr.arabic != null) ...[
-                            Text(
-                              dhikr.arabic!,
-                              style: TextStyle(
-                                color: cs.primary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Arial',
-                                height: 1.25,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                          Text(
-                            _localizedDhikrTitle(context, dhikr),
-                            style: TextStyle(
-                              color: isCompleted
-                                  ? titleColor
-                                  : subtitleColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    if (dhikr.isCustom)
-                      Row(
-                        children: [
-                          _IconPillButton(
-                            icon: Icons.edit_outlined,
-                            onTap: () => _showEditTargetDialog(
-                              context,
-                              dhikr,
-                              notifier,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _IconPillButton(
-                            icon: Icons.delete_outline,
-                            onTap: () => _confirmDeleteDhikr(
-                              context,
-                              dhikr,
-                              notifier,
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Counter Display (Glass + 3D)
-                _GlassPanel(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
-                  borderRadius: 18,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildCounterButton(
-                        icon: Icons.remove,
-                        onPressed: dhikr.currentCount > 0
-                            ? () {
-                                HapticFeedback.lightImpact();
-                                notifier.decrementDhikr(dhikr.id);
-                              }
-                            : null,
-                      ),
-                      const SizedBox(width: 16),
-
-                      // Count Display (Tappable for manual input)
-                      Flexible(
-                        child: InkWell(
-                          onTap: () => _showManualInputDialog(
-                            context,
-                            dhikr,
-                            notifier,
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          child: Container(
-                            constraints: const BoxConstraints(minWidth: 120),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: theme.extension<GradientColors>()!.innerCardGradient,
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: cs.primary.withOpacity(0.25),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.shadowColor.withOpacity(0.15),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (dhikr.arabic != null) ...[
+                              Text(
+                                dhikr.arabic!,
+                                style: TextStyle(
+                                  color: cs.primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Arial',
+                                  height: 1.25,
                                 ),
-                              ],
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            Text(
+                              _localizedDhikrTitle(context, dhikr),
+                              style: TextStyle(
+                                color: isCompleted ? titleColor : subtitleColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                              ),
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  height: 42,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '${dhikr.currentCount}',
-                                      maxLines: 1,
-                                      softWrap: false,
-                                      style: TextStyle(
-                                        color: cs.primary,
-                                        fontSize: 36,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1,
-                                        letterSpacing: -0.6,
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      if (dhikr.isCustom)
+                        Row(
+                          children: [
+                            _IconPillButton(
+                              icon: Icons.edit_outlined,
+                              onTap: () => _showEditTargetDialog(
+                                context,
+                                dhikr,
+                                notifier,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _IconPillButton(
+                              icon: Icons.delete_outline,
+                              onTap: () =>
+                                  _confirmDeleteDhikr(context, dhikr, notifier),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Counter Display (Glass + 3D)
+                  _GlassPanel(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 14,
+                    ),
+                    borderRadius: 18,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildCounterButton(
+                          icon: Icons.remove,
+                          onPressed: dhikr.currentCount > 0
+                              ? () {
+                                  HapticFeedback.lightImpact();
+                                  notifier.decrementDhikr(dhikr.id);
+                                }
+                              : null,
+                        ),
+                        const SizedBox(width: 16),
+
+                        // Count Display (Tappable for manual input)
+                        Flexible(
+                          child: InkWell(
+                            onTap: () => _showManualInputDialog(
+                              context,
+                              dhikr,
+                              notifier,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              constraints: const BoxConstraints(minWidth: 120),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: theme
+                                      .extension<GradientColors>()!
+                                      .innerCardGradient,
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: cs.primary.withOpacity(0.25),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.shadowColor.withOpacity(0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    height: 42,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        '${dhikr.currentCount}',
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                          color: cs.primary,
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w900,
+                                          height: 1,
+                                          letterSpacing: -0.6,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${'daily_amal_goal'.tr()}: ${dhikr.targetCount}',
-                                  style: TextStyle(
-                                    color: cs.onSurfaceVariant,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${'daily_amal_goal'.tr()}: ${dhikr.targetCount}',
+                                    style: TextStyle(
+                                      color: cs.onSurfaceVariant,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 6),
-                                Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: cs.primary,
-                                    shape: BoxShape.circle,
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: cs.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 12,
+                                      color: theme
+                                          .extension<GradientColors>()!
+                                          .onPrimaryText,
+                                    ),
                                   ),
-                                  child: Icon(
-                                    Icons.edit,
-                                    size: 12,
-                                    color: theme.extension<GradientColors>()!.onPrimaryText,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(width: 16),
-                      _buildCounterButton(
-                        icon: Icons.add,
-                        onPressed: dhikr.currentCount < dhikr.targetCount
-                            ? () {
-                                HapticFeedback.mediumImpact();
-                                notifier.incrementDhikr(dhikr.id);
-                                if (dhikr.currentCount + 1 ==
-                                    dhikr.targetCount) {
-                                  HapticFeedback.heavyImpact();
+                        const SizedBox(width: 16),
+                        _buildCounterButton(
+                          icon: Icons.add,
+                          onPressed: dhikr.currentCount < dhikr.targetCount
+                              ? () {
+                                  HapticFeedback.mediumImpact();
+                                  notifier.incrementDhikr(dhikr.id);
+                                  if (dhikr.currentCount + 1 ==
+                                      dhikr.targetCount) {
+                                    HapticFeedback.heavyImpact();
+                                  }
                                 }
-                              }
-                            : null,
-                        isPrimary: true,
+                              : null,
+                          isPrimary: true,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Progress Bar + actions
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${(progress * 100).toInt()}% ${'dhikr_complete'.tr()}',
+                            style: TextStyle(
+                              color: cs.onSurfaceVariant,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (isCompleted)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: completedBg,
+                                border: Border.all(color: completedBorder),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: completedText,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'dhikr_complete'.tr(),
+                                    style: TextStyle(
+                                      color: completedText,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else
+                            TextButton.icon(
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                notifier.resetDhikr(dhikr.id);
+                              },
+                              icon: Icon(
+                                Icons.refresh,
+                                size: 14,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              label: Text(
+                                'dhikr_reset'.tr(),
+                                style: TextStyle(
+                                  color: cs.onSurfaceVariant,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: progress),
+                          duration: const Duration(milliseconds: 650),
+                          curve: Curves.easeOutCubic,
+                          builder: (context, value, _) {
+                            return LinearProgressIndicator(
+                              value: value,
+                              minHeight: 7,
+                              backgroundColor: trackColor,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                cs.primary,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Progress Bar + actions
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${(progress * 100).toInt()}% ${'dhikr_complete'.tr()}',
-                          style: TextStyle(
-                            color: cs.onSurfaceVariant,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (isCompleted)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              color: completedBg,
-                              border: Border.all(color: completedBorder),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.check_circle,
-                                  color: completedText,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'dhikr_complete'.tr(),
-                                  style: TextStyle(
-                                    color: completedText,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          TextButton.icon(
-                            onPressed: () {
-                              HapticFeedback.selectionClick();
-                              notifier.resetDhikr(dhikr.id);
-                            },
-                            icon: Icon(
-                              Icons.refresh,
-                              size: 14,
-                              color: cs.onSurfaceVariant,
-                            ),
-                            label: Text(
-                              'dhikr_reset'.tr(),
-                              style: TextStyle(
-                                color: cs.onSurfaceVariant,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: progress),
-                        duration: const Duration(milliseconds: 650),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, value, _) {
-                          return LinearProgressIndicator(
-                            value: value,
-                            minHeight: 7,
-                            backgroundColor:
-                                trackColor,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              cs.primary,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -645,11 +658,16 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                           ],
                         ),
                   border: isPrimary
-                      ? Border.all(color: cs.primary.withOpacity(0.75), width: 1)
+                      ? Border.all(
+                          color: cs.primary.withOpacity(0.75),
+                          width: 1,
+                        )
                       : null,
                   boxShadow: [
                     BoxShadow(
-                      color: theme.shadowColor.withOpacity(isPrimary ? 0.30 : 0.20),
+                      color: theme.shadowColor.withOpacity(
+                        isPrimary ? 0.30 : 0.20,
+                      ),
                       blurRadius: isPrimary ? 6 : 2,
                       offset: const Offset(0, 3),
                     ),
@@ -664,9 +682,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 alignment: Alignment.center,
                 child: Icon(
                   icon,
-                  color: isPrimary
-                      ? gradients.onPrimaryText
-                      : cs.onSurface,
+                  color: isPrimary ? gradients.onPrimaryText : cs.onSurface,
                   size: 28,
                 ),
               ),
@@ -678,7 +694,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
   }
 
   void _showAddDhikrDialog(
-      BuildContext context, DhikrCounterNotifier notifier) {
+    BuildContext context,
+    DhikrCounterNotifier notifier,
+  ) {
     final titleController = TextEditingController();
     final arabicController = TextEditingController();
     final targetController = TextEditingController(text: '100');
@@ -714,16 +732,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: titleController,
-                  style: TextStyle(
-                    color: cs.onSurface,
-                  ),
+                  style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     labelText: 'dhikr_name'.tr(),
                     filled: true,
                     fillColor: fieldFill,
-                    labelStyle: TextStyle(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
@@ -742,17 +756,12 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: arabicController,
-                  style: TextStyle(
-                    color: cs.onSurface,
-                    fontSize: 20,
-                  ),
+                  style: TextStyle(color: cs.onSurface, fontSize: 20),
                   decoration: InputDecoration(
                     labelText: 'dhikr_arabic_optional'.tr(),
                     filled: true,
                     fillColor: fieldFill,
-                    labelStyle: TextStyle(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
@@ -771,17 +780,13 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: targetController,
-                  style: TextStyle(
-                    color: cs.onSurface,
-                  ),
+                  style: TextStyle(color: cs.onSurface),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: 'dhikr_target_count'.tr(),
                     filled: true,
                     fillColor: fieldFill,
-                    labelStyle: TextStyle(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
@@ -812,7 +817,8 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     ElevatedButton(
                       onPressed: () {
                         if (titleController.text.isNotEmpty) {
-                          final target = int.tryParse(targetController.text) ?? 100;
+                          final target =
+                              int.tryParse(targetController.text) ?? 100;
                           notifier.addCustomDhikr(
                             titleController.text,
                             arabicController.text.isEmpty
@@ -831,8 +837,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
                       ),
                       child: Text('dhikr_add'.tr()),
                     ),
@@ -851,8 +859,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     DhikrItem dhikr,
     DhikrCounterNotifier notifier,
   ) {
-    final targetController =
-        TextEditingController(text: '${dhikr.targetCount}');
+    final targetController = TextEditingController(
+      text: '${dhikr.targetCount}',
+    );
 
     showDialog(
       context: context,
@@ -885,30 +894,26 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: targetController,
-                  style: TextStyle(
-                    color: cs.onSurface,
-                  ),
+                  style: TextStyle(color: cs.onSurface),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: 'dhikr_new_target'.tr(),
                     filled: true,
                     fillColor: fieldFill,
-                labelStyle: TextStyle(
-                  color: cs.onSurfaceVariant,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: cs.outline.withOpacity(0.2),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: cs.primary.withOpacity(0.6),
-                    width: 1.4,
-                  ),
-                ),
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: cs.outline.withOpacity(0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: cs.primary.withOpacity(0.6),
+                        width: 1.4,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -939,8 +944,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
                       ),
                       child: Text('dhikr_update'.tr()),
                     ),
@@ -990,10 +997,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                   'dhikr_delete_confirm'.tr(
                     namedArgs: {'title': _localizedDhikrTitle(context, dhikr)},
                   ),
-                  style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -1020,8 +1024,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
                       ),
                       child: Text('daily_amal_delete_confirm'.tr()),
                     ),
@@ -1109,9 +1115,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                     labelText: 'dhikr_enter_count'.tr(),
                     filled: true,
                     fillColor: fieldFill,
-                    labelStyle: TextStyle(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    labelStyle: TextStyle(color: cs.onSurfaceVariant),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide(
@@ -1130,10 +1134,7 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 const SizedBox(height: 16),
                 Text(
                   '${'daily_amal_goal'.tr()}: ${dhikr.targetCount}',
-                  style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -1172,8 +1173,10 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
                       ),
                       child: Text('dhikr_set_count'.tr()),
                     ),
@@ -1187,16 +1190,15 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
     );
   }
 
-  
-      
-
   // Show info bottom sheet
   void _showInfoBottomSheet(BuildContext context) {
     final dividerColor = Theme.of(context).colorScheme.primary.withOpacity(0.3);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
+      backgroundColor: Theme.of(
+        context,
+      ).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.86,
@@ -1215,10 +1217,9 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1230,15 +1231,16 @@ class _DhikrCounterScreenState extends ConsumerState<DhikrCounterScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.15),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(Icons.info_outline_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 24),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1436,10 +1438,7 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
-  });
+  const _SectionHeader({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -1456,8 +1455,13 @@ class _SectionHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: Theme.of(context).extension<GradientColors>()!.onPrimaryText, size: 18),
+            child: Icon(
+              icon,
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.onPrimaryText,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1481,10 +1485,7 @@ class _HadithCard extends StatelessWidget {
   final String hadith;
   final String reference;
 
-  const _HadithCard({
-    required this.hadith,
-    required this.reference,
-  });
+  const _HadithCard({required this.hadith, required this.reference});
 
   @override
   Widget build(BuildContext context) {
@@ -1506,12 +1507,16 @@ class _HadithCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.format_quote_rounded,
-                    color: Theme.of(context).colorScheme.primary, size: 14),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1547,7 +1552,7 @@ class _HadithCard extends StatelessWidget {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -1583,7 +1588,7 @@ class _GlassPanel extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: theme.extension<GradientColors>()!.innerCardGradient,
             ),
-            border:Border.all(color: cs.outline.withOpacity(0.10), width: 1),
+            border: Border.all(color: cs.outline.withOpacity(0.10), width: 1),
             boxShadow: [
               BoxShadow(
                 color: theme.shadowColor.withOpacity(0.15),
@@ -1600,10 +1605,7 @@ class _GlassPanel extends StatelessWidget {
 }
 
 class _IconPillButton extends StatelessWidget {
-  const _IconPillButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _IconPillButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -1634,11 +1636,7 @@ class _IconPillButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            icon,
-            color: cs.onSurfaceVariant,
-            size: 20,
-          ),
+          child: Icon(icon, color: cs.onSurfaceVariant, size: 20),
         ),
       ),
     );

@@ -6,7 +6,8 @@ import 'package:hive/hive.dart';
 /// Firestore Sync Service
 /// ক্লাউডে ডেটা সিংক করার জন্য সার্ভিস
 class FirestoreSyncService {
-  static final FirestoreSyncService _instance = FirestoreSyncService._internal();
+  static final FirestoreSyncService _instance =
+      FirestoreSyncService._internal();
   factory FirestoreSyncService() => _instance;
   FirestoreSyncService._internal();
 
@@ -20,7 +21,7 @@ class FirestoreSyncService {
       _firestore = FirebaseFirestore.instance;
       _auth = FirebaseAuth.instance;
       _isAvailable = true;
-      
+
       // Enable offline persistence (only for mobile - web uses IndexedDB by default)
       if (!kIsWeb) {
         _firestore!.settings = const Settings(
@@ -36,7 +37,7 @@ class FirestoreSyncService {
 
   /// Check if user is logged in and sync is available
   bool get canSync => _isAvailable && _auth?.currentUser != null;
-  
+
   /// Get current user ID
   String? get userId => _auth?.currentUser?.uid;
 
@@ -49,16 +50,23 @@ class FirestoreSyncService {
   // ==================== SYNC METHODS ====================
 
   /// Sync prayer tracking data
-  Future<void> syncPrayerTracking(String date, Map<String, dynamic> data) async {
+  Future<void> syncPrayerTracking(
+    String date,
+    Map<String, dynamic> data,
+  ) async {
     if (!canSync) {
       print('Cannot sync prayer_tracking - not logged in');
       return;
     }
     try {
-      await _userDataCollection!.doc('prayer_tracking').collection('days').doc(date).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('prayer_tracking')
+          .collection('days')
+          .doc(date)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
       print('Synced prayer_tracking for $date');
     } catch (e) {
       print('Error syncing prayer tracking: $e');
@@ -72,10 +80,14 @@ class FirestoreSyncService {
       return;
     }
     try {
-      await _userDataCollection!.doc('daily_amal').collection('days').doc(date).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('daily_amal')
+          .collection('days')
+          .doc(date)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
       print('Synced daily_amal for $date');
     } catch (e) {
       print('Error syncing daily amal: $e');
@@ -86,23 +98,34 @@ class FirestoreSyncService {
   Future<void> syncDhikrCounter(String date, Map<String, dynamic> data) async {
     if (!canSync) return;
     try {
-      await _userDataCollection!.doc('dhikr_counter').collection('days').doc(date).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('dhikr_counter')
+          .collection('days')
+          .doc(date)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
     } catch (e) {
       print('Error syncing dhikr counter: $e');
     }
   }
 
   /// Sync reading tracker data
-  Future<void> syncReadingTracker(String date, Map<String, dynamic> data) async {
+  Future<void> syncReadingTracker(
+    String date,
+    Map<String, dynamic> data,
+  ) async {
     if (!canSync) return;
     try {
-      await _userDataCollection!.doc('reading_tracker').collection('days').doc(date).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('reading_tracker')
+          .collection('days')
+          .doc(date)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
     } catch (e) {
       print('Error syncing reading tracker: $e');
     }
@@ -112,10 +135,14 @@ class FirestoreSyncService {
   Future<void> syncSinTracker(String date, Map<String, dynamic> data) async {
     if (!canSync) return;
     try {
-      await _userDataCollection!.doc('sin_tracker').collection('days').doc(date).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('sin_tracker')
+          .collection('days')
+          .doc(date)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
     } catch (e) {
       print('Error syncing sin tracker: $e');
     }
@@ -138,10 +165,14 @@ class FirestoreSyncService {
   Future<void> syncQazaPrayer(String key, Map<String, dynamic> data) async {
     if (!canSync) return;
     try {
-      await _userDataCollection!.doc('qaza_prayers').collection('items').doc(key).set({
-        ...data,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await _userDataCollection!
+          .doc('qaza_prayers')
+          .collection('items')
+          .doc(key)
+          .set({
+            ...data,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
     } catch (e) {
       print('Error syncing qaza prayer: $e');
     }
@@ -166,12 +197,12 @@ class FirestoreSyncService {
   /// Restore all data from cloud to local
   Future<bool> restoreAllData() async {
     print('RestoreAllData called. canSync: $canSync, userId: $userId');
-    
+
     if (!canSync) {
       print('Cannot sync - Firebase not available or user not logged in');
       return false;
     }
-    
+
     try {
       print('Starting restore from Firestore...');
       await Future.wait([
@@ -196,7 +227,7 @@ class FirestoreSyncService {
         .doc('prayer_tracking')
         .collection('days')
         .get();
-    
+
     print('Restoring prayer_tracking: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('prayer_tracking');
     for (var doc in snapshot.docs) {
@@ -211,7 +242,7 @@ class FirestoreSyncService {
         .doc('daily_amal')
         .collection('days')
         .get();
-    
+
     print('Restoring daily_amal: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('daily_amal');
     for (var doc in snapshot.docs) {
@@ -226,7 +257,7 @@ class FirestoreSyncService {
         .doc('dhikr_counter')
         .collection('days')
         .get();
-    
+
     print('Restoring dhikr_counter: ${snapshot.docs.length} documents');
     final box = await Hive.openBox('dhikr_counter');
     for (var doc in snapshot.docs) {
@@ -241,7 +272,7 @@ class FirestoreSyncService {
         .doc('reading_tracker')
         .collection('days')
         .get();
-    
+
     final box = await Hive.openBox('reading_tracker');
     for (var doc in snapshot.docs) {
       final data = doc.data();
@@ -255,7 +286,7 @@ class FirestoreSyncService {
         .doc('sin_tracker')
         .collection('days')
         .get();
-    
+
     final box = await Hive.openBox('sin_tracker');
     for (var doc in snapshot.docs) {
       final data = doc.data();
@@ -292,7 +323,7 @@ class FirestoreSyncService {
   /// Backup all local data to cloud
   Future<bool> backupAllData() async {
     if (!canSync) return false;
-    
+
     try {
       await _backupPrayerTracking();
       await _backupDailyAmal();
@@ -349,7 +380,7 @@ class FirestoreSyncService {
 
   Future<void> _backupSinTracker() async {
     final box = await Hive.openBox('sin_tracker');
-    
+
     // Backup daily records
     for (var key in box.keys) {
       if (key == 'sin_types') continue;
@@ -358,11 +389,13 @@ class FirestoreSyncService {
         await syncSinTracker(key, Map<String, dynamic>.from(data));
       }
     }
-    
+
     // Backup sin types
     final sinTypes = box.get('sin_types');
     if (sinTypes != null) {
-      final types = (sinTypes as List).map((e) => Map<String, dynamic>.from(e)).toList();
+      final types = (sinTypes as List)
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
       await syncSinTypes(types);
     }
   }
@@ -380,17 +413,17 @@ class FirestoreSyncService {
   /// Delete all user data from cloud
   Future<bool> deleteAllUserData() async {
     if (!canSync) return false;
-    
+
     try {
       // Delete all subcollections
       final collections = [
         'prayer_tracking',
-        'daily_amal', 
+        'daily_amal',
         'dhikr_counter',
         'reading_tracker',
         'sin_tracker',
       ];
-      
+
       for (var col in collections) {
         final snapshot = await _userDataCollection!
             .doc(col)
@@ -401,13 +434,13 @@ class FirestoreSyncService {
         }
         await _userDataCollection!.doc(col).delete();
       }
-      
+
       // Delete config docs
       await _userDataCollection!.doc('sin_types').delete();
-      
+
       // Delete user doc
       await _firestore!.collection('users').doc(userId).delete();
-      
+
       return true;
     } catch (e) {
       print('Error deleting user data: $e');

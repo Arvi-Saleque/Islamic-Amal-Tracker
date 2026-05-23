@@ -34,10 +34,7 @@ class SinTrackerScreen extends ConsumerWidget {
               ],
             ),
             border: Border(
-              bottom: BorderSide(
-                color: gradients.appBarBorder,
-                width: 1.5,
-              ),
+              bottom: BorderSide(color: gradients.appBarBorder, width: 1.5),
             ),
           ),
         ),
@@ -56,7 +53,6 @@ class SinTrackerScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: true,
-        
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddSinTypeDialog(context, ref),
@@ -66,9 +62,7 @@ class SinTrackerScreen extends ConsumerWidget {
         child: Icon(Icons.add, color: gradients.onPrimaryText),
       ),
       body: state.isLoading
-          ? Center(
-              child: CircularProgressIndicator(color: cs.primary),
-            )
+          ? Center(child: CircularProgressIndicator(color: cs.primary))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -76,14 +70,14 @@ class SinTrackerScreen extends ConsumerWidget {
                 children: [
                   // Summary Card
                   _buildSummaryCard(state, context),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Motivation
                   _buildMotivationCard(state, context),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Sin Types List
                   Text(
                     'sin_list_title'.tr(),
@@ -93,14 +87,16 @@ class SinTrackerScreen extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   ...state.sinTypes.map((sinType) {
-                    final record = state.todayRecord.getRecordForType(sinType.id);
+                    final record = state.todayRecord.getRecordForType(
+                      sinType.id,
+                    );
                     return _buildSinTypeCard(context, ref, sinType, record);
                   }),
-                  
+
                   const SizedBox(height: 20),
                 ],
               ),
@@ -118,18 +114,17 @@ class SinTrackerScreen extends ConsumerWidget {
     } else if (pendingKaffara == 0) {
       message = 'sin_kaffara_done_all'.tr();
     } else {
-      message = 'sin_kaffara_pending'
-          .tr(namedArgs: {'count': pendingKaffara.toString()});
+      message = 'sin_kaffara_pending'.tr(
+        namedArgs: {'count': pendingKaffara.toString()},
+      );
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cs.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: cs.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: cs.primary.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -138,10 +133,7 @@ class SinTrackerScreen extends ConsumerWidget {
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
-                color: cs.primary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: cs.primary, fontSize: 14),
             ),
           ),
         ],
@@ -162,12 +154,7 @@ class SinTrackerScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(
-            'sin_total'.tr(),
-            '$totalSins',
-            cs.primary,
-            context,
-          ),
+          _buildStatItem('sin_total'.tr(), '$totalSins', cs.primary, context),
           Container(
             width: 1,
             height: 40,
@@ -195,7 +182,12 @@ class SinTrackerScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color, BuildContext context) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    Color color,
+    BuildContext context,
+  ) {
     final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
@@ -208,13 +200,7 @@ class SinTrackerScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: cs.onSurfaceVariant,
-            fontSize: 12,
-          ),
-        ),
+        Text(label, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12)),
       ],
     );
   }
@@ -230,25 +216,26 @@ class SinTrackerScreen extends ConsumerWidget {
     final kaffaraDone = record?.kaffaraDone ?? false;
     final kaffaraType = record?.kaffaraType;
 
-    
     Color? sinColor;
-    if(hasSinned && !kaffaraDone) {
+    if (hasSinned && !kaffaraDone) {
       sinColor = const Color(0xFFE53935); // Red for pending sin
     } else if (hasSinned && kaffaraDone) {
       sinColor = cs.primary; // Green for completed kaffara
     } else {
       sinColor = cs.primary;
-    }    
+    }
 
     Color? sin2Color;
-    if(hasSinned && !kaffaraDone) {
+    if (hasSinned && !kaffaraDone) {
       sin2Color = const Color(0xFFE53935); // Red for pending sin
     } else if (hasSinned && kaffaraDone) {
       sin2Color = cs.primary; // Green for completed kaffara
     } else {
-      sin2Color = Theme.of(context).colorScheme.onSurfaceVariant;// Grey for no sin
+      sin2Color = Theme.of(
+        context,
+      ).colorScheme.onSurfaceVariant; // Grey for no sin
     }
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: buildPremiumCard(
@@ -256,152 +243,186 @@ class SinTrackerScreen extends ConsumerWidget {
         radius: 18,
         padding: EdgeInsets.zero,
         child: Column(
-        children: [
-          // Main Row - Sin Name & Toggle
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Icon
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: cs.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    _getSinIcon(sinType.icon),
-                    color: sinColor,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                
-                const SizedBox(width: 12),
-                
-                // Name & Status
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _localizedSinName(context, sinType),
-                              style: TextStyle(
-                                color: cs.onSurface,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          if (!sinType.isDefault)
-                            GestureDetector(
-                              onTap: () => _showDeleteSinTypeDialog(context, ref, sinType),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Icon(Icons.delete_outline, color: cs.onSurfaceVariant, size: 18),
-                              ),
-                            ),
-                        ],
-                      ),
-                        if (hasSinned && kaffaraDone && kaffaraType != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            '${'sin_kaffara'.tr()}: ${_localizedKaffaraName(kaffaraType)}',
-                            style: TextStyle(
-                              color: sinColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                
-                // Sin Toggle
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    ref.read(sinTrackerProvider.notifier).toggleSin(sinType.id);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          children: [
+            // Main Row - Sin Name & Toggle
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Icon
+                  Container(
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: sin2Color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: sin2Color.withOpacity(0.5),
-                      ),
+                      color: cs.primary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Icon(
+                      _getSinIcon(sinType.icon),
+                      color: sinColor,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  const SizedBox(width: 12),
+
+                  // Name & Status
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          hasSinned ? Icons.check : Icons.close,
-                          color: sin2Color,
-                          size: 16,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _localizedSinName(context, sinType),
+                                style: TextStyle(
+                                  color: cs.onSurface,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            if (!sinType.isDefault)
+                              GestureDetector(
+                                onTap: () => _showDeleteSinTypeDialog(
+                                  context,
+                                  ref,
+                                  sinType,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Icon(
+                                    Icons.delete_outline,
+                                    color: cs.onSurfaceVariant,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          hasSinned ? 'sin_done'.tr() : 'sin_not_done'.tr(),
-                          style: TextStyle(
-                            color: sin2Color,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                        if (hasSinned && kaffaraDone && kaffaraType != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              '${'sin_kaffara'.tr()}: ${_localizedKaffaraName(kaffaraType)}',
+                              style: TextStyle(color: sinColor, fontSize: 12),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Kaffara Section - Only if sinned and not done
-          if (hasSinned && !kaffaraDone) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Row(
-                children: [
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.istighfar, 'sin_kaffara_dhikr'),
-                  const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.quran, 'sin_kaffara_quran'),
-                  const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.charity, 'sin_kaffara_charity'),
-                  const SizedBox(width: 6),
-                  _buildKaffaraChip(context, ref, sinType.id, KaffaraType.prayer, 'sin_kaffara_prayer'),
+
+                  // Sin Toggle
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      ref
+                          .read(sinTrackerProvider.notifier)
+                          .toggleSin(sinType.id);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: sin2Color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: sin2Color.withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            hasSinned ? Icons.check : Icons.close,
+                            color: sin2Color,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            hasSinned ? 'sin_done'.tr() : 'sin_not_done'.tr(),
+                            style: TextStyle(
+                              color: sin2Color,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-          
-          // Undo Kaffara - Only if kaffara done
-          if (hasSinned && kaffaraDone)
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  ref.read(sinTrackerProvider.notifier).undoKaffara(sinType.id);
-                },
-                child: Text(
-                  'sin_undo_kaffara'.tr(),
-                  style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 12,
-                    decoration: TextDecoration.underline,
+
+            // Kaffara Section - Only if sinned and not done
+            if (hasSinned && !kaffaraDone) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  children: [
+                    _buildKaffaraChip(
+                      context,
+                      ref,
+                      sinType.id,
+                      KaffaraType.istighfar,
+                      'sin_kaffara_dhikr',
+                    ),
+                    const SizedBox(width: 6),
+                    _buildKaffaraChip(
+                      context,
+                      ref,
+                      sinType.id,
+                      KaffaraType.quran,
+                      'sin_kaffara_quran',
+                    ),
+                    const SizedBox(width: 6),
+                    _buildKaffaraChip(
+                      context,
+                      ref,
+                      sinType.id,
+                      KaffaraType.charity,
+                      'sin_kaffara_charity',
+                    ),
+                    const SizedBox(width: 6),
+                    _buildKaffaraChip(
+                      context,
+                      ref,
+                      sinType.id,
+                      KaffaraType.prayer,
+                      'sin_kaffara_prayer',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Undo Kaffara - Only if kaffara done
+            if (hasSinned && kaffaraDone)
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    ref
+                        .read(sinTrackerProvider.notifier)
+                        .undoKaffara(sinType.id);
+                  },
+                  child: Text(
+                    'sin_undo_kaffara'.tr(),
+                    style: TextStyle(
+                      color: cs.onSurfaceVariant,
+                      fontSize: 12,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildKaffaraChip(
@@ -416,9 +437,11 @@ class SinTrackerScreen extends ConsumerWidget {
       child: GestureDetector(
         onTap: () {
           HapticFeedback.mediumImpact();
-          ref.read(sinTrackerProvider.notifier).giveKaffara(sinTypeId, kaffaraType);
+          ref
+              .read(sinTrackerProvider.notifier)
+              .giveKaffara(sinTypeId, kaffaraType);
         },
-          child: Container(
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: cs.primary.withOpacity(0.15),
@@ -491,7 +514,7 @@ class SinTrackerScreen extends ConsumerWidget {
 
   void _showAddSinTypeDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
-    
+
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -524,8 +547,9 @@ class SinTrackerScreen extends ConsumerWidget {
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     hintText: 'sin_name_hint'.tr(),
-                    hintStyle:
-                        TextStyle(color: cs.onSurfaceVariant.withOpacity(0.5)),
+                    hintStyle: TextStyle(
+                      color: cs.onSurfaceVariant.withOpacity(0.5),
+                    ),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
                     border: OutlineInputBorder(
@@ -538,43 +562,53 @@ class SinTrackerScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child:
-                    Text('cancel'.tr(), style: TextStyle(color: cs.onSurfaceVariant)),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: () {
-                  if (controller.text.trim().isNotEmpty) {
-                    ref.read(sinTrackerProvider.notifier).addCustomSinType(controller.text.trim());
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: cs.primary,
-                  foregroundColor: Theme.of(context).extension<GradientColors>()!.onPrimaryText,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'cancel'.tr(),
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (controller.text.trim().isNotEmpty) {
+                          ref
+                              .read(sinTrackerProvider.notifier)
+                              .addCustomSinType(controller.text.trim());
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).extension<GradientColors>()!.onPrimaryText,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text('sin_add'.tr()),
+                    ),
+                  ],
                 ),
-                child: Text('sin_add'.tr()),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
-      ),
-    ),
-  );
+        );
       },
     );
   }
 
-  void _showDeleteSinTypeDialog(BuildContext context, WidgetRef ref, SinType sinType) {
+  void _showDeleteSinTypeDialog(
+    BuildContext context,
+    WidgetRef ref,
+    SinType sinType,
+  ) {
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -602,12 +636,8 @@ class SinTrackerScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'sin_delete_confirm'
-                      .tr(namedArgs: {'name': sinType.name}),
-                  style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 14,
-                  ),
+                  'sin_delete_confirm'.tr(namedArgs: {'name': sinType.name}),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -615,13 +645,17 @@ class SinTrackerScreen extends ConsumerWidget {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('no'.tr(),
-                          style: TextStyle(color: cs.onSurfaceVariant)),
+                      child: Text(
+                        'no'.tr(),
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
-                        ref.read(sinTrackerProvider.notifier).removeCustomSinType(sinType.id);
+                        ref
+                            .read(sinTrackerProvider.notifier)
+                            .removeCustomSinType(sinType.id);
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(

@@ -98,8 +98,9 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
 
   Future<void> _loadSinCount() async {
     if (!widget.isMonthly) {
-      final count =
-          await ref.read(sinTrackerProvider.notifier).getWeeklySinCount();
+      final count = await ref
+          .read(sinTrackerProvider.notifier)
+          .getWeeklySinCount();
       if (mounted) {
         setState(() {
           weeklySinCount = count;
@@ -115,7 +116,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     // Calculate totals based on view type
     final stats = widget.isMonthly && widget.monthlyStats != null
         ? widget.monthlyStats!
@@ -203,7 +204,8 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
                 iconColor: primary,
                 title: 'stats_reading_time'.tr(),
                 value: totalReadingMinutes.toString(),
-                subtitle: '/${maxReadingMinutes.toString()} ${'stats_minutes'.tr()}',
+                subtitle:
+                    '/${maxReadingMinutes.toString()} ${'stats_minutes'.tr()}',
               ),
             ),
             const SizedBox(width: 12),
@@ -223,9 +225,7 @@ class _WeeklySummarySectionState extends ConsumerState<WeeklySummarySection> {
         // Sin Count Card - Only for weekly view
         if (!widget.isMonthly) ...[
           const SizedBox(height: 12),
-          _SinCountCard(
-            sinCount: weeklySinCount,
-          ),
+          _SinCountCard(sinCount: weeklySinCount),
         ],
       ],
     );
@@ -252,7 +252,7 @@ class _SummaryCard extends StatelessWidget {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
@@ -265,11 +265,7 @@ class _SummaryCard extends StatelessWidget {
               color: iconColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
-            ),
+            child: Icon(icon, color: iconColor, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -278,10 +274,7 @@ class _SummaryCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    color: bulletTextColor,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: bulletTextColor, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 RichText(
@@ -316,20 +309,17 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-
 class _SinCountCard extends StatelessWidget {
   final int sinCount;
 
-  const _SinCountCard({
-    required this.sinCount,
-  });
+  const _SinCountCard({required this.sinCount});
 
   @override
   Widget build(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final primary = Theme.of(context).colorScheme.primary;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
@@ -342,11 +332,7 @@ class _SinCountCard extends StatelessWidget {
               color: primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.auto_fix_high,
-              color: primary,
-              size: 24,
-            ),
+            child: Icon(Icons.auto_fix_high, color: primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -355,20 +341,17 @@ class _SinCountCard extends StatelessWidget {
               children: [
                 Text(
                   'stats_total_sins'.tr(),
-                  style: TextStyle(
-                    color: bulletTextColor,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: bulletTextColor, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   sinCount == 0
                       ? 'stats_mashallah_no_sin'.tr()
-                      : 'stats_sin_count'.tr(namedArgs: {'count': sinCount.toString()}),
+                      : 'stats_sin_count'.tr(
+                          namedArgs: {'count': sinCount.toString()},
+                        ),
                   style: TextStyle(
-                    color: sinCount == 0
-                        ? const Color(0xFF4CAF50)
-                        : primary,
+                    color: sinCount == 0 ? const Color(0xFF4CAF50) : primary,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -402,7 +385,7 @@ class _PrayerDetailCard extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     // Check if we have detailed data
     final hasDetailedData = jamaatPrayers > 0 || delayedPrayers > 0;
 
@@ -422,11 +405,7 @@ class _PrayerDetailCard extends StatelessWidget {
                   color: primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  Icons.mosque,
-                  color: primary,
-                  size: 24,
-                ),
+                child: Icon(Icons.mosque, color: primary, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -435,10 +414,7 @@ class _PrayerDetailCard extends StatelessWidget {
                   children: [
                     Text(
                       'stats_total_prayer'.tr(),
-                      style: TextStyle(
-                        color: bulletTextColor,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: bulletTextColor, fontSize: 12),
                     ),
                     const SizedBox(height: 4),
                     RichText(
@@ -453,7 +429,8 @@ class _PrayerDetailCard extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: '/${maxPrayers.toString()} ${'stats_waqt'.tr()}',
+                            text:
+                                '/${maxPrayers.toString()} ${'stats_waqt'.tr()}',
                             style: TextStyle(
                               color: bulletTextColor,
                               fontSize: 14,
@@ -486,7 +463,9 @@ class _PrayerDetailCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -559,7 +538,9 @@ class _PrayerDetailCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(

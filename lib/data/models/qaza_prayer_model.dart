@@ -59,11 +59,9 @@ class QazaPrayerSummary {
   final int totalMissed;
   final int totalCompleted;
 
-  QazaPrayerSummary({
-    required this.prayerName,
-    required this.missedPrayers,
-  })  : totalMissed = missedPrayers.where((p) => !p.isCompleted).length,
-        totalCompleted = missedPrayers.where((p) => p.isCompleted).length;
+  QazaPrayerSummary({required this.prayerName, required this.missedPrayers})
+    : totalMissed = missedPrayers.where((p) => !p.isCompleted).length,
+      totalCompleted = missedPrayers.where((p) => p.isCompleted).length;
 
   int get totalCount => missedPrayers.length;
   int get pendingCount => totalMissed;

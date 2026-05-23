@@ -5,22 +5,22 @@ import 'package:flutter/material.dart';
 class GradientColors extends ThemeExtension<GradientColors> {
   // AppBar gradient (3 shades)
   final List<Color> appBarGradient;
-  
+
   // AppBar bottom border for 3D effect
   final Color appBarBorder;
-  
+
   // Main background gradient (2 shades)
   final List<Color> backgroundGradient;
-  
+
   // Card background gradient (3 shades)
   final List<Color> cardGradient;
-  
+
   // Inner card gradient (2 shades)
   final List<Color> innerCardGradient;
-  
+
   // Text on primary color (badges, icons on primary background)
   final Color onPrimaryText;
-  
+
   // Bullet text color (for usage rules, lists, etc.)
   final Color bulletTextColor;
 
@@ -59,15 +59,27 @@ class GradientColors extends ThemeExtension<GradientColors> {
   GradientColors lerp(ThemeExtension<GradientColors>? other, double t) {
     if (other is! GradientColors) return this;
     return GradientColors(
-      appBarGradient: appBarGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.appBarGradient[e.key], t)!).toList(),
+      appBarGradient: appBarGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.appBarGradient[e.key], t)!)
+          .toList(),
       appBarBorder: Color.lerp(appBarBorder, other.appBarBorder, t)!,
-      backgroundGradient: backgroundGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.backgroundGradient[e.key], t)!).toList(),
-      cardGradient: cardGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.cardGradient[e.key], t)!).toList(),
-      innerCardGradient: innerCardGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.innerCardGradient[e.key], t)!).toList(),
+      backgroundGradient: backgroundGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.backgroundGradient[e.key], t)!)
+          .toList(),
+      cardGradient: cardGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.cardGradient[e.key], t)!)
+          .toList(),
+      innerCardGradient: innerCardGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.innerCardGradient[e.key], t)!)
+          .toList(),
       onPrimaryText: Color.lerp(onPrimaryText, other.onPrimaryText, t)!,
       bulletTextColor: Color.lerp(bulletTextColor, other.bulletTextColor, t)!,
     );
@@ -125,11 +137,11 @@ class GradientColors extends ThemeExtension<GradientColors> {
 }
 
 /// Premium card styling extension for home-style cards
-/// 
+///
 /// Usage:
 /// ```dart
 /// final cardStyle = Theme.of(context).extension<PremiumCardStyle>()!;
-/// 
+///
 /// Container(
 ///   decoration: BoxDecoration(
 ///     gradient: LinearGradient(
@@ -163,31 +175,31 @@ class GradientColors extends ThemeExtension<GradientColors> {
 class PremiumCardStyle extends ThemeExtension<PremiumCardStyle> {
   // Main card gradient (diagonal: topLeft → bottomRight)
   final List<Color> cardGradient;
-  
+
   // Border color
   final Color borderColor;
-  
+
   // Shadow colors
   final Color shadowDark;
   final Color shadowGlow;
-  
+
   // Top overlay gradient
   final List<Color> topOverlayGradient;
-  
+
   // Noise texture color
   final Color noiseColor;
-  
+
   // Shadow properties
   final double shadowDarkBlur;
   final double shadowDarkOpacity;
   final Offset shadowDarkOffset;
   final double shadowDarkSpread;
-  
+
   final double shadowGlowBlur;
   final double shadowGlowOpacity;
   final Offset shadowGlowOffset;
   final double shadowGlowSpread;
-  
+
   // Border width
   final double borderWidth;
 
@@ -250,39 +262,47 @@ class PremiumCardStyle extends ThemeExtension<PremiumCardStyle> {
   PremiumCardStyle lerp(ThemeExtension<PremiumCardStyle>? other, double t) {
     if (other is! PremiumCardStyle) return this;
     return PremiumCardStyle(
-      cardGradient: cardGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.cardGradient[e.key], t)!).toList(),
+      cardGradient: cardGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.cardGradient[e.key], t)!)
+          .toList(),
       borderColor: Color.lerp(borderColor, other.borderColor, t)!,
       shadowDark: Color.lerp(shadowDark, other.shadowDark, t)!,
       shadowGlow: Color.lerp(shadowGlow, other.shadowGlow, t)!,
-      topOverlayGradient: topOverlayGradient.asMap().entries.map((e) => 
-        Color.lerp(e.value, other.topOverlayGradient[e.key], t)!).toList(),
+      topOverlayGradient: topOverlayGradient
+          .asMap()
+          .entries
+          .map((e) => Color.lerp(e.value, other.topOverlayGradient[e.key], t)!)
+          .toList(),
       noiseColor: Color.lerp(noiseColor, other.noiseColor, t)!,
       shadowDarkBlur: lerpDouble(shadowDarkBlur, other.shadowDarkBlur, t),
-      shadowDarkOpacity: lerpDouble(shadowDarkOpacity, other.shadowDarkOpacity, t),
+      shadowDarkOpacity: lerpDouble(
+        shadowDarkOpacity,
+        other.shadowDarkOpacity,
+        t,
+      ),
       shadowGlowBlur: lerpDouble(shadowGlowBlur, other.shadowGlowBlur, t),
-      shadowGlowOpacity: lerpDouble(shadowGlowOpacity, other.shadowGlowOpacity, t),
+      shadowGlowOpacity: lerpDouble(
+        shadowGlowOpacity,
+        other.shadowGlowOpacity,
+        t,
+      ),
       borderWidth: lerpDouble(borderWidth, other.borderWidth, t),
     );
   }
-  
+
   double lerpDouble(double a, double b, double t) {
     return a + (b - a) * t;
   }
 
   // Light theme premium card style
   static const light = PremiumCardStyle(
-    cardGradient: [
-      AppColors.lightPremiumCard1,
-      AppColors.lightPremiumCard2,
-    ],
+    cardGradient: [AppColors.lightPremiumCard1, AppColors.lightPremiumCard2],
     borderColor: Color(0x2ECEA10F), // primary.withOpacity(0.18)
     shadowDark: Color(0x1A000000), // black.withOpacity(0.10)
     shadowGlow: Color(0x14CEA10F), // primary.withOpacity(0.08)
-    topOverlayGradient: [
-      AppColors.lightPremiumOverlay1,
-      Colors.transparent,
-    ],
+    topOverlayGradient: [AppColors.lightPremiumOverlay1, Colors.transparent],
     noiseColor: AppColors.lightPremiumNoise,
     shadowDarkBlur: 18,
     shadowDarkOpacity: 0.10,
@@ -290,17 +310,11 @@ class PremiumCardStyle extends ThemeExtension<PremiumCardStyle> {
 
   // Dark theme premium card style
   static const dark = PremiumCardStyle(
-    cardGradient: [
-      AppColors.darkPremiumCard1,
-      AppColors.darkPremiumCard2,
-    ],
+    cardGradient: [AppColors.darkPremiumCard1, AppColors.darkPremiumCard2],
     borderColor: Color(0x1AD4AF37), // primaryGold.withOpacity(0.10)
     shadowDark: Color(0x73000000), // black.withOpacity(0.45)
     shadowGlow: Color(0x0FD4AF37), // primaryGold.withOpacity(0.06)
-    topOverlayGradient: [
-      AppColors.darkPremiumOverlay1,
-      Colors.transparent,
-    ],
+    topOverlayGradient: [AppColors.darkPremiumOverlay1, Colors.transparent],
     noiseColor: AppColors.darkPremiumNoise,
     shadowDarkBlur: 18,
     shadowDarkOpacity: 0.45,
@@ -309,7 +323,7 @@ class PremiumCardStyle extends ThemeExtension<PremiumCardStyle> {
 
 /// Builds a premium card with golden border, 3D shadows, and glow effect
 /// Matches the home page card styling exactly
-/// 
+///
 /// Usage:
 /// ```dart
 /// buildPremiumCard(
@@ -385,10 +399,7 @@ Widget buildPremiumCard({
               ),
             ),
             // Content
-            Padding(
-              padding: padding,
-              child: child,
-            ),
+            Padding(padding: padding, child: child),
           ],
         ),
       ),
@@ -398,7 +409,7 @@ Widget buildPremiumCard({
 
 /// Builds a premium card with InkWell for tap interactions
 /// Includes golden border, 3D shadows, glow effect, and ripple effect
-/// 
+///
 /// Usage:
 /// ```dart
 /// buildPremiumInkCard(
@@ -481,12 +492,9 @@ Widget buildPremiumInkCard({
                   ),
                 ),
                 // Content
-                Padding(
-                  padding: padding,
-                  child: child,
-                ),
+                Padding(padding: padding, child: child),
               ],
-            ),    
+            ),
           ),
         ),
       ),
@@ -540,12 +548,10 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: AppColors.primaryGold),
     ),
-    cardTheme: CardThemeData(   
+    cardTheme: CardThemeData(
       color: AppColors.darkCard,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
     fontFamily: 'Cascadia Mono',
     textTheme: const TextTheme(
@@ -595,9 +601,7 @@ class AppTheme {
         fontFamilyFallback: ['MehdiEkushey'],
       ),
     ),
-    iconTheme: const IconThemeData(
-      color: AppColors.primaryGold,
-    ),
+    iconTheme: const IconThemeData(color: AppColors.primaryGold),
     dividerTheme: const DividerThemeData(
       color: AppColors.dividerDark,
       thickness: 1,
@@ -623,7 +627,8 @@ class AppTheme {
       primary: AppColors.primary,
       secondary: AppColors.primary,
       surface: AppColors.surfaceLightMode,
-      surfaceContainerHighest: AppColors.cardLightMode, // Light gray for containers
+      surfaceContainerHighest:
+          AppColors.cardLightMode, // Light gray for containers
       onPrimary: AppColors.onPrimaryTextLight,
       onSecondary: AppColors.onPrimaryTextLight,
       onSurface: AppColors.textLightMode,
@@ -714,4 +719,3 @@ class AppTheme {
     ],
   );
 }
-

@@ -3,9 +3,7 @@
 String fridayAwareDisplay(String text, {DateTime? date}) {
   final d = date ?? DateTime.now();
   if (d.weekday != DateTime.friday) return text;
-  return text
-      .replaceAll('যোহরের', 'জুম\'আর')
-      .replaceAll('যোহর', 'জুম\'আ');
+  return text.replaceAll('যোহরের', 'জুম\'আর').replaceAll('যোহর', 'জুম\'আ');
 }
 
 /// On Fridays, Dhuhr sunnah after prayer is 4 rakats instead of 2.

@@ -44,85 +44,82 @@ class _MainShellState extends ConsumerState<MainShell> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: currentIndex,
-          children: _screens,
-        ),
+        body: IndexedStack(index: currentIndex, children: _screens),
         bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Golden gradient top divider
-          Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  activeColor.withOpacity(0.25),
-                  activeColor.withOpacity(0.55),
-                  activeColor.withOpacity(0.25),
-                  Colors.transparent,
-                ],
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Golden gradient top divider
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    activeColor.withOpacity(0.25),
+                    activeColor.withOpacity(0.55),
+                    activeColor.withOpacity(0.25),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-          ),
-          NavigationBar(
-            selectedIndex: currentIndex,
-            onDestinationSelected: (index) {
-              ref.read(mainShellTabIndexProvider.notifier).state = index;
-            },
-            backgroundColor: cs.surface,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            indicatorColor: activeColor.withOpacity(0.14),
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            animationDuration: const Duration(milliseconds: 300),
-            destinations: [
-              _buildDestination(
-                icon: Icons.home_outlined,
-                selectedIcon: Icons.home_rounded,
-                label: 'tab_home'.tr(),
-                isSelected: currentIndex == 0,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-              ),
-              _buildDestination(
-                icon: Icons.notifications_outlined,
-                selectedIcon: Icons.notifications_rounded,
-                label: 'tab_reminders'.tr(),
-                isSelected: currentIndex == 1,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-              ),
-              _buildDestination(
-                icon: Icons.menu_book_outlined,
-                selectedIcon: Icons.menu_book_rounded,
-                label: 'tab_dua'.tr(),
-                isSelected: currentIndex == 2,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-              ),
-              _buildDestination(
-                icon: Icons.bar_chart_outlined,
-                selectedIcon: Icons.bar_chart_rounded,
-                label: 'tab_statistics'.tr(),
-                isSelected: currentIndex == 3,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-              ),
-              _buildDestination(
-                icon: Icons.settings_outlined,
-                selectedIcon: Icons.settings_rounded,
-                label: 'tab_settings'.tr(),
-                isSelected: currentIndex == 4,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-              ),
-            ],
-          ),
-        ],
-      ),
+            NavigationBar(
+              selectedIndex: currentIndex,
+              onDestinationSelected: (index) {
+                ref.read(mainShellTabIndexProvider.notifier).state = index;
+              },
+              backgroundColor: cs.surface,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              indicatorColor: activeColor.withOpacity(0.14),
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              animationDuration: const Duration(milliseconds: 300),
+              destinations: [
+                _buildDestination(
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home_rounded,
+                  label: 'tab_home'.tr(),
+                  isSelected: currentIndex == 0,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+                _buildDestination(
+                  icon: Icons.notifications_outlined,
+                  selectedIcon: Icons.notifications_rounded,
+                  label: 'tab_reminders'.tr(),
+                  isSelected: currentIndex == 1,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+                _buildDestination(
+                  icon: Icons.menu_book_outlined,
+                  selectedIcon: Icons.menu_book_rounded,
+                  label: 'tab_dua'.tr(),
+                  isSelected: currentIndex == 2,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+                _buildDestination(
+                  icon: Icons.bar_chart_outlined,
+                  selectedIcon: Icons.bar_chart_rounded,
+                  label: 'tab_statistics'.tr(),
+                  isSelected: currentIndex == 3,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+                _buildDestination(
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings_rounded,
+                  label: 'tab_settings'.tr(),
+                  isSelected: currentIndex == 4,
+                  activeColor: activeColor,
+                  inactiveColor: inactiveColor,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

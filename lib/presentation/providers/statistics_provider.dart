@@ -17,12 +17,15 @@ Map<String, dynamic> _deepConvert(Map data) {
     if (value is Map) {
       return MapEntry(key.toString(), _deepConvert(value));
     } else if (value is List) {
-      return MapEntry(key.toString(), value.map((e) {
-        if (e is Map) {
-          return _deepConvert(e);
-        }
-        return e;
-      }).toList());
+      return MapEntry(
+        key.toString(),
+        value.map((e) {
+          if (e is Map) {
+            return _deepConvert(e);
+          }
+          return e;
+        }).toList(),
+      );
     }
     return MapEntry(key.toString(), value);
   });
@@ -57,10 +60,12 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
   final Ref _ref;
 
   StatisticsNotifier(this._ref)
-      : super(StatisticsState(
+    : super(
+        StatisticsState(
           data: StatisticsModel.empty(),
           weeklyStats: WeeklyStatistics(days: []),
-        )) {
+        ),
+      ) {
     _init();
   }
 
@@ -103,22 +108,22 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
 
   /// Force refresh weekly stats from current data
   void refreshWeeklyStats() {
-    state = state.copyWith(
-      weeklyStats: state.data.getWeeklyStats(),
-    );
+    state = state.copyWith(weeklyStats: state.data.getWeeklyStats());
   }
 
   /// Rebuild statistics from all individual data boxes
   Future<void> rebuildFromBoxes() async {
     try {
       state = state.copyWith(isLoading: true);
-      
+
       final prayerBox = await Hive.openBox('prayer_tracking');
       final amalBox = await Hive.openBox('daily_amal');
       final dhikrBox = await Hive.openBox('dhikr_counter');
       final readingBox = await Hive.openBox('reading_tracker');
 
-      final updatedDailyStats = Map<String, DailyStatistics>.from(state.data.dailyStats);
+      final updatedDailyStats = Map<String, DailyStatistics>.from(
+        state.data.dailyStats,
+      );
 
       // Get all unique dates from all boxes
       final allDates = <String>{};
@@ -180,8 +185,14 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
             dhikrTarget = 0;
             for (var item in items) {
               if (item is Map) {
-                dhikrCount += (item['currentCount'] as int? ?? item['count'] as int? ?? 0);
-                dhikrTarget += (item['targetCount'] as int? ?? item['target'] as int? ?? 100);
+                dhikrCount +=
+                    (item['currentCount'] as int? ??
+                    item['count'] as int? ??
+                    0);
+                dhikrTarget +=
+                    (item['targetCount'] as int? ??
+                    item['target'] as int? ??
+                    100);
               }
             }
             if (dhikrTarget == 0) dhikrTarget = 1;
@@ -195,7 +206,10 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
           if (sessions != null) {
             for (var session in sessions) {
               if (session is Map) {
-                readingMinutes += (session['durationMinutes'] as int? ?? session['duration'] as int? ?? 0);
+                readingMinutes +=
+                    (session['durationMinutes'] as int? ??
+                    session['duration'] as int? ??
+                    0);
               }
             }
           }
@@ -268,7 +282,9 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
     );
 
     // Update daily stats map
-    final updatedDailyStats = Map<String, DailyStatistics>.from(state.data.dailyStats);
+    final updatedDailyStats = Map<String, DailyStatistics>.from(
+      state.data.dailyStats,
+    );
     updatedDailyStats[_todayKey] = todayStats;
 
     // Calculate streaks
@@ -350,21 +366,27 @@ class StatisticsNotifier extends StateNotifier<StatisticsState> {
     final dhikrData = dhikrBox.get(dateKey);
     DhikrCounterModel? dhikrModel;
     if (dhikrData != null) {
-      dhikrModel = DhikrCounterModel.fromJson(Map<String, dynamic>.from(dhikrData));
+      dhikrModel = DhikrCounterModel.fromJson(
+        Map<String, dynamic>.from(dhikrData),
+      );
     }
 
     // Get Reading data
     final readingData = readingBox.get(dateKey);
     ReadingTrackerModel? readingModel;
     if (readingData != null) {
-      readingModel = ReadingTrackerModel.fromJson(Map<String, dynamic>.from(readingData));
+      readingModel = ReadingTrackerModel.fromJson(
+        Map<String, dynamic>.from(readingData),
+      );
     }
 
     // Get Prayer data
     final prayerData = prayerBox.get(dateKey);
     PrayerTrackingModel? prayerModel;
     if (prayerData != null) {
-      prayerModel = PrayerTrackingModel.fromJson(Map<String, dynamic>.from(prayerData));
+      prayerModel = PrayerTrackingModel.fromJson(
+        Map<String, dynamic>.from(prayerData),
+      );
     }
 
     return DayDetailedData(
@@ -392,5 +414,5 @@ class DayDetailedData {
 
 final statisticsProvider =
     StateNotifierProvider<StatisticsNotifier, StatisticsState>((ref) {
-  return StatisticsNotifier(ref);
-});
+      return StatisticsNotifier(ref);
+    });

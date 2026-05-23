@@ -49,13 +49,18 @@ class DailyStatistics {
     );
   }
 
-  double get prayerProgress => totalPrayers > 0 ? prayersCompleted / totalPrayers : 0.0;
+  double get prayerProgress =>
+      totalPrayers > 0 ? prayersCompleted / totalPrayers : 0.0;
   double get amalProgress => totalAmal > 0 ? amalCompleted / totalAmal : 0.0;
-  double get dhikrProgress => dhikrTarget > 0 ? (dhikrCount / dhikrTarget).clamp(0.0, 1.0) : 0.0;
-  double get readingProgress => readingTarget > 0 ? (readingMinutes / readingTarget).clamp(0.0, 1.0) : 0.0;
-  
+  double get dhikrProgress =>
+      dhikrTarget > 0 ? (dhikrCount / dhikrTarget).clamp(0.0, 1.0) : 0.0;
+  double get readingProgress => readingTarget > 0
+      ? (readingMinutes / readingTarget).clamp(0.0, 1.0)
+      : 0.0;
+
   double get overallProgress {
-    return (prayerProgress + amalProgress + dhikrProgress + readingProgress) / 4;
+    return (prayerProgress + amalProgress + dhikrProgress + readingProgress) /
+        4;
   }
 
   int get overallScore {
@@ -74,34 +79,41 @@ class WeeklyStatistics {
     this.bestStreak = 0,
   });
 
-  int get totalPrayersCompleted => days.fold(0, (sum, d) => sum + d.prayersCompleted);
+  int get totalPrayersCompleted =>
+      days.fold(0, (sum, d) => sum + d.prayersCompleted);
   int get totalAmalCompleted => days.fold(0, (sum, d) => sum + d.amalCompleted);
   int get totalDhikrCount => days.fold(0, (sum, d) => sum + d.dhikrCount);
-  int get totalReadingMinutes => days.fold(0, (sum, d) => sum + d.readingMinutes);
+  int get totalReadingMinutes =>
+      days.fold(0, (sum, d) => sum + d.readingMinutes);
 
   double get averagePrayerProgress {
     if (days.isEmpty) return 0.0;
-    return days.map((d) => d.prayerProgress).reduce((a, b) => a + b) / days.length;
+    return days.map((d) => d.prayerProgress).reduce((a, b) => a + b) /
+        days.length;
   }
 
   double get averageAmalProgress {
     if (days.isEmpty) return 0.0;
-    return days.map((d) => d.amalProgress).reduce((a, b) => a + b) / days.length;
+    return days.map((d) => d.amalProgress).reduce((a, b) => a + b) /
+        days.length;
   }
 
   double get averageDhikrProgress {
     if (days.isEmpty) return 0.0;
-    return days.map((d) => d.dhikrProgress).reduce((a, b) => a + b) / days.length;
+    return days.map((d) => d.dhikrProgress).reduce((a, b) => a + b) /
+        days.length;
   }
 
   double get averageReadingProgress {
     if (days.isEmpty) return 0.0;
-    return days.map((d) => d.readingProgress).reduce((a, b) => a + b) / days.length;
+    return days.map((d) => d.readingProgress).reduce((a, b) => a + b) /
+        days.length;
   }
 
   double get averageOverallProgress {
     if (days.isEmpty) return 0.0;
-    return days.map((d) => d.overallProgress).reduce((a, b) => a + b) / days.length;
+    return days.map((d) => d.overallProgress).reduce((a, b) => a + b) /
+        days.length;
   }
 
   int get perfectDays => days.where((d) => d.overallScore >= 100).length;
@@ -122,7 +134,9 @@ class StatisticsModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'dailyStats': dailyStats.map((key, value) => MapEntry(key, value.toJson())),
+      'dailyStats': dailyStats.map(
+        (key, value) => MapEntry(key, value.toJson()),
+      ),
       'currentStreak': currentStreak,
       'bestStreak': bestStreak,
       'lastActiveDate': lastActiveDate?.toIso8601String(),
@@ -150,11 +164,7 @@ class StatisticsModel {
   }
 
   factory StatisticsModel.empty() {
-    return StatisticsModel(
-      dailyStats: {},
-      currentStreak: 0,
-      bestStreak: 0,
-    );
+    return StatisticsModel(dailyStats: {}, currentStreak: 0, bestStreak: 0);
   }
 
   WeeklyStatistics getWeeklyStats() {

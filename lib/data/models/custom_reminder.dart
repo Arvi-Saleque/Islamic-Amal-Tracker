@@ -1,23 +1,22 @@
-
 enum ReminderType {
-  beforePrayer,  // নামাজের আগে
-  afterPrayer,   // নামাজের পরে
-  fixedTime,     // নির্দিষ্ট সময়ে
+  beforePrayer, // নামাজের আগে
+  afterPrayer, // নামাজের পরে
+  fixedTime, // নির্দিষ্ট সময়ে
 }
 
 enum PrayerName {
-  fajr,     // ফজর
-  dhuhr,    // যোহর
-  asr,      // আসর
-  maghrib,  // মাগরিব
-  isha,     // এশা
+  fajr, // ফজর
+  dhuhr, // যোহর
+  asr, // আসর
+  maghrib, // মাগরিব
+  isha, // এশা
 }
 
 enum ReminderCategory {
-  quran,    // কুরআন
-  dhikr,    // যিকির
-  dua,      // দোয়া
-  general,  // সাধারণ
+  quran, // কুরআন
+  dhikr, // যিকির
+  dua, // দোয়া
+  general, // সাধারণ
 }
 
 class CustomReminder {
@@ -25,10 +24,11 @@ class CustomReminder {
   final String title;
   final String? description;
   final ReminderType type;
-  final PrayerName? prayer;  // null if type is fixedTime
-  final int minutesOffset;   // minutes before/after prayer (positive = after, negative = before)
-  final int? fixedHour;      // for fixedTime type
-  final int? fixedMinute;    // for fixedTime type
+  final PrayerName? prayer; // null if type is fixedTime
+  final int
+  minutesOffset; // minutes before/after prayer (positive = after, negative = before)
+  final int? fixedHour; // for fixedTime type
+  final int? fixedMinute; // for fixedTime type
   final bool isEnabled;
   final List<int> repeatDays; // 1-7 (Monday-Sunday), empty = daily
   final DateTime createdAt;
@@ -112,7 +112,9 @@ class CustomReminder {
       title: json['title'] as String,
       description: json['description'] as String?,
       type: ReminderType.values[json['type'] as int],
-      prayer: json['prayer'] != null ? PrayerName.values[json['prayer'] as int] : null,
+      prayer: json['prayer'] != null
+          ? PrayerName.values[json['prayer'] as int]
+          : null,
       minutesOffset: json['minutesOffset'] as int? ?? 0,
       fixedHour: json['fixedHour'] as int?,
       fixedMinute: json['fixedMinute'] as int?,
@@ -185,8 +187,12 @@ class CustomReminder {
 
   // Get display string for the reminder time
   String getTimeDisplayString() {
-    if (type == ReminderType.fixedTime && fixedHour != null && fixedMinute != null) {
-      final hour = fixedHour! > 12 ? fixedHour! - 12 : (fixedHour == 0 ? 12 : fixedHour!);
+    if (type == ReminderType.fixedTime &&
+        fixedHour != null &&
+        fixedMinute != null) {
+      final hour = fixedHour! > 12
+          ? fixedHour! - 12
+          : (fixedHour == 0 ? 12 : fixedHour!);
       final period = fixedHour! >= 12 ? 'PM' : 'AM';
       return '$hour:${fixedMinute!.toString().padLeft(2, '0')} $period';
     } else if (prayer != null) {

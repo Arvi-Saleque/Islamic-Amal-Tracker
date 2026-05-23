@@ -63,7 +63,6 @@ class DailyReminderService {
   static const String _kDefaultWindowStartDay = 'default_window_start_day';
   static const String _kDefaultWindowDaysAhead = 'default_window_days_ahead';
 
-
   static int _getDefaultPrayerNotificationId(PrayerName prayer) {
     return _defaultPrayerBaseId + prayer.index; // stable + unique
   }
@@ -114,8 +113,9 @@ class DailyReminderService {
       tz.setLocalLocation(tz.UTC);
     }
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const initSettings = InitializationSettings(android: androidSettings);
 
     await _notifications.initialize(
@@ -157,24 +157,24 @@ class DailyReminderService {
 
     const AndroidNotificationChannel defaultPrayerChannel =
         AndroidNotificationChannel(
-      'default_prayer_channel',
-      'Default Prayer Reminders',
-      description: 'Always active default prayer reminders (rolling window)',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
+          'default_prayer_channel',
+          'Default Prayer Reminders',
+          description:
+              'Always active default prayer reminders (rolling window)',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+        );
 
     const AndroidNotificationChannel defaultDhikrChannel =
         AndroidNotificationChannel(
-      'default_dhikr_channel',
-      'Default Dhikr Reminders',
-      description: 'Always active default dhikr reminders (rolling window)',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
-
+          'default_dhikr_channel',
+          'Default Dhikr Reminders',
+          description: 'Always active default dhikr reminders (rolling window)',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+        );
 
     const AndroidNotificationChannel customChannel = AndroidNotificationChannel(
       'custom_reminder_channel',
@@ -187,16 +187,18 @@ class DailyReminderService {
 
     const AndroidNotificationChannel defaultDailyAmalChannel =
         AndroidNotificationChannel(
-      'default_daily_amal_channel',
-      'Default Daily Amal',
-      description: 'Always active default daily amal reminder',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
+          'default_daily_amal_channel',
+          'Default Daily Amal',
+          description: 'Always active default daily amal reminder',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+        );
 
-    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     await androidPlugin?.createNotificationChannel(dailyChannel);
     await androidPlugin?.createNotificationChannel(dhikrChannel);
@@ -205,7 +207,6 @@ class DailyReminderService {
     await androidPlugin?.createNotificationChannel(defaultPrayerChannel);
     await androidPlugin?.createNotificationChannel(defaultDhikrChannel);
     await androidPlugin?.createNotificationChannel(defaultDailyAmalChannel);
-
   }
 
   // Snooze notification IDs start at 8000
@@ -219,8 +220,8 @@ class DailyReminderService {
       final minutes = response.actionId == 'snooze_5'
           ? 5
           : response.actionId == 'snooze_10'
-              ? 10
-              : 15;
+          ? 10
+          : 15;
       final title = response.payload ?? 'রিমাইন্ডার';
       _scheduleSnoozeNotification(
         originalId: response.id ?? 0,
@@ -467,7 +468,10 @@ class DailyReminderService {
 
   /// Save reminder settings to SharedPreferences
   static Future<void> _saveReminderSettings(
-      bool enabled, int hour, int minute) async {
+    bool enabled,
+    int hour,
+    int minute,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_reminderEnabledKey, enabled);
     await prefs.setInt(_reminderHourKey, hour);
@@ -497,8 +501,10 @@ class DailyReminderService {
 
   /// Check if notifications are permitted
   static Future<bool> areNotificationsEnabled() async {
-    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidPlugin != null) {
       return await androidPlugin.areNotificationsEnabled() ?? false;
@@ -508,8 +514,10 @@ class DailyReminderService {
 
   /// Request notification permission (Android 13+)
   static Future<bool> requestNotificationPermission() async {
-    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidPlugin != null) {
       return await androidPlugin.requestNotificationsPermission() ?? false;
@@ -692,7 +700,10 @@ class DailyReminderService {
 
     final scheduledDate = tz.TZDateTime.from(scheduledDateTime, tz.local);
 
-    final prayerName = CustomReminder.getPrayerBengaliName(prayer, date: scheduledDateTime);
+    final prayerName = CustomReminder.getPrayerBengaliName(
+      prayer,
+      date: scheduledDateTime,
+    );
 
     final androidDetails = AndroidNotificationDetails(
       'prayer_reminder_channel',
@@ -721,10 +732,12 @@ class DailyReminderService {
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
-await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
+    await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
+    await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
     await prefs.setInt(
-        '$_prayerReminderPrefix${prayer.name}_minutesBefore', minutesBefore);
+      '$_prayerReminderPrefix${prayer.name}_minutesBefore',
+      minutesBefore,
+    );
 
     print('${prayer.name} reminder scheduled for $scheduledDateTime');
   }
@@ -752,7 +765,10 @@ await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    final prayerName = CustomReminder.getPrayerBengaliName(prayer, date: scheduledDate);
+    final prayerName = CustomReminder.getPrayerBengaliName(
+      prayer,
+      date: scheduledDate,
+    );
 
     final androidDetails = AndroidNotificationDetails(
       'prayer_reminder_channel',
@@ -781,8 +797,8 @@ await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
 
     // Save settings
     final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
-await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
+    await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', true);
+    await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     await prefs.setInt('$_prayerReminderPrefix${prayer.name}_minute', minute);
 
     print('${prayer.name} reminder scheduled for $hour:$minute');
@@ -798,8 +814,7 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
   static Future<void> cancelPrayerReminder(PrayerName prayer) async {
     await _notifications.cancel(_getPrayerNotificationId(prayer));
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(
-        '$_prayerReminderPrefix${prayer.name}_enabled', false);
+    await prefs.setBool('$_prayerReminderPrefix${prayer.name}_enabled', false);
     print('${prayer.name} reminder cancelled');
   }
 
@@ -811,14 +826,16 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     for (final prayer in PrayerName.values) {
       settings['${prayer.name}_enabled'] =
           prefs.getBool('$_prayerReminderPrefix${prayer.name}_enabled') ??
-              false;
-      settings['${prayer.name}_minutesBefore'] = prefs
-              .getInt('$_prayerReminderPrefix${prayer.name}_minutesBefore') ??
+          false;
+      settings['${prayer.name}_minutesBefore'] =
+          prefs.getInt('$_prayerReminderPrefix${prayer.name}_minutesBefore') ??
           10;
-      settings['${prayer.name}_hour'] =
-          prefs.getInt('$_prayerReminderPrefix${prayer.name}_hour');
-      settings['${prayer.name}_minute'] =
-          prefs.getInt('$_prayerReminderPrefix${prayer.name}_minute');
+      settings['${prayer.name}_hour'] = prefs.getInt(
+        '$_prayerReminderPrefix${prayer.name}_hour',
+      );
+      settings['${prayer.name}_minute'] = prefs.getInt(
+        '$_prayerReminderPrefix${prayer.name}_minute',
+      );
     }
 
     return settings;
@@ -846,7 +863,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
   /// Save custom reminders
   static Future<void> _saveCustomReminders(
-      List<CustomReminder> reminders) async {
+    List<CustomReminder> reminders,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = json.encode(reminders.map((r) => r.toJson()).toList());
     await prefs.setString(_customRemindersKey, jsonString);
@@ -925,8 +943,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
   /// Schedule notification for a custom reminder
   static Future<void> _scheduleCustomReminderNotification(
-      CustomReminder reminder, {
-      Map<String, DateTime>? prayerTimes,
+    CustomReminder reminder, {
+    Map<String, DateTime>? prayerTimes,
   }) async {
     final now = tz.TZDateTime.now(tz.local);
     tz.TZDateTime? scheduledDate;
@@ -1020,7 +1038,9 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
       );
     }
 
-    print('Custom reminder "${reminder.title}" scheduled (oneTime: ${reminder.isOneTime}, category: ${reminder.category})');
+    print(
+      'Custom reminder "${reminder.title}" scheduled (oneTime: ${reminder.isOneTime}, category: ${reminder.category})',
+    );
   }
 
   /// Auto-disable a one-time reminder after it fires
@@ -1074,10 +1094,14 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
   /// Reschedule custom reminders with prayer times (for prayer-relative reminders)
   static Future<void> rescheduleCustomRemindersWithPrayerTimes(
-      Map<String, DateTime> prayerTimes) async {
+    Map<String, DateTime> prayerTimes,
+  ) async {
     final customReminders = await getCustomReminders();
     for (final reminder in customReminders.where((r) => r.isEnabled)) {
-      await _scheduleCustomReminderNotification(reminder, prayerTimes: prayerTimes);
+      await _scheduleCustomReminderNotification(
+        reminder,
+        prayerTimes: prayerTimes,
+      );
     }
   }
 
@@ -1158,30 +1182,38 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
     if (startDate != null) {
       final todayDate = DateTime.now();
-      final todayMidnight = DateTime(todayDate.year, todayDate.month, todayDate.day);
+      final todayMidnight = DateTime(
+        todayDate.year,
+        todayDate.month,
+        todayDate.day,
+      );
 
       final endDate = startDate.add(Duration(days: days));
       final remaining = endDate.difference(todayMidnight).inDays;
 
       // ✅ If still have at least 7 days scheduled, do nothing
-            // ✅ Only skip rebuilding if we still have alarms actually scheduled.
+      // ✅ Only skip rebuilding if we still have alarms actually scheduled.
       final pending = await _notifications.pendingNotificationRequests();
 
       final maxPrayerId = _defaultPrayerIdBase + days * 10;
       final maxDhikrId = _defaultDhikrIdBase + days * 10;
 
-      final hasAnyDefaultScheduled = pending.any((r) =>
-          (r.id >= _defaultPrayerIdBase && r.id < maxPrayerId) ||
-          (r.id >= _defaultDhikrIdBase && r.id < maxDhikrId));
+      final hasAnyDefaultScheduled = pending.any(
+        (r) =>
+            (r.id >= _defaultPrayerIdBase && r.id < maxPrayerId) ||
+            (r.id >= _defaultDhikrIdBase && r.id < maxDhikrId),
+      );
 
       if (remaining >= 2 && hasAnyDefaultScheduled) {
-        print('[DefaultRolling] Skipping: $remaining days remaining, has pending alarms');
+        print(
+          '[DefaultRolling] Skipping: $remaining days remaining, has pending alarms',
+        );
         return;
       }
-      print('[DefaultRolling] Rebuilding: remaining=$remaining, hasAlarms=$hasAnyDefaultScheduled');
-
+      print(
+        '[DefaultRolling] Rebuilding: remaining=$remaining, hasAlarms=$hasAnyDefaultScheduled',
+      );
     }
-
 
     double lat = 23.8103;
     double lon = 90.4125;
@@ -1189,7 +1221,8 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     bool gotLiveLocation = false;
     final perm = await Geolocator.checkPermission();
     final canUseLocation =
-        perm == LocationPermission.always || perm == LocationPermission.whileInUse;
+        perm == LocationPermission.always ||
+        perm == LocationPermission.whileInUse;
 
     if (canUseLocation) {
       try {
@@ -1218,15 +1251,12 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
         lon = (savedLon * 100).round() / 100;
       }
     }
-// DO NOT request permission here
-
-
+    // DO NOT request permission here
 
     int scheduledCount = 0;
 
     final nowDate = DateTime.now();
-    final todayMidnight =
-        DateTime(nowDate.year, nowDate.month, nowDate.day);
+    final todayMidnight = DateTime(nowDate.year, nowDate.month, nowDate.day);
 
     // Offsets (your default rules)
     const offsets = <String, int>{
@@ -1238,13 +1268,11 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
     };
 
     for (int i = 0; i < daysAhead; i++) {
-
       for (int p = 0; p < 5; p++) {
         await _notifications.cancel(_defaultPrayerIdForDayIndex(i, p));
       }
       await _notifications.cancel(_defaultDhikrIdForDayIndex(i, true));
       await _notifications.cancel(_defaultDhikrIdForDayIndex(i, false));
-
 
       final date = todayMidnight.add(Duration(days: i));
 
@@ -1261,7 +1289,6 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
         continue;
       }
 
-
       // ===== Default prayers =====
       final keys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
@@ -1274,7 +1301,10 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
         if (target.isBefore(tz.TZDateTime.now(tz.local))) continue;
 
         // Show জুম'আ instead of যোহর on Fridays
-        final prayerLabel = _displayPrayerName(PrayerName.values[p], date: date);
+        final prayerLabel = _displayPrayerName(
+          PrayerName.values[p],
+          date: date,
+        );
 
         await _notifications.zonedSchedule(
           _defaultPrayerIdForDayIndex(i, p),
@@ -1294,12 +1324,13 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
         scheduledCount++;
-
       }
 
       // ===== Default dhikr =====
       final morning = tz.TZDateTime.from(
-          pt['fajr']!.add(const Duration(minutes: 30)), tz.local);
+        pt['fajr']!.add(const Duration(minutes: 30)),
+        tz.local,
+      );
       if (morning.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, true),
@@ -1319,11 +1350,12 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
         scheduledCount++;
-
       }
 
       final evening = tz.TZDateTime.from(
-          pt['maghrib']!.add(const Duration(minutes: 30)), tz.local);
+        pt['maghrib']!.add(const Duration(minutes: 30)),
+        tz.local,
+      );
       if (evening.isAfter(tz.TZDateTime.now(tz.local))) {
         await _notifications.zonedSchedule(
           _defaultDhikrIdForDayIndex(i, false),
@@ -1343,7 +1375,6 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
         scheduledCount++;
-
       }
     }
 
@@ -1355,12 +1386,11 @@ await prefs.setInt('$_prayerReminderPrefix${prayer.name}_hour', hour);
 
       await prefs.setString(_kDefaultWindowStartDay, _dayKey(start));
       await prefs.setInt(_kDefaultWindowDaysAhead, daysAhead);
-      print('[DefaultRolling] Scheduled $scheduledCount notifications for $daysAhead days');
+      print(
+        '[DefaultRolling] Scheduled $scheduledCount notifications for $daysAhead days',
+      );
     } else {
       print('[DefaultRolling] WARNING: 0 notifications scheduled!');
     }
-
-
   }
-
 }

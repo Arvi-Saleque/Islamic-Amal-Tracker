@@ -13,7 +13,7 @@ class PrayerTimesState {
   final String? currentPrayer;
   final String? timeToCurrentPrayerEnd;
   final bool
-      isForbiddenTime; // True during forbidden prayer times (post-sunrise & zawal)
+  isForbiddenTime; // True during forbidden prayer times (post-sunrise & zawal)
   final bool isNaflTime; // True during voluntary prayer time
   final bool isLoading;
   final String? error;
@@ -67,7 +67,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
   Timer? _timer;
 
   PrayerTimesNotifier()
-      : super(PrayerTimesState(prayerTimes: {}, isLoading: true)) {
+    : super(PrayerTimesState(prayerTimes: {}, isLoading: true)) {
     fetchPrayerTimes();
     _startTimer();
   }
@@ -90,7 +90,10 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
 
     final now = DateTime.now();
     final result = _calculateCurrentAndNextPrayer(
-        now, state.prayerTimes, state.waqtEndTimes);
+      now,
+      state.prayerTimes,
+      state.waqtEndTimes,
+    );
 
     state = state.copyWith(
       nextPrayer: result['nextPrayer'],
@@ -129,36 +132,50 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
     // Convert all times to today's date for comparison
     DateTime toToday(DateTime time) {
       return DateTime(
-          now.year, now.month, now.day, time.hour, time.minute, time.second);
+        now.year,
+        now.month,
+        now.day,
+        time.hour,
+        time.minute,
+        time.second,
+      );
     }
 
     // Get today's times
-    final fajrStart =
-        prayerTimes['fajr'] != null ? toToday(prayerTimes['fajr']!) : null;
+    final fajrStart = prayerTimes['fajr'] != null
+        ? toToday(prayerTimes['fajr']!)
+        : null;
     final sunrise = prayerTimes['sunrise'] != null
         ? toToday(prayerTimes['sunrise']!)
         : null;
-    final dhuhrStart =
-        prayerTimes['dhuhr'] != null ? toToday(prayerTimes['dhuhr']!) : null;
-    final asrStart =
-        prayerTimes['asr'] != null ? toToday(prayerTimes['asr']!) : null;
+    final dhuhrStart = prayerTimes['dhuhr'] != null
+        ? toToday(prayerTimes['dhuhr']!)
+        : null;
+    final asrStart = prayerTimes['asr'] != null
+        ? toToday(prayerTimes['asr']!)
+        : null;
     final maghribStart = prayerTimes['maghrib'] != null
         ? toToday(prayerTimes['maghrib']!)
         : null;
-    final ishaStart =
-        prayerTimes['isha'] != null ? toToday(prayerTimes['isha']!) : null;
+    final ishaStart = prayerTimes['isha'] != null
+        ? toToday(prayerTimes['isha']!)
+        : null;
 
     // Calculate forbidden times
-    final sunriseEnd =
-        sunrise?.add(const Duration(minutes: 15)); // ~15 min after sunrise
-    final zawalStart = dhuhrStart
-        ?.subtract(const Duration(minutes: 10)); // ~10 min before dhuhr
-    final sunsetForbiddenStart = maghribStart
-        ?.subtract(const Duration(minutes: 15)); // ~15 min before maghrib
+    final sunriseEnd = sunrise?.add(
+      const Duration(minutes: 15),
+    ); // ~15 min after sunrise
+    final zawalStart = dhuhrStart?.subtract(
+      const Duration(minutes: 10),
+    ); // ~10 min before dhuhr
+    final sunsetForbiddenStart = maghribStart?.subtract(
+      const Duration(minutes: 15),
+    ); // ~15 min before maghrib
 
     // Get waqt end times (adjusted for sunset forbidden time)
-    final fajrEnd =
-        waqtEndTimes['fajr'] != null ? toToday(waqtEndTimes['fajr']!) : sunrise;
+    final fajrEnd = waqtEndTimes['fajr'] != null
+        ? toToday(waqtEndTimes['fajr']!)
+        : sunrise;
     final dhuhrEnd = waqtEndTimes['dhuhr'] != null
         ? toToday(waqtEndTimes['dhuhr']!)
         : asrStart;
@@ -169,8 +186,14 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         : ishaStart;
     // Isha ends at fajr next day
     final ishaEnd = fajrStart != null
-        ? DateTime(now.year, now.month, now.day + 1, fajrStart.hour,
-            fajrStart.minute, fajrStart.second)
+        ? DateTime(
+            now.year,
+            now.month,
+            now.day + 1,
+            fajrStart.hour,
+            fajrStart.minute,
+            fajrStart.second,
+          )
         : null;
 
     // Check each time period
@@ -346,7 +369,8 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         );
         if (placemarks.isNotEmpty) {
           final place = placemarks.first;
-          cityName = place.locality ??
+          cityName =
+              place.locality ??
               place.subAdministrativeArea ??
               place.administrativeArea ??
               'ঢাকা';
@@ -400,8 +424,8 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       // Include sunrise for waqt end time calculation
       final times = {
         'fajr': prayerTimes.fajr.toLocal(),
-        'sunrise':
-            prayerTimes.sunrise.toLocal(), // Important: Fajr ends at sunrise
+        'sunrise': prayerTimes.sunrise
+            .toLocal(), // Important: Fajr ends at sunrise
         'dhuhr': prayerTimes.dhuhr.toLocal(),
         'asr': prayerTimes.asr.toLocal(),
         'maghrib': prayerTimes.maghrib.toLocal(),
@@ -415,8 +439,9 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         'dhuhr': times['asr']!, // Dhuhr ends when Asr starts
         'asr': times['maghrib']!, // Asr ends at sunset (Maghrib)
         'maghrib': times['isha']!, // Maghrib ends when Isha starts
-        'isha': times['fajr']!
-            .add(const Duration(days: 1)), // Isha ends at next day Fajr
+        'isha': times['fajr']!.add(
+          const Duration(days: 1),
+        ), // Isha ends at next day Fajr
       };
 
       print('Local Prayer Times:');
@@ -451,10 +476,7 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
         locationName: cityName,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -491,7 +513,8 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (serviceEnabled) {
         final permission = await Geolocator.checkPermission();
-        final canUseLocation = permission == LocationPermission.always ||
+        final canUseLocation =
+            permission == LocationPermission.always ||
             permission == LocationPermission.whileInUse;
 
         if (canUseLocation) {
@@ -534,5 +557,5 @@ class PrayerTimesNotifier extends StateNotifier<PrayerTimesState> {
 
 final prayerTimesProvider =
     StateNotifierProvider<PrayerTimesNotifier, PrayerTimesState>((ref) {
-  return PrayerTimesNotifier();
-});
+      return PrayerTimesNotifier();
+    });

@@ -62,21 +62,22 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color:
-                    Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -110,9 +111,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: Theme.of(context)
-                .extension<GradientColors>()!
-                .backgroundGradient,
+            colors: Theme.of(
+              context,
+            ).extension<GradientColors>()!.backgroundGradient,
           ),
         ),
         child: SafeArea(
@@ -262,8 +263,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     final percentage = total > 0 ? completed / total : 0.0;
 
     return Padding(
-      padding:
-          const EdgeInsets.only(left: _pagePad, right: _pagePad, bottom: 14),
+      padding: const EdgeInsets.only(
+        left: _pagePad,
+        right: _pagePad,
+        bottom: 14,
+      ),
       child: buildPremiumCard(
         context: context,
         radius: _sectionRadius,
@@ -282,14 +286,17 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors:
-                          theme.extension<GradientColors>()!.innerCardGradient,
+                      colors: theme
+                          .extension<GradientColors>()!
+                          .innerCardGradient,
                     ),
                     borderRadius: BorderRadius.circular(_sectionRadius),
                     border: Border.all(
@@ -377,10 +384,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     );
   }
 
-  Widget _buildChecklistItem(
-    DailyAmalItem item,
-    DailyAmalNotifier notifier,
-  ) {
+  Widget _buildChecklistItem(DailyAmalItem item, DailyAmalNotifier notifier) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -584,19 +588,19 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         final fieldFill = cs.surfaceContainerHighest;
         final borderCol = cs.outline.withOpacity(0.30);
 
-        InputDecoration deco({
-          required String hint,
-          IconData? icon,
-        }) {
+        InputDecoration deco({required String hint, IconData? icon}) {
           return InputDecoration(
             hintText: hint,
             filled: true,
             fillColor: fieldFill,
-            prefixIcon:
-                icon == null ? null : Icon(icon, color: cs.onSurfaceVariant),
+            prefixIcon: icon == null
+                ? null
+                : Icon(icon, color: cs.onSurfaceVariant),
             hintStyle: TextStyle(color: cs.onSurfaceVariant),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: borderCol),
@@ -656,36 +660,41 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 TextField(
                   controller: titleController,
                   style: TextStyle(color: cs.onSurface),
-                  decoration:
-                      deco(hint: 'daily_amal_name_hint'.tr(), icon: Icons.edit_outlined),
+                  decoration: deco(
+                    hint: 'daily_amal_name_hint'.tr(),
+                    icon: Icons.edit_outlined,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // Dropdown
                 StatefulBuilder(
                   builder: (context, setState) =>
                       DropdownButtonFormField<String>(
-                    initialValue: selectedCategory,
-                    dropdownColor: cs.surfaceContainerHighest,
-                    style: TextStyle(color: cs.onSurface),
-                    decoration: deco(
-                        hint: 'daily_amal_category_hint'.tr(),
-                        icon: Icons.category_outlined),
-                    items: _categoryNames.entries
-                        .where((e) => e.key != 'all')
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e.key,
-                            child: Text(e.value,
-                                style: TextStyle(color: cs.onSurface)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCategory = value!;
-                      });
-                    },
-                  ),
+                        initialValue: selectedCategory,
+                        dropdownColor: cs.surfaceContainerHighest,
+                        style: TextStyle(color: cs.onSurface),
+                        decoration: deco(
+                          hint: 'daily_amal_category_hint'.tr(),
+                          icon: Icons.category_outlined,
+                        ),
+                        items: _categoryNames.entries
+                            .where((e) => e.key != 'all')
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.key,
+                                child: Text(
+                                  e.value,
+                                  style: TextStyle(color: cs.onSurface),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCategory = value!;
+                          });
+                        },
+                      ),
                 ),
                 const SizedBox(height: 20),
                 // Action buttons
@@ -706,8 +715,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: cs.primary,
-                        foregroundColor:
-                            theme.extension<GradientColors>()!.onPrimaryText,
+                        foregroundColor: theme
+                            .extension<GradientColors>()!
+                            .onPrimaryText,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 12,
@@ -721,10 +731,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                         final title = titleController.text.trim();
                         if (title.isEmpty) return;
 
-                        notifier.addCustomItem(
-                          title,
-                          selectedCategory,
-                        );
+                        notifier.addCustomItem(title, selectedCategory);
                         Navigator.pop(context);
                       },
                       child: Text(
@@ -852,10 +859,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
   void _showInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context)
-          .extension<GradientColors>()!
-          .onPrimaryText
-          .withOpacity(0),
+      backgroundColor: Theme.of(
+        context,
+      ).extension<GradientColors>()!.onPrimaryText.withOpacity(0),
       isScrollControlled: true,
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.85,
@@ -1090,10 +1096,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     );
   }
 
-  Widget _buildHadithCard({
-    required String hadith,
-    required String reference,
-  }) {
+  Widget _buildHadithCard({required String hadith, required String reference}) {
     final cs = Theme.of(context).colorScheme;
 
     return buildPremiumCard(
@@ -1113,8 +1116,11 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                   color: cs.primary.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.format_quote_rounded,
-                    color: cs.primary, size: 14),
+                child: Icon(
+                  Icons.format_quote_rounded,
+                  color: cs.primary,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1156,10 +1162,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-  }) {
+  Widget _buildSectionHeader({required IconData icon, required String title}) {
     final cs = Theme.of(context).colorScheme;
 
     return buildPremiumCard(
@@ -1175,11 +1178,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               color: cs.primary.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon,
-                color: Theme.of(context)
-                    .extension<GradientColors>()!
-                    .onPrimaryText,
-                size: 18),
+            child: Icon(
+              icon,
+              color: Theme.of(
+                context,
+              ).extension<GradientColors>()!.onPrimaryText,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1218,11 +1223,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               color: cs.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              Icons.wb_twilight,
-              color: cs.primary,
-              size: 20,
-            ),
+            child: Icon(Icons.wb_twilight, color: cs.primary, size: 20),
           ),
           title: Text(
             'daily_amal_adhkar_title'.tr(),
@@ -1236,10 +1237,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             padding: const EdgeInsets.only(top: 6),
             child: Text(
               'daily_amal_adhkar_subtitle'.tr(),
-              style: TextStyle(
-                color: cs.onSurfaceVariant,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
             ),
           ),
           iconColor: cs.primary,
@@ -1410,7 +1408,6 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
             const SizedBox(height: 14),
 
             // 27.2: Ayatul Kursi
-
             _buildExpandableDuaCard(
               title: 'dhikr_morning_1_title'.tr(),
               arabic:
@@ -1435,7 +1432,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_2_count'.tr(),
             ),
 
-// ৩ নং যিক্র: হাসবিয়াল্লাহু
+            // ৩ নং যিক্র: হাসবিয়াল্লাহু
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1449,7 +1446,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_3_count'.tr(),
             ),
 
-// ৪ নং যিক্র: সায়্যিদুল ইস্তিগফার
+            // ৪ নং যিক্র: সায়্যিদুল ইস্তিগফার
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1463,7 +1460,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_4_count'.tr(),
             ),
 
-// ৫ নং যিক্র
+            // ৫ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1477,7 +1474,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_5_count'.tr(),
             ),
 
-// ৬ নং যিক্র
+            // ৬ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1491,7 +1488,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_6_count'.tr(),
             ),
 
-// ৭ নং যিক্র
+            // ৭ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1504,7 +1501,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_7_count'.tr(),
             ),
 
-// ৮ নং যিক্র
+            // ৮ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1518,8 +1515,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_8_count'.tr(),
             ),
 
-// ৯ নং যিক্র
-
+            // ৯ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1532,14 +1528,13 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               fazilat: 'dhikr_morning_9_fazilat'.tr(),
               count: 'dhikr_morning_9_count'.tr(),
             ),
-            
 
-// ১০ নং যিক্র
-            
+            // ১০ নং যিক্র
             const SizedBox(height: 14),
             _buildExpandableDuaCard(
               title: 'dhikr_morning_10_title'.tr(),
-              arabic: 'اَعُوْذُ بِكَلِمٰتِ اللّٰهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+              arabic:
+                  'اَعُوْذُ بِكَلِمٰتِ اللّٰهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
               pronunciation: 'dhikr_morning_10_pron'.tr(),
               meaning: 'dhikr_morning_10_meaning'.tr(),
               reference: 'dhikr_morning_10_ref'.tr(),
@@ -1547,7 +1542,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_10_count'.tr(),
             ),
 
-// ১১ নং যিক্র
+            // ১১ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1561,7 +1556,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_11_count'.tr(),
             ),
 
-// ১২ নং যিক্র
+            // ১২ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1575,7 +1570,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_12_count'.tr(),
             ),
 
-// ১৩ নং যিক্র
+            // ১৩ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1588,7 +1583,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_13_count'.tr(),
             ),
 
-// ১৪ নং যিক্র
+            // ১৪ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1602,7 +1597,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_14_count'.tr(),
             ),
 
-// ১৫ নং যিক্র
+            // ১৫ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1616,7 +1611,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_15_count'.tr(),
             ),
 
-// ১৬ নং যিক্র
+            // ১৬ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1630,7 +1625,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_16_count'.tr(),
             ),
 
-// ১৭ নং যিক্র
+            // ১৭ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1644,7 +1639,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_17_count'.tr(),
             ),
 
-// ১৮ নং যিক্র
+            // ১৮ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1658,8 +1653,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_18_count'.tr(),
             ),
 
-// ১৯ নং যিক্র
-            
+            // ১৯ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1673,7 +1667,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_19_count'.tr(),
             ),
 
-// ২০ নং যিক্র
+            // ২০ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1687,7 +1681,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_20_count'.tr(),
             ),
 
-// ২১ নং যিক্র
+            // ২১ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1701,7 +1695,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               count: 'dhikr_morning_21_count'.tr(),
             ),
 
-// ২২ নং যিক্র
+            // ২২ নং যিক্র
             const SizedBox(height: 14),
 
             _buildExpandableDuaCard(
@@ -1750,11 +1744,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-          leading: Icon(
-            Icons.format_quote,
-            color: cs.primary,
-            size: 20,
-          ),
+          leading: Icon(Icons.format_quote, color: cs.primary, size: 20),
           title: Text(
             title,
             style: TextStyle(
@@ -1788,9 +1778,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: cs.outline.withOpacity(0.15),
-                ),
+                border: Border.all(color: cs.outline.withOpacity(0.15)),
                 boxShadow: [
                   BoxShadow(
                     color: theme.shadowColor.withOpacity(0.08),
@@ -1806,7 +1794,9 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: cs.primary.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(6),
@@ -1853,9 +1843,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.outline.withValues(alpha: 0.10),
-                ),
+                border: Border.all(color: cs.outline.withValues(alpha: 0.10)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1900,20 +1888,14 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.outline.withOpacity(0.10),
-                ),
+                border: Border.all(color: cs.outline.withOpacity(0.10)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.translate,
-                        color: cs.secondary,
-                        size: 14,
-                      ),
+                      Icon(Icons.translate, color: cs.secondary, size: 14),
                       const SizedBox(width: 6),
                       Text(
                         'meaning'.tr(),
@@ -1946,9 +1928,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
               decoration: BoxDecoration(
                 color: cs.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: cs.primary.withOpacity(0.15),
-                ),
+                border: Border.all(color: cs.primary.withOpacity(0.15)),
                 boxShadow: [
                   BoxShadow(
                     color: theme.shadowColor.withOpacity(0.08),
@@ -1962,11 +1942,7 @@ class _DailyAmalScreenState extends ConsumerState<DailyAmalScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: cs.primary,
-                        size: 14,
-                      ),
+                      Icon(Icons.star, color: cs.primary, size: 14),
                       const SizedBox(width: 6),
                       Text(
                         'virtue'.tr(),

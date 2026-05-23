@@ -1,8 +1,4 @@
-enum ReadingType {
-  quran,
-  tafsir,
-  hadith,
-}
+enum ReadingType { quran, tafsir, hadith }
 
 class ReadingSession {
   final String id;
@@ -184,19 +180,27 @@ class ReadingTrackerModel {
   factory ReadingTrackerModel.fromJson(Map<String, dynamic> json) {
     return ReadingTrackerModel(
       date: json['date'] as String,
-      sessions: (json['sessions'] as List<dynamic>?)
-              ?.map((s) => ReadingSession.fromJson(Map<String, dynamic>.from(s as Map)))
+      sessions:
+          (json['sessions'] as List<dynamic>?)
+              ?.map(
+                (s) => ReadingSession.fromJson(
+                  Map<String, dynamic>.from(s as Map),
+                ),
+              )
               .toList() ??
           [],
       goal: json['goal'] != null
-          ? DailyReadingGoal.fromJson(Map<String, dynamic>.from(json['goal'] as Map))
+          ? DailyReadingGoal.fromJson(
+              Map<String, dynamic>.from(json['goal'] as Map),
+            )
           : DailyReadingGoal(),
     );
   }
 
   factory ReadingTrackerModel.empty() {
     final now = DateTime.now();
-    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
     return ReadingTrackerModel(
       date: dateStr,
@@ -236,5 +240,6 @@ class ReadingTrackerModel {
   bool get isQuranGoalMet => quranMinutes >= goal.quranMinutes;
   bool get isTafsirGoalMet => tafsirMinutes >= goal.tafsirMinutes;
   bool get isHadithGoalMet => hadithMinutes >= goal.hadithMinutes;
-  bool get isAllGoalsMet => isQuranGoalMet && isTafsirGoalMet && isHadithGoalMet;
+  bool get isAllGoalsMet =>
+      isQuranGoalMet && isTafsirGoalMet && isHadithGoalMet;
 }

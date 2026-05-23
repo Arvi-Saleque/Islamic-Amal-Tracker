@@ -56,23 +56,20 @@ class DailyAmalModel {
   final String date; // Format: yyyy-MM-dd
   final List<DailyAmalItem> items;
 
-  DailyAmalModel({
-    required this.date,
-    required this.items,
-  });
+  DailyAmalModel({required this.date, required this.items});
 
   Map<String, dynamic> toJson() {
-    return {
-      'date': date,
-      'items': items.map((item) => item.toJson()).toList(),
-    };
+    return {'date': date, 'items': items.map((item) => item.toJson()).toList()};
   }
 
   factory DailyAmalModel.fromJson(Map<String, dynamic> json) {
     return DailyAmalModel(
       date: json['date'] as String,
       items: (json['items'] as List)
-          .map((item) => DailyAmalItem.fromJson(Map<String, dynamic>.from(item as Map)))
+          .map(
+            (item) =>
+                DailyAmalItem.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
           .toList(),
     );
   }
@@ -108,11 +105,7 @@ class DailyAmalModel {
           category: 'miswak',
         ),
         // সূরাহ পড়া
-        DailyAmalItem(
-          id: 'surah_mulk',
-          title: 'সূরা মুলক',
-          category: 'surah',
-        ),
+        DailyAmalItem(id: 'surah_mulk', title: 'সূরা মুলক', category: 'surah'),
         DailyAmalItem(
           id: 'surah_waqi',
           title: 'সূরা ওয়াকিয়া',
@@ -150,26 +143,14 @@ class DailyAmalModel {
           title: 'তাহাজ্জুদ নামাজ',
           category: 'prayer',
         ),
-        DailyAmalItem(
-          id: 'ishraq',
-          title: 'ইশরাক নামাজ',
-          category: 'prayer',
-        ),
-        DailyAmalItem(
-          id: 'duha',
-          title: 'চাশত নামাজ',
-          category: 'prayer',
-        ),
+        DailyAmalItem(id: 'ishraq', title: 'ইশরাক নামাজ', category: 'prayer'),
+        DailyAmalItem(id: 'duha', title: 'চাশত নামাজ', category: 'prayer'),
         DailyAmalItem(
           id: 'awwabin',
           title: 'আউওয়াবীন নামাজ',
           category: 'prayer',
         ),
-        DailyAmalItem(
-          id: 'charity',
-          title: 'দান/সাদাকা',
-          category: 'other',
-        ),
+        DailyAmalItem(id: 'charity', title: 'দান/সাদাকা', category: 'other'),
         DailyAmalItem(
           id: 'helping',
           title: 'কাউকে সাহায্য করা',
@@ -181,15 +162,10 @@ class DailyAmalModel {
 
   int get completedCount => items.where((item) => item.isCompleted).length;
   int get totalCount => items.length;
-  double get progressPercentage => totalCount > 0 ? completedCount / totalCount : 0;
+  double get progressPercentage =>
+      totalCount > 0 ? completedCount / totalCount : 0;
 
-  DailyAmalModel copyWith({
-    String? date,
-    List<DailyAmalItem>? items,
-  }) {
-    return DailyAmalModel(
-      date: date ?? this.date,
-      items: items ?? this.items,
-    );
+  DailyAmalModel copyWith({String? date, List<DailyAmalItem>? items}) {
+    return DailyAmalModel(date: date ?? this.date, items: items ?? this.items);
   }
 }

@@ -8,7 +8,6 @@ class UsageRulesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final bg = Theme.of(context).scaffoldBackgroundColor;
     final colors = Theme.of(context).colorScheme;
 
@@ -24,20 +23,22 @@ class UsageRulesScreen extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -58,7 +59,6 @@ class UsageRulesScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -119,15 +119,15 @@ class UsageRulesScreen extends StatelessWidget {
 
   static Widget _buildHeaderSection(BuildContext context) {
     final gradients = Theme.of(context).extension<GradientColors>()!;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: gradients.cardGradient,
-        ),
+        gradient: LinearGradient(colors: gradients.cardGradient),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,37 +155,68 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_reminder_types_title'.tr(),
-          items: ['usage_reminder_types_1', 'usage_reminder_types_2', 'usage_reminder_types_3', 'usage_reminder_types_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_types_1',
+            'usage_reminder_types_2',
+            'usage_reminder_types_3',
+            'usage_reminder_types_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_reminder_default_prayer_title'.tr(),
-          items: ['usage_reminder_default_prayer_1', 'usage_reminder_default_prayer_2', 'usage_reminder_default_prayer_3', 'usage_reminder_default_prayer_4', 'usage_reminder_default_prayer_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_default_prayer_1',
+            'usage_reminder_default_prayer_2',
+            'usage_reminder_default_prayer_3',
+            'usage_reminder_default_prayer_4',
+            'usage_reminder_default_prayer_5',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_reminder_default_dhikr_title'.tr(),
-          items: ['usage_reminder_default_dhikr_1', 'usage_reminder_default_dhikr_2', 'usage_reminder_default_dhikr_3'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_default_dhikr_1',
+            'usage_reminder_default_dhikr_2',
+            'usage_reminder_default_dhikr_3',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_reminder_personal_title'.tr(),
-          items: ['usage_reminder_personal_1', 'usage_reminder_personal_2', 'usage_reminder_personal_3', 'usage_reminder_personal_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_personal_1',
+            'usage_reminder_personal_2',
+            'usage_reminder_personal_3',
+            'usage_reminder_personal_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_reminder_custom_title'.tr(),
-          items: ['usage_reminder_custom_1', 'usage_reminder_custom_2', 'usage_reminder_custom_3', 'usage_reminder_custom_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_custom_1',
+            'usage_reminder_custom_2',
+            'usage_reminder_custom_3',
+            'usage_reminder_custom_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_reminder_trouble_title'.tr(),
-          items: ['usage_reminder_trouble_1', 'usage_reminder_trouble_2', 'usage_reminder_trouble_3', 'usage_reminder_trouble_4', 'usage_reminder_trouble_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reminder_trouble_1',
+            'usage_reminder_trouble_2',
+            'usage_reminder_trouble_3',
+            'usage_reminder_trouble_4',
+            'usage_reminder_trouble_5',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -201,37 +232,69 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_prayer_calc_title'.tr(),
-          items: ['usage_prayer_calc_1', 'usage_prayer_calc_2', 'usage_prayer_calc_3', 'usage_prayer_calc_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_calc_1',
+            'usage_prayer_calc_2',
+            'usage_prayer_calc_3',
+            'usage_prayer_calc_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_prayer_location_title'.tr(),
-          items: ['usage_prayer_location_1', 'usage_prayer_location_2', 'usage_prayer_location_3', 'usage_prayer_location_4', 'usage_prayer_location_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_location_1',
+            'usage_prayer_location_2',
+            'usage_prayer_location_3',
+            'usage_prayer_location_4',
+            'usage_prayer_location_5',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_prayer_waqt_title'.tr(),
-          items: ['usage_prayer_waqt_1', 'usage_prayer_waqt_2', 'usage_prayer_waqt_3', 'usage_prayer_waqt_4', 'usage_prayer_waqt_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_waqt_1',
+            'usage_prayer_waqt_2',
+            'usage_prayer_waqt_3',
+            'usage_prayer_waqt_4',
+            'usage_prayer_waqt_5',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_prayer_makruh_title'.tr(),
-          items: ['usage_prayer_makruh_1', 'usage_prayer_makruh_2', 'usage_prayer_makruh_3', 'usage_prayer_makruh_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_makruh_1',
+            'usage_prayer_makruh_2',
+            'usage_prayer_makruh_3',
+            'usage_prayer_makruh_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_prayer_special_title'.tr(),
-          items: ['usage_prayer_special_1', 'usage_prayer_special_2', 'usage_prayer_special_3', 'usage_prayer_special_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_special_1',
+            'usage_prayer_special_2',
+            'usage_prayer_special_3',
+            'usage_prayer_special_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_prayer_tracking_title'.tr(),
-          items: ['usage_prayer_tracking_1', 'usage_prayer_tracking_2', 'usage_prayer_tracking_3', 'usage_prayer_tracking_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_prayer_tracking_1',
+            'usage_prayer_tracking_2',
+            'usage_prayer_tracking_3',
+            'usage_prayer_tracking_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -247,19 +310,33 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_amal_preset_title'.tr(),
-          items: ['usage_amal_preset_1', 'usage_amal_preset_2', 'usage_amal_preset_3', 'usage_amal_preset_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_amal_preset_1',
+            'usage_amal_preset_2',
+            'usage_amal_preset_3',
+            'usage_amal_preset_4',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_amal_custom_title'.tr(),
-          items: ['usage_amal_custom_1', 'usage_amal_custom_2', 'usage_amal_custom_3'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_amal_custom_1',
+            'usage_amal_custom_2',
+            'usage_amal_custom_3',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_amal_progress_title'.tr(),
-          items: ['usage_amal_progress_1', 'usage_amal_progress_2', 'usage_amal_progress_3', 'usage_amal_progress_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_amal_progress_1',
+            'usage_amal_progress_2',
+            'usage_amal_progress_3',
+            'usage_amal_progress_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -275,7 +352,12 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_dhikr_tracking_title'.tr(),
-          items: ['usage_dhikr_tracking_1', 'usage_dhikr_tracking_2', 'usage_dhikr_tracking_3', 'usage_dhikr_tracking_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_dhikr_tracking_1',
+            'usage_dhikr_tracking_2',
+            'usage_dhikr_tracking_3',
+            'usage_dhikr_tracking_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -291,7 +373,12 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_reading_types_title'.tr(),
-          items: ['usage_reading_types_1', 'usage_reading_types_2', 'usage_reading_types_3', 'usage_reading_types_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_reading_types_1',
+            'usage_reading_types_2',
+            'usage_reading_types_3',
+            'usage_reading_types_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -307,7 +394,12 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_sin_purpose_title'.tr(),
-          items: ['usage_sin_purpose_1', 'usage_sin_purpose_2', 'usage_sin_purpose_3', 'usage_sin_purpose_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_sin_purpose_1',
+            'usage_sin_purpose_2',
+            'usage_sin_purpose_3',
+            'usage_sin_purpose_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -323,7 +415,12 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_stats_viz_title'.tr(),
-          items: ['usage_stats_viz_1', 'usage_stats_viz_2', 'usage_stats_viz_3', 'usage_stats_viz_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_stats_viz_1',
+            'usage_stats_viz_2',
+            'usage_stats_viz_3',
+            'usage_stats_viz_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -339,7 +436,13 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_cloud_sync_title'.tr(),
-          items: ['usage_cloud_sync_1', 'usage_cloud_sync_2', 'usage_cloud_sync_3', 'usage_cloud_sync_4', 'usage_cloud_sync_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_cloud_sync_1',
+            'usage_cloud_sync_2',
+            'usage_cloud_sync_3',
+            'usage_cloud_sync_4',
+            'usage_cloud_sync_5',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -355,7 +458,12 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_settings_main_title'.tr(),
-          items: ['usage_settings_main_1', 'usage_settings_main_2', 'usage_settings_main_3', 'usage_settings_main_4'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_settings_main_1',
+            'usage_settings_main_2',
+            'usage_settings_main_3',
+            'usage_settings_main_4',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -371,13 +479,23 @@ class UsageRulesScreen extends StatelessWidget {
         _buildSubSection(
           context: context,
           title: 'usage_trouble_common_title'.tr(),
-          items: ['usage_trouble_common_1', 'usage_trouble_common_2', 'usage_trouble_common_3', 'usage_trouble_common_4', 'usage_trouble_common_5'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_trouble_common_1',
+            'usage_trouble_common_2',
+            'usage_trouble_common_3',
+            'usage_trouble_common_4',
+            'usage_trouble_common_5',
+          ].map((k) => k.tr()).toList(),
         ),
         const SizedBox(height: 12),
         _buildSubSection(
           context: context,
           title: 'usage_trouble_tips_title'.tr(),
-          items: ['usage_trouble_tips_1', 'usage_trouble_tips_2', 'usage_trouble_tips_3'].map((k) => k.tr()).toList(),
+          items: [
+            'usage_trouble_tips_1',
+            'usage_trouble_tips_2',
+            'usage_trouble_tips_3',
+          ].map((k) => k.tr()).toList(),
         ),
       ],
     );
@@ -403,9 +521,7 @@ class UsageRulesScreen extends StatelessWidget {
             final Uri emailUri = Uri(
               scheme: 'mailto',
               path: 'effttech@gmail.com',
-              queryParameters: {
-                'subject': 'usage_contact_email_subject'.tr(),
-              },
+              queryParameters: {'subject': 'usage_contact_email_subject'.tr()},
             );
             launchUrl(emailUri);
           },
@@ -514,28 +630,27 @@ class UsageRulesScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ...items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6, left: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '• ',
-                    style: TextStyle(color: bulletColor, fontSize: 16),
-                  ),
-                  Expanded(
-                    child: Text(
-                      item,
-                      style: TextStyle(
-                        color: bulletColor,
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: 6, left: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('• ', style: TextStyle(color: bulletColor, fontSize: 16)),
+                Expanded(
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      color: bulletColor,
+                      fontSize: 13,
+                      height: 1.5,
                     ),
                   ),
-                ],
-              ),
-            )),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

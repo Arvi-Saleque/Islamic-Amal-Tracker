@@ -1,10 +1,9 @@
-
 // This script generates app icon with mosque icon
 // Run: dart run tool/generate_icon.dart
 
 void main() async {
   print('Generating app icon with mosque...');
-  
+
   // Create SVG content for mosque icon
   const svgContent = '''
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
@@ -34,7 +33,9 @@ void main() async {
   print('SVG content created');
   print('Please use an online SVG to PNG converter or design tool to create:');
   print('1. assets/icons/app_icon.png (1024x1024)');
-  print('2. assets/icons/app_icon_foreground.png (1024x1024 with transparent background)');
+  print(
+    '2. assets/icons/app_icon_foreground.png (1024x1024 with transparent background)',
+  );
   print('');
   print('Then run: flutter pub run flutter_launcher_icons');
 }

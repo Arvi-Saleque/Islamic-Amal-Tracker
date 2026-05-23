@@ -9,14 +9,16 @@ class PermissionService {
   static const String _notificationPopupShownKey = 'notification_popup_shown';
 
   /// Show notification permission popup after location permission is granted
-  static Future<void> showNotificationPermissionPopup(BuildContext context) async {
+  static Future<void> showNotificationPermissionPopup(
+    BuildContext context,
+  ) async {
     if (!Platform.isAndroid) return;
-    
+
     // Check if popup was already shown
     final prefs = await SharedPreferences.getInstance();
     final alreadyShown = prefs.getBool(_notificationPopupShownKey) ?? false;
     if (alreadyShown) return;
-    
+
     // Check if notification + exact alarm permission is already granted
     final notification = await Permission.notification.status;
     final alarm = await Permission.scheduleExactAlarm.status;
@@ -25,10 +27,10 @@ class PermissionService {
 
     // Mark as shown
     await prefs.setBool(_notificationPopupShownKey, true);
-    
+
     // Wait a moment for UI to settle
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     if (context.mounted) {
       _showNotificationReminderDialog(context);
     }
@@ -40,9 +42,7 @@ class PermissionService {
       barrierDismissible: true,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
             Icon(Icons.notifications_active, color: Color(0xFFD4AF37)),
@@ -50,10 +50,7 @@ class PermissionService {
             Expanded(
               child: Text(
                 'রিমাইন্ডার সেটআপ করুন',
-                style: TextStyle(
-                  color: Color(0xFFD4AF37),
-                  fontSize: 18,
-                ),
+                style: TextStyle(color: Color(0xFFD4AF37), fontSize: 18),
               ),
             ),
           ],
@@ -104,10 +101,7 @@ class PermissionService {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'পরে দিব',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('পরে দিব', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -133,13 +127,13 @@ class PermissionService {
   /// Check all required permissions and show dialog if needed
   static Future<void> checkAndRequestPermissions(BuildContext context) async {
     if (!Platform.isAndroid) return;
-    
+
     // Wait for the widget tree to be ready
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     final notification = await Permission.notification.status;
     final alarm = await Permission.scheduleExactAlarm.status;
-    
+
     if (!notification.isGranted || !alarm.isGranted) {
       if (context.mounted) {
         // Show only the GREEN setup dialog
@@ -152,17 +146,15 @@ class PermissionService {
     await DailyReminderService.scheduleDefaultDailyAmalReminder();
     await DailyReminderService.rescheduleReminderIfNeeded();
     await DailyReminderService.scheduleDefaultRollingWindowFromApi();
-
-
   }
 
   /// Check if all required permissions are granted
   static Future<bool> areAllPermissionsGranted() async {
     if (!Platform.isAndroid) return true;
-    
+
     final notification = await Permission.notification.status;
     final alarm = await Permission.scheduleExactAlarm.status;
-    
+
     return notification.isGranted && alarm.isGranted;
   }
 }

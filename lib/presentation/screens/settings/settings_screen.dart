@@ -19,10 +19,9 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch theme provider to rebuild when theme changes
     ref.watch(appThemeModeProvider);
-    
+
     final colors = Theme.of(context).colorScheme;
     final titleColor = colors.primary;
-
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -33,20 +32,22 @@ class SettingsScreen extends ConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[0],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[1],
-                Theme.of(context)
-                    .extension<GradientColors>()!
-                    .appBarGradient[2],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[0],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[1],
+                Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarGradient[2],
               ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).extension<GradientColors>()!.appBarBorder,
+                color: Theme.of(
+                  context,
+                ).extension<GradientColors>()!.appBarBorder,
                 width: 1.5,
               ),
             ),
@@ -64,7 +65,6 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: false,
-        
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -81,8 +81,9 @@ class SettingsScreen extends ConsumerWidget {
                   builder: (context) {
                     return SwitchListTile(
                       value: Theme.of(context).brightness == Brightness.light,
-                      onChanged: (v) => ref.read(appThemeModeProvider.notifier)
-                        .setTheme(v ? 'light' : 'dark'),
+                      onChanged: (v) => ref
+                          .read(appThemeModeProvider.notifier)
+                          .setTheme(v ? 'light' : 'dark'),
 
                       title: Text(
                         'theme_toggle'.tr(),
@@ -94,19 +95,21 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: Text(
                         'theme_subtitle'.tr(),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 12,
                         ),
                       ),
                       secondary: Icon(
-                        Theme.of(context).brightness == Brightness.dark 
-                            ? Icons.nightlight_round 
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Icons.nightlight_round
                             : Icons.wb_sunny_rounded,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       activeColor: Theme.of(context).colorScheme.primary,
                     );
-                  }
+                  },
                 ),
               ),
             ),
@@ -122,11 +125,16 @@ class SettingsScreen extends ConsumerWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.language_rounded,
-                        color: Theme.of(context).colorScheme.primary, size: 22),
+                    child: Icon(
+                      Icons.language_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 22,
+                    ),
                   ),
                   title: Text(
                     'language'.tr(),
@@ -139,12 +147,18 @@ class SettingsScreen extends ConsumerWidget {
                   subtitle: Text(
                     context.locale.languageCode == 'bn' ? 'বাংলা' : 'English',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 12,
                     ),
                   ),
-                  trailing: Icon(Icons.chevron_right,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45)),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.45),
+                  ),
                   onTap: () => _showLanguagePicker(context),
                 ),
               ),
@@ -157,52 +171,54 @@ class SettingsScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _softCard(
                 context: context,
-                child: Builder(builder: (context) {
-                  final authState = ref.watch(authProvider);
-                  final isLoggedIn = authState.isAuthenticated;
-                  final email = authState.user?.email;
-                  return Column(
-                    children: [
-                      _buildNavigationTile(
-                        context: context,
-                        icon: isLoggedIn
-                            ? Icons.account_circle_rounded
-                            : Icons.login_rounded,
-                        title: isLoggedIn ? 'account'.tr() : 'login'.tr(),
-                        subtitle: isLoggedIn
-                            ? (email ?? 'cloud_sync_active'.tr())
-                            : 'login_subtitle'.tr(),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => isLoggedIn
-                                  ? const ProfileScreen()
-                                  : const AuthScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      if (isLoggedIn) ...[
-                        _softDivider(context: context),
+                child: Builder(
+                  builder: (context) {
+                    final authState = ref.watch(authProvider);
+                    final isLoggedIn = authState.isAuthenticated;
+                    final email = authState.user?.email;
+                    return Column(
+                      children: [
                         _buildNavigationTile(
                           context: context,
-                          icon: Icons.person_outline,
-                          title: 'profile'.tr(),
-                          subtitle: 'profile_subtitle'.tr(),
+                          icon: isLoggedIn
+                              ? Icons.account_circle_rounded
+                              : Icons.login_rounded,
+                          title: isLoggedIn ? 'account'.tr() : 'login'.tr(),
+                          subtitle: isLoggedIn
+                              ? (email ?? 'cloud_sync_active'.tr())
+                              : 'login_subtitle'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ProfileScreen(),
+                                builder: (context) => isLoggedIn
+                                    ? const ProfileScreen()
+                                    : const AuthScreen(),
                               ),
                             );
                           },
                         ),
+                        if (isLoggedIn) ...[
+                          _softDivider(context: context),
+                          _buildNavigationTile(
+                            context: context,
+                            icon: Icons.person_outline,
+                            title: 'profile'.tr(),
+                            subtitle: 'profile_subtitle'.tr(),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ProfileScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ],
-                    ],
-                  );
-                }),
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -220,15 +236,8 @@ class SettingsScreen extends ConsumerWidget {
 
   // ---------- UI helpers (Premium card styling) ----------
 
-  Widget _softCard({
-    required BuildContext context,
-    required Widget child,
-  }) {
-    return buildPremiumCard(
-      context: context,
-      radius: 16,
-      child: child,
-    );
+  Widget _softCard({required BuildContext context, required Widget child}) {
+    return buildPremiumCard(context: context, radius: 16, child: child);
   }
 
   Widget _softDivider({required BuildContext context}) {
@@ -249,7 +258,6 @@ class SettingsScreen extends ConsumerWidget {
     final titleColor = Theme.of(context).colorScheme.onSurface;
     final subColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
 
-
     return ListTile(
       onTap: onTap,
       leading: Container(
@@ -258,7 +266,11 @@ class SettingsScreen extends ConsumerWidget {
           color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.primary,
+          size: 22,
+        ),
       ),
       title: Text(
         title,
@@ -268,13 +280,7 @@ class SettingsScreen extends ConsumerWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          color: subColor,
-          fontSize: 12,
-        ),
-      ),
+      subtitle: Text(subtitle, style: TextStyle(color: subColor, fontSize: 12)),
       trailing: Icon(
         Icons.chevron_right,
         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
@@ -285,7 +291,6 @@ class SettingsScreen extends ConsumerWidget {
   // ---------- About section (now supports light + dark) ----------
 
   Widget _buildAboutSection(BuildContext context) {
-
     final headerColor = Theme.of(context).colorScheme.primary;
     final titleColor = Theme.of(context).colorScheme.onSurface;
     final subColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.60);
@@ -314,7 +319,9 @@ class SettingsScreen extends ConsumerWidget {
             subColor: subColor,
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const UsageRulesScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const UsageRulesScreen(),
+                ),
               );
             },
           ),
@@ -370,7 +377,11 @@ class SettingsScreen extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 18),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 18,
+              ),
             ),
 
             const SizedBox(width: 12),
@@ -490,7 +501,9 @@ class SettingsScreen extends ConsumerWidget {
               : cs.surfaceContainerHighest.withOpacity(0.4),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? cs.primary.withOpacity(0.4) : Colors.transparent,
+            color: isSelected
+                ? cs.primary.withOpacity(0.4)
+                : Colors.transparent,
           ),
         ),
         child: Row(
@@ -574,7 +587,11 @@ class SettingsScreen extends ConsumerWidget {
                   SizedBox(width: 8),
                   Text(
                     'Amal Tracker',
-                    style: TextStyle(color: Color(0xFFD4AF37), fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Color(0xFFD4AF37),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -590,7 +607,9 @@ class SettingsScreen extends ConsumerWidget {
               Text(
                 '${'settings_build'.tr()}: 13',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
                 ),
               ),
@@ -598,16 +617,24 @@ class SettingsScreen extends ConsumerWidget {
               Text(
                 '${'settings_developer'.tr()}: Effy Tech',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
-                  final Uri emailUri = Uri(scheme: 'mailto', path: 'effttech@gmail.com');
+                  final Uri emailUri = Uri(
+                    scheme: 'mailto',
+                    path: 'effttech@gmail.com',
+                  );
                   try {
-                    await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+                    await launchUrl(
+                      emailUri,
+                      mode: LaunchMode.externalApplication,
+                    );
                   } catch (_) {}
                 },
                 child: const Text(
@@ -620,12 +647,18 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.10)),
+              Divider(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.10),
+              ),
               const SizedBox(height: 8),
               Text(
                 'settings_copyright'.tr(),
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 12,
                 ),
               ),
@@ -654,8 +687,10 @@ class SettingsScreen extends ConsumerWidget {
 
   String? _encodeQueryParameters(Map<String, String> params) {
     return params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
   }
 }
-

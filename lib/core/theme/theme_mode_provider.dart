@@ -5,8 +5,8 @@ import 'theme_storage.dart';
 /// Supports: 'light', 'dark', and future themes like 'green'
 final appThemeModeProvider =
     StateNotifierProvider<AppThemeModeController, String>(
-  (ref) => AppThemeModeController()..load(),
-);
+      (ref) => AppThemeModeController()..load(),
+    );
 
 class AppThemeModeController extends StateNotifier<String> {
   AppThemeModeController() : super('dark');

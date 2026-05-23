@@ -21,7 +21,7 @@ class TabSelector extends StatelessWidget {
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
     final shadowColor = Theme.of(context).shadowColor;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -37,8 +37,8 @@ class TabSelector extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: selectedTab == StatisticsTab.weekly 
-                      ? primary 
+                  color: selectedTab == StatisticsTab.weekly
+                      ? primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -46,8 +46,8 @@ class TabSelector extends StatelessWidget {
                   child: Text(
                     'stats_weekly'.tr(),
                     style: TextStyle(
-                      color: selectedTab == StatisticsTab.weekly 
-                          ? onPrimary 
+                      color: selectedTab == StatisticsTab.weekly
+                          ? onPrimary
                           : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -64,8 +64,8 @@ class TabSelector extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: selectedTab == StatisticsTab.monthly 
-                      ? primary 
+                  color: selectedTab == StatisticsTab.monthly
+                      ? primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -73,8 +73,8 @@ class TabSelector extends StatelessWidget {
                   child: Text(
                     'stats_monthly'.tr(),
                     style: TextStyle(
-                      color: selectedTab == StatisticsTab.monthly 
-                          ? onPrimary 
+                      color: selectedTab == StatisticsTab.monthly
+                          ? onPrimary
                           : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -91,8 +91,8 @@ class TabSelector extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: selectedTab == StatisticsTab.qaza 
-                      ? primary 
+                  color: selectedTab == StatisticsTab.qaza
+                      ? primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(26),
                 ),
@@ -100,8 +100,8 @@ class TabSelector extends StatelessWidget {
                   child: Text(
                     'stats_qaza'.tr(),
                     style: TextStyle(
-                      color: selectedTab == StatisticsTab.qaza 
-                          ? onPrimary 
+                      color: selectedTab == StatisticsTab.qaza
+                          ? onPrimary
                           : bulletTextColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,

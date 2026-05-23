@@ -8,11 +8,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  
+
   // Hive initialization - different for web
   if (kIsWeb) {
     await Hive.initFlutter('amal_tracker_db');
@@ -26,13 +25,10 @@ void main() async {
       supportedLocales: const [Locale('bn'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('bn'),
-      child: const ProviderScope(
-        child: AmalTrackerApp(),
-      ),
+      child: const ProviderScope(child: AmalTrackerApp()),
     ),
   );
 }
-
 
 class AmalTrackerApp extends ConsumerWidget {
   const AmalTrackerApp({super.key});

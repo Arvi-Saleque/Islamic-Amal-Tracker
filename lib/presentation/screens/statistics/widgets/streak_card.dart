@@ -19,7 +19,7 @@ class StreakCard extends StatelessWidget {
     final shadowColor = Theme.of(context).shadowColor;
     final gradients = Theme.of(context).extension<GradientColors>()!;
     final bulletTextColor = gradients.bulletTextColor;
-    
+
     return buildPremiumCard(
       context: context,
       radius: 18,
@@ -55,10 +55,7 @@ class StreakCard extends StatelessWidget {
                     ),
                     Text(
                       'stats_streak'.tr(),
-                      style: TextStyle(
-                        color: primary,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: primary, fontSize: 14),
                     ),
                   ],
                 ),
@@ -79,11 +76,7 @@ class StreakCard extends StatelessWidget {
                         color: primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(
-                        Icons.emoji_events,
-                        color: primary,
-                        size: 32,
-                      ),
+                      child: Icon(Icons.emoji_events, color: primary, size: 32),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -96,10 +89,7 @@ class StreakCard extends StatelessWidget {
                     ),
                     Text(
                       'stats_best_streak'.tr(),
-                      style: TextStyle(
-                        color: primary,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: primary, fontSize: 14),
                     ),
                   ],
                 ),
@@ -126,10 +116,7 @@ class StreakCard extends StatelessWidget {
                   child: Text(
                     'stats_streak_threshold'.tr(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: bulletTextColor,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: bulletTextColor, fontSize: 12),
                   ),
                 ),
               ],

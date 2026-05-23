@@ -30,15 +30,15 @@ class SinTrackerState {
 class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
   static const String _boxName = 'sin_tracker';
   static const String _sinTypesKey = 'sin_types';
-  
-  SinTrackerNotifier() : super(SinTrackerState(
-    todayRecord: DailySinRecord(
-      date: _getTodayDate(),
-      records: [],
-    ),
-    sinTypes: getDefaultSinTypes(),
-    isLoading: true,
-  )) {
+
+  SinTrackerNotifier()
+    : super(
+        SinTrackerState(
+          todayRecord: DailySinRecord(date: _getTodayDate(), records: []),
+          sinTypes: getDefaultSinTypes(),
+          isLoading: true,
+        ),
+      ) {
     _loadData();
   }
 
@@ -51,49 +51,52 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
     try {
       final box = await Hive.openBox(_boxName);
       final today = _getTodayDate();
-      
+
       // Load sin types (default + custom)
       final sinTypesData = box.get(_sinTypesKey);
       List<SinType> sinTypes = getDefaultSinTypes();
-      
+
       if (sinTypesData != null) {
         final List<dynamic> typesList = List<dynamic>.from(sinTypesData);
-        final customTypes = typesList.map((s) {
-          final map = _deepConvert(Map<String, dynamic>.from(s));
-          return SinType.fromJson(map);
-        }).where((t) => !t.isDefault).toList();
-        
+        final customTypes = typesList
+            .map((s) {
+              final map = _deepConvert(Map<String, dynamic>.from(s));
+              return SinType.fromJson(map);
+            })
+            .where((t) => !t.isDefault)
+            .toList();
+
         sinTypes = [...getDefaultSinTypes(), ...customTypes];
       }
-      
+
       // Load today's record
       final todayData = box.get(today);
       DailySinRecord todayRecord;
-      
+
       if (todayData != null) {
         final map = _deepConvert(Map<String, dynamic>.from(todayData));
         todayRecord = DailySinRecord.fromJson(map);
       } else {
         // Initialize with empty records for all sin types
         todayRecord = DailySinRecord(
-          date: today, 
+          date: today,
           records: sinTypes.map((t) => SinRecord(sinTypeId: t.id)).toList(),
         );
       }
-      
+
       // Ensure all sin types have a record
       final existingIds = todayRecord.records.map((r) => r.sinTypeId).toSet();
       final missingRecords = sinTypes
           .where((t) => !existingIds.contains(t.id))
           .map((t) => SinRecord(sinTypeId: t.id))
           .toList();
-      
+
       if (missingRecords.isNotEmpty) {
         todayRecord = todayRecord.copyWith(
           records: [...todayRecord.records, ...missingRecords],
         );
       }
-      
+
       state = SinTrackerState(
         todayRecord: todayRecord,
         sinTypes: sinTypes,
@@ -110,12 +113,15 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
       if (value is Map) {
         return MapEntry(key.toString(), _deepConvert(value));
       } else if (value is List) {
-        return MapEntry(key.toString(), value.map((item) {
-          if (item is Map) {
-            return _deepConvert(item);
-          }
-          return item;
-        }).toList());
+        return MapEntry(
+          key.toString(),
+          value.map((item) {
+            if (item is Map) {
+              return _deepConvert(item);
+            }
+            return item;
+          }).toList(),
+        );
       }
       return MapEntry(key.toString(), value);
     });
@@ -126,13 +132,13 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
       final box = await Hive.openBox(_boxName);
       final todayJson = state.todayRecord.toJson();
       await box.put(state.todayRecord.date, todayJson);
-      
+
       // Save custom sin types only
       final customTypes = state.sinTypes.where((t) => !t.isDefault).toList();
       final allTypes = [...getDefaultSinTypes(), ...customTypes];
       final typesJson = allTypes.map((t) => t.toJson()).toList();
       await box.put(_sinTypesKey, typesJson);
-      
+
       // Sync to cloud
       firestoreSyncService.syncSinTracker(state.todayRecord.date, todayJson);
       firestoreSyncService.syncSinTypes(typesJson.cast<Map<String, dynamic>>());
@@ -155,7 +161,7 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
       }
       return record;
     }).toList();
-    
+
     state = state.copyWith(
       todayRecord: state.todayRecord.copyWith(records: updatedRecords),
     );
@@ -166,14 +172,11 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
   void giveKaffara(String sinTypeId, String kaffaraType) {
     final updatedRecords = state.todayRecord.records.map((record) {
       if (record.sinTypeId == sinTypeId && record.hasSinned) {
-        return record.copyWith(
-          kaffaraDone: true,
-          kaffaraType: kaffaraType,
-        );
+        return record.copyWith(kaffaraDone: true, kaffaraType: kaffaraType);
       }
       return record;
     }).toList();
-    
+
     state = state.copyWith(
       todayRecord: state.todayRecord.copyWith(records: updatedRecords),
     );
@@ -193,7 +196,7 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
       }
       return record;
     }).toList();
-    
+
     state = state.copyWith(
       todayRecord: state.todayRecord.copyWith(records: updatedRecords),
     );
@@ -208,10 +211,10 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
       isDefault: false,
       icon: 'warning',
     );
-    
+
     // Add new record for this type
     final newRecord = SinRecord(sinTypeId: newType.id);
-    
+
     state = state.copyWith(
       sinTypes: [...state.sinTypes, newType],
       todayRecord: state.todayRecord.copyWith(
@@ -223,11 +226,13 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
 
   /// কাস্টম গুনাহের ধরন মুছে ফেলা
   void removeCustomSinType(String sinTypeId) {
-    final updatedTypes = state.sinTypes.where((t) => t.id != sinTypeId).toList();
+    final updatedTypes = state.sinTypes
+        .where((t) => t.id != sinTypeId)
+        .toList();
     final updatedRecords = state.todayRecord.records
         .where((r) => r.sinTypeId != sinTypeId)
         .toList();
-    
+
     state = state.copyWith(
       sinTypes: updatedTypes,
       todayRecord: state.todayRecord.copyWith(records: updatedRecords),
@@ -251,7 +256,7 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
     try {
       final box = await Hive.openBox(_boxName);
       final data = box.get(dateKey);
-      
+
       if (data != null) {
         final map = _deepConvert(Map<String, dynamic>.from(data));
         return DailySinRecord.fromJson(map);
@@ -268,20 +273,21 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
     try {
       final box = await Hive.openBox(_boxName);
       int totalSins = 0;
-      
+
       final now = DateTime.now();
       for (int i = 0; i < 7; i++) {
         final date = now.subtract(Duration(days: i));
-        final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        final dateKey =
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
         final data = box.get(dateKey);
-        
+
         if (data != null) {
           final map = _deepConvert(Map<String, dynamic>.from(data));
           final record = DailySinRecord.fromJson(map);
           totalSins += record.totalSinCount;
         }
       }
-      
+
       return totalSins;
     } catch (e) {
       print('Error getting weekly sin count: $e');
@@ -294,19 +300,20 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
     try {
       final box = await Hive.openBox(_boxName);
       int totalSins = 0;
-      
+
       final daysInMonth = DateTime(year, month + 1, 0).day;
       for (int day = 1; day <= daysInMonth; day++) {
-        final dateKey = '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
+        final dateKey =
+            '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
         final data = box.get(dateKey);
-        
+
         if (data != null) {
           final map = _deepConvert(Map<String, dynamic>.from(data));
           final record = DailySinRecord.fromJson(map);
           totalSins += record.totalSinCount;
         }
       }
-      
+
       return totalSins;
     } catch (e) {
       print('Error getting monthly sin count: $e');
@@ -315,6 +322,7 @@ class SinTrackerNotifier extends StateNotifier<SinTrackerState> {
   }
 }
 
-final sinTrackerProvider = StateNotifierProvider<SinTrackerNotifier, SinTrackerState>((ref) {
-  return SinTrackerNotifier();
-});
+final sinTrackerProvider =
+    StateNotifierProvider<SinTrackerNotifier, SinTrackerState>((ref) {
+      return SinTrackerNotifier();
+    });

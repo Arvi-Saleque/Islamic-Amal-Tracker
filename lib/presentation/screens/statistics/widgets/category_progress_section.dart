@@ -18,20 +18,30 @@ class CategoryProgressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    
+
     // Calculate averages based on view type
-    final stats = isMonthly && monthlyStats != null ? monthlyStats! : weeklyStats.days;
-    
+    final stats = isMonthly && monthlyStats != null
+        ? monthlyStats!
+        : weeklyStats.days;
+
     double avgPrayer = 0;
     double avgAmal = 0;
     double avgDhikr = 0;
     double avgReading = 0;
 
     if (stats.isNotEmpty) {
-      avgPrayer = stats.map((d) => d.prayerProgress).reduce((a, b) => a + b) / stats.length;
-      avgAmal = stats.map((d) => d.amalProgress).reduce((a, b) => a + b) / stats.length;
-      avgDhikr = stats.map((d) => d.dhikrProgress).reduce((a, b) => a + b) / stats.length;
-      avgReading = stats.map((d) => d.readingProgress).reduce((a, b) => a + b) / stats.length;
+      avgPrayer =
+          stats.map((d) => d.prayerProgress).reduce((a, b) => a + b) /
+          stats.length;
+      avgAmal =
+          stats.map((d) => d.amalProgress).reduce((a, b) => a + b) /
+          stats.length;
+      avgDhikr =
+          stats.map((d) => d.dhikrProgress).reduce((a, b) => a + b) /
+          stats.length;
+      avgReading =
+          stats.map((d) => d.readingProgress).reduce((a, b) => a + b) /
+          stats.length;
     }
 
     return buildPremiumCard(
@@ -116,11 +126,7 @@ class _CategoryProgressItem extends StatelessWidget {
             color: iconColor.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: 24,
-          ),
+          child: Icon(icon, color: iconColor, size: 24),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -153,7 +159,9 @@ class _CategoryProgressItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
-                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.1),
                   valueColor: AlwaysStoppedAnimation<Color>(iconColor),
                   minHeight: 6,
                 ),
